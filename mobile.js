@@ -56,8 +56,12 @@ async function carregarDadosPlanilha() {
             btn.setAttribute('data-zona', registro.reg);
             
             btn.innerHTML = `
-                <span>${registro.reg} ${registro.nomeCurto}</span>
-                <span class="estoque-label">${registro.estoque ? 'RESTAM ' + registro.estoque + ' UN.' : '-'}</span>
+                <div style="font-size: 0.7rem; color: #666; font-weight: bold;">${registro.reg}</div>
+                <div style="font-size: 1rem; color: #00713a; font-weight: 900; margin-bottom: 2px;">${registro.nomeCurto}</div>
+                <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #eee; pt-5">
+                    <span style="font-size: 0.8rem; font-weight: bold; color: #333;">${col[4] || 'Consultar'}</span>
+                    <span class="estoque-label" style="font-size: 0.6rem;">RESTAM ${registro.estoque} UN.</span>
+                </div>
             `;
 
             btn.onclick = () => selecionarEmpreendimento(registro, btn);
