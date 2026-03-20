@@ -12,21 +12,21 @@ html, body {
 
 * { box-sizing: border-box !important; font-family: sans-serif; }
 
-/* ==========================================================================
-   BLOCO 10 & 20: CONTAINER MESTRE (O PALCO)
-   ========================================================================== */
+/* ===================================================
+   BLOCO 10 & 20: FUNDAÇÃO (O Wrapper agora é o Pai)
+   =================================================== */
 .mobile-wrapper { 
     display: flex !important; 
     width: 100vw !important; 
     height: 100vh !important;
     overflow: hidden !important;
-    position: relative !important; /* Base para os elementos flutuantes */
+    position: relative !important; /* Essencial para a ficha flutuar */
     background: #fff;
 }
 
-/* ==========================================================================
-   BLOCO 30: FAIXA VERDE (75px e Ícones 200% maiores)
-   ========================================================================== */
+/* ===================================================
+   BLOCO 30: FAIXA VERDE (Fica no lugar)
+   =================================================== */
 .faixa-verde-vertical { 
     width: 75px !important; 
     height: 100% !important; 
@@ -40,61 +40,46 @@ html, body {
     z-index: 999 !important; 
 }
 
-.titulo-vertical { 
-    writing-mode: vertical-rl !important; 
-    transform: rotate(180deg) !important; 
-    color: #ffffff !important; 
-    font-weight: bold !important; 
-    font-size: 1.2rem !important; 
-    letter-spacing: 3px !important;
-}
-
-.icon-top, .icon-bottom {
-    color: #ffffff !important;
-    font-size: 3rem !important; /* Tamanho 200% para facilitar o toque */
-}
-
-/* ==========================================================================
-   BLOCO 40: MAPA (OCUPANDO O FUNDO TODO)
-   ========================================================================= */
+/* ===================================================
+   BLOCO 40: ÁREA DO MAPA (OCUPA O FUNDO)
+   =================================================== */
 .area-mapa {
     position: absolute !important;
-    top: 0;
-    left: 75px; /* Começa depois da faixa verde */
+    top: 0 !important;
+    left: 75px !important; /* Começa após a faixa verde */
     width: calc(100% - 75px) !important;
     height: 100% !important;
-    z-index: 1 !important; /* No fundo */
+    z-index: 1 !important; /* Fica por baixo de tudo */
     display: flex !important;
     align-items: center !important;
-    justify-content: flex-start !important;
 }
 
 .area-mapa svg {
     display: block;
     height: 100% !important;
-    width: auto !important; /* Deixa o SVG respirar */
-    margin-left: -105px !important; /* Seu mergulho perfeito */
+    width: auto !important; 
+    margin-left: -105px !important; /* O mergulho que você aprovou */
     filter: drop-shadow(5px 0 10px rgba(0,0,0,0.1));
 }
 
-/* ==========================================================================
-   BLOCO 50: FICHA TÉCNICA (A CAMADA SUPERIOR CINZA)
-   ========================================================================== */
-.area-ficha-teste {
+/* ===================================================
+   BLOCO 50: FICHA TÉCNICA (A CAIXA CINZA FLUTUANTE)
+   =================================================== */
+.ficha-tecnica { /* Nome corrigido conforme seu HTML */
     position: absolute !important;
     right: 20px !important; 
     top: 20px !important; 
     
-    width: 25% !important; 
+    width: 25% !important; /* 25% da tela conforme combinado */
     height: calc(100% - 40px) !important; 
     
-    background: #f4f4f4 !important; /* O cinza solicitado */
-    border: 1px solid #ccc !important;
+    background: #808080 !important; /* CINZA FORTE para visualizarmos bem */
+    color: #ffffff !important; /* Texto branco para o cinza escuro */
+    
     border-radius: 12px !important;
-    box-shadow: -10px 10px 30px rgba(0,0,0,0.2) !important;
+    box-shadow: -10px 10px 30px rgba(0,0,0,0.3) !important;
     
     padding: 20px !important;
-    z-index: 500 !important; /* Sempre acima do mapa */
+    z-index: 500 !important; /* Voa por cima do mapa */
     overflow-y: auto !important;
-    display: block !important; /* Garante que ela apareça */
 }
