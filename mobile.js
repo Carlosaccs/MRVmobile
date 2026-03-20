@@ -1,14 +1,13 @@
 /* ==========================================================================
-   BLOCO 01: CONFIGURAÇÕES E SELETORES
+   BLOCO 01: CONFIGURAÇÕES
    ========================================================================== */
-const containerMapa = document.getElementById('mapa-container');
-const listaBotoes = document.getElementById('lista-botoes');
-const fichaNome = document.getElementById('nome-imovel');
-const fichaDetalhes = document.getElementById('detalhes-imovel');
-const svgNS = "http://www.w3.org/2000/svg";
-
-// URL da planilha publicada como CSV
-const URL_PLANILHA_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSRKdJctOPQjKAtOZSDHyArD_H8SgKIouelAS1vF1d_-13pu7u_ic6J8nP3r0Ijd56WA-mbUmHjb4Me/pub?output=csv'; 
+      const containerMapa = document.getElementById('mapa-container');
+      const listaBotoes = document.getElementById('lista-botoes');
+      const fichaNome = document.getElementById('nome-imovel');
+      const fichaDetalhes = document.getElementById('detalhes-imovel');
+      const URL_PLANILHA_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSRKdJctOPQjKAtOZSDHyArD_H8SgKIouelAS1vF1d_-13pu7u_ic6J8nP3r0Ijd56WA-mbUmHjb4Me/pub?output=csv';
+      // URL da planilha publicada como CSV
+      const URL_PLANILHA_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSRKdJctOPQjKAtOZSDHyArD_H8SgKIouelAS1vF1d_-13pu7u_ic6J8nP3r0Ijd56WA-mbUmHjb4Me/pub?output=csv'; 
 
 /* ==========================================================================
    BLOCO 05: INICIALIZAÇÃO DO SISTEMA
@@ -26,53 +25,47 @@ window.onload = () => {
 };
 
 /* ==========================================================================
-   BLOCO 10: MOTOR DA PLANILHA (Leitura e Geração de Botões)
+   BLOCO 10: MOTOR DA PLANILHA (Ajuste de Colunas e Zonas)
    ========================================================================== */
 async function carregarDadosPlanilha() {
     try {
         const response = await fetch(URL_PLANILHA_CSV);
         const csvText = await response.text();
-        const linhas = csvText.split('\n').slice(1); // Pula o cabeçalho
+        const linhas = csvText.split('\n').slice(1);
 
         if (!listaBotoes) return;
         listaBotoes.innerHTML = '';
 
         linhas.forEach(linha => {
-            // Regex para separar por vírgula respeitando aspas
             const col = linha.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
-            
             if (col.length < 5) return;
 
-            // Tratamento dos dados conforme sua planilha
             const registro = {
-                idPath: col[0].replace(/"/g, '').trim(),      // Coluna A
-                zona: col[1]?.replace(/"/g, '').trim() || "", // Coluna B (Para o CSS de borda)
-                nomeExibicao: col[3].replace(/"/g, '').trim(),// Coluna D (Título do Card)
-                estoque: col[5]?.replace(/"/g, '').trim() || "0" // Coluna F
+                idPath: col[0].replace(/"/g, '').trim(),
+                zona: col[1]?.replace(/"/g, '').trim().toUpperCase() || "", // Pega ZO, ZL, etc.
+                nomeExibicao: col[3].replace(/"/g, '').trim(), // COLUNA D (Título)
+                estoque: col[5]?.replace(/"/g, '').trim() || "0" // COLUNA F (Subtítulo)
             };
 
             const btn = document.createElement('div');
             btn.className = 'btn-empreendimento';
+            btn.setAttribute('data-zona', registro.zona); // Essencial para a cor da borda
             
-            // Atribui a zona para o CSS pintar a borda colorida (Bloco 70.3 do CSS)
-            btn.setAttribute('data-zona', registro.zona);
-            
-            // HTML Interno do botão (Título Coluna D + Estoque Coluna F)
+            // Layout limpo: Coluna D em destaque e Coluna F embaixo
             btn.innerHTML = `
-                <div style="color: #333; font-size: 0.9rem; font-weight: 800; line-height: 1.1;">
+                <div style="color: #333; font-size: 0.85rem; font-weight: 800; text-transform: uppercase;">
                     ${registro.nomeExibicao}
                 </div>
-                <div style="margin-top: 5px; color: #888; font-size: 0.65rem; font-weight: bold; text-transform: uppercase;">
-                    Restam ${registro.estoque} unidades
+                <div style="margin-top: 4px; color: #666; font-size: 0.65rem; font-weight: bold;">
+                    RESTAM ${registro.estoque} UNIDADES
                 </div>
             `;
 
             btn.onclick = () => selecionarEmpreendimento(registro, btn);
             listaBotoes.appendChild(btn);
         });
-    } catch (e) { console.error("Erro na leitura da planilha:", e); }
+    } catch (e) { console.error("Erro v31:", e); }
 }
-
 /* ==========================================================================
    BLOCO 20: INTERAÇÃO (Clique no Botão)
    ========================================================================== */
@@ -120,7 +113,6 @@ function renderizarMapa(dados) {
         path.setAttribute("d", pData.d);
         path.setAttribute("id", pData.id);
         
-        // Define a cor base
         const corBase = pData.class === "semmrv" ? "#cccccc" : "#00713a";
         path.style.fill = corBase;
         path.setAttribute('data-original-fill', corBase);
@@ -134,7 +126,7 @@ function renderizarMapa(dados) {
             document.querySelectorAll('path').forEach(p => {
                 p.style.fill = p.getAttribute('data-original-fill');
             });
-            path.style.fill = "#ff8c00"; // Laranja ao clicar direto no mapa
+            path.style.fill = "#ff8c00"; 
         };
         g.appendChild(path);
     });
@@ -145,9 +137,15 @@ function renderizarMapa(dados) {
 }
 
 /* ==========================================================================
-   BLOCO 40: INTERFACE (Menu Lateral)
+   BLOCO 40: INTERFACE E INICIALIZAÇÃO (As tais 7 linhas)
    ========================================================================== */
-// Abre/Fecha Menu através do ícone de hambúrguer (icon-bottom)
+// 1. Comando que dispara tudo assim que a página abre
+window.onload = () => {
+    if (typeof MAPA_GSP !== 'undefined') renderizarMapa(MAPA_GSP);
+    carregarDadosPlanilha(); // Esta função puxa os dados e cria os botões
+};
+
+// 2. Comando que faz o ícone de hambúrguer (icon-bottom) abrir/fechar o menu
 const btnMenu = document.querySelector('.icon-bottom');
 if(btnMenu) {
     btnMenu.onclick = () => {
