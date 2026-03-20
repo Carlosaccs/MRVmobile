@@ -37,36 +37,34 @@ async function carregarDadosPlanilha() {
         if (!listaBotoes) return;
         listaBotoes.innerHTML = '';
 
-        linhas.forEach(linha => {
-            const col = linha.split(',');
-            if (col.length < 5) return;
+      linhas.forEach(linha => {
+    const col = linha.split(',');
+    if (col.length < 5) return;
 
-            const registro = {
-                idPath: col[0].trim(),
-                categoria: col[1].trim(),
-                nomeCurto: col[3].trim(),
-                estoque: col[5].trim(),
-                reg: col[13].trim(),
-                desc: col[17].trim()
-            };
+    const registro = {
+        reg: col[13]?.trim() || "",        // Ex: ZS
+        nomeCurto: col[3]?.trim() || "",   // Ex: Estoril
+        preco: col[4]?.trim() || "",       // Ex: R$ 250.000
+        estoque: col[5]?.trim() || "0"     // Ex: 83
+    };
 
-            const btn = document.createElement('div');
-            // Design: COMPLEXO (escuro), outros (branco)
-            btn.className = `btn-empreendimento ${registro.categoria === 'COMPLEXO' ? 'complexo' : ''}`;
-            btn.setAttribute('data-zona', registro.reg);
-            
-            btn.innerHTML = `
-                <div style="font-size: 0.7rem; color: #666; font-weight: bold;">${registro.reg}</div>
-                <div style="font-size: 1rem; color: #00713a; font-weight: 900; margin-bottom: 2px;">${registro.nomeCurto}</div>
-                <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #eee; pt-5">
-                    <span style="font-size: 0.8rem; font-weight: bold; color: #333;">${col[4] || 'Consultar'}</span>
-                    <span class="estoque-label" style="font-size: 0.6rem;">RESTAM ${registro.estoque} UN.</span>
-                </div>
-            `;
+    const btn = document.createElement('div');
+    btn.className = 'btn-empreendimento';
+    
+    // HTML limpo: Nome em destaque e Preço/Estoque embaixo
+    btn.innerHTML = `
+        <div style="color: #00713a; font-size: 1.1rem; font-weight: 800; margin-bottom: 5px;">
+            ${registro.reg} ${registro.nomeCurto}
+        </div>
+        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+            <span style="color: #333; font-weight: bold; font-size: 0.9rem;">${registro.preco}</span>
+            <span style="color: #888; font-size: 0.7rem; font-weight: normal;">RESTAM ${registro.estoque} UN.</span>
+        </div>
+    `;
 
-            btn.onclick = () => selecionarEmpreendimento(registro, btn);
-            listaBotoes.appendChild(btn);
-        });
+    btn.onclick = () => selecionarEmpreendimento(registro, btn);
+    listaBotoes.appendChild(btn);
+});
     } catch (e) {
         console.error("Erro ao ler planilha:", e);
     }
