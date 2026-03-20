@@ -1,0 +1,74 @@
+/* ==========================================================================
+   BLOCO 05: FUNDAÇÃO DA TELA
+   ========================================================================== */
+html, body { 
+    margin: 0 !important; 
+    padding: 0 !important; 
+    width: 100% !important; 
+    height: 100% !important; 
+    overflow: hidden !important;
+    background: #fff; 
+}
+
+* { box-sizing: border-box !important; font-family: sans-serif; }
+
+/* ==========================================================================
+   BLOCO 10: CONTAINER MESTRE
+   ========================================================================== */
+.mobile-wrapper { 
+    display: flex !important; 
+    flex-direction: row !important; /* Disposição Horizontal */
+    width: 100vw !important; 
+    height: 100vh !important; 
+}
+
+/* ==========================================================================
+   BLOCO 20: FAIXA VERDE (Ocupa apenas o necessário)
+   ========================================================================== */
+.faixa-verde-vertical { 
+    width: 50px !important; 
+    height: 100% !important; 
+    background: #00713a !important; 
+    display: flex !important; 
+    flex-direction: column !important;
+    align-items: center !important; 
+    justify-content: space-between !important; 
+    padding: 15px 0 !important;
+    flex-shrink: 0 !important; 
+}
+
+.titulo-vertical { 
+    writing-mode: vertical-rl; 
+    transform: rotate(180deg); 
+    color: white; 
+    font-weight: bold; 
+    font-size: 0.8rem; 
+    letter-spacing: 2px;
+}
+
+/* ==========================================================================
+   BLOCO 30: ÁREA DO MAPA (70% do que sobra)
+   ========================================================================== */
+.area-mapa-teste { 
+    width: 70% !important; 
+    height: 100% !important;
+    background: #eeeeee !important; /* Cinza para vermos o limite */
+    display: flex !important; 
+    align-items: center !important; 
+    justify-content: center !important;
+    border-right: 2px solid #ddd;
+}
+
+/* ==========================================================================
+   BLOCO 40: ÁREA DA FICHA (30% do que sobra)
+   ========================================================================== */
+.area-ficha-teste {
+    flex: 1 !important; /* Pega o restante (30%) */
+    height: 100% !important;
+    background: #fff5eb !important; /* Laranja suave para vermos o limite */
+    display: flex !important; 
+    flex-direction: column !important;
+    align-items: center !important; 
+    justify-content: center !important;
+    padding: 10px;
+}
