@@ -47,18 +47,31 @@ html, body {
 }
 
 /* ==========================================================================
-   BLOCO 30: ÁREA DO MAPA (70% do que sobra)
+   BLOCO 30: FAIXA VERDE VERTICAL (MAIS LARGA - 75px)
    ========================================================================== */
-.area-mapa-teste { 
-    width: 70% !important; 
-    height: 100% !important;
-    background: #eeeeee !important; /* Cinza para vermos o limite */
+.faixa-verde-vertical { 
+    width: 75px !important; /* Aumentado 50% de 50px */
+    height: 100% !important; 
+    background: #00713a !important; 
     display: flex !important; 
+    flex-direction: column !important;
     align-items: center !important; 
-    justify-content: center !important;
-    border-right: 2px solid #ddd;
+    justify-content: space-between !important; 
+    padding: 15px 0 !important;
+    flex-shrink: 0 !important; 
+    z-index: 200 !important; /* Aumentado o z-index para mergulho */
 }
 
+/* Título Vertical (Aumentado Fonte e Espaçamento) */
+.titulo-vertical { 
+    writing-mode: vertical-rl; 
+    transform: rotate(180deg); 
+    color: white; 
+    font-weight: bold; 
+    font-size: 1rem; /* Aumentado de 0.8rem */
+    letter-spacing: 3px; /* Aumentado de 2px */
+    font-family: sans-serif;
+}
 /* ==========================================================================
    BLOCO 40: ÁREA DA FICHA (30% do que sobra)
    ========================================================================== */
