@@ -63,39 +63,23 @@ html, body {
 }
 
 /* ==========================================================================
-   BLOCO 40 (Revisado): ÁREA DO MAPA (AUMENTADO PARA 75% + VAZAMENTO)
+   BLOCO 40 (Ajuste Fino): RECUANDO O MAPA PARA FORA DA FAIXA
    ========================================================================= */
-.area-mapa { 
-    /* AUMENTO AGRESSIVO CONFORME SOLICITADO */
-    width: 75% !important; /* Passou de 60% para 75% */
-    
-    height: 100% !important;
-    background: transparent !important; 
-    
-    /* Puxa a caixa para a extrema esquerda */
-    margin-left: -75px !important; 
-    padding-left: 0 !important;
-    
-    display: flex !important; 
-    align-items: center !important; 
-    justify-content: flex-start !important; 
-    z-index: 1 !important; 
-    overflow: visible !important; /* CRUCIAL: Permite que o mapa vaze */
-    position: relative;
-}
-
-/* ESTICANDO O MAPA PARA VAZAR NO CONTAINER MAIOR */
 .area-mapa svg {
     display: block;
     height: 100% !important;
     
-    /* VAZAMENTO: O mapa precisa ser ainda maior para o container novo de 75% */
-    width: 115% !important; /* Mapa 115% do container de 75% (esticando ainda mais) */
-    margin-left: -125px !important; /* "Chuta" o mapa 125px para a esquerda (mais agressivo) */
+    /* AUMENTO: Mantemos ele grande para preencher a tela */
+    width: 115% !important; 
     
-    filter: drop-shadow(-5px 0 10px rgba(0,0,0,0.1)); /* Sombra para profundidade */
+    /* RECUO: Mudamos de -125px para -40px. 
+       Isso tira os caminhos verdes debaixo da faixa de 75px, 
+       mas mantém o efeito de que o mapa começa "do nada". */
+    margin-left: -40px !important; 
+    
+    filter: drop-shadow(5px 0 10px rgba(0,0,0,0.1));
+    transition: margin-left 0.3s ease; /* Transição suave caso mudemos de estado */
 }
-
 /* ==========================================================================
    BLOCO 50 (Revisado): ÁREA DA FICHA (DIMINUÍDO PARA 25%)
    ========================================================================== */
