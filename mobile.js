@@ -25,7 +25,7 @@ function renderizarMapa(dadosEstado) {
     svg.setAttribute("viewBox", dadosEstado.viewBox);
     svg.setAttribute("width", "100%");
     svg.setAttribute("height", "100%");
-    svg.setAttribute("preserveAspectRatio", "xMidYMid meet");
+    svg.setAttribute("preserveAspectRatio", "xMinYMid meet");
 
     // Grupo principal com a transformação de escala/posicionamento
     const grupoPrincipal = document.createElementNS(svgNS, "g");
