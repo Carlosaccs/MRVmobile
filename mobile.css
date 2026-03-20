@@ -63,45 +63,50 @@ html, body {
 }
 
 /* ==========================================================================
-   BLOCO 40: ÁREA DO MAPA (COM EFEITO DE VAZAMENTO)
+   BLOCO 40 (Revisado): ÁREA DO MAPA (AUMENTADO PARA 75% + VAZAMENTO)
    ========================================================================= */
 .area-mapa { 
-    width: 60% !important; /* Mantemos a proporção da caixa */
-    height: 100% !important;
-    background: transparent !important; /* Removemos a cor cinza para o mapa "vazar" */
+    /* AUMENTO AGRESSIVO CONFORME SOLICITADO */
+    width: 75% !important; /* Passou de 60% para 75% */
     
-    margin-left: -75px !important; /* Puxa a caixa para a extrema esquerda */
+    height: 100% !important;
+    background: transparent !important; 
+    
+    /* Puxa a caixa para a extrema esquerda */
+    margin-left: -75px !important; 
     padding-left: 0 !important;
     
     display: flex !important; 
     align-items: center !important; 
-    justify-content: flex-start !important; /* Ancorado à esquerda */
-    z-index: 1 !important; /* Abaixo da faixa verde */
+    justify-content: flex-start !important; 
+    z-index: 1 !important; 
     overflow: visible !important; /* CRUCIAL: Permite que o mapa vaze */
     position: relative;
 }
 
-/* ESTICANDO O MAPA PARA VAZAR */
+/* ESTICANDO O MAPA PARA VAZAR NO CONTAINER MAIOR */
 .area-mapa svg {
     display: block;
     height: 100% !important;
     
-    /* SEGREDOS DE VAZAMENTO */
-    width: 110% !important; /* Mapa maior que a caixa (110% do container) */
-    margin-left: -100px !important; /* "Chuta" o mapa 100px para a esquerda */
+    /* VAZAMENTO: O mapa precisa ser ainda maior para o container novo de 75% */
+    width: 115% !important; /* Mapa 115% do container de 75% (esticando ainda mais) */
+    margin-left: -125px !important; /* "Chuta" o mapa 125px para a esquerda (mais agressivo) */
     
     filter: drop-shadow(-5px 0 10px rgba(0,0,0,0.1)); /* Sombra para profundidade */
 }
 
 /* ==========================================================================
-   BLOCO 50: ÁREA DA FICHA (40%)
+   BLOCO 50 (Revisado): ÁREA DA FICHA (DIMINUÍDO PARA 25%)
    ========================================================================== */
 .area-ficha-teste {
-    width: 40% !important; /* Aumentado conforme solicitado */
+    /* DIMINUIÇÃO CONFORME SOLICITADO */
+    width: 25% !important; /* Passou de 40% para 25% */
+    
     height: 100% !important;
     background: #fff5eb !important;
     border-left: 4px solid #ff8c00;
     padding: 20px;
     z-index: 10;
-    box-shadow: -5px 0 15px rgba(0,0,0,0.1); /* Sombra suave para separar do mapa */
+    box-shadow: -5px 0 15px rgba(0,0,0,0.1); /* Sombra para separar do mapa */
 }
