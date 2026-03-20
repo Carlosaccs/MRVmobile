@@ -47,30 +47,22 @@ html, body {
 }
 
 /* ==========================================================================
-   BLOCO 30: FAIXA VERDE VERTICAL (MAIS LARGA - 75px)
+   BLOCO 30 (Revisado): CONTAINER DO MAPA (70%) - COM EFEITO DE MERGULHO
    ========================================================================== */
-.faixa-verde-vertical { 
-    width: 75px !important; /* Aumentado 50% de 50px */
-    height: 100% !important; 
-    background: #00713a !important; 
+.area-mapa-teste { 
+    width: 70% !important; 
+    height: 100% !important;
+    background: #eeeeee !important; 
     display: flex !important; 
-    flex-direction: column !important;
     align-items: center !important; 
-    justify-content: space-between !important; 
-    padding: 15px 0 !important;
-    flex-shrink: 0 !important; 
-    z-index: 200 !important; /* Aumentado o z-index para mergulho */
-}
-
-/* Título Vertical (Aumentado Fonte e Espaçamento) */
-.titulo-vertical { 
-    writing-mode: vertical-rl; 
-    transform: rotate(180deg); 
-    color: white; 
-    font-weight: bold; 
-    font-size: 1rem; /* Aumentado de 0.8rem */
-    letter-spacing: 3px; /* Aumentado de 2px */
-    font-family: sans-serif;
+    justify-content: center !important;
+    
+    /* SEGREDOS DE ENGENHARIA PARA MERGULHO */
+    margin-left: -50px !important; /* Puxa o mapa para baixo da faixa verde */
+    padding-left: 50px !important; /* Compensa o puxão para o conteúdo não fugir */
+    z-index: 1 !important; /* Coloca o mapa em uma camada inferior à faixa */
+    
+    border-right: 2px solid #ddd;
 }
 /* ==========================================================================
    BLOCO 40: ÁREA DA FICHA (30% do que sobra)
