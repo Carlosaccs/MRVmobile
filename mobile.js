@@ -1,36 +1,44 @@
 /* ==========================================================================
-   CONFIGURAÇÕES E SELETORES
+   CONFIGURAÇÕES E SELETORES (Sincronizados com o HTML v25)
    ========================================================================== */
-const containerMapa = document.getElementById('mapa-container');
+// Ajustado: Seu HTML usa a classe 'area-mapa' como container
+const containerMapa = document.querySelector('.area-mapa'); 
 const fichaNome = document.getElementById('nome-imovel');
 const fichaDetalhes = document.getElementById('detalhes-imovel');
-const svgNS = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSRKdJctOPQjKAtOZSDHyArD_H8SgKIouelAS1vF1d_-13pu7u_ic6J8nP3r0Ijd56WA-mbUmHjb4Me/pub?output=csv";
+const svgNS = "http://www.w3.org/2000/svg";
 
-// COLOQUE AQUI O LINK DA SUA PLANILHA PUBLICADA COMO CSV
-const URL_PLANILHA_CSV = 'SUA_URL_DA_PLANILHA_AQUI'; 
+// URL da sua planilha (Já no formato CSV para o JS ler)
+const URL_PLANILHA_CSV = 'https://docs.google.com/spreadsheets/d/15V194P2JPGCCPpCTKJsib8sJuCZPgtbNb-rtgNaLS7E/pub?output=csv'; 
 
 /* ==========================================================================
-   INICIALIZAÇÃO E CARREGAMENTO DE DADOS
+   INICIALIZAÇÃO
    ========================================================================== */
 window.onload = () => {
-    renderizarMapa(MAPA_GSP); // Inicia o mapa
-    carregarDadosPlanilha();  // Inicia a lista de botões
+    if (typeof MAPA_GSP !== 'undefined') {
+        renderizarMapa(MAPA_GSP); // Tenta carregar o mapa do seu mapa-SP.js
+    } else {
+        console.error("Erro: O arquivo mapa-SP.js não foi carregado.");
+    }
+    carregarDadosPlanilha(); // Tenta carregar os botões da planilha
 };
 
+/* ==========================================================================
+   MOTOR DA PLANILHA (Gerador de Botões)
+   ========================================================================== */
 async function carregarDadosPlanilha() {
     try {
         const response = await fetch(URL_PLANILHA_CSV);
         const csvText = await response.text();
-        const linhas = csvText.split('\n').slice(1); // Pula o cabeçalho
+        const linhas = csvText.split('\n').slice(1); 
 
         const listaBotoes = document.getElementById('lista-botoes');
+        if (!listaBotoes) return;
         listaBotoes.innerHTML = '';
 
         linhas.forEach(linha => {
             const col = linha.split(',');
             if (col.length < 5) return;
 
-            // Mapeamento das colunas conforme sua lista
             const registro = {
                 idPath: col[0].trim(),
                 categoria: col[1].trim(),
@@ -40,8 +48,8 @@ async function carregarDadosPlanilha() {
                 desc: col[17].trim()
             };
 
-            // Criar o botão seguindo o design do print laranja/escuro
             const btn = document.createElement('div');
+            // Aplica o design do print: escuro para COMPLEXO, branco para o resto
             btn.className = `btn-empreendimento ${registro.categoria === 'COMPLEXO' ? 'complexo' : ''}`;
             btn.setAttribute('data-zona', registro.reg);
             
@@ -50,83 +58,59 @@ async function carregarDadosPlanilha() {
                 <span class="estoque-label">${registro.estoque ? 'RESTAM ' + registro.estoque + ' UN.' : '-'}</span>
             `;
 
-            btn.onclick = () => clicarNoBotao(registro, btn);
+            btn.onclick = () => selecionarEmpreendimento(registro, btn);
             listaBotoes.appendChild(btn);
         });
-    } catch (e) { console.error("Erro ao carregar CSV:", e); }
+    } catch (e) { console.error("Erro no CSV:", e); }
 }
 
-/* ==========================================================================
-   INTERAÇÃO: BOTÃO -> MAPA -> FICHA
-   ========================================================================== */
-function clicarNoBotao(registro, elementoBtn) {
-    // 1. Destaque visual no botão (Laranja)
+function selecionarEmpreendimento(reg, elemento) {
     document.querySelectorAll('.btn-empreendimento').forEach(b => b.classList.remove('ativo'));
-    elementoBtn.classList.add('ativo');
+    elemento.classList.add('ativo');
 
-    // 2. Atualizar a Ficha Técnica
-    fichaNome.innerText = registro.nomeCurto;
-    fichaDetalhes.innerHTML = `
-        <p style="margin-top:10px;">${registro.desc}</p>
-        <p><strong>Regional:</strong> ${registro.reg}</p>
-    `;
+    fichaNome.innerText = reg.nomeCurto;
+    fichaDetalhes.innerHTML = `<p>${reg.desc}</p><p><strong>Status:</strong> ${reg.estoque} unidades.</p>`;
 
-    // 3. Comandar o Mapa (Encontrar o path pelo ID)
-    document.querySelectorAll('path').forEach(p => {
-        p.style.fill = "#00713a"; // Reseta todos para verde MRV
-        p.style.strokeWidth = "2";
-    });
-
-    const regiaoNoMapa = document.getElementById(registro.idPath);
-    if (regiaoNoMapa) {
-        regiaoNoMapa.style.fill = "#ff8c00"; // Pinta a região de Laranja
-        regiaoNoMapa.style.strokeWidth = "5";
-        // Opcional: Centralizar ou dar zoom (podemos fazer depois)
-    }
+    // Pinta a região no mapa
+    document.querySelectorAll('path').forEach(p => p.style.fill = "#00713a");
+    const shape = document.getElementById(reg.idPath);
+    if (shape) { shape.style.fill = "#ff8c00"; }
 }
 
 /* ==========================================================================
-   MOTOR DO MAPA (MANTER O QUE VOCÊ JÁ TINHA)
+   MOTOR DO MAPA (Engine SVG)
    ========================================================================== */
-function renderizarMapa(dadosEstado) {
-    if (!dadosEstado) return;
+function renderizarMapa(dados) {
+    if (!containerMapa || !dados) return;
+    
     const svg = document.createElementNS(svgNS, "svg");
-    svg.setAttribute("viewBox", dadosEstado.viewBox);
+    svg.setAttribute("viewBox", dados.viewBox);
     svg.setAttribute("width", "100%");
     svg.setAttribute("height", "100%");
     svg.setAttribute("preserveAspectRatio", "xMinYMid meet");
 
-    const grupoPrincipal = document.createElementNS(svgNS, "g");
-    grupoPrincipal.setAttribute("transform", dadosEstado.transform);
+    const g = document.createElementNS(svgNS, "g");
+    g.setAttribute("transform", dados.transform);
 
-    dadosEstado.paths.forEach(pathData => {
+    dados.paths.forEach(pData => {
         const path = document.createElementNS(svgNS, "path");
-        path.setAttribute("d", pathData.d);
-        path.setAttribute("id", pathData.id);
-        path.setAttribute("class", pathData.class || "regiao-padrao");
-        path.style.fill = pathData.class === "semmrv" ? "#cccccc" : "#00713a";
+        path.setAttribute("d", pData.d);
+        path.setAttribute("id", pData.id);
+        path.style.fill = pData.class === "semmrv" ? "#cccccc" : "#00713a";
         path.style.stroke = "#ffffff";
         path.style.strokeWidth = "2";
-        path.style.cursor = "pointer";
-
+        
         path.onclick = () => {
-            // Se clicar no mapa, ele tenta achar o botão correspondente
-            atualizarFicha(pathData);
+            fichaNome.innerText = pData.name;
             document.querySelectorAll('path').forEach(p => p.style.fill = "#00713a");
             path.style.fill = "#ff8c00";
         };
-
-        grupoPrincipal.appendChild(path);
+        g.appendChild(path);
     });
 
-    svg.appendChild(grupoPrincipal);
+    svg.appendChild(g);
     containerMapa.innerHTML = "";
     containerMapa.appendChild(svg);
-}
-
-function atualizarFicha(item) {
-    fichaNome.innerText = item.name;
-    fichaDetalhes.innerHTML = `<p>Toque em um empreendimento no menu para ver detalhes.</p>`;
 }
 
 // Controle do Menu
