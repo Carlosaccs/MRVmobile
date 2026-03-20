@@ -206,13 +206,48 @@ html, body {
 /* ==========================================================================
    BLOCO 70: ESTILIZAÇÃO DOS BOTÕES DO MENU (v23)
    ========================================================================== */
+/* ==========================================================================
+   MENU LATERAL (v27 - Limpo e 150% maior)
+   ========================================================================== */
+.menu-lateral {
+    position: absolute !important;
+    top: 0 !important;
+    left: 60px !important; /* Lado da faixa verde */
+    width: 320px !important; /* Aumentado conforme solicitado */
+    height: 100% !important;
+    background: transparent !important; /* Sem fundo */
+    z-index: 999 !important;
+    transition: transform 0.3s ease !important;
+    transform: translateX(-110%); /* Começa escondido */
+    border: none !important;
+}
+
+.menu-lateral.aberto {
+    transform: translateX(0) !important;
+}
+
+/* CARROSSEL SEM BARRAS DE ROLAGEM */
 .carrossel-botoes {
-    display: flex;
-    flex-direction: column;
-    gap: 10px; /* Espaçamento entre botões */
-    overflow-y: auto; /* Permite scroll se a lista for grande */
-    height: calc(100vh - 100px); /* Altura do carrossel */
-    padding-bottom: 20px;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 10px !important;
+    padding: 20px 10px !important;
+    height: 100% !important;
+    overflow-y: scroll !important; /* Mantém o carrossel ativo */
+    scrollbar-width: none !important; /* Esconde barra no Firefox */
+    -webkit-overflow-scrolling: touch !important;
+}
+
+.carrossel-botoes::-webkit-scrollbar {
+    display: none !important; /* Esconde barra no Chrome/Safari */
+}
+
+/* Ajuste dos cards para não ocuparem a largura toda se não quiser */
+.btn-empreendimento {
+    width: 95% !important;
+    background: white !important; /* Os cards continuam brancos para leitura */
+    border-radius: 5px !important;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1) !important;
 }
 
 /* Base do Botão */
