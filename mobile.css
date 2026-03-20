@@ -25,25 +25,23 @@ html, body {
 }
 
 /* ==========================================================================
-   BLOCO 30: FAIXA VERDE (PRIORIDADE MÁXIMA)
+   BLOCO 30: FAIXA VERDE (FIXA E SOBREPOSTA)
    ========================================================================== */
 .faixa-verde-vertical { 
+    position: fixed !important; /* Muda para fixed para garantir que nada a cubra */
+    left: 0 !important;
+    top: 0 !important;
     width: 75px !important; 
-    height: 100% !important; 
+    height: 100vh !important; 
     background: #00713a !important; 
+    z-index: 2000 !important; /* Dobro da ficha técnica para garantir os ícones */
+    
     display: flex !important; 
     flex-direction: column !important;
     align-items: center !important; 
     justify-content: space-between !important; 
     padding: 30px 0 !important; 
-    flex-shrink: 0 !important; 
-    
-    /* O SEGREDO: z-index maior que o do mapa e da ficha */
-    position: relative !important;
-    z-index: 1000 !important; 
-    box-shadow: 5px 0 15px rgba(0,0,0,0.2) !important;
 }
-
 /* ==========================================================================
    BLOCO 40: ÁREA DO MAPA (RECUEI PARA NÃO BATER NA FAIXA)
    ========================================================================= */
@@ -95,4 +93,16 @@ html, body {
     z-index: 500 !important; /* Mantém por cima do mapa */
     overflow-y: auto !important; /* Scroll se o texto for grande */
     display: block !important;
+}
+/* ==========================================================================
+   INDICADOR DE VERSÃO (VALIDADOR DE CACHE)
+   ========================================================================== */
+.ficha-tecnica::after {
+    content: "CSS Ativo: v=18"; /* Mude aqui toda vez que mudar a versão */
+    position: absolute;
+    bottom: 10px;
+    right: 15px;
+    font-size: 10px;
+    color: rgba(255, 255, 255, 0.4); /* Branco bem discreto */
+    letter-spacing: 1px;
 }
