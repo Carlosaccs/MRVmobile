@@ -63,24 +63,23 @@ html, body {
 }
 
 /* ==========================================================================
-   BLOCO 40 (Ajuste Fino): RECUANDO O MAPA PARA FORA DA FAIXA
+   BLOCO 40 (Revisado): O EQUILÍBRIO DO MERGULHO (-85px)
    ========================================================================= */
 .area-mapa svg {
     display: block;
     height: 100% !important;
     
-    /* AUMENTO: Mantemos ele grande para preencher a tela */
+    /* AUMENTO AGRESSIVO: Mantemos ele grande para preencher a tela */
     width: 115% !important; 
     
-    /* RECUO: Mudamos de -125px para -40px. 
-       Isso tira os caminhos verdes debaixo da faixa de 75px, 
-       mas mantém o efeito de que o mapa começa "do nada". */
-    margin-left: -40px !important; 
+    /* RECUO DE EQUILÍBRIO (-85px): 
+       Ponto ideal para liberar os paths verdes da zona oeste, 
+       mas manter o mapa encostado na faixa verde de 75px. 
+       Elimina o vão branco exagerado. */
+    margin-left: -85px !important; 
     
     filter: drop-shadow(5px 0 10px rgba(0,0,0,0.1));
-    transition: margin-left 0.3s ease; /* Transição suave caso mudemos de estado */
-}
-/* ==========================================================================
+}/* ==========================================================================
    BLOCO 50 (Revisado): ÁREA DA FICHA (DIMINUÍDO PARA 25%)
    ========================================================================== */
 .area-ficha-teste {
