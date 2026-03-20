@@ -265,3 +265,9 @@ html, body {
 .btn-empreendimento.ativo .estoque-label {
     color: #ffffff;
 }
+/* Isso no final do seu mobile.css */
+
+.ficha-tecnica::after {
+    content: "CSS Ativo: v=23" !important; /* <--- O "CÓDIGO" É ESSE TEXTO AQUI */
+    /* ... resto das configurações de posição e cor ... */
+}
