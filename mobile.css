@@ -279,3 +279,18 @@ html, body {
     z-index: 10000 !important;
     display: block !important;
 }
+
+/* Garante que o container dos botões seja visível */
+.carrossel-botoes {
+    display: flex !important;
+    flex-direction: column !important;
+    padding: 20px !important;
+    gap: 12px !important;
+    overflow-y: auto !important;
+}
+
+/* Estilo para quando o botão for um COMPLEXO (Fundo Escuro) */
+.btn-empreendimento.complexo {
+    background-color: #1a1a1a !important;
+    color: #ffffff !important;
+}
