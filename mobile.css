@@ -158,3 +158,47 @@ html, body {
     margin-left: -105px !important; 
     filter: drop-shadow(5px 0 10px rgba(0,0,0,0.1));
 }
+/* ==========================================================================
+   MENU FLUTUANTE (CIDADES)
+   ========================================================================== */
+.menu-lateral {
+    position: absolute !important;
+    left: -250px; /* Começa escondido atrás da faixa verde */
+    top: 0;
+    width: 250px !important;
+    height: 100vh !important;
+    background: #004d28 !important; /* Verde mais escuro que a faixa */
+    z-index: 1500 !important; /* Acima do mapa, abaixo da faixa verde */
+    transition: left 0.3s ease; /* Efeito de deslizar */
+    padding: 30px 20px 30px 85px !important; /* 85px para não ficar sob a faixa */
+}
+
+/* Classe que será ativada via JavaScript */
+.menu-lateral.aberto {
+    left: 0 !important;
+}
+
+.menu-header {
+    color: #fff;
+    font-weight: bold;
+    border-bottom: 2px solid #00713a;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+.menu-lateral ul {
+    list-style: none;
+    padding: 0;
+}
+
+.menu-lateral li {
+    color: white;
+    padding: 15px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    cursor: pointer;
+    font-size: 1.1rem;
+}
+
+.menu-lateral li:hover {
+    color: #00ff00;
+}
