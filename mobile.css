@@ -77,26 +77,36 @@ html, body {
     filter: drop-shadow(5px 0 10px rgba(0,0,0,0.1));
 }
 /* ==========================================================================
-   BLOCO 50: ÁREA DA FICHA (FLUTUANTE SOBRE O MAPA)
+   BLOCO 50: ÁREA DA FICHA (FLUTUANTE E FIXA)
    ========================================================================== */
 .area-ficha-teste {
-    width: 25% !important; /* Mantemos os 25% de largura */
-    height: calc(100% - 40px) !important; /* Altura total menos margens */
+    /* Largura de 25% conforme o equilíbrio de 15% que fizemos */
+    width: 25% !important; 
+    height: calc(100% - 40px) !important; 
     
-    /* COR DE FUNDO PARA VISUALIZAÇÃO */
-    background: #fff5eb !important; /* Bege suave para contraste */
+    /* COR DE FUNDO CINZA PARA VISUALIZAÇÃO */
+    background: #f4f4f4 !important; /* Cinza claro e sólido */
     
-    /* POSICIONAMENTO FLUTUANTE */
+    /* POSICIONAMENTO: Flutuando sobre o mapa */
     position: absolute !important;
-    right: 20px !important; /* Afastado da borda direita */
-    top: 20px !important;   /* Afastado do topo */
+    right: 20px !important; 
+    top: 20px !important; 
     
-    /* ACABAMENTO DE ALTO PADRÃO */
-    border-radius: 15px !important; /* Bordas arredondadas */
-    border-left: 5px solid #ff8c00 !important; /* Detalhe lateral MRV */
-    box-shadow: -10px 0 30px rgba(0,0,0,0.15) !important; /* Sombra projetada */
+    /* DESIGN E ACABAMENTO */
+    border-radius: 12px !important;
+    border: 1px solid #ccc !important; /* Moldura fina para ver o limite */
+    box-shadow: -5px 5px 20px rgba(0,0,0,0.2) !important;
     
-    padding: 25px !important;
-    z-index: 500 !important; /* Acima do mapa, abaixo da faixa verde */
-    overflow-y: auto !important; /* Scroll interno se o texto crescer */
+    padding: 20px !important;
+    z-index: 500 !important; /* Garante que fique acima do mapa */
+    overflow-y: auto !important;
+}
+
+/* Título dentro da ficha para teste */
+.area-ficha-teste h2 {
+    color: #333;
+    font-size: 1.1rem;
+    margin-bottom: 10px;
+    border-bottom: 2px solid #00713a; /* Linha verde MRV */
+    padding-bottom: 5px;
 }
