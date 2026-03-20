@@ -13,16 +13,15 @@ html, body {
 * { box-sizing: border-box !important; font-family: sans-serif; }
 
 /* ==========================================================================
-   BLOCO 10 & 20: CONTAINER MESTRE (UNIFICADO)
+   BLOCO 10 & 20: CONTAINER MESTRE (O PALCO)
    ========================================================================== */
 .mobile-wrapper { 
     display: flex !important; 
-    flex-direction: row !important;
     width: 100vw !important; 
     height: 100vh !important;
     overflow: hidden !important;
-    /* O SEGREDO: Isso faz a ficha flutuante respeitar os limites da tela */
-    position: relative !important; 
+    position: relative !important; /* Base para os elementos flutuantes */
+    background: #fff;
 }
 
 /* ==========================================================================
@@ -56,42 +55,46 @@ html, body {
 }
 
 /* ==========================================================================
-   BLOCO 40: ÁREA DO MAPA (ESTRUTURA DE FUNDO)
+   BLOCO 40: MAPA (OCUPANDO O FUNDO TODO)
    ========================================================================= */
 .area-mapa {
-    width: 100% !important; /* Mapa ocupa o fundo todo agora */
+    position: absolute !important;
+    top: 0;
+    left: 75px; /* Começa depois da faixa verde */
+    width: calc(100% - 75px) !important;
     height: 100% !important;
+    z-index: 1 !important; /* No fundo */
     display: flex !important;
     align-items: center !important;
     justify-content: flex-start !important;
-    z-index: 1 !important;
 }
 
 .area-mapa svg {
     display: block;
     height: 100% !important;
-    width: 115% !important; 
-    margin-left: -105px !important; 
+    width: auto !important; /* Deixa o SVG respirar */
+    margin-left: -105px !important; /* Seu mergulho perfeito */
     filter: drop-shadow(5px 0 10px rgba(0,0,0,0.1));
 }
 
 /* ==========================================================================
-   BLOCO 50: ÁREA DA FICHA (FLUTUANTE E FIXA)
+   BLOCO 50: FICHA TÉCNICA (A CAMADA SUPERIOR CINZA)
    ========================================================================== */
 .area-ficha-teste {
-    width: 25% !important; 
-    height: calc(100% - 40px) !important; 
-    background: #f4f4f4 !important; /* Seu cinza de visualização */
-    
     position: absolute !important;
     right: 20px !important; 
     top: 20px !important; 
     
+    width: 25% !important; 
+    height: calc(100% - 40px) !important; 
+    
+    background: #f4f4f4 !important; /* O cinza solicitado */
+    border: 1px solid #ccc !important;
     border-radius: 12px !important;
-    border: 1px solid #ccc !important; 
-    box-shadow: -10px 10px 30px rgba(0,0,0,0.3) !important; /* Sombra mais forte */
+    box-shadow: -10px 10px 30px rgba(0,0,0,0.2) !important;
     
     padding: 20px !important;
-    z-index: 500 !important; 
+    z-index: 500 !important; /* Sempre acima do mapa */
     overflow-y: auto !important;
+    display: block !important; /* Garante que ela apareça */
 }
