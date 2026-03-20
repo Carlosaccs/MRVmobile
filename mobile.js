@@ -8,7 +8,7 @@ const fichaDetalhes = document.getElementById('detalhes-imovel');
 const svgNS = "http://www.w3.org/2000/svg";
 
 // URL da planilha publicada como CSV
-const URL_PLANILHA_CSV = 'https://docs.google.com/spreadsheets/d/15V194P2JPGCCPpCTKJsib8sJuCZPgtbNb-rtgNaLS7E/pub?output=csv'; 
+const URL_PLANILHA_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSRKdJctOPQjKAtOZSDHyArD_H8SgKIouelAS1vF1d_-13pu7u_ic6J8nP3r0Ijd56WA-mbUmHjb4Me/pub?output=csv'; 
 
 /* ==========================================================================
    INICIALIZAÇÃO
