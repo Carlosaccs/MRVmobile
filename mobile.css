@@ -13,23 +13,16 @@ html, body {
 * { box-sizing: border-box !important; font-family: sans-serif; }
 
 /* ==========================================================================
-   BLOCO 10: CONTAINER MESTRE
+   BLOCO 10 & 20: CONTAINER MESTRE (UNIFICADO)
    ========================================================================== */
-.mobile-wrapper { 
-    display: flex !important; 
-    flex-direction: row !important; /* Disposição Horizontal */
-    width: 100vw !important; 
-    height: 100vh !important; 
-}
-
-/* ==========================================================================
-/* BLOCO 20: CONTAINER MESTRE */
 .mobile-wrapper { 
     display: flex !important; 
     flex-direction: row !important;
     width: 100vw !important; 
     height: 100vh !important;
     overflow: hidden !important;
+    /* O SEGREDO: Isso faz a ficha flutuante respeitar os limites da tela */
+    position: relative !important; 
 }
 
 /* ==========================================================================
@@ -63,50 +56,42 @@ html, body {
 }
 
 /* ==========================================================================
-   BLOCO 40 (Ajuste de Mergulho): AGORA COM -105px
+   BLOCO 40: ÁREA DO MAPA (ESTRUTURA DE FUNDO)
    ========================================================================= */
+.area-mapa {
+    width: 100% !important; /* Mapa ocupa o fundo todo agora */
+    height: 100% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    z-index: 1 !important;
+}
+
 .area-mapa svg {
     display: block;
     height: 100% !important;
     width: 115% !important; 
-    
-    /* RECUO OTIMIZADO: Avançando um pouco mais sob a faixa verde 
-       para eliminar qualquer distanciamento visual indesejado. */
     margin-left: -105px !important; 
-    
     filter: drop-shadow(5px 0 10px rgba(0,0,0,0.1));
 }
+
 /* ==========================================================================
    BLOCO 50: ÁREA DA FICHA (FLUTUANTE E FIXA)
    ========================================================================== */
 .area-ficha-teste {
-    /* Largura de 25% conforme o equilíbrio de 15% que fizemos */
     width: 25% !important; 
     height: calc(100% - 40px) !important; 
+    background: #f4f4f4 !important; /* Seu cinza de visualização */
     
-    /* COR DE FUNDO CINZA PARA VISUALIZAÇÃO */
-    background: #f4f4f4 !important; /* Cinza claro e sólido */
-    
-    /* POSICIONAMENTO: Flutuando sobre o mapa */
     position: absolute !important;
     right: 20px !important; 
     top: 20px !important; 
     
-    /* DESIGN E ACABAMENTO */
     border-radius: 12px !important;
-    border: 1px solid #ccc !important; /* Moldura fina para ver o limite */
-    box-shadow: -5px 5px 20px rgba(0,0,0,0.2) !important;
+    border: 1px solid #ccc !important; 
+    box-shadow: -10px 10px 30px rgba(0,0,0,0.3) !important; /* Sombra mais forte */
     
     padding: 20px !important;
-    z-index: 500 !important; /* Garante que fique acima do mapa */
+    z-index: 500 !important; 
     overflow-y: auto !important;
-}
-
-/* Título dentro da ficha para teste */
-.area-ficha-teste h2 {
-    color: #333;
-    font-size: 1.1rem;
-    margin-bottom: 10px;
-    border-bottom: 2px solid #00713a; /* Linha verde MRV */
-    padding-bottom: 5px;
 }
