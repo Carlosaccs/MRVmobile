@@ -202,3 +202,66 @@ html, body {
 .menu-lateral li:hover {
     color: #00ff00;
 }
+
+/* ==========================================================================
+   BLOCO 70: ESTILIZAÇÃO DOS BOTÕES DO MENU (v23)
+   ========================================================================== */
+.carrossel-botoes {
+    display: flex;
+    flex-direction: column;
+    gap: 10px; /* Espaçamento entre botões */
+    overflow-y: auto; /* Permite scroll se a lista for grande */
+    height: calc(100vh - 100px); /* Altura do carrossel */
+    padding-bottom: 20px;
+}
+
+/* Base do Botão */
+.btn-empreendimento {
+    background: #ffffff;
+    color: #333333;
+    border: none;
+    border-radius: 8px;
+    padding: 15px;
+    width: 100%;
+    text-align: left;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: bold;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    transition: all 0.2s ease;
+    border-left: 5px solid transparent; /* Borda da zona */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Efeito Hover e Clique (Laranja) */
+.btn-empreendimento:hover,
+.btn-empreendimento.ativo {
+    background: #ff8c00 !important; /* Laranja MRV */
+    color: #ffffff !important;
+}
+
+/* Estilo para CATEGORIA "COMPLEXO" (Fundo Escuro) */
+.btn-empreendimento.complexo {
+    background: #1a1a1a;
+    color: #ffffff;
+}
+
+/* Cores das Bordas por Zona (Baseado no REG) */
+.btn-empreendimento[data-zona="ZO"] { border-left-color: #e07b39; } /* Laranja */
+.btn-empreendimento[data-zona="ZL"] { border-left-color: #004d28; } /* Verde Escuro */
+.btn-empreendimento[data-zona="ZN"] { border-left-color: #ffd700; } /* Amarelo */
+.btn-empreendimento[data-zona="ZS"] { border-left-color: #e6007e; } /* Rosa */
+
+/* Texto do Estoque */
+.estoque-label {
+    font-size: 0.8rem;
+    color: #888888;
+    font-weight: normal;
+}
+.btn-empreendimento.complexo .estoque-label,
+.btn-empreendimento:hover .estoque-label,
+.btn-empreendimento.ativo .estoque-label {
+    color: #ffffff;
+}
