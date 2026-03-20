@@ -24,9 +24,9 @@ html, body {
     background: #fff;
 }
 
-/* ===================================================
-   BLOCO 30: FAIXA VERDE (Fica no lugar)
-   =================================================== */
+/* ==========================================================================
+   BLOCO 30: FAIXA VERDE (PRIORIDADE MÁXIMA)
+   ========================================================================== */
 .faixa-verde-vertical { 
     width: 75px !important; 
     height: 100% !important; 
@@ -37,19 +37,25 @@ html, body {
     justify-content: space-between !important; 
     padding: 30px 0 !important; 
     flex-shrink: 0 !important; 
-    z-index: 999 !important; 
+    
+    /* O SEGREDO: z-index maior que o do mapa e da ficha */
+    position: relative !important;
+    z-index: 1000 !important; 
+    box-shadow: 5px 0 15px rgba(0,0,0,0.2) !important;
 }
 
-/* ===================================================
-   BLOCO 40: ÁREA DO MAPA (OCUPA O FUNDO)
-   =================================================== */
+/* ==========================================================================
+   BLOCO 40: ÁREA DO MAPA (RECUEI PARA NÃO BATER NA FAIXA)
+   ========================================================================= */
 .area-mapa {
     position: absolute !important;
     top: 0 !important;
-    left: 75px !important; /* Começa após a faixa verde */
+    left: 75px !important; /* Mantém o espaço da faixa livre */
     width: calc(100% - 75px) !important;
     height: 100% !important;
-    z-index: 1 !important; /* Fica por baixo de tudo */
+    
+    /* Fica abaixo da faixa (1000) e da ficha (500) */
+    z-index: 1 !important; 
     display: flex !important;
     align-items: center !important;
 }
