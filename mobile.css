@@ -12,34 +12,30 @@ html, body {
 
 * { box-sizing: border-box !important; font-family: sans-serif; }
 
-/* ===================================================
-   BLOCO 10 & 20: FUNDAÇÃO (O Wrapper agora é o Pai)
-   /* UNIFICAÇÃO: Apenas um bloco para o container mestre,
-      resolvendo os dois wrapper que tínhamos.
-   =================================================== */
+/* ==========================================================================
+   BLOCO 10: WRAPPER PRINCIPAL
+   ========================================================================== */
 .mobile-wrapper { 
     display: flex !important; 
-    flex-direction: row !important; /* Mantém a disposição horizontal */
+    flex-direction: row !important;
     width: 100vw !important; 
     height: 100vh !important;
     overflow: hidden !important;
-    position: relative !important; /* Base para o absolute da faixa */
+    position: relative !important;
     background: #fff;
 }
 
 /* ==========================================================================
-   BLOCO 30: FAIXA VERDE (FIXA E SOBREPOSTA)
+   BLOCO 30: FAIXA VERDE (FIXA)
    ========================================================================== */
 .faixa-verde-vertical { 
-    /* Mudamos de fixed para absolute para não "pular" */
     position: absolute !important; 
     left: 0 !important;
     top: 0 !important;
     width: 75px !important; 
     height: 100vh !important; 
     background: #00713a !important; 
-    z-index: 2000 !important; /* Mantém no topo */
-    
+    z-index: 2000 !important;
     display: flex !important; 
     flex-direction: column !important;
     align-items: center !important; 
@@ -48,7 +44,6 @@ html, body {
     box-shadow: 4px 0 15px rgba(0,0,0,0.3) !important;
 }
 
-/* Título Vertical (RESIDENCIAIS MRV) */
 .titulo-vertical {
     writing-mode: vertical-rl !important;
     transform: rotate(180deg) !important;
@@ -60,63 +55,56 @@ html, body {
     margin: auto 0 !important;
 }
 
-/* Ícones Topo e Base */
 .icon-top, .icon-bottom {
     color: white !important;
-    font-size: 2rem !important; /* Facilita o toque */
+    font-size: 2rem !important;
     cursor: pointer !important;
-    height: 50px !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
     z-index: 10000 !important;
 }
 
 /* ==========================================================================
-   BLOCO 40: ÁREA DO MAPA (RECUEI PARA NÃO BATER NA FAIXA)
-   ========================================================================= */
+   BLOCO 40: ÁREA DO MAPA E SVG
+   ========================================================================== */
 .area-mapa {
-    width: calc(100% - 75px) !important; /* Área total menos a faixa */
+    width: calc(100% - 75px) !important;
     height: 100% !important;
-    /* Adicionamos margem para não precisar do recuo no SVG */
     margin-left: 75px !important;
-    z-index: 1 !important; /* Abaixo da faixa */
+    z-index: 1 !important;
     display: flex !important;
     align-items: center !important;
     justify-content: flex-start !important;
 }
 
-/* O SVG FOI MOVIDO PARA O FINAL DO ARQUIVO CONFORME ACORDADO */
+.area-mapa svg {
+    display: block;
+    height: 100% !important;
+    width: auto !important; 
+    margin-left: -105px !important; 
+    filter: drop-shadow(5px 0 10px rgba(0,0,0,0.1));
+}
 
 /* ==========================================================================
-   BLOCO 50 (Ajuste Final): FICHA TÉCNICA (AMPLIADA E INTEGRADA)
+   BLOCO 50: FICHA TÉCNICA (PAINEL DIREITO)
    ========================================================================== */
 .ficha-tecnica {
     position: absolute !important;
-    right: 0 !important;   /* Cola na borda direita da tela */
-    top: 0 !important;     /* Cola no topo da tela */
-    width: 40% !important; /* Ganha corpo sobre o mapa */
-    height: 100% !important; /* Altura total da tela */
-    background: rgba(128, 128, 128, 0.95) !important; /* Cinza com transparência */
+    right: 0 !important;
+    top: 0 !important;
+    width: 40% !important;
+    height: 100% !important;
+    background: rgba(128, 128, 128, 0.95) !important;
     color: #ffffff !important; 
-    border-radius: 0 !important; /* Cola na borda */
-    box-shadow: -15px 0 40px rgba(0,0,0,0.4) !important; /* Sombra para profundidade */
-    padding: 30px !important; /* Respiro interno */
-    z-index: 500 !important; /* Mantém por cima do mapa */
-    overflow-y: auto !important; /* Scroll interno */
-    display: block !important;
+    padding: 30px !important;
+    z-index: 500 !important;
+    overflow-y: auto !important;
 }
 
-/* Formatação do Título "Selecione" */
 .ficha-tecnica h3 {
     color: #ffffff !important; 
     font-size: 1.6rem !important; 
-    margin-bottom: 5px !important;
-    text-transform: uppercase; 
-    letter-spacing: 1px;
+    text-transform: uppercase;
 }
 
-/* Linha divisória verde (Estilo MRV) */
 .ficha-tecnica h3::after {
     content: "";
     display: block;
@@ -126,96 +114,16 @@ html, body {
     margin-top: 10px;
 }
 
-/* Formatação do Texto do Corpo */
-.ficha-tecnica div {
-    color: #dfdfdf !important; 
-    font-size: 1.1rem !important;
-    line-height: 1.6 !important;
-    margin-top: 20px !important;
-}
-
-/* INDICADOR DE VERSÃO (COLAR NO FINAL DO ARQUIVO) */
-.ficha-tecnica::after {
-    content: "CSS Ativo: v=21" !important;
-    position: absolute !important;
-    top: 10px !important;
-    right: 15px !important;
-    font-size: 12px !important;
-    color: #00ff00 !important; /* Verde limão */
-    font-weight: bold !important;
-    z-index: 10000 !important; /* Valor altíssimo */
-}
-
 /* ==========================================================================
-   BLOCO 40: REPOSICIONAMENTO DO SVG (NO FINAL PARA PRIORIDADE)
-   ========================================================================== */
-.area-mapa svg {
-    display: block;
-    height: 100% !important;
-    width: auto !important; 
-    
-    /* RECUO OTIMIZADO: O mergulho perfeito de -105px que você aprovou */
-    margin-left: -105px !important; 
-    filter: drop-shadow(5px 0 10px rgba(0,0,0,0.1));
-}
-/* ==========================================================================
-   MENU FLUTUANTE (CIDADES)
-   ========================================================================== */
-.menu-lateral {
-    position: absolute !important;
-    left: -250px; /* Começa escondido atrás da faixa verde */
-    top: 0;
-    width: 250px !important;
-    height: 100vh !important;
-    background: #004d28 !important; /* Verde mais escuro que a faixa */
-    z-index: 1500 !important; /* Acima do mapa, abaixo da faixa verde */
-    transition: left 0.3s ease; /* Efeito de deslizar */
-    padding: 30px 20px 30px 85px !important; /* 85px para não ficar sob a faixa */
-}
-
-/* Classe que será ativada via JavaScript */
-.menu-lateral.aberto {
-    left: 0 !important;
-}
-
-.menu-header {
-    color: #fff;
-    font-weight: bold;
-    border-bottom: 2px solid #00713a;
-    padding-bottom: 10px;
-    margin-bottom: 20px;
-}
-
-.menu-lateral ul {
-    list-style: none;
-    padding: 0;
-}
-
-.menu-lateral li {
-    color: white;
-    padding: 15px 0;
-    border-bottom: 1px solid rgba(255,255,255,0.1);
-    cursor: pointer;
-    font-size: 1.1rem;
-}
-
-.menu-lateral li:hover {
-    color: #00ff00;
-}
-
-/* ==========================================================================
-   BLOCO 70: ESTILIZAÇÃO DOS BOTÕES DO MENU (v23)
-   ========================================================================== */
-/* ==========================================================================
-   MENU LATERAL (v27 - Limpo e 150% maior)
+   BLOCO 70.1: ESTRUTURA DO MENU (POSICIONAMENTO)
    ========================================================================== */
 .menu-lateral {
     position: absolute !important;
     top: 0 !important;
-    left: 60px !important; /* Lado da faixa verde */
-    width: 320px !important; /* Aumentado conforme solicitado */
-    height: 100% !important;
-    background: transparent !important; /* Sem fundo */
+    left: 75px !important; /* Começa exatamente após a faixa verde */
+    width: 450px !important; /* Largura ampliada */
+    height: 100vh !important;
+    background: transparent !important; /* Sem fundo escuro */
     z-index: 999 !important;
     transition: transform 0.3s ease !important;
     transform: translateX(-110%); /* Começa escondido */
@@ -226,140 +134,55 @@ html, body {
     transform: translateX(0) !important;
 }
 
-/* CARROSSEL SEM BARRAS DE ROLAGEM */
-/* MENU AMPLO E TRANSPARENTE */
-.menu-lateral {
-    position: absolute !important;
-    top: 0 !important;
-    left: 60px !important;
-    width: 450px !important; /* Largura ampliada */
-    height: 100% !important;
-    background: transparent !important;
-    z-index: 999 !important;
-    border: none !important;
-    box-shadow: none !important;
+/* Remove resíduos de versões antigas */
+.menu-header, .menu-lateral::before, .menu-lateral::after {
+    display: none !important;
+    content: none !important;
 }
 
-/* CARROSSEL SEM BARRAS E SEM LINHAS DIVISORAS */
+/* ==========================================================================
+   BLOCO 70.2: CARROSSEL (MOVIMENTO TOUCH)
+   ========================================================================== */
 .carrossel-botoes {
     display: flex !important;
     flex-direction: column !important;
     gap: 15px !important;
-    padding: 20px !important;
-    overflow-y: scroll !important;
+    padding: 20px 10px !important;
+    height: 100% !important;
+    overflow-y: auto !important; /* Ativa rolagem */
+    -webkit-overflow-scrolling: touch !important; /* Deslize suave */
     scrollbar-width: none !important;
-    border: none !important; /* Remove qualquer linha que tenha sobrado */
 }
 
 .carrossel-botoes::-webkit-scrollbar {
     display: none !important;
 }
 
-/* BOTÕES (CARDS) LARGOS */
+/* ==========================================================================
+   BLOCO 70.3: ESTILO DOS BOTÕES (CARDS)
+   ========================================================================== */
 .btn-empreendimento {
     width: 100% !important;
-    min-height: 80px !important;
-    background: white !important;
+    background: #ffffff !important;
     border-radius: 8px !important;
-    border: none !important; /* Remove bordas laterais */
     padding: 15px !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
+    border: none !important;
     display: flex !important;
     flex-direction: column !important;
-    justify-content: center !important;
+    cursor: pointer !important;
 }
 
-/* Base do Botão */
-.btn-empreendimento {
-    background: #ffffff;
-    color: #333333;
-    border: none;
-    border-radius: 8px;
-    padding: 15px;
-    width: 100%;
-    text-align: left;
-    cursor: pointer;
-    font-size: 1rem;
-    font-weight: bold;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    transition: all 0.2s ease;
-    border-left: 5px solid transparent; /* Borda da zona */
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-/* Efeito Hover e Clique (Laranja) */
-.btn-empreendimento:hover,
-.btn-empreendimento.ativo {
-    background: #ff8c00 !important; /* Laranja MRV */
-    color: #ffffff !important;
-}
-
-/* Estilo para CATEGORIA "COMPLEXO" (Fundo Escuro) */
-.btn-empreendimento.complexo {
-    background: #1a1a1a;
-    color: #ffffff;
-}
-
-/* Cores das Bordas por Zona (Baseado no REG) */
-.btn-empreendimento[data-zona="ZO"] { border-left-color: #e07b39; } /* Laranja */
-.btn-empreendimento[data-zona="ZL"] { border-left-color: #004d28; } /* Verde Escuro */
-.btn-empreendimento[data-zona="ZN"] { border-left-color: #ffd700; } /* Amarelo */
-.btn-empreendimento[data-zona="ZS"] { border-left-color: #e6007e; } /* Rosa */
-
-/* Texto do Estoque */
-.estoque-label {
-    font-size: 0.8rem;
-    color: #888888;
-    font-weight: normal;
-}
-.btn-empreendimento.complexo .estoque-label,
-.btn-empreendimento:hover .estoque-label,
-.btn-empreendimento.ativo .estoque-label {
-    color: #ffffff;
-}
 /* ==========================================================================
-   ASSINATURA DE CONTROLE (v25)
+   BLOCO 99: ASSINATURA E CONTROLE
    ========================================================================== */
 .ficha-tecnica::after {
-    content: "CSS Ativo: v=25" !important;
-    position: absolute !important;
+    content: "CSS Ativo: v=29" !important;
+    position: fixed !important;
     top: 10px !important;
     right: 15px !important;
     font-size: 12px !important;
-    color: #00ff00 !important; 
+    color: #00ff00 !important;
     font-weight: bold !important;
     z-index: 10000 !important;
-    display: block !important;
-}
-
-/* Garante que o container dos botões seja visível */
-.carrossel-botoes {
-    display: flex !important;
-    flex-direction: column !important;
-    padding: 20px !important;
-    gap: 12px !important;
-    overflow-y: auto !important;
-}
-
-/* Estilo para quando o botão for um COMPLEXO (Fundo Escuro) */
-.btn-empreendimento.complexo {
-    background-color: #1a1a1a !important;
-    color: #ffffff !important;
-}
-
-/* Remove a linha decorativa que sobrou do cabeçalho */
-.menu-header, 
-.menu-lateral::before, 
-.menu-lateral::after {
-    display: none !important;
-    content: none !important;
-    border: none !important;
-}
-
-/* Garante que o container de botões não tenha bordas no topo */
-.carrossel-botoes {
-    border-top: none !important;
-    margin-top: 0 !important;
-    padding-top: 10px !important;
 }
