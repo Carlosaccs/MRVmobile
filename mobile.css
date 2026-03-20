@@ -14,35 +14,37 @@ html, body {
 
 /* ===================================================
    BLOCO 10 & 20: FUNDAÇÃO (O Wrapper agora é o Pai)
+   /* UNIFICAÇÃO: Apenas um bloco para o container mestre,
+      resolvendo os dois wrapper que tínhamos.
    =================================================== */
 .mobile-wrapper { 
     display: flex !important; 
+    flex-direction: row !important; /* Mantém a disposição horizontal */
     width: 100vw !important; 
     height: 100vh !important;
     overflow: hidden !important;
-    position: relative !important; /* Essencial para a ficha flutuar */
+    position: relative !important; /* Base para o absolute da faixa */
     background: #fff;
 }
 
 /* ==========================================================================
-   BLOCO 30: FAIXA VERDE (ESTABILIZAÇÃO TOTAL)
+   BLOCO 30: FAIXA VERDE (FIXA E SOBREPOSTA)
    ========================================================================== */
 .faixa-verde-vertical { 
-    position: fixed !important; 
+    /* Mudamos de fixed para absolute para não "pular" */
+    position: absolute !important; 
     left: 0 !important;
     top: 0 !important;
     width: 75px !important; 
     height: 100vh !important; 
     background: #00713a !important; 
-    
-    /* Z-INDEX NO TOPO DO MUNDO */
-    z-index: 9999 !important; 
+    z-index: 2000 !important; /* Mantém no topo */
     
     display: flex !important; 
     flex-direction: column !important;
     align-items: center !important; 
     justify-content: space-between !important; 
-    padding: 20px 0 !important;
+    padding: 30px 0 !important; 
     box-shadow: 4px 0 15px rgba(0,0,0,0.3) !important;
 }
 
@@ -61,7 +63,7 @@ html, body {
 /* Ícones Topo e Base */
 .icon-top, .icon-bottom {
     color: white !important;
-    font-size: 2rem !important; /* Aumentei para facilitar o toque no mobile */
+    font-size: 2rem !important; /* Facilita o toque */
     cursor: pointer !important;
     height: 50px !important;
     display: flex !important;
@@ -69,55 +71,48 @@ html, body {
     justify-content: center !important;
     z-index: 10000 !important;
 }
+
 /* ==========================================================================
-   BLOCO 40: ÁREA DO MAPA (RECUADO)
+   BLOCO 40: ÁREA DO MAPA (RECUEI PARA NÃO BATER NA FAIXA)
    ========================================================================= */
 .area-mapa {
-    position: absolute !important;
-    top: 0 !important;
-    left: 75px !important; /* Espaço sagrado da faixa verde */
-    width: calc(100% - 75px) !important;
+    width: calc(100% - 75px) !important; /* Área total menos a faixa */
     height: 100% !important;
-    z-index: 1 !important; 
-    overflow: hidden !important;
+    /* Adicionamos margem para não precisar do recuo no SVG */
+    margin-left: 75px !important;
+    z-index: 1 !important; /* Abaixo da faixa */
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
 }
+
+/* O SVG FOI MOVIDO PARA O FINAL DO ARQUIVO CONFORME ACORDADO */
 
 /* ==========================================================================
    BLOCO 50 (Ajuste Final): FICHA TÉCNICA (AMPLIADA E INTEGRADA)
    ========================================================================== */
 .ficha-tecnica {
     position: absolute !important;
-    
-    /* ELIMINAÇÃO DAS MARGENS (right e top agora são 0) */
     right: 0 !important;   /* Cola na borda direita da tela */
     top: 0 !important;     /* Cola no topo da tela */
-    
-    /* AMPLIAÇÃO DA LARGURA EM 30% (Passamos de 25% para 40%) */
     width: 40% !important; /* Ganha corpo sobre o mapa */
-    
-    /* AJUSTE DE ALTURA */
     height: 100% !important; /* Altura total da tela */
-    
-    /* ACABAMENTO VISUAL */
-    background: rgba(128, 128, 128, 0.95) !important; /* Mantém o cinza com leve transparência */
+    background: rgba(128, 128, 128, 0.95) !important; /* Cinza com transparência */
     color: #ffffff !important; 
-    
-    border-radius: 0 !important; /* Removemos o arredondamento para colar na borda */
-    box-shadow: -15px 0 40px rgba(0,0,0,0.4) !important; /* Sombra mais forte para profundidade */
-    
-    padding: 30px !important; /* Mais respiro interno */
+    border-radius: 0 !important; /* Cola na borda */
+    box-shadow: -15px 0 40px rgba(0,0,0,0.4) !important; /* Sombra para profundidade */
+    padding: 30px !important; /* Respiro interno */
     z-index: 500 !important; /* Mantém por cima do mapa */
-    overflow-y: auto !important; /* Scroll se o texto for grande */
+    overflow-y: auto !important; /* Scroll interno */
     display: block !important;
 }
-/* ==========================================================================
-   FORMATAÇÃO INTERNA DA FICHA (TEXTOS E TÍTULOS)
-   ========================================================================== */
+
+/* Formatação do Título "Selecione" */
 .ficha-tecnica h3 {
-    color: #ffffff !important; /* Branco puro para o título */
-    font-size: 1.6rem !important; /* Título maior e imponente */
+    color: #ffffff !important; 
+    font-size: 1.6rem !important; 
     margin-bottom: 5px !important;
-    text-transform: uppercase; /* Estilo profissional */
+    text-transform: uppercase; 
     letter-spacing: 1px;
 }
 
@@ -131,19 +126,35 @@ html, body {
     margin-top: 10px;
 }
 
+/* Formatação do Texto do Corpo */
 .ficha-tecnica div {
-    color: #dfdfdf !important; /* Cinza muito claro para o corpo do texto */
+    color: #dfdfdf !important; 
     font-size: 1.1rem !important;
     line-height: 1.6 !important;
     margin-top: 20px !important;
 }
+
+/* INDICADOR DE VERSÃO (COLAR NO FINAL DO ARQUIVO) */
 .ficha-tecnica::after {
-    content: "CSS Ativo: v=20" !important;
+    content: "CSS Ativo: v=21" !important;
     position: absolute !important;
     top: 10px !important;
     right: 15px !important;
     font-size: 12px !important;
-    color: #00ff00 !important; /* VERDE LIMÃO para gritar no cinza */
+    color: #00ff00 !important; /* Verde limão */
     font-weight: bold !important;
-    z-index: 1000 !important;
+    z-index: 10000 !important; /* Valor altíssimo */
+}
+
+/* ==========================================================================
+   BLOCO 40: REPOSICIONAMENTO DO SVG (NO FINAL PARA PRIORIDADE)
+   ========================================================================== */
+.area-mapa svg {
+    display: block;
+    height: 100% !important;
+    width: auto !important; 
+    
+    /* RECUO OTIMIZADO: O mergulho perfeito de -105px que você aprovou */
+    margin-left: -105px !important; 
+    filter: drop-shadow(5px 0 10px rgba(0,0,0,0.1));
 }
