@@ -227,27 +227,45 @@ html, body {
 }
 
 /* CARROSSEL SEM BARRAS DE ROLAGEM */
+/* MENU AMPLO E TRANSPARENTE */
+.menu-lateral {
+    position: absolute !important;
+    top: 0 !important;
+    left: 60px !important;
+    width: 450px !important; /* Largura ampliada */
+    height: 100% !important;
+    background: transparent !important;
+    z-index: 999 !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+/* CARROSSEL SEM BARRAS E SEM LINHAS DIVISORAS */
 .carrossel-botoes {
     display: flex !important;
     flex-direction: column !important;
-    gap: 10px !important;
-    padding: 20px 10px !important;
-    height: 100% !important;
-    overflow-y: scroll !important; /* Mantém o carrossel ativo */
-    scrollbar-width: none !important; /* Esconde barra no Firefox */
-    -webkit-overflow-scrolling: touch !important;
+    gap: 15px !important;
+    padding: 20px !important;
+    overflow-y: scroll !important;
+    scrollbar-width: none !important;
+    border: none !important; /* Remove qualquer linha que tenha sobrado */
 }
 
 .carrossel-botoes::-webkit-scrollbar {
-    display: none !important; /* Esconde barra no Chrome/Safari */
+    display: none !important;
 }
 
-/* Ajuste dos cards para não ocuparem a largura toda se não quiser */
+/* BOTÕES (CARDS) LARGOS */
 .btn-empreendimento {
-    width: 95% !important;
-    background: white !important; /* Os cards continuam brancos para leitura */
-    border-radius: 5px !important;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1) !important;
+    width: 100% !important;
+    min-height: 80px !important;
+    background: white !important;
+    border-radius: 8px !important;
+    border: none !important; /* Remove bordas laterais */
+    padding: 15px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
 }
 
 /* Base do Botão */
