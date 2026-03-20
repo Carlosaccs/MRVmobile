@@ -95,14 +95,29 @@ html, body {
     display: block !important;
 }
 /* ==========================================================================
-   INDICADOR DE VERSÃO (VALIDADOR DE CACHE)
+   FORMATAÇÃO INTERNA DA FICHA (TEXTOS E TÍTULOS)
    ========================================================================== */
-.ficha-tecnica::after {
-    content: "CSS Ativo: v=18"; /* Mude aqui toda vez que mudar a versão */
-    position: absolute;
-    bottom: 10px;
-    right: 15px;
-    font-size: 10px;
-    color: rgba(255, 255, 255, 0.4); /* Branco bem discreto */
+.ficha-tecnica h3 {
+    color: #ffffff !important; /* Branco puro para o título */
+    font-size: 1.6rem !important; /* Título maior e imponente */
+    margin-bottom: 5px !important;
+    text-transform: uppercase; /* Estilo profissional */
     letter-spacing: 1px;
+}
+
+/* Linha divisória verde (Estilo MRV) */
+.ficha-tecnica h3::after {
+    content: "";
+    display: block;
+    width: 50px;
+    height: 3px;
+    background: #00713a; 
+    margin-top: 10px;
+}
+
+.ficha-tecnica div {
+    color: #dfdfdf !important; /* Cinza muito claro para o corpo do texto */
+    font-size: 1.1rem !important;
+    line-height: 1.6 !important;
+    margin-top: 20px !important;
 }
