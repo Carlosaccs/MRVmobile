@@ -23,46 +23,39 @@ html, body {
 }
 
 /* ==========================================================================
-   BLOCO 20: FAIXA VERDE (Ocupa apenas o necessário)
-   ========================================================================== */
+/* BLOCO 20: CONTAINER MESTRE */
+.mobile-wrapper { 
+    display: flex !important; 
+    flex-direction: row !important;
+    width: 100vw !important; 
+    height: 100vh !important;
+    overflow: hidden !important;
+}
+
+/* BLOCO 30: FAIXA VERDE (75px e por cima de tudo) */
 .faixa-verde-vertical { 
-    width: 50px !important; 
+    width: 75px !important; 
     height: 100% !important; 
     background: #00713a !important; 
     display: flex !important; 
     flex-direction: column !important;
     align-items: center !important; 
     justify-content: space-between !important; 
-    padding: 15px 0 !important;
+    padding: 20px 0 !important;
     flex-shrink: 0 !important; 
+    z-index: 999 !important; /* Garante que ela fique por cima */
 }
 
-.titulo-vertical { 
-    writing-mode: vertical-rl; 
-    transform: rotate(180deg); 
-    color: white; 
-    font-weight: bold; 
-    font-size: 0.8rem; 
-    letter-spacing: 2px;
-}
-
-/* ==========================================================================
-   BLOCO 30 (Revisado): CONTAINER DO MAPA (70%) - COM EFEITO DE MERGULHO
-   ========================================================================== */
+/* BLOCO 35: AJUSTE DO MAPA (Para "mergulhar") */
 .area-mapa-teste { 
-    width: 70% !important; 
+    flex: 0.7 !important; /* Seus 70% */
     height: 100% !important;
     background: #eeeeee !important; 
+    margin-left: -30px !important; /* Puxa o mapa para trás da faixa */
+    z-index: 1 !important; 
     display: flex !important; 
     align-items: center !important; 
     justify-content: center !important;
-    
-    /* SEGREDOS DE ENGENHARIA PARA MERGULHO */
-    margin-left: -50px !important; /* Puxa o mapa para baixo da faixa verde */
-    padding-left: 50px !important; /* Compensa o puxão para o conteúdo não fugir */
-    z-index: 1 !important; /* Coloca o mapa em uma camada inferior à faixa */
-    
-    border-right: 2px solid #ddd;
 }
 /* ==========================================================================
    BLOCO 40: ÁREA DA FICHA (30% do que sobra)
