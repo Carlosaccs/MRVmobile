@@ -1,188 +1,91 @@
 /* ==========================================================================
-   BLOCO 05: FUNDAÇÃO DA TELA
+   BLOCO 05 & 10: FUNDAÇÃO
    ========================================================================== */
 html, body { 
-    margin: 0 !important; 
-    padding: 0 !important; 
-    width: 100% !important; 
-    height: 100% !important; 
-    overflow: hidden !important;
-    background: #fff; 
+    margin: 0 !important; padding: 0 !important; 
+    width: 100% !important; height: 100% !important; 
+    overflow: hidden !important; background: #fff; 
 }
-
 * { box-sizing: border-box !important; font-family: sans-serif; }
 
-/* ==========================================================================
-   BLOCO 10: WRAPPER PRINCIPAL
-   ========================================================================== */
 .mobile-wrapper { 
-    display: flex !important; 
-    flex-direction: row !important;
-    width: 100vw !important; 
-    height: 100vh !important;
-    overflow: hidden !important;
-    position: relative !important;
-    background: #fff;
+    display: flex !important; width: 100vw !important; height: 100vh !important;
+    overflow: hidden !important; position: relative !important;
 }
 
 /* ==========================================================================
-   BLOCO 30: FAIXA VERDE (FIXA)
+   BLOCO 30: FAIXA VERDE (Reduzida em 30% -> ~52px)
    ========================================================================== */
 .faixa-verde-vertical { 
-    position: absolute !important; 
-    left: 0 !important;
-    top: 0 !important;
-    width: 75px !important; 
-    height: 100vh !important; 
-    background: #00713a !important; 
-    z-index: 2000 !important;
-    display: flex !important; 
-    flex-direction: column !important;
-    align-items: center !important; 
-    justify-content: space-between !important; 
-    padding: 30px 0 !important; 
-    box-shadow: 4px 0 15px rgba(0,0,0,0.3) !important;
+    position: absolute !important; left: 0 !important; top: 0 !important;
+    width: 52px !important; /* Redução de 30% sobre os 75px anteriores */
+    height: 100vh !important; background: #00713a !important; 
+    z-index: 2000 !important; display: flex !important; 
+    flex-direction: column !important; align-items: center !important; 
+    justify-content: space-between !important; padding: 20px 0 !important; 
+    box-shadow: 2px 0 10px rgba(0,0,0,0.3) !important;
 }
 
 .titulo-vertical {
-    writing-mode: vertical-rl !important;
-    transform: rotate(180deg) !important;
-    color: white !important;
-    font-weight: bold !important;
-    font-size: 1.2rem !important;
-    letter-spacing: 2px !important;
-    white-space: nowrap !important;
-    margin: auto 0 !important;
-}
-
-.icon-top, .icon-bottom {
-    color: white !important;
-    font-size: 2rem !important;
-    cursor: pointer !important;
-    z-index: 10000 !important;
+    writing-mode: vertical-rl !important; transform: rotate(180deg) !important;
+    color: white !important; font-weight: bold !important;
+    font-size: 0.9rem !important; letter-spacing: 1px !important;
 }
 
 /* ==========================================================================
-   BLOCO 40: ÁREA DO MAPA E SVG
+   BLOCO 40: ÁREA DO MAPA
    ========================================================================== */
 .area-mapa {
-    width: calc(100% - 75px) !important;
-    height: 100% !important;
-    margin-left: 75px !important;
-    z-index: 1 !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: flex-start !important;
+    width: calc(100% - 52px) !important; height: 100% !important;
+    margin-left: 52px !important; z-index: 1 !important;
+    display: flex !important; align-items: center !important;
 }
 
 .area-mapa svg {
-    display: block;
-    height: 100% !important;
-    width: auto !important; 
-    margin-left: -105px !important; 
-    filter: drop-shadow(5px 0 10px rgba(0,0,0,0.1));
+    height: 100% !important; width: auto !important; 
+    margin-left: -80px !important; /* Ajustado para nova largura da faixa */
 }
 
 /* ==========================================================================
-   BLOCO 50: FICHA TÉCNICA (PAINEL DIREITO)
-   ========================================================================== */
-.ficha-tecnica {
-    position: absolute !important;
-    right: 0 !important;
-    top: 0 !important;
-    width: 40% !important;
-    height: 100% !important;
-    background: rgba(128, 128, 128, 0.95) !important;
-    color: #ffffff !important; 
-    padding: 30px !important;
-    z-index: 500 !important;
-    overflow-y: auto !important;
-}
-
-.ficha-tecnica h3 {
-    color: #ffffff !important; 
-    font-size: 1.6rem !important; 
-    text-transform: uppercase;
-}
-
-.ficha-tecnica h3::after {
-    content: "";
-    display: block;
-    width: 50px;
-    height: 3px;
-    background: #00713a; 
-    margin-top: 10px;
-}
-
-/* ==========================================================================
-   BLOCO 70.1: ESTRUTURA DO MENU (POSICIONAMENTO)
+   BLOCO 70: MENU E BOTÕES (Largura 60% e Bordas Coloridas)
    ========================================================================== */
 .menu-lateral {
-    position: absolute !important;
-    top: 0 !important;
-    left: 75px !important; /* Começa exatamente após a faixa verde */
-    width: 450px !important; /* Largura ampliada */
-    height: 100vh !important;
-    background: transparent !important; /* Sem fundo escuro */
-    z-index: 999 !important;
-    transition: transform 0.3s ease !important;
-    transform: translateX(-110%); /* Começa escondido */
-    border: none !important;
+    position: absolute !important; top: 0 !important;
+    left: 52px !important; /* Encostado na faixa verde */
+    width: 270px !important; /* 60% dos 450px anteriores para caber no celular */
+    height: 100vh !important; background: transparent !important;
+    z-index: 999 !important; overflow: hidden !important;
 }
 
-.menu-lateral.aberto {
-    transform: translateX(0) !important;
-}
-
-/* Remove resíduos de versões antigas */
-.menu-header, .menu-lateral::before, .menu-lateral::after {
-    display: none !important;
-    content: none !important;
-}
-
-/* ==========================================================================
-   BLOCO 70.2: CARROSSEL (MOVIMENTO TOUCH)
-   ========================================================================== */
 .carrossel-botoes {
-    display: flex !important;
-    flex-direction: column !important;
-    gap: 15px !important;
-    padding: 20px 10px !important;
-    height: 100% !important;
-    overflow-y: auto !important; /* Ativa rolagem */
-    -webkit-overflow-scrolling: touch !important; /* Deslize suave */
-    scrollbar-width: none !important;
+    display: flex !important; flex-direction: column !important;
+    gap: 10px !important; padding: 15px 10px !important;
+    height: 100% !important; overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
 }
 
-.carrossel-botoes::-webkit-scrollbar {
-    display: none !important;
-}
-
-/* ==========================================================================
-   BLOCO 70.3: ESTILO DOS BOTÕES (CARDS)
-   ========================================================================== */
 .btn-empreendimento {
-    width: 100% !important;
-    background: #ffffff !important;
-    border-radius: 8px !important;
-    padding: 15px !important;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
-    border: none !important;
-    display: flex !important;
+    width: 100% !important; background: #ffffff !important;
+    border-radius: 6px !important; padding: 12px !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15) !important;
+    cursor: pointer !important; display: flex !important;
     flex-direction: column !important;
-    cursor: pointer !important;
+    border: none !important;
+    /* BORDA DIREITA PADRÃO (VERDE MRV) */
+    border-right: 6px solid #00713a !important; 
 }
 
+/* CORES DAS BORDAS POR ZONA (Borda Direita) */
+.btn-empreendimento[data-zona="ZO"] { border-right-color: #e07b39 !important; } /* Laranja */
+.btn-empreendimento[data-zona="ZL"] { border-right-color: #004d28 !important; } /* Verde Escuro */
+.btn-empreendimento[data-zona="ZN"] { border-right-color: #ffd700 !important; } /* Amarelo */
+.btn-empreendimento[data-zona="ZS"] { border-right-color: #e6007e !important; } /* Rosa */
+
 /* ==========================================================================
-   BLOCO 99: ASSINATURA E CONTROLE
+   BLOCO 99: VERSÃO
    ========================================================================== */
 .ficha-tecnica::after {
-    content: "CSS Ativo: v=29" !important;
-    position: fixed !important;
-    top: 10px !important;
-    right: 15px !important;
-    font-size: 12px !important;
-    color: #00ff00 !important;
-    font-weight: bold !important;
-    z-index: 10000 !important;
+    content: "v=30" !important; position: fixed !important;
+    top: 5px !important; right: 10px !important;
+    font-size: 10px !important; color: #00ff00 !important;
 }
