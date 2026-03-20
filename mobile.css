@@ -347,3 +347,19 @@ html, body {
     background-color: #1a1a1a !important;
     color: #ffffff !important;
 }
+
+/* Remove a linha decorativa que sobrou do cabeçalho */
+.menu-header, 
+.menu-lateral::before, 
+.menu-lateral::after {
+    display: none !important;
+    content: none !important;
+    border: none !important;
+}
+
+/* Garante que o container de botões não tenha bordas no topo */
+.carrossel-botoes {
+    border-top: none !important;
+    margin-top: 0 !important;
+    padding-top: 10px !important;
+}
