@@ -70,3 +70,17 @@ function atualizarFicha(item) {
     // Feedback visual simples
     console.log("Selecionado:", item.name);
 }
+
+// Função para abrir/fechar o menu
+document.querySelector('.icon-bottom').onclick = function() {
+    document.getElementById('menu-cidades').classList.toggle('aberto');
+};
+
+// Função que o menu vai disparar
+function selecionarCidade(nome) {
+    document.getElementById('nome-imovel').innerText = nome;
+    document.getElementById('detalhes-imovel').innerText = "Exibindo residenciais da região de " + nome;
+    
+    // Fecha o menu após selecionar
+    document.getElementById('menu-cidades').classList.remove('aberto');
+}
