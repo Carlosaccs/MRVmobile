@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Mobile Layout Test</title>
-    
+    <title>MRV Mobile - Real Estate</title>
     <link rel="stylesheet" href="mobile.css">
 </head>
 <body>
@@ -17,15 +16,20 @@
             <div class="icon-bottom" style="color:white; font-size:1.5rem;">☰</div>
         </aside>
 
-        <main class="area-mapa-teste">
-            <h2 style="color:#666">ESPAÇO MAPA (70%)</h2>
+        <main class="area-mapa" id="mapa-container">
+            <p style="color:#999; font-size: 0.8rem;">Carregando mapa...</p>
         </main>
 
-        <aside class="area-ficha-teste">
-            <h3 style="color:#ff8c00">ESPAÇO FICHA (30%)</h3>
+        <aside class="ficha-tecnica" id="ficha-tecnica">
+            <h3 id="nome-imovel" style="color: #00713a; font-size: 1rem; margin-bottom: 5px;">Selecione</h3>
+            <div id="detalhes-imovel" style="font-size: 0.85rem; color: #444;">
+                Toque em um ponto do mapa para ver os detalhes do residencial.
+            </div>
         </aside>
 
     </div>
 
+    <script src="mrv-data.js"></script>
+    <script src="mobile.js"></script>
 </body>
 </html>
