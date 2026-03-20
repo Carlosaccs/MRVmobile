@@ -63,31 +63,33 @@ html, body {
 }
 
 /* ==========================================================================
-   BLOCO 40: ÁREA DO MAPA (60% e Mergulho sob a faixa)
+   BLOCO 40: ÁREA DO MAPA (COM MERGULHO TOTAL À ESQUERDA)
    ========================================================================== */
 .area-mapa-teste { 
-    width: 60% !important; 
+    width: 60% !important; /* Diminuído para dar mais espaço à ficha */
     height: 100% !important;
     background: #eeeeee !important; 
     
-    /* O SEGREDO DO MERGULHO: Puxa 75px para a esquerda */
-    margin-left: -75px !important; 
-    padding-left: 75px !important; 
+    /* ESTE É O SEGREDO DO MERGULHO */
+    margin-left: -75px !important; /* Puxa a caixa para o início da tela */
+    padding-left: 75px !important; /* Empurra o conteúdo para não ficar escondido */
     
     display: flex !important; 
     align-items: center !important; 
     justify-content: center !important;
-    z-index: 1 !important;
+    z-index: 1 !important; /* Fica abaixo da faixa verde */
+    position: relative;
 }
 
 /* ==========================================================================
    BLOCO 50: ÁREA DA FICHA (40%)
    ========================================================================== */
 .area-ficha-teste {
-    flex: 1 !important; /* Pega os 40% restantes */
+    width: 40% !important; /* Aumentado conforme solicitado */
     height: 100% !important;
     background: #fff5eb !important;
     border-left: 4px solid #ff8c00;
     padding: 20px;
     z-index: 10;
+    box-shadow: -5px 0 15px rgba(0,0,0,0.1); /* Sombra suave para separar do mapa */
 }
