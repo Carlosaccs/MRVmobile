@@ -63,28 +63,36 @@ html, body {
 }
 
 /* ==========================================================================
-   BLOCO 40: ÁREA DO MAPA (LIBERADO PARA A ESQUERDA)
-   ========================================================================== */
-.area-mapa-teste { 
-    width: 60% !important; 
+   BLOCO 40: ÁREA DO MAPA (COM EFEITO DE VAZAMENTO)
+   ========================================================================= */
+.area-mapa { 
+    width: 60% !important; /* Mantemos a proporção da caixa */
     height: 100% !important;
-    background: #eeeeee !important; 
+    background: transparent !important; /* Removemos a cor cinza para o mapa "vazar" */
     
-    margin-left: -75px !important; 
-    padding-left: 0 !important; /* Zeramos o padding para o mapa encostar no ferro */
+    margin-left: -75px !important; /* Puxa a caixa para a extrema esquerda */
+    padding-left: 0 !important;
     
-    display: block !important; /* Mudamos de flex para block para não centralizar */
-    overflow: hidden !important;
-    z-index: 1 !important;
+    display: flex !important; 
+    align-items: center !important; 
+    justify-content: flex-start !important; /* Ancorado à esquerda */
+    z-index: 1 !important; /* Abaixo da faixa verde */
+    overflow: visible !important; /* CRUCIAL: Permite que o mapa vaze */
     position: relative;
 }
 
-/* Garante que o SVG ocupe a altura toda e aceite o alinhamento xMin */
-.area-mapa-teste svg {
+/* ESTICANDO O MAPA PARA VAZAR */
+.area-mapa svg {
     display: block;
-    height: 100%;
-    width: auto;
+    height: 100% !important;
+    
+    /* SEGREDOS DE VAZAMENTO */
+    width: 110% !important; /* Mapa maior que a caixa (110% do container) */
+    margin-left: -100px !important; /* "Chuta" o mapa 100px para a esquerda */
+    
+    filter: drop-shadow(-5px 0 10px rgba(0,0,0,0.1)); /* Sombra para profundidade */
 }
+
 /* ==========================================================================
    BLOCO 50: ÁREA DA FICHA (40%)
    ========================================================================== */
