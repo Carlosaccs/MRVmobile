@@ -265,9 +265,17 @@ html, body {
 .btn-empreendimento.ativo .estoque-label {
     color: #ffffff;
 }
-/* Isso no final do seu mobile.css */
-
+/* ==========================================================================
+   ASSINATURA DE CONTROLE (v25)
+   ========================================================================== */
 .ficha-tecnica::after {
-    content: "CSS Ativo: v=23" !important; /* <--- O "CÓDIGO" É ESSE TEXTO AQUI */
-    /* ... resto das configurações de posição e cor ... */
+    content: "CSS Ativo: v=25" !important;
+    position: absolute !important;
+    top: 10px !important;
+    right: 15px !important;
+    font-size: 12px !important;
+    color: #00ff00 !important; 
+    font-weight: bold !important;
+    z-index: 10000 !important;
+    display: block !important;
 }
