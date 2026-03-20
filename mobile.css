@@ -119,8 +119,8 @@ html, body {
 .btn-empreendimento[data-zona="ZN"] { border-right-color: #ffd700 !important; } /* Amarelo */
 .btn-empreendimento[data-zona="ZS"] { border-right-color: #e6007e !important; } /* Rosa */
 
-/* Se o registro não tiver zona (Coluna B vazia), ele mantém o verde padrão do border-right acima *//* ==========================================================================
-  
+/* Se o registro não tiver zona (Coluna B vazia), ele mantém o verde padrão do border-right acima */ 
+
 /* ==========================================================================
    BLOCO 99: VERSÃO
    ========================================================================== */
