@@ -32,7 +32,9 @@ html, body {
     overflow: hidden !important;
 }
 
-/* BLOCO 30: FAIXA VERDE (75px e por cima de tudo) */
+/* ==========================================================================
+   BLOCO 30: FAIXA VERDE (75px e Ícones 200% maiores)
+   ========================================================================== */
 .faixa-verde-vertical { 
     width: 75px !important; 
     height: 100% !important; 
@@ -41,32 +43,51 @@ html, body {
     flex-direction: column !important;
     align-items: center !important; 
     justify-content: space-between !important; 
-    padding: 20px 0 !important;
+    padding: 30px 0 !important; 
     flex-shrink: 0 !important; 
-    z-index: 999 !important; /* Garante que ela fique por cima */
+    z-index: 999 !important; 
 }
 
-/* BLOCO 35: AJUSTE DO MAPA (Para "mergulhar") */
+.titulo-vertical { 
+    writing-mode: vertical-rl !important; 
+    transform: rotate(180deg) !important; 
+    color: #ffffff !important; 
+    font-weight: bold !important; 
+    font-size: 1.2rem !important; 
+    letter-spacing: 3px !important;
+}
+
+.icon-top, .icon-bottom {
+    color: #ffffff !important;
+    font-size: 3rem !important; /* Tamanho 200% para facilitar o toque */
+}
+
+/* ==========================================================================
+   BLOCO 40: ÁREA DO MAPA (60% e Mergulho sob a faixa)
+   ========================================================================== */
 .area-mapa-teste { 
-    flex: 0.7 !important; /* Seus 70% */
+    width: 60% !important; 
     height: 100% !important;
     background: #eeeeee !important; 
-    margin-left: -30px !important; /* Puxa o mapa para trás da faixa */
-    z-index: 1 !important; 
+    
+    /* O SEGREDO DO MERGULHO: Puxa 75px para a esquerda */
+    margin-left: -75px !important; 
+    padding-left: 75px !important; 
+    
     display: flex !important; 
     align-items: center !important; 
     justify-content: center !important;
+    z-index: 1 !important;
 }
+
 /* ==========================================================================
-   BLOCO 40: ÁREA DA FICHA (30% do que sobra)
+   BLOCO 50: ÁREA DA FICHA (40%)
    ========================================================================== */
 .area-ficha-teste {
-    flex: 1 !important; /* Pega o restante (30%) */
+    flex: 1 !important; /* Pega os 40% restantes */
     height: 100% !important;
-    background: #fff5eb !important; /* Laranja suave para vermos o limite */
-    display: flex !important; 
-    flex-direction: column !important;
-    align-items: center !important; 
-    justify-content: center !important;
-    padding: 10px;
+    background: #fff5eb !important;
+    border-left: 4px solid #ff8c00;
+    padding: 20px;
+    z-index: 10;
 }
