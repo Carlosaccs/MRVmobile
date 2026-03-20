@@ -26,50 +26,49 @@ window.onload = () => {
 };
 
 /* ==========================================================================
-   MOTOR DA PLANILHA (Criação dos Botões)
+   MOTOR DA PLANILHA (Sincronizado com Coluna D)
    ========================================================================== */
 async function carregarDadosPlanilha() {
     try {
         const response = await fetch(URL_PLANILHA_CSV);
         const csvText = await response.text();
-        const linhas = csvText.split('\n').slice(1); // Pula cabeçalho
+        
+        // Divide as linhas, mas lida melhor com possíveis vírgulas no texto
+        const linhas = csvText.split('\n').slice(1); 
 
         if (!listaBotoes) return;
         listaBotoes.innerHTML = '';
 
-      linhas.forEach(linha => {
-    const col = linha.split(',');
-    if (col.length < 5) return;
+        linhas.forEach(linha => {
+            // Regex simples para separar por vírgula, ignorando vírgulas dentro de aspas
+            const col = linha.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+            
+            if (col.length < 5) return;
 
-    const registro = {
-        reg: col[13]?.trim() || "",        // Ex: ZS
-        nomeCurto: col[3]?.trim() || "",   // Ex: Estoril
-        preco: col[4]?.trim() || "",       // Ex: R$ 250.000
-        estoque: col[5]?.trim() || "0"     // Ex: 83
-    };
+            const registro = {
+                idPath: col[0].replace(/"/g, '').trim(),
+                nomeExibicao: col[3].replace(/"/g, '').trim(), // APENAS COLUNA D
+                estoque: col[5]?.replace(/"/g, '').trim() || "0"
+            };
 
-    const btn = document.createElement('div');
-    btn.className = 'btn-empreendimento';
-    
-    // HTML limpo: Nome em destaque e Preço/Estoque embaixo
-    btn.innerHTML = `
-        <div style="color: #00713a; font-size: 1.1rem; font-weight: 800; margin-bottom: 5px;">
-            ${registro.reg} ${registro.nomeCurto}
-        </div>
-        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-            <span style="color: #333; font-weight: bold; font-size: 0.9rem;">${registro.preco}</span>
-            <span style="color: #888; font-size: 0.7rem; font-weight: normal;">RESTAM ${registro.estoque} UN.</span>
-        </div>
-    `;
+            const btn = document.createElement('div');
+            btn.className = 'btn-empreendimento';
+            
+            // Layout sem linhas horizontais e focado na Coluna D
+            btn.innerHTML = `
+                <div style="color: #00713a; font-size: 1rem; font-weight: 800; line-height: 1.2;">
+                    ${registro.nomeExibicao}
+                </div>
+                <div style="margin-top: 5px; color: #888; font-size: 0.7rem; font-weight: bold; text-transform: uppercase;">
+                    Restam ${registro.estoque} unidades
+                </div>
+            `;
 
-    btn.onclick = () => selecionarEmpreendimento(registro, btn);
-    listaBotoes.appendChild(btn);
-});
-    } catch (e) {
-        console.error("Erro ao ler planilha:", e);
-    }
+            btn.onclick = () => selecionarEmpreendimento(registro, btn);
+            listaBotoes.appendChild(btn);
+        });
+    } catch (e) { console.error("Erro na leitura:", e); }
 }
-
 function selecionarEmpreendimento(reg, elemento) {
     // Destaque no botão
     document.querySelectorAll('.btn-empreendimento').forEach(b => b.classList.remove('ativo'));
