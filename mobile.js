@@ -1,5 +1,5 @@
 /* ==========================================================================
-   v132 - RETORNO À ESTABILIDADE DA v127
+   v127 - CORREÇÃO DE POSICIONAMENTO E CARREGAMENTO
    ========================================================================== */
 const svgNS = "http://www.w3.org/2000/svg";
 const URL_PLANILHA = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSRKdJctOPQjKAtOZSDHyArD_H8SgKIouelAS1vF1d_-13pu7u_ic6J8nP3r0Ijd56WA-mbUmHjb4Me/pub?output=csv';
@@ -13,6 +13,7 @@ const AJUSTES_MAPA = {
     INTERIOR: { marginRight: "50%", marginLeft: "-100px", scale: "1.15" }
 };
 
+// Carregamento da planilha (Igual v125)
 async function carregarPlanilha() {
     try {
         const res = await fetch(URL_PLANILHA);
@@ -58,17 +59,19 @@ function desenharMapa(dados, targetId, ehMinimizado) {
         const idLimpo = pData.id.toLowerCase();
         const info = window.bancoDados[idLimpo];
         const nomeCidade = pData.name || pData.id;
+        
+        // CORREÇÃO: Identifica a classe do path para a trava
         const ehMRV = pData.class === "commrv";
 
         path.setAttribute("d", pData.d);
-        path.setAttribute("class", pData.class || "semmrv");
         path.setAttribute("id", (ehMinimizado ? 'mini-' : '') + pData.id);
+        path.setAttribute("class", pData.class || "semmrv");
         
         const corVerde = "#00713a";
         const corCinzaClaro = "#cccccc";
         const corLaranjaVivo = "#FF4500";
-        const corOriginal = ehMRV ? corVerde : corCinzaClaro;
 
+        const corOriginal = ehMRV ? corVerde : corCinzaClaro;
         path.style.fill = corOriginal;
         path.style.stroke = "#ffffff";
         path.style.strokeWidth = ehMinimizado ? "6" : "1.2";
@@ -79,18 +82,24 @@ function desenharMapa(dados, targetId, ehMinimizado) {
                 if (ehMRV) {
                     const display = document.getElementById('identificador-cidade');
                     if(display) display.innerText = nomeCidade;
-                    if (path.getAttribute('data-selecionado') !== 'true') path.style.fill = corLaranjaVivo;
+                    if (path.getAttribute('data-selecionado') !== 'true') {
+                        path.style.fill = corLaranjaVivo;
+                    }
+                } else {
+                    path.style.fill = "#888888"; // Feedback visual simples para semmrv
                 }
             };
 
             path.onmouseout = () => {
                 const display = document.getElementById('identificador-cidade');
                 if(display) display.innerText = cidadeSelecionada;
-                if (path.getAttribute('data-selecionado') !== 'true') path.style.fill = corOriginal;
+                if (path.getAttribute('data-selecionado') !== 'true') {
+                    path.style.fill = corOriginal;
+                }
             };
 
             path.onclick = () => {
-                if (!ehMRV) return;
+                if (!ehMRV) return; // TRAVA DE CLIQUE: Ignora paths semmrv
 
                 document.querySelectorAll('#mapa-container path').forEach(p => {
                     p.setAttribute('data-selecionado', 'false');
@@ -136,7 +145,7 @@ function trocarMapas() {
 }
 
 window.onload = carregarPlanilha;
-
+// Atribui o clique ao botão minimizado de forma segura
 document.addEventListener('click', (e) => {
     if (e.target.closest('#mapa-minimizado')) trocarMapas();
 });
