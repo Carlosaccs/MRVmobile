@@ -25,7 +25,7 @@ async function carregarPlanilha() {
                 estoque: c[5]?.replace(/"/g, '').trim() || "0"
             };
         });
-    } catch (e) { console.warn("Erro ao carregar planilha."); }
+    } catch (e) { console.warn("Planilha..."); }
 }
 
 /* ==========================================================================
@@ -41,16 +41,25 @@ function desenharMapa(dados, targetId, ehMinimizado) {
     svg.setAttribute("viewBox", dados.viewBox);
     svg.setAttribute("preserveAspectRatio", "xMidYMid meet");
 
-    // 3.1 Ajuste Dinâmico de Posição (v120)
+    /* ==========================================================================
+       3.1 AJUSTE DINÂMICO DE POSIÇÃO E ZOOM (v121)
+       ========================================================================== 
+       Controlamos o zoom isolado aqui para não impactar o mapa oposto.
+    */
     if (!ehMinimizado) {
         if (mapaAtivo === "INTERIOR") {
-            // Empurra o Interior mais para a esquerda para liberar as áreas verdes
+            // INTERIOR (SP): Centralizado e Ampliado v121
+            // Mantém a Grande SP na posição original aprovada
             svg.style.marginRight = "50%"; 
             svg.style.marginLeft = "-100px";
+            // ZOOM v121: Aplica scale(1.15) apenas ao Interior para ele crescer 15%
+            svg.style.transform = "scale(1.15)"; 
         } else {
-            // Mantém a Grande SP na posição original aprovada
+            // GRANDE SP (GSP): Mantém a configuração da v116/120 (está ótima)
             svg.style.marginRight = "35%"; 
             svg.style.marginLeft = "-70px";
+            // Reseta o zoom
+            svg.style.transform = "scale(1)"; 
         }
     }
 
