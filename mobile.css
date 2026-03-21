@@ -6,7 +6,7 @@ html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden;
 .mobile-wrapper { display: flex; width: 100vw; height: 100vh; position: relative; overflow: hidden; }
 
 /* ==========================================================================
-   BLOCO 20: FAIXA VERDE
+   BLOCO 20: FAIXA VERDE (FLUTUANTE SOBRE O MAPA)
    ========================================================================== */
 .faixa-verde-vertical { 
     position: absolute; left: 0; top: 0; width: 52px; height: 100vh; 
@@ -16,29 +16,29 @@ html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden;
 .titulo-vertical { writing-mode: vertical-rl; transform: rotate(180deg); color: white; font-weight: bold; font-size: 1rem; letter-spacing: 2px; white-space: nowrap; }
 
 /* ==========================================================================
-   BLOCO 30: MAPA (CENTRALIZADO NA ÁREA ÚTIL)
+   BLOCO 30: MAPA (OCUPA TUDO E MERGULHA NA ESQUERDA)
    ========================================================================== */
 #mapa-container {
     position: absolute;
-    left: 0;
-    top: 0;
-    width: 100%; /* Ocupa a tela toda por baixo */
+    left: 0; top: 0;
+    width: 70%; /* Limita a área útil para não ficar sob a ficha técnica */
     height: 100%;
     z-index: 10;
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start; /* Alinha o mapa à esquerda */
+    overflow: visible; /* Permite que o SVG "saia" do container se necessário */
 }
 #mapa-container svg { 
-    width: 85%; /* Ajustado para não bater na ficha técnica */
+    width: 100%; /* Ocupa toda a largura do container de 70% */
     height: auto;
-    max-height: 90%;
-    /* O padding-left garante que o conteúdo do mapa não fique escondido sob a faixa verde */
-    padding-left: 60px; 
+    max-height: 95%;
+    /* O segredo do mergulho: margem negativa para ignorar o limite da faixa verde */
+    margin-left: -20px; 
 }
 
 /* ==========================================================================
-   BLOCO 40: MINIATURA (DIREITA)
+   BLOCO 40: MINIATURA (LADO DIREITO)
    ========================================================================== */
 #mapa-minimizado {
     position: absolute;
@@ -51,8 +51,7 @@ html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden;
     z-index: 1500;
     cursor: pointer;
     box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-    display: flex; align-items: center; justify-content: center;
-    overflow: hidden;
+    display: flex; align-items: center; justify-content: center; overflow: hidden;
 }
 #mapa-minimizado svg { width: 90%; height: 90%; pointer-events: none; }
 
