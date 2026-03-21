@@ -1,20 +1,26 @@
 /* ==========================================================================
-   BLOCO 10: MOTOR DA PLANILHA (v27)
+   BLOCO 01: CONFIGURAÇÕES
    ========================================================================== */
-const URL_PLANILHA_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSRKdJctOPQjKAtOZSDHyArD_H8SgKIouelAS1vF1d_-13pu7u_ic6J8nP3r0Ijd56WA-mbUmHjb4Me/pub?output=csv';
+const containerMapa = document.getElementById('mapa-container');
+const listaBotoes = document.getElementById('lista-botoes');
+const menuEmp = document.getElementById('menu-empreendimentos');
+const svgNS = "http://www.w3.org/2000/svg";
+const URL_PLANILHA_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSRKdJctOPQjKAtOZSDHyArD_H8SgKIouelAS1vF1d_-13pu7u_ic6J8nP3r0Ijd56WA-mbUmHjb4Me/pub?output=csv'; 
 
+/* ==========================================================================
+   BLOCO 10: MOTOR DA PLANILHA (SIMPLES)
+   ========================================================================== */
 async function carregarDadosPlanilha() {
     try {
         const response = await fetch(URL_PLANILHA_CSV);
         const csvText = await response.text();
         const linhas = csvText.split('\n').slice(1);
-        const lista = document.getElementById('lista-botoes');
-        if (!lista) return;
-        lista.innerHTML = '';
+        if (!listaBotoes) return;
+        listaBotoes.innerHTML = '';
 
         linhas.forEach(linha => {
             const col = linha.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
-            if (col.length < 4) return;
+            if (col.length < 5) return;
 
             const registro = {
                 idPath: col[0].replace(/"/g, '').trim(),
@@ -30,25 +36,20 @@ async function carregarDadosPlanilha() {
             `;
             
             btn.onclick = () => {
-                document.getElementById('nome-imovel').innerText = registro.nome;
-                // Lógica de destaque do mapa simplificada
                 document.querySelectorAll('path').forEach(p => p.style.fill = p.getAttribute('data-original-fill'));
                 const shape = document.getElementById(registro.idPath);
                 if (shape) shape.style.fill = "#ff8c00";
             };
-            lista.appendChild(btn);
+            listaBotoes.appendChild(btn);
         });
-    } catch (e) { console.error("Erro na restauração v27:", e); }
+    } catch (e) { console.error("Erro v27:", e); }
 }
 
 /* ==========================================================================
    BLOCO 30: RENDERIZAÇÃO DO MAPA
    ========================================================================== */
 function renderizarMapa(dados) {
-    const container = document.getElementById('mapa-container');
-    if (!container || !dados) return;
-    
-    const svgNS = "http://www.w3.org/2000/svg";
+    if (!containerMapa || !dados) return;
     const svg = document.createElementNS(svgNS, "svg");
     svg.setAttribute("viewBox", dados.viewBox);
     svg.setAttribute("preserveAspectRatio", "xMidYMid meet");
@@ -69,8 +70,8 @@ function renderizarMapa(dados) {
     });
 
     svg.appendChild(g);
-    container.innerHTML = "";
-    container.appendChild(svg);
+    containerMapa.innerHTML = "";
+    containerMapa.appendChild(svg);
 }
 
 /* ==========================================================================
@@ -81,6 +82,9 @@ window.onload = () => {
     carregarDadosPlanilha();
 };
 
-document.querySelector('.icon-bottom').onclick = () => {
-    document.getElementById('menu-empreendimentos').classList.toggle('aberto');
-};
+const btnMenu = document.querySelector('.icon-bottom');
+if(btnMenu) {
+    btnMenu.onclick = () => {
+        if(menuEmp) menuEmp.classList.toggle('aberto');
+    };
+}
