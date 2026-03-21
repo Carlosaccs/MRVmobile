@@ -1,37 +1,53 @@
 /* ==========================================================================
-   1. CONFIGURAÇÕES E VARIÁVEIS GLOBAIS
-   ========================================================================== 
-*/
+   v122 - CONEXÃO GOOGLE SHEETS + MAPA DINÂMICO
+   ========================================================================== */
 const svgNS = "http://www.w3.org/2000/svg";
 const URL_PLANILHA = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSRKdJctOPQjKAtOZSDHyArD_H8SgKIouelAS1vF1d_-13pu7u_ic6J8nP3r0Ijd56WA-mbUmHjb4Me/pub?output=csv';
-let mapaAtivo = "GSP";
 
-/* ==========================================================================
-   2. CONEXÃO COM O BANCO DE DADOS (PLANILHA)
-   ========================================================================== 
-*/
+let mapaAtivo = "GSP";
+window.bancoDados = {}; // Repositório global de dados da planilha
+
+// AJUSTES DE POSICIONAMENTO (Mantendo a blindagem da v121)
+const AJUSTES_MAPA = {
+    GSP: { marginRight: "35%", marginLeft: "-70px", scale: "1" },
+    INTERIOR: { marginRight: "50%", marginLeft: "-100px", scale: "1.15" }
+};
+
+/* --------------------------------------------------------------------------
+   FUNÇÃO: Busca dados na Planilha e converte CSV em Objeto
+   -------------------------------------------------------------------------- */
 async function carregarPlanilha() {
     try {
         const res = await fetch(URL_PLANILHA);
         const csv = await res.text();
+        
+        // Converte CSV em linhas, ignorando o cabeçalho
         const linhas = csv.split('\n').slice(1);
-        window.bancoDados = {};
-        linhas.forEach(l => {
-            const c = l.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
-            if (c.length < 5) return;
-            const id = c[0].replace(/"/g, '').trim();
-            window.bancoDados[id] = {
-                nome: c[3]?.replace(/"/g, '').trim() || "Residencial",
-                estoque: c[5]?.replace(/"/g, '').trim() || "0"
-            };
+        
+        linhas.forEach(linha => {
+            // Regex para lidar com possíveis vírgulas dentro de aspas nos nomes
+            const colunas = linha.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+            
+            if (colunas.length >= 4) {
+                const idRegiao = colunas[0].replace(/"/g, '').trim().toLowerCase();
+                window.bancoDados[idRegiao] = {
+                    nome: colunas[3]?.replace(/"/g, '').trim() || "Empreendimento",
+                    estoque: colunas[5]?.replace(/"/g, '').trim() || "Consulte",
+                    status: colunas[4]?.replace(/"/g, '').trim() || ""
+                };
+            }
         });
-    } catch (e) { console.warn("Planilha..."); }
+        console.log("Banco de dados atualizado via Sheets");
+        // Re-desenha o mapa inicial agora com os dados carregados
+        atualizarVisualizacao();
+    } catch (e) {
+        console.error("Erro ao conectar com Google Sheets:", e);
+    }
 }
 
-/* ==========================================================================
-   3. RENDERIZAÇÃO DO MAPA (DESENHO DOS PATHS)
-   ========================================================================== 
-*/
+/* --------------------------------------------------------------------------
+   FUNÇÃO: Desenha o SVG e associa aos Dados
+   -------------------------------------------------------------------------- */
 function desenharMapa(dados, targetId, ehMinimizado) {
     const container = document.getElementById(targetId);
     if (!container || !dados) return;
@@ -39,55 +55,54 @@ function desenharMapa(dados, targetId, ehMinimizado) {
     container.innerHTML = "";
     const svg = document.createElementNS(svgNS, "svg");
     svg.setAttribute("viewBox", dados.viewBox);
-    svg.setAttribute("preserveAspectRatio", "xMidYMid meet");
-
-    /* ==========================================================================
-       3.1 AJUSTE DINÂMICO DE POSIÇÃO E ZOOM (v121)
-       ========================================================================== 
-       Controlamos o zoom isolado aqui para não impactar o mapa oposto.
-    */
+    
     if (!ehMinimizado) {
-        if (mapaAtivo === "INTERIOR") {
-            // INTERIOR (SP): Centralizado e Ampliado v121
-            // Mantém a Grande SP na posição original aprovada
-            svg.style.marginRight = "50%"; 
-            svg.style.marginLeft = "-100px";
-            // ZOOM v121: Aplica scale(1.15) apenas ao Interior para ele crescer 15%
-            svg.style.transform = "scale(1.15)"; 
-        } else {
-            // GRANDE SP (GSP): Mantém a configuração da v116/120 (está ótima)
-            svg.style.marginRight = "35%"; 
-            svg.style.marginLeft = "-70px";
-            // Reseta o zoom
-            svg.style.transform = "scale(1)"; 
-        }
+        const conf = AJUSTES_MAPA[mapaAtivo];
+        svg.style.marginRight = conf.marginRight;
+        svg.style.marginLeft = conf.marginLeft;
+        svg.style.transform = `scale(${conf.scale})`;
     }
 
     const g = document.createElementNS(svgNS, "g");
     g.setAttribute("transform", dados.transform);
 
-    // 3.2 Loop de criação dos polígonos
     dados.paths.forEach(pData => {
         const path = document.createElementNS(svgNS, "path");
+        const idLimpo = pData.id.toLowerCase();
+        
         path.setAttribute("d", pData.d);
         path.setAttribute("id", (ehMinimizado ? 'mini-' : '') + pData.id);
         
-        const corBase = pData.class === "semmrv" ? "#cccccc" : "#00713a";
+        // Lógica de Cor: Se o ID existe na planilha e tem estoque, fica verde
+        const info = window.bancoDados[idLimpo];
+        const corBase = (info && pData.class !== "semmrv") ? "#00713a" : "#cccccc";
+        
         path.style.fill = corBase;
         path.style.stroke = "#ffffff";
-        path.style.strokeWidth = ehMinimizado ? "6" : "1.8";
+        path.style.strokeWidth = ehMinimizado ? "6" : "1.5";
 
-        // 3.3 Interação de Clique
         if (!ehMinimizado) {
             path.setAttribute('data-fill-original', corBase);
+            path.style.cursor = info ? "pointer" : "default";
+
             path.onclick = () => {
+                // Reset de cores
                 document.querySelectorAll('#mapa-container path').forEach(p => {
                     p.style.fill = p.getAttribute('data-fill-original');
                 });
-                path.style.fill = "#ffb347";
-                const info = window.bancoDados ? window.bancoDados[pData.id] : null;
-                document.getElementById('nome-imovel').innerText = info ? info.nome : pData.id.toUpperCase();
-                document.getElementById('detalhes-imovel').innerText = info ? `Unidades: ${info.estoque}` : "Toque em um residencial verde.";
+
+                if (info) {
+                    path.style.fill = "#ffb347"; // Destaque laranja ao clicar
+                    document.getElementById('nome-imovel').innerText = info.nome;
+                    document.getElementById('detalhes-imovel').innerHTML = `
+                        <strong>Região:</strong> ${idLimpo.toUpperCase()}<br>
+                        <strong>Unidades:</strong> ${info.estoque}<br>
+                        <small>Status: ${info.status}</small>
+                    `;
+                } else {
+                    document.getElementById('nome-imovel').innerText = "Selecione";
+                    document.getElementById('detalhes-imovel').innerText = "Sem dados para esta região.";
+                }
             };
         }
         g.appendChild(path);
@@ -97,25 +112,19 @@ function desenharMapa(dados, targetId, ehMinimizado) {
     container.appendChild(svg);
 }
 
-/* ==========================================================================
-   4. LOGICA DE TROCA DE MAPAS (BOTÃO MINIATURA)
-   ========================================================================== 
-*/
-function trocarMapas() {
-    mapaAtivo = (mapaAtivo === "GSP") ? "INTERIOR" : "GSP";
+function atualizarVisualizacao() {
     desenharMapa(mapaAtivo === "GSP" ? MAPA_GSP : MAPA_INTERIOR, "mapa-container", false);
     desenharMapa(mapaAtivo === "GSP" ? MAPA_INTERIOR : MAPA_GSP, "mapa-minimizado", true);
 }
 
-/* ==========================================================================
-   5. INICIALIZAÇÃO DO SISTEMA
-   ========================================================================== 
-*/
+function trocarMapas() {
+    mapaAtivo = (mapaAtivo === "GSP") ? "INTERIOR" : "GSP";
+    atualizarVisualizacao();
+}
+
+// Inicialização
 window.onload = async () => {
+    // Primeiro carrega os dados, o desenho acontece dentro do carregarPlanilha
     await carregarPlanilha();
-    if (typeof MAPA_GSP !== 'undefined' && typeof MAPA_INTERIOR !== 'undefined') {
-        desenharMapa(MAPA_GSP, "mapa-container", false);
-        desenharMapa(MAPA_INTERIOR, "mapa-minimizado", true);
-        document.getElementById('mapa-minimizado').onclick = trocarMapas;
-    }
+    document.getElementById('mapa-minimizado').onclick = trocarMapas;
 };
