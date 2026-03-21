@@ -1,6 +1,8 @@
 /* ==========================================================================
-   BLOCO 10: MOTOR DA PLANILHA (ORDEM DAS COLUNAS REVISADA)
+   BLOCO 10: MOTOR DA PLANILHA (MAPEAMENTO SEGURO)
    ========================================================================== */
+const URL_PLANILHA_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSRKdJctOPQjKAtOZSDHyArD_H8SgKIouelAS1vF1d_-13pu7u_ic6J8nP3r0Ijd56WA-mbUmHjb4Me/pub?output=csv';
+
 async function carregarDadosPlanilha() {
     try {
         const response = await fetch(URL_PLANILHA_CSV);
@@ -17,6 +19,7 @@ async function carregarDadosPlanilha() {
             const registro = {
                 idPath: col[0].replace(/"/g, '').trim(),
                 zona: col[1]?.replace(/"/g, '').trim().toUpperCase() || "", // Coluna B
+                valor: col[2]?.replace(/"/g, '').trim() || "",              // Coluna C
                 nome: col[3]?.replace(/"/g, '').trim() || "Sem Nome",       // Coluna D
                 estoque: col[5]?.replace(/"/g, '').trim() || "0"            // Coluna F
             };
@@ -25,24 +28,21 @@ async function carregarDadosPlanilha() {
             btn.className = 'btn-empreendimento';
             btn.setAttribute('data-zona', registro.zona);
             
-            // HTML limpo para evitar textos encavalados
+            // Estrutura de texto em blocos para não encavalar
             btn.innerHTML = `
-                <div style="font-weight: 800; color: #333; font-size: 0.85rem; margin-bottom: 3px;">
-                    ${registro.zona} ${registro.nome}
-                </div>
-                <div style="color: #888; font-size: 0.65rem; text-transform: uppercase;">
-                    Restam ${registro.estoque} unidades
-                </div>
+                <div style="font-size: 0.7rem; color: #666; font-weight: bold;">${registro.valor}</div>
+                <div style="font-size: 0.95rem; color: #222; font-weight: 800;">${registro.nome}</div>
+                <div style="font-size: 0.65rem; color: #999; text-transform: uppercase;">Restam ${registro.estoque} unidades</div>
             `;
             
             btn.onclick = () => selecionarEmpreendimento(registro, btn);
             lista.appendChild(btn);
         });
-    } catch (e) { console.error("Erro na restauração v35:", e); }
+    } catch (e) { console.error("Erro v36:", e); }
 }
 
 /* ==========================================================================
-   BLOCO 30 & 40: INICIALIZAÇÃO E MAPA
+   BLOCO 30: RENDERIZAÇÃO DO MAPA
    ========================================================================== */
 function renderizarMapa(dados) {
     const container = document.getElementById('mapa-container');
@@ -73,12 +73,14 @@ function renderizarMapa(dados) {
     container.appendChild(svg);
 }
 
+/* ==========================================================================
+   BLOCO 40: EVENTOS
+   ========================================================================== */
 window.onload = () => {
     if (typeof MAPA_GSP !== 'undefined') renderizarMapa(MAPA_GSP);
     carregarDadosPlanilha();
 };
 
-// Toggle Menu
 document.querySelector('.icon-bottom').onclick = () => {
     document.getElementById('menu-empreendimentos').classList.toggle('aberto');
 };
