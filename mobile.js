@@ -1,53 +1,45 @@
 /* ==========================================================================
-   v122 - CONEXÃO GOOGLE SHEETS + MAPA DINÂMICO
+   v123 - LÓGICA DE DADOS COMPLETA + INTERAÇÃO AVANÇADA
    ========================================================================== */
 const svgNS = "http://www.w3.org/2000/svg";
 const URL_PLANILHA = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSRKdJctOPQjKAtOZSDHyArD_H8SgKIouelAS1vF1d_-13pu7u_ic6J8nP3r0Ijd56WA-mbUmHjb4Me/pub?output=csv';
 
 let mapaAtivo = "GSP";
-window.bancoDados = {}; // Repositório global de dados da planilha
+window.bancoDados = {}; 
 
-// AJUSTES DE POSICIONAMENTO (Mantendo a blindagem da v121)
 const AJUSTES_MAPA = {
     GSP: { marginRight: "35%", marginLeft: "-70px", scale: "1" },
     INTERIOR: { marginRight: "50%", marginLeft: "-100px", scale: "1.15" }
 };
 
-/* --------------------------------------------------------------------------
-   FUNÇÃO: Busca dados na Planilha e converte CSV em Objeto
-   -------------------------------------------------------------------------- */
+/* 1. CARREGAMENTO DA PLANILHA (Mapeamento Completo) */
 async function carregarPlanilha() {
     try {
         const res = await fetch(URL_PLANILHA);
         const csv = await res.text();
-        
-        // Converte CSV em linhas, ignorando o cabeçalho
         const linhas = csv.split('\n').slice(1);
         
+        window.bancoDados = {};
         linhas.forEach(linha => {
-            // Regex para lidar com possíveis vírgulas dentro de aspas nos nomes
-            const colunas = linha.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
-            
-            if (colunas.length >= 4) {
-                const idRegiao = colunas[0].replace(/"/g, '').trim().toLowerCase();
-                window.bancoDados[idRegiao] = {
-                    nome: colunas[3]?.replace(/"/g, '').trim() || "Empreendimento",
-                    estoque: colunas[5]?.replace(/"/g, '').trim() || "Consulte",
-                    status: colunas[4]?.replace(/"/g, '').trim() || ""
+            const c = linha.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+            if (c.length >= 5) {
+                const id = c[0].replace(/"/g, '').trim().toLowerCase();
+                // Mapeamos os campos conforme sua lista (0 a 30)
+                window.bancoDados[id] = {
+                    nomeCurto: c[3]?.replace(/"/g, '').trim(),
+                    nomeFull: c[4]?.replace(/"/g, '').trim(),
+                    estoque: c[5]?.replace(/"/g, '').trim(),
+                    entrega: c[8]?.replace(/"/g, '').trim(),
+                    statusObra: c[11]?.replace(/"/g, '').trim(),
+                    dica: c[16]?.replace(/"/g, '').trim()
                 };
             }
         });
-        console.log("Banco de dados atualizado via Sheets");
-        // Re-desenha o mapa inicial agora com os dados carregados
         atualizarVisualizacao();
-    } catch (e) {
-        console.error("Erro ao conectar com Google Sheets:", e);
-    }
+    } catch (e) { console.error("Erro ao carregar dados."); }
 }
 
-/* --------------------------------------------------------------------------
-   FUNÇÃO: Desenha o SVG e associa aos Dados
-   -------------------------------------------------------------------------- */
+/* 2. RENDERIZAÇÃO E INTERAÇÃO */
 function desenharMapa(dados, targetId, ehMinimizado) {
     const container = document.getElementById(targetId);
     if (!container || !dados) return;
@@ -58,9 +50,7 @@ function desenharMapa(dados, targetId, ehMinimizado) {
     
     if (!ehMinimizado) {
         const conf = AJUSTES_MAPA[mapaAtivo];
-        svg.style.marginRight = conf.marginRight;
-        svg.style.marginLeft = conf.marginLeft;
-        svg.style.transform = `scale(${conf.scale})`;
+        Object.assign(svg.style, { marginRight: conf.marginRight, marginLeft: conf.marginLeft, transform: `scale(${conf.scale})` });
     }
 
     const g = document.createElementNS(svgNS, "g");
@@ -69,39 +59,69 @@ function desenharMapa(dados, targetId, ehMinimizado) {
     dados.paths.forEach(pData => {
         const path = document.createElementNS(svgNS, "path");
         const idLimpo = pData.id.toLowerCase();
+        const info = window.bancoDados[idLimpo];
         
         path.setAttribute("d", pData.d);
         path.setAttribute("id", (ehMinimizado ? 'mini-' : '') + pData.id);
         
-        // Lógica de Cor: Se o ID existe na planilha e tem estoque, fica verde
-        const info = window.bancoDados[idLimpo];
-        const corBase = (info && pData.class !== "semmrv") ? "#00713a" : "#cccccc";
+        // Cores Iniciais
+        const corVerde = "#00713a";
+        const corCinzaClaro = "#cccccc";
+        const corCinzaEscuro = "#999999"; // Hover do cinza
+        const corLaranja = "#ffb347";   // Seleção/Hover do verde
+
+        const corOriginal = (info && pData.class !== "semmrv") ? corVerde : corCinzaClaro;
         
-        path.style.fill = corBase;
+        path.style.fill = corOriginal;
         path.style.stroke = "#ffffff";
-        path.style.strokeWidth = ehMinimizado ? "6" : "1.5";
+        path.style.strokeWidth = ehMinimizado ? "6" : "1.2";
+        path.setAttribute('data-cor-base', corOriginal);
 
         if (!ehMinimizado) {
-            path.setAttribute('data-fill-original', corBase);
-            path.style.cursor = info ? "pointer" : "default";
+            // EVENTO: Hover (Passar o Mouse)
+            path.onmouseover = () => {
+                if (path.getAttribute('data-selecionado') === 'true') return;
+                
+                if (corOriginal === corVerde) {
+                    path.style.fill = corLaranja;
+                } else {
+                    path.style.fill = corCinzaEscuro;
+                }
+            };
 
+            // EVENTO: Out (Sair com o Mouse)
+            path.onmouseout = () => {
+                if (path.getAttribute('data-selecionado') === 'true') return;
+                path.style.fill = corOriginal;
+            };
+
+            // EVENTO: Clique (Selecionar)
             path.onclick = () => {
-                // Reset de cores
+                // 1. Limpa seleção anterior de todos os paths
                 document.querySelectorAll('#mapa-container path').forEach(p => {
-                    p.style.fill = p.getAttribute('data-fill-original');
+                    p.setAttribute('data-selecionado', 'false');
+                    p.style.fill = p.getAttribute('data-cor-base');
+                    p.style.strokeWidth = "1.2";
                 });
 
-                if (info) {
-                    path.style.fill = "#ffb347"; // Destaque laranja ao clicar
-                    document.getElementById('nome-imovel').innerText = info.nome;
+                // 2. Fixa o novo path como selecionado se for Verde/MRV
+                if (corOriginal === corVerde) {
+                    path.setAttribute('data-selecionado', 'true');
+                    path.style.fill = corLaranja;
+                    path.style.strokeWidth = "2";
+                    
+                    // Atualiza Ficha Técnica
+                    document.getElementById('nome-imovel').innerText = info.nomeCurto || info.nomeFull;
                     document.getElementById('detalhes-imovel').innerHTML = `
-                        <strong>Região:</strong> ${idLimpo.toUpperCase()}<br>
-                        <strong>Unidades:</strong> ${info.estoque}<br>
-                        <small>Status: ${info.status}</small>
+                        <p><strong>Estoque:</strong> ${info.estoque} unidades</p>
+                        <p><strong>Previsão:</strong> ${info.entrega}</p>
+                        <p><strong>Obra:</strong> ${info.statusObra}</p>
+                        <hr style="border:0; border-top:1px solid #777">
+                        <p style="font-style:italic; font-size:0.9rem">${info.dica}</p>
                     `;
                 } else {
-                    document.getElementById('nome-imovel').innerText = "Selecione";
-                    document.getElementById('detalhes-imovel').innerText = "Sem dados para esta região.";
+                    document.getElementById('nome-imovel').innerText = "Área sem MRV";
+                    document.getElementById('detalhes-imovel').innerText = "Esta região não possui empreendimentos ativos no momento.";
                 }
             };
         }
@@ -119,12 +139,11 @@ function atualizarVisualizacao() {
 
 function trocarMapas() {
     mapaAtivo = (mapaAtivo === "GSP") ? "INTERIOR" : "GSP";
+    // Ao trocar, a visualização reseta (limpa o laranja fixo)
     atualizarVisualizacao();
 }
 
-// Inicialização
 window.onload = async () => {
-    // Primeiro carrega os dados, o desenho acontece dentro do carregarPlanilha
     await carregarPlanilha();
     document.getElementById('mapa-minimizado').onclick = trocarMapas;
 };
