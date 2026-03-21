@@ -17,9 +17,8 @@ html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden;
 
 /* ... (Mantenha os blocos 10, 20, 40 e 50 iguais à v116) ... */
 
-/* ... (Mantenha os blocos 10, 20, 40 e 50 das versões anteriores) ... */
+/* ... (mantenha os estilos gerais de wrapper e faixa verde) ... */
 
-/* BLOCO 30: MAPA (v118) */
 #mapa-container {
     position: absolute;
     left: 0; top: 0;
@@ -30,22 +29,21 @@ html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden;
 }
 
 #mapa-container svg { 
-    width: 125% !important; /* Zoom padrão que você gostou */
+    width: 125% !important; 
     height: auto;
     max-height: 95%;
 }
 
-/* GRANDE SP: Fica exatamente como estava na v115/116 */
+/* CONFIGURAÇÃO GRANDE SP (v119) - Fica exatamente como você gostava */
 #mapa-container.modo-gsp svg {
     margin-right: 35%; 
     margin-left: -70px;
 }
 
-/* INTERIOR: Agora também vai para a esquerda para revelar os pontos verdes */
+/* CONFIGURAÇÃO INTERIOR (v119) - Move para a esquerda para liberar as áreas verdes */
 #mapa-container.modo-interior svg {
-    /* Puxamos para a esquerda para tirar as cidades da MRV debaixo da ficha */
-    margin-right: 40%; 
-    margin-left: -80px;
+    margin-right: 48%; /* Aumentamos aqui para empurrar mais para a esquerda */
+    margin-left: -120px; /* Ajuste compensatório */
 }
 /* ==========================================================================
    BLOCO 40: MINIATURA (AGORA FORA DA FICHA TÉCNICA v115 - SEM ALTERAÇÕES)
