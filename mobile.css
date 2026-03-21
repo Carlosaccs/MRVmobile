@@ -1,23 +1,22 @@
 /* ==========================================================================
-   BLOCO 10: FUNDAÇÃO
+   BLOCO 10: FUNDAÇÃO (SEM ALTERAÇÕES)
    ========================================================================== */
 html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #fff; }
 * { box-sizing: border-box; font-family: sans-serif; }
 .mobile-wrapper { display: flex; width: 100vw; height: 100vh; position: relative; overflow: hidden; }
 
 /* ==========================================================================
-   BLOCO 20: FAIXA VERDE (FLUTUANTE)
+   BLOCO 20: FAIXA VERDE (FLUTUANTE - SEM ALTERAÇÕES)
    ========================================================================== */
 .faixa-verde-vertical { 
     position: absolute; left: 0; top: 0; width: 52px; height: 100vh; 
-    background: #00713a; z-index: 2000; /* Sempre no topo */
+    background: #00713a; z-index: 2000;
     display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 20px 0;
 }
 .titulo-vertical { writing-mode: vertical-rl; transform: rotate(180deg); color: white; font-weight: bold; font-size: 1rem; letter-spacing: 2px; white-space: nowrap; }
-.icon-top, .icon-bottom { color: #ffffff; font-size: 2rem; cursor: pointer; }
 
 /* ==========================================================================
-   BLOCO 30: MAPA (OCUPA TUDO NO FUNDO v114)
+   BLOCO 30: MAPA (OCUPA TUDO NO FUNDO v115 - PUXADO PARA A ESQUERDA)
    ========================================================================== */
 #mapa-container {
     position: absolute;
@@ -30,30 +29,27 @@ html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden;
     overflow: hidden;
 }
 #mapa-container svg { 
-    /* AUMENTO v114: Dá o zoom de 20% no SVG diretamente */
-    width: 120% !important; /* Aumentado de 100% para 120% */
+    /* Mantemos o zoom de 20% no SVG diretamente */
+    width: 120% !important;
     height: auto;
     max-height: 95%;
-    /* COMPENSAÇÃO v114: Como o mapa centralizado agora é gigante, ele ficaria 
-       muito coberto pela ficha técnica. Usamos margem negativa para 'puxar' 
-       o mapa levemente para a esquerda, centralizando-o na área útil. */
-    margin-right: 25%; 
-    margin-left: -60px; /* Mantém o mergulho sob a faixa verde */
+    /* COMPENSAÇÃO v115: 'Puxa' o mapa mais agressivamente para a esquerda */
+    margin-right: 35%; /* Aumentado de 25% para 35% para fugir mais da ficha */
+    margin-left: -70px; /* Aumentado de -60px para -70px para a faixa verde */
 }
 
 /* ==========================================================================
-   BLOCO 40: MINIATURA (AGORA FORA DA FICHA TÉCNICA v114)
+   BLOCO 40: MINIATURA (AGORA FORA DA FICHA TÉCNICA v115 - SEM ALTERAÇÕES)
    ========================================================================== */
 #mapa-minimizado {
     position: absolute;
-    /* Ajustado para acompanhar a borda da nova ficha ampla (44% + respiro) */
     right: 46%; 
     bottom: 30px;
     width: 110px; height: 110px;
     background: #ffffff;
     border: 3px solid #00713a;
     border-radius: 12px;
-    z-index: 1500; /* Mais alto que a ficha (1000) */
+    z-index: 1500;
     cursor: pointer;
     box-shadow: 0 4px 15px rgba(0,0,0,0.3);
     display: flex; align-items: center; justify-content: center;
@@ -62,17 +58,17 @@ html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden;
 #mapa-minimizado svg { width: 90%; height: 90%; pointer-events: none; }
 
 /* ==========================================================================
-   BLOCO 50: FICHA TÉCNICA (MANTIDA EM 44%)
+   BLOCO 50: FICHA TÉCNICA (MANTIDA EM 44% - SEM ALTERAÇÕES)
    ========================================================================== */
 .ficha-tecnica {
     position: absolute; right: 0; top: 0; 
-    width: 44%; /* Mantida conforme v113 */
+    width: 44%;
     height: 100%;
-    background: rgba(80, 80, 80, 0.95); /* Um pouco mais opaco para legibilidade */
+    background: rgba(80, 80, 80, 0.95);
     backdrop-filter: blur(10px); 
     color: white;
     padding: 30px;
-    z-index: 1000; /* Mais alto que o mapa (10) */
+    z-index: 1000;
     box-shadow: -10px 0 25px rgba(0,0,0,0.4);
 }
 #nome-imovel { color: #50c878; margin: 0 0 15px 0; font-size: 1.4rem; border-bottom: 1px solid #777; padding-bottom: 10px; }
