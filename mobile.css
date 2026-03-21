@@ -34,7 +34,7 @@ html, body {
 }
 
 /* ==========================================================================
-   BLOCO 40: ÁREA DO MAPA (O RECUO QUE ESTAVA FALTANDO)
+   BLOCO 40: ÁREA DO MAPA (CENTRALIZAÇÃO PERFEITA)
    ========================================================================== */
 #mapa-container {
     width: calc(100% - 52px) !important; 
@@ -64,7 +64,7 @@ html, body {
    ========================================================================== */
 .menu-lateral {
     position: absolute !important; top: 0 !important;
-    left: 52px !important; /* COLADO SEM BURACO */
+    left: 52px !important; /* COLADO SEM BURACO BRANCO */
     width: 300px !important; height: 100vh !important;
     background: transparent !important; z-index: 999 !important;
     transition: transform 0.3s ease !important;
@@ -84,7 +84,7 @@ html, body {
 .carrossel-botoes::-webkit-scrollbar { display: none !important; }
 
 /* ==========================================================================
-   BLOCO 70.3: BOTÕES (BORDA ESQUERDA E CORES)
+   BLOCO 70.3: BOTÕES (BORDA ESQUERDA E CORES POR ZONA)
    ========================================================================== */
 .btn-empreendimento {
     width: 100% !important; background: #fff !important; 
@@ -93,7 +93,7 @@ html, body {
     border: none !important;
     border-left: 10px solid #00713a !important; /* BORDA NA ESQUERDA */
 }
-.btn-empreendimento[data-zona="ZO"] { border-left-color: #e07b39 !important; }
-.btn-empreendimento[data-zona="ZL"] { border-left-color: #004d28 !important; }
-.btn-empreendimento[data-zona="ZN"] { border-left-color: #ffd700 !important; }
-.btn-empreendimento[data-zona="ZS"] { border-left-color: #e6007e !important; }
+.btn-empreendimento[data-zona="ZO"] { border-left-color: #e07b39 !important; } /* Laranja */
+.btn-empreendimento[data-zona="ZL"] { border-left-color: #004d28 !important; } /* Verde Escuro */
+.btn-empreendimento[data-zona="ZN"] { border-left-color: #ffd700 !important; } /* Amarelo */
+.btn-empreendimento[data-zona="ZS"] { border-left-color: #e6007e !important; } /* Rosa */
