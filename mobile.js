@@ -4,14 +4,17 @@ const listaBotoes = document.getElementById('lista-botoes');
 const menuEmp = document.getElementById('menu-empreendimentos');
 const URL_PLANILHA_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSRKdJctOPQjKAtOZSDHyArD_H8SgKIouelAS1vF1d_-13pu7u_ic6J8nP3r0Ijd56WA-mbUmHjb4Me/pub?output=csv'; 
 
-/* BLOCO 10: MOTOR DA PLANILHA */
+/* ==========================================================================
+   BLOCO 10: MOTOR DA PLANILHA
+   ========================================================================== */
 async function carregarDadosPlanilha() {
     try {
         const response = await fetch(URL_PLANILHA_CSV);
         const csvText = await response.text();
         const linhas = csvText.split('\n').slice(1);
-        if (!listaBotoes) return;
-        listaBotoes.innerHTML = '';
+        const lista = document.getElementById('lista-botoes');
+        if (!lista) return;
+        lista.innerHTML = '';
 
         linhas.forEach(linha => {
             const col = linha.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
@@ -19,22 +22,24 @@ async function carregarDadosPlanilha() {
 
             const registro = {
                 idPath: col[0].replace(/"/g, '').trim(),
-                zona: col[1]?.replace(/"/g, '').trim().toUpperCase() || "",
-                nomeExibicao: col[3].replace(/"/g, '').trim(),
-                estoque: col[5]?.replace(/"/g, '').trim() || "0"
+                zona: col[1]?.replace(/"/g, '').trim().toUpperCase() || "", // Coluna B
+                nome: col[3].replace(/"/g, '').trim(), // Coluna D
+                estoque: col[5]?.replace(/"/g, '').trim() || "0" // Coluna F
             };
 
             const btn = document.createElement('div');
             btn.className = 'btn-empreendimento';
-            btn.setAttribute('data-zona', registro.zona);
+            btn.setAttribute('data-zona', registro.zona); // Define a cor via CSS
+            
             btn.innerHTML = `
-                <div style="color: #333; font-size: 0.85rem; font-weight: 800;">${registro.nomeExibicao}</div>
+                <div style="color: #333; font-size: 0.85rem; font-weight: 800;">${registro.nome}</div>
                 <div style="margin-top: 4px; color: #666; font-size: 0.65rem;">RESTAM ${registro.estoque} UNIDADES</div>
             `;
+            
             btn.onclick = () => selecionarEmpreendimento(registro, btn);
-            listaBotoes.appendChild(btn);
+            lista.appendChild(btn);
         });
-    } catch (e) { console.error("Erro no JS v32:", e); }
+    } catch (e) { console.error("Erro v32.1:", e); }
 }
 
 /* BLOCO 30: MOTOR DO MAPA */
@@ -62,19 +67,22 @@ function renderizarMapa(dados) {
     containerMapa.innerHTML = ""; containerMapa.appendChild(svg);
 }
 
-/* BLOCO 40: INICIALIZAÇÃO */
+/* ==========================================================================
+   BLOCO 40: INICIALIZAÇÃO E EVENTOS
+   ========================================================================== */
 window.onload = () => {
     if (typeof MAPA_GSP !== 'undefined') renderizarMapa(MAPA_GSP);
     carregarDadosPlanilha();
 };
 
+// Controle do Menu (Ícone debaixo)
 const btnMenu = document.querySelector('.icon-bottom');
 if(btnMenu) {
     btnMenu.onclick = () => {
-        if(menuEmp) menuEmp.classList.toggle('aberto');
+        const menu = document.getElementById('menu-empreendimentos');
+        if(menu) menu.classList.toggle('aberto');
     };
 }
-
 function selecionarEmpreendimento(reg, el) {
     document.querySelectorAll('.btn-empreendimento').forEach(b => b.classList.remove('ativo'));
     el.classList.add('ativo');
