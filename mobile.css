@@ -1,16 +1,12 @@
 /* ==========================================================================
-   BLOCO 10: FUNDAÇÃO E WRAPPER
+   BLOCO 10: FUNDAÇÃO (Obrigatório para o Wrapper)
    ========================================================================== */
-html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #fff; }
-* { box-sizing: border-box; font-family: sans-serif; }
-
-.mobile-wrapper { 
-    display: flex; width: 100vw; height: 100vh; 
-    position: relative; overflow: hidden; 
-}
+   html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #fff; }
+   * { box-sizing: border-box; font-family: sans-serif; }
+   .mobile-wrapper { display: flex; width: 100vw; height: 100vh; position: relative; overflow: hidden; }
 
 /* ==========================================================================
-   BLOCO 30: FAIXA VERDE (MRV EM SP)
+   BLOCO 30: FAIXA VERDE (52px de largura)
    ========================================================================== */
 .faixa-verde-vertical { 
     position: absolute; left: 0; top: 0; width: 52px; height: 100vh; 
@@ -40,12 +36,18 @@ html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden;
 }
 
 /* ==========================================================================
-   BLOCO 70.1: MENU LATERAL (TRANSPARENTE)
+   BLOCO 70.1: ESTRUTURA DO MENU (COLADO NA FAIXA)
    ========================================================================== */
 .menu-lateral {
-    position: absolute; top: 0; left: 52px; width: 300px; height: 100vh;
-    background: transparent !important; z-index: 999; 
-    transition: transform 0.3s ease; transform: translateX(-110%);
+    position: absolute; 
+    top: 0; 
+    left: 52px !important; /* COLADO NA FAIXA SEM BURACO */
+    width: 280px; 
+    height: 100vh;
+    background: transparent !important; 
+    z-index: 999; 
+    transition: transform 0.3s ease; 
+    transform: translateX(-110%);
 }
 .menu-lateral.aberto { transform: translateX(0) !important; }
 
@@ -60,14 +62,17 @@ html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden;
 .carrossel-botoes::-webkit-scrollbar { display: none; }
 
 /* ==========================================================================
-   BLOCO 70.3: BOTÕES E CORES POR ZONA
+   BLOCO 70.3: BOTÕES (BORDA NA ESQUERDA E CORES)
    ========================================================================== */
 .btn-empreendimento {
     width: 100%; background: #fff; border-radius: 6px; padding: 12px;
     box-shadow: 0 4px 10px rgba(0,0,0,0.1); border: none;
-    border-left: 8px solid #00713a; /* Borda de destaque */
+    border-left: 10px solid #00713a !important; /* BORDA NA ESQUERDA VOLTOU */
+    margin-bottom: 8px;
 }
-.btn-empreendimento[data-zona="ZO"] { border-left-color: #e07b39 !important; }
-.btn-empreendimento[data-zona="ZL"] { border-left-color: #004d28 !important; }
-.btn-empreendimento[data-zona="ZN"] { border-left-color: #ffd700 !important; }
-.btn-empreendimento[data-zona="ZS"] { border-left-color: #e6007e !important; }
+
+/* CORES DAS ZONAS (Baseado na Coluna B) */
+.btn-empreendimento[data-zona="ZO"] { border-left-color: #e07b39 !important; } /* Laranja */
+.btn-empreendimento[data-zona="ZL"] { border-left-color: #004d28 !important; } /* Verde Escuro */
+.btn-empreendimento[data-zona="ZN"] { border-left-color: #ffd700 !important; } /* Amarelo */
+.btn-empreendimento[data-zona="ZS"] { border-left-color: #e6007e !important; } /* Rosa */
