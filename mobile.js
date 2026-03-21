@@ -1,5 +1,5 @@
 /* ==========================================================================
-   v133 - INTERAÇÃO TOTAL: TODOS OS PATHS COM HOVER E TEXTO
+   v134 - DESTAQUE DIFERENCIADO: LARANJA (MRV) VS CINZA ESCURO (OUTROS)
    ========================================================================== */
 
 // 1. Configurações Iniciais
@@ -71,24 +71,24 @@ function desenharMapa(dados, targetId, ehMinimizado) {
         const corVerde = "#00713a";
         const corCinzaClaro = "#cccccc";
         const corLaranjaVivo = "#FF4500";
-        const corOriginal = ehMRV ? corVerde : corCinzaClaro;
+        const corCinzaEscuro = "#777777"; // Cor pedida para o destaque dos cinzas
 
+        const corOriginal = ehMRV ? corVerde : corCinzaClaro;
         path.style.fill = corOriginal;
         path.style.stroke = "#ffffff";
         path.style.strokeWidth = ehMinimizado ? "6" : "1.2";
         path.setAttribute('data-cor-base', corOriginal);
 
-        // 4. Lógica de Interação Sem Trava (Informa todos os nomes)
+        // 4. Lógica de Interação com Cores Específicas
         if (!ehMinimizado) {
             
             const ativarFoco = () => {
-                // AGORA INFORMA O NOME DE QUALQUER PATH (CINZA OU VERDE)
                 const display = document.getElementById('identificador-cidade');
                 if(display) display.innerText = nomeCidade;
                 
-                // TODOS ENTRAM EM DESTAQUE LARANJA
                 if (path.getAttribute('data-selecionado') !== 'true') {
-                    path.style.fill = corLaranjaVivo;
+                    // SE FOR MRV -> LARANJA | SE FOR CINZA -> CINZA ESCURO
+                    path.style.fill = ehMRV ? corLaranjaVivo : corCinzaEscuro;
                 }
             };
 
@@ -105,7 +105,6 @@ function desenharMapa(dados, targetId, ehMinimizado) {
             path.ontouchstart = (e) => { ativarFoco(); };
 
             path.onclick = () => {
-                // O CLIQUE AINDA SÓ ABRE FICHA SE FOR MRV
                 if (!ehMRV) return;
 
                 document.querySelectorAll('#mapa-container path').forEach(p => {
