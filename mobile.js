@@ -1,5 +1,5 @@
 /* ==========================================================================
-   v127 - CORREÇÃO DE POSICIONAMENTO E CARREGAMENTO
+   v129 - RESTAURAÇÃO TOTAL E COMPATIBILIDADE TOUCH
    ========================================================================== */
 const svgNS = "http://www.w3.org/2000/svg";
 const URL_PLANILHA = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSRKdJctOPQjKAtOZSDHyArD_H8SgKIouelAS1vF1d_-13pu7u_ic6J8nP3r0Ijd56WA-mbUmHjb4Me/pub?output=csv';
@@ -13,7 +13,6 @@ const AJUSTES_MAPA = {
     INTERIOR: { marginRight: "50%", marginLeft: "-100px", scale: "1.15" }
 };
 
-// Carregamento da planilha (Igual v125)
 async function carregarPlanilha() {
     try {
         const res = await fetch(URL_PLANILHA);
@@ -32,12 +31,30 @@ async function carregarPlanilha() {
                 };
             }
         });
-    } catch (e) { console.warn("Planilha Offline"); }
-    atualizarVisualizacao();
+    } catch (e) { 
+        console.warn("Aviso: Rodando com dados locais."); 
+    } finally {
+        atualizarVisualizacao(); 
+    }
 }
 
 function desenharMapa(dados, targetId, ehMinimizado) {
-    // ... (Lógica de criação do SVG igual) ...
+    const container = document.getElementById(targetId);
+    if (!container || !dados) return;
+
+    container.innerHTML = "";
+    const svg = document.createElementNS(svgNS, "svg");
+    svg.setAttribute("viewBox", dados.viewBox);
+    
+    if (!ehMinimizado) {
+        const conf = AJUSTES_MAPA[mapaAtivo];
+        svg.style.marginRight = conf.marginRight;
+        svg.style.marginLeft = conf.marginLeft;
+        svg.style.transform = `scale(${conf.scale})`;
+    }
+
+    const g = document.createElementNS(svgNS, "g");
+    g.setAttribute("transform", dados.transform);
 
     dados.paths.forEach(pData => {
         const path = document.createElementNS(svgNS, "path");
@@ -48,6 +65,7 @@ function desenharMapa(dados, targetId, ehMinimizado) {
 
         path.setAttribute("d", pData.d);
         path.setAttribute("class", pData.class || "semmrv");
+        path.setAttribute("id", (ehMinimizado ? 'mini-' : '') + pData.id);
         
         const corVerde = "#00713a";
         const corCinzaClaro = "#cccccc";
@@ -60,18 +78,17 @@ function desenharMapa(dados, targetId, ehMinimizado) {
         path.setAttribute('data-cor-base', corOriginal);
 
         if (!ehMinimizado) {
-            // Função unificada para o efeito de "foco" (Mouse ou Toque)
-            const aplicarHover = () => {
-                if (ehMRV) {
-                    const display = document.getElementById('identificador-cidade');
-                    if(display) display.innerText = nomeCidade;
-                    if (path.getAttribute('data-selecionado') !== 'true') {
-                        path.style.fill = corLaranjaVivo;
-                    }
+            // Função de interação simplificada
+            const focarCidade = () => {
+                if (!ehMRV) return;
+                const display = document.getElementById('identificador-cidade');
+                if(display) display.innerText = nomeCidade;
+                if (path.getAttribute('data-selecionado') !== 'true') {
+                    path.style.fill = corLaranjaVivo;
                 }
             };
 
-            const removerHover = () => {
+            const desfocarCidade = () => {
                 const display = document.getElementById('identificador-cidade');
                 if(display) display.innerText = cidadeSelecionada;
                 if (path.getAttribute('data-selecionado') !== 'true') {
@@ -79,18 +96,19 @@ function desenharMapa(dados, targetId, ehMinimizado) {
                 }
             };
 
-            // Eventos para Desktop
-            path.onmouseover = aplicarHover;
-            path.onmouseout = removerHover;
+            // Eventos Desktop
+            path.onmouseover = focarCidade;
+            path.onmouseout = desfocarCidade;
 
-            // EVENTO PARA CELULAR: Detecta o toque do dedo
+            // Evento Mobile (Touch)
             path.ontouchstart = (e) => {
-                aplicarHover();
+                focarCidade();
             };
 
-            path.onclick = () => {
+            path.onclick = (e) => {
                 if (!ehMRV) return;
-
+                
+                // Limpa seleções anteriores
                 document.querySelectorAll('#mapa-container path').forEach(p => {
                     p.setAttribute('data-selecionado', 'false');
                     p.style.fill = p.getAttribute('data-cor-base');
@@ -135,7 +153,8 @@ function trocarMapas() {
 }
 
 window.onload = carregarPlanilha;
-// Atribui o clique ao botão minimizado de forma segura
+
+// Clique no mini mapa
 document.addEventListener('click', (e) => {
     if (e.target.closest('#mapa-minimizado')) trocarMapas();
 });
