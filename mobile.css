@@ -57,3 +57,29 @@ html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden;
 }
 #nome-imovel { color: #50c878; margin: 0 0 15px 0; font-size: 1.6rem; border-bottom: 2px solid #50c878; padding-bottom: 10px; }
 #detalhes-imovel { font-size: 1.2rem; line-height: 1.6; }
+
+
+/* ==========================================================================
+   6. IDENTIFICADOR DE CIDADE (v124)
+   ========================================================================== */
+#identificador-cidade {
+    position: absolute;
+    top: 20px;
+    left: 28%; /* Ajustado para compensar a ficha técnica */
+    transform: translateX(-50%);
+    z-index: 1500;
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #333;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    pointer-events: none; /* Não interfere no clique do mapa */
+    height: 2rem;
+    text-shadow: 1px 1px 2px rgba(255,255,255,0.8);
+}
+
+/* Transição de cor para o path */
+#mapa-container path {
+    transition: fill 0.15s ease;
+    cursor: pointer;
+}
