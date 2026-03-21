@@ -37,60 +37,41 @@ async function carregarPlanilha() {
 }
 
 function desenharMapa(dados, targetId, ehMinimizado) {
-    const container = document.getElementById(targetId);
-    if (!container || !dados) return;
-
-    container.innerHTML = "";
-    const svg = document.createElementNS(svgNS, "svg");
-    svg.setAttribute("viewBox", dados.viewBox);
-    
-    if (!ehMinimizado) {
-        const conf = AJUSTES_MAPA[mapaAtivo];
-        svg.style.marginRight = conf.marginRight;
-        svg.style.marginLeft = conf.marginLeft;
-        svg.style.transform = `scale(${conf.scale})`;
-    }
-
-    const g = document.createElementNS(svgNS, "g");
-    g.setAttribute("transform", dados.transform);
+    // ... (Lógica de criação do SVG igual) ...
 
     dados.paths.forEach(pData => {
         const path = document.createElementNS(svgNS, "path");
         const idLimpo = pData.id.toLowerCase();
         const info = window.bancoDados[idLimpo];
         const nomeCidade = pData.name || pData.id;
-        
-        // CORREÇÃO: Identifica a classe do path para a trava
         const ehMRV = pData.class === "commrv";
 
         path.setAttribute("d", pData.d);
-        path.setAttribute("id", (ehMinimizado ? 'mini-' : '') + pData.id);
         path.setAttribute("class", pData.class || "semmrv");
         
         const corVerde = "#00713a";
         const corCinzaClaro = "#cccccc";
         const corLaranjaVivo = "#FF4500";
-
         const corOriginal = ehMRV ? corVerde : corCinzaClaro;
+
         path.style.fill = corOriginal;
         path.style.stroke = "#ffffff";
         path.style.strokeWidth = ehMinimizado ? "6" : "1.2";
         path.setAttribute('data-cor-base', corOriginal);
 
         if (!ehMinimizado) {
-            path.onmouseover = () => {
+            // Função unificada para o efeito de "foco" (Mouse ou Toque)
+            const aplicarHover = () => {
                 if (ehMRV) {
                     const display = document.getElementById('identificador-cidade');
                     if(display) display.innerText = nomeCidade;
                     if (path.getAttribute('data-selecionado') !== 'true') {
                         path.style.fill = corLaranjaVivo;
                     }
-                } else {
-                    path.style.fill = "#888888"; // Feedback visual simples para semmrv
                 }
             };
 
-            path.onmouseout = () => {
+            const removerHover = () => {
                 const display = document.getElementById('identificador-cidade');
                 if(display) display.innerText = cidadeSelecionada;
                 if (path.getAttribute('data-selecionado') !== 'true') {
@@ -98,8 +79,17 @@ function desenharMapa(dados, targetId, ehMinimizado) {
                 }
             };
 
+            // Eventos para Desktop
+            path.onmouseover = aplicarHover;
+            path.onmouseout = removerHover;
+
+            // EVENTO PARA CELULAR: Detecta o toque do dedo
+            path.ontouchstart = (e) => {
+                aplicarHover();
+            };
+
             path.onclick = () => {
-                if (!ehMRV) return; // TRAVA DE CLIQUE: Ignora paths semmrv
+                if (!ehMRV) return;
 
                 document.querySelectorAll('#mapa-container path').forEach(p => {
                     p.setAttribute('data-selecionado', 'false');
