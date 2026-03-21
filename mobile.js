@@ -1,12 +1,12 @@
 /* ==========================================================================
-   BLOCO 01: CONFIGURAÇÕES E ESTADO
+   BLOCO 01: CONFIGURAÇÕES
    ========================================================================== */
 const svgNS = "http://www.w3.org/2000/svg";
 const URL_PLANILHA = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSRKdJctOPQjKAtOZSDHyArD_H8SgKIouelAS1vF1d_-13pu7u_ic6J8nP3r0Ijd56WA-mbUmHjb4Me/pub?output=csv';
-let mapaAtivo = "GSP"; // Estado inicial
+let mapaAtivo = "GSP";
 
 /* ==========================================================================
-   BLOCO 10: MOTOR DE DADOS (PLANILHA)
+   BLOCO 10: DADOS DA PLANILHA
    ========================================================================== */
 async function carregarPlanilha() {
     try {
@@ -14,7 +14,6 @@ async function carregarPlanilha() {
         const csv = await res.text();
         const linhas = csv.split('\n').slice(1);
         window.bancoDados = {};
-
         linhas.forEach(l => {
             const c = l.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
             if (c.length < 5) return;
@@ -24,12 +23,11 @@ async function carregarPlanilha() {
                 estoque: c[5]?.replace(/"/g, '').trim() || "0"
             };
         });
-        console.log("v101: Planilha Sincronizada.");
     } catch (e) { console.error("Erro Planilha:", e); }
 }
 
 /* ==========================================================================
-   BLOCO 20: RENDERIZADOR DE SVG
+   BLOCO 20: DESENHO DOS MAPAS
    ========================================================================== */
 function desenharMapa(dados, targetId, ehMinimizado) {
     const container = document.getElementById(targetId);
@@ -55,16 +53,13 @@ function desenharMapa(dados, targetId, ehMinimizado) {
         if (!ehMinimizado) {
             path.setAttribute('data-fill-original', corBase);
             path.onclick = () => {
-                // Reseta cores
                 document.querySelectorAll('#mapa-container path').forEach(p => {
                     p.style.fill = p.getAttribute('data-fill-original');
                 });
-                // Destaca laranja
                 path.style.fill = "#ff8c00";
-                // Atualiza Ficha
                 const info = window.bancoDados ? window.bancoDados[pData.id] : null;
                 document.getElementById('nome-imovel').innerText = info ? info.nome : pData.id.toUpperCase();
-                document.getElementById('detalhes-imovel').innerText = info ? `Restam ${info.estoque} unidades.` : "Informações não disponíveis.";
+                document.getElementById('detalhes-imovel').innerText = info ? `Restam ${info.estoque} unidades.` : "Unidade selecionada.";
             };
         }
         g.appendChild(path);
@@ -76,7 +71,7 @@ function desenharMapa(dados, targetId, ehMinimizado) {
 }
 
 /* ==========================================================================
-   BLOCO 30: LÓGICA DE INTERCAMBIO (TOGGLE)
+   BLOCO 30: TOGGLE E INIT
    ========================================================================== */
 function trocarMapas() {
     if (mapaAtivo === "GSP") {
@@ -88,22 +83,13 @@ function trocarMapas() {
         desenharMapa(MAPA_GSP, "mapa-container", false);
         desenharMapa(MAPA_INTERIOR, "mapa-minimizado", true);
     }
-    console.log("Troca de mapa realizada para: " + mapaAtivo);
 }
 
-/* ==========================================================================
-   BLOCO 40: INICIALIZAÇÃO
-   ========================================================================== */
 window.onload = () => {
     if (typeof MAPA_GSP !== 'undefined' && typeof MAPA_INTERIOR !== 'undefined') {
-        // Inicia GSP Grande e Interior Mini
         desenharMapa(MAPA_GSP, "mapa-container", false);
         desenharMapa(MAPA_INTERIOR, "mapa-minimizado", true);
-        
-        // Ativa o clique na miniatura
         document.getElementById('mapa-minimizado').onclick = trocarMapas;
-    } else {
-        console.error("v101: Erro ao carregar constantes do mapa-SP.js");
     }
     carregarPlanilha();
 };
