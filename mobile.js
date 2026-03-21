@@ -1,8 +1,8 @@
 /* ==========================================================================
-   v132 - JS CONSOLIDADO: TOUCH ATIVO + DESTAQUE FILTRADO
+   v133 - INTERAÇÃO TOTAL: TODOS OS PATHS COM HOVER E TEXTO
    ========================================================================== */
 
-// 1. Configurações Iniciais e Variáveis Globais
+// 1. Configurações Iniciais
 const svgNS = "http://www.w3.org/2000/svg";
 const URL_PLANILHA = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSRKdJctOPQjKAtOZSDHyArD_H8SgKIouelAS1vF1d_-13pu7u_ic6J8nP3r0Ijd56WA-mbUmHjb4Me/pub?output=csv';
 
@@ -15,7 +15,7 @@ const AJUSTES_MAPA = {
     INTERIOR: { marginRight: "50%", marginLeft: "-100px", scale: "1.15" }
 };
 
-// 2. Carregamento de Dados da Planilha
+// 2. Carregamento de Dados
 async function carregarPlanilha() {
     try {
         const res = await fetch(URL_PLANILHA);
@@ -34,14 +34,11 @@ async function carregarPlanilha() {
                 };
             }
         });
-    } catch (e) { 
-        console.warn("Aviso: Planilha offline ou erro de conexão."); 
-    }
-    // Desenha os mapas após tentar carregar os dados
+    } catch (e) { console.warn("Planilha Offline"); }
     atualizarVisualizacao();
 }
 
-// 3. Função de Construção do Mapa SVG
+// 3. Função de Desenho
 function desenharMapa(dados, targetId, ehMinimizado) {
     const container = document.getElementById(targetId);
     if (!container || !dados) return;
@@ -50,7 +47,6 @@ function desenharMapa(dados, targetId, ehMinimizado) {
     const svg = document.createElementNS(svgNS, "svg");
     svg.setAttribute("viewBox", dados.viewBox);
     
-    // Aplica zoom e margens no mapa principal
     if (!ehMinimizado) {
         const conf = AJUSTES_MAPA[mapaAtivo];
         svg.style.marginRight = conf.marginRight;
@@ -61,7 +57,6 @@ function desenharMapa(dados, targetId, ehMinimizado) {
     const g = document.createElementNS(svgNS, "g");
     g.setAttribute("transform", dados.transform);
 
-    // 4. Renderização dos Paths (Cidades)
     dados.paths.forEach(pData => {
         const path = document.createElementNS(svgNS, "path");
         const idLimpo = pData.id.toLowerCase();
@@ -83,21 +78,20 @@ function desenharMapa(dados, targetId, ehMinimizado) {
         path.style.strokeWidth = ehMinimizado ? "6" : "1.2";
         path.setAttribute('data-cor-base', corOriginal);
 
-        // 5. Lógica de Interação (Apenas para o mapa principal)
+        // 4. Lógica de Interação Sem Trava (Informa todos os nomes)
         if (!ehMinimizado) {
             
-            // Sub-função para ativar o destaque e o nome
             const ativarFoco = () => {
-                if (ehMRV) {
-                    const display = document.getElementById('identificador-cidade');
-                    if(display) display.innerText = nomeCidade;
-                    if (path.getAttribute('data-selecionado') !== 'true') {
-                        path.style.fill = corLaranjaVivo;
-                    }
+                // AGORA INFORMA O NOME DE QUALQUER PATH (CINZA OU VERDE)
+                const display = document.getElementById('identificador-cidade');
+                if(display) display.innerText = nomeCidade;
+                
+                // TODOS ENTRAM EM DESTAQUE LARANJA
+                if (path.getAttribute('data-selecionado') !== 'true') {
+                    path.style.fill = corLaranjaVivo;
                 }
             };
 
-            // Sub-função para remover o destaque
             const desativarFoco = () => {
                 const display = document.getElementById('identificador-cidade');
                 if(display) display.innerText = cidadeSelecionada;
@@ -106,26 +100,19 @@ function desenharMapa(dados, targetId, ehMinimizado) {
                 }
             };
 
-            // Eventos de Mouse (Notebook)
             path.onmouseover = ativarFoco;
             path.onmouseout = desativarFoco;
+            path.ontouchstart = (e) => { ativarFoco(); };
 
-            // EVENTO DE TOQUE (Celular) - Adicionado para v132
-            path.ontouchstart = (e) => {
-                ativarFoco();
-            };
-
-            // Evento de Clique (Seleção Definitiva)
             path.onclick = () => {
+                // O CLIQUE AINDA SÓ ABRE FICHA SE FOR MRV
                 if (!ehMRV) return;
 
-                // Limpa seleções anteriores
                 document.querySelectorAll('#mapa-container path').forEach(p => {
                     p.setAttribute('data-selecionado', 'false');
                     p.style.fill = p.getAttribute('data-cor-base');
                 });
 
-                // Define nova seleção
                 path.setAttribute('data-selecionado', 'true');
                 path.style.fill = corLaranjaVivo;
                 cidadeSelecionada = nomeCidade;
@@ -133,7 +120,6 @@ function desenharMapa(dados, targetId, ehMinimizado) {
                 const display = document.getElementById('identificador-cidade');
                 if(display) display.innerText = nomeCidade;
 
-                // Atualiza Ficha Técnica
                 if (info) {
                     document.getElementById('nome-imovel').innerText = info.nomeCurto || info.nomeFull;
                     document.getElementById('detalhes-imovel').innerHTML = `
@@ -150,7 +136,7 @@ function desenharMapa(dados, targetId, ehMinimizado) {
     container.appendChild(svg);
 }
 
-// 6. Funções de Controle de Visualização
+// 5. Controles Finais
 function atualizarVisualizacao() {
     if (typeof MAPA_GSP !== 'undefined' && typeof MAPA_INTERIOR !== 'undefined') {
         desenharMapa(mapaAtivo === "GSP" ? MAPA_GSP : MAPA_INTERIOR, "mapa-container", false);
@@ -158,7 +144,6 @@ function atualizarVisualizacao() {
     }
 }
 
-// 7. Troca entre GSP e Interior
 function trocarMapas() {
     mapaAtivo = (mapaAtivo === "GSP") ? "INTERIOR" : "GSP";
     cidadeSelecionada = "";
@@ -167,10 +152,8 @@ function trocarMapas() {
     atualizarVisualizacao();
 }
 
-// 8. Inicialização
 window.onload = carregarPlanilha;
 
-// Ouvinte Global para o Mini Mapa
 document.addEventListener('click', (e) => {
     if (e.target.closest('#mapa-minimizado')) trocarMapas();
 });
