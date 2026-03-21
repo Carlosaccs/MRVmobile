@@ -1,43 +1,40 @@
 /* ==========================================================================
-   BLOCO 01: CONFIGURAÇÕES E SELEÇÃO (ESTILO v27)
+   BLOCO 01: CONFIGURAÇÕES E ESTADO
    ========================================================================== */
-const containerMapa = document.getElementById('mapa-container');
 const svgNS = "http://www.w3.org/2000/svg";
-// URL da sua planilha MRV atualizada
-const URL_PLANILHA_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSRKdJctOPQjKAtOZSDHyArD_H8SgKIouelAS1vF1d_-13pu7u_ic6J8nP3r0Ijd56WA-mbUmHjb4Me/pub?output=csv'; 
+const URL_PLANILHA = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSRKdJctOPQjKAtOZSDHyArD_H8SgKIouelAS1vF1d_-13pu7u_ic6J8nP3r0Ijd56WA-mbUmHjb4Me/pub?output=csv';
+let mapaAtivo = "GSP"; // Estado inicial
 
 /* ==========================================================================
-   BLOCO 10: MOTOR DA PLANILHA (ADAPTADO PARA FICHA TÉCNICA)
+   BLOCO 10: MOTOR DE DADOS (PLANILHA)
    ========================================================================== */
-async function carregarDadosPlanilha() {
+async function carregarPlanilha() {
     try {
-        const response = await fetch(URL_PLANILHA_CSV);
-        const csvText = await response.text();
-        const linhas = csvText.split('\n').slice(1);
-        
-        // Criamos um mapa de dados na memória para consulta rápida
-        window.dadosEmpreendimentos = {};
+        const res = await fetch(URL_PLANILHA);
+        const csv = await res.text();
+        const linhas = csv.split('\n').slice(1);
+        window.bancoDados = {};
 
-        linhas.forEach(linha => {
-            const col = linha.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
-            if (col.length < 5) return;
-
-            const idPath = col[0].replace(/"/g, '').trim();
-            window.dadosEmpreendimentos[idPath] = {
-                nome: col[3]?.replace(/"/g, '').trim() || "Sem Nome",
-                estoque: col[5]?.replace(/"/g, '').trim() || "0"
+        linhas.forEach(l => {
+            const c = l.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+            if (c.length < 5) return;
+            const id = c[0].replace(/"/g, '').trim();
+            window.bancoDados[id] = {
+                nome: c[3]?.replace(/"/g, '').trim() || "Residencial MRV",
+                estoque: c[5]?.replace(/"/g, '').trim() || "0"
             };
         });
-        console.log("Bloco 10: Dados da Planilha sincronizados.");
-    } catch (e) { console.error("Erro Bloco 10:", e); }
+        console.log("v101: Planilha Sincronizada.");
+    } catch (e) { console.error("Erro Planilha:", e); }
 }
 
 /* ==========================================================================
-   BLOCO 30: RENDERIZAÇÃO DO MAPA (LÓGICA v27 PURA)
+   BLOCO 20: RENDERIZADOR DE SVG
    ========================================================================== */
-function renderizarMapa(dados) {
-    if (!containerMapa || !dados) return;
-    
+function desenharMapa(dados, targetId, ehMinimizado) {
+    const container = document.getElementById(targetId);
+    if (!container || !dados) return;
+
     const svg = document.createElementNS(svgNS, "svg");
     svg.setAttribute("viewBox", dados.viewBox);
     svg.setAttribute("preserveAspectRatio", "xMidYMid meet");
@@ -48,60 +45,65 @@ function renderizarMapa(dados) {
     dados.paths.forEach(pData => {
         const path = document.createElementNS(svgNS, "path");
         path.setAttribute("d", pData.d);
-        path.setAttribute("id", pData.id);
+        path.setAttribute("id", (ehMinimizado ? 'mini-' : '') + pData.id);
         
-        // Cores originais v27
         const corBase = pData.class === "semmrv" ? "#cccccc" : "#00713a";
         path.style.fill = corBase;
-        path.setAttribute('data-original-fill', corBase);
         path.style.stroke = "#ffffff";
-        path.style.strokeWidth = "2";
+        path.style.strokeWidth = ehMinimizado ? "5" : "1.5";
 
-        // Interação de Clique (Atualiza a Ficha Técnica Cinza)
-        path.onclick = () => {
-            // Reseta cores
-            document.querySelectorAll('#mapa-container path').forEach(p => {
-                p.style.fill = p.getAttribute('data-original-fill');
-            });
-            
-            // Destaca selecionado
-            path.style.fill = "#ff8c00";
-            
-            // Busca dados da planilha salvos no Bloco 10
-            const info = window.dadosEmpreendimentos ? window.dadosEmpreendimentos[pData.id] : null;
-            
-            const txtNome = document.getElementById('nome-imovel');
-            const txtDetalhes = document.getElementById('detalhes-imovel');
-            
-            if (info) {
-                txtNome.innerText = info.nome;
-                txtDetalhes.innerText = `Restam apenas ${info.estoque} unidades neste residencial.`;
-            } else {
-                txtNome.innerText = pData.id.replace(/-/g, ' ').toUpperCase();
-                txtDetalhes.innerText = "Residencial selecionado.";
-            }
-        };
-
+        if (!ehMinimizado) {
+            path.setAttribute('data-fill-original', corBase);
+            path.onclick = () => {
+                // Reseta cores
+                document.querySelectorAll('#mapa-container path').forEach(p => {
+                    p.style.fill = p.getAttribute('data-fill-original');
+                });
+                // Destaca laranja
+                path.style.fill = "#ff8c00";
+                // Atualiza Ficha
+                const info = window.bancoDados ? window.bancoDados[pData.id] : null;
+                document.getElementById('nome-imovel').innerText = info ? info.nome : pData.id.toUpperCase();
+                document.getElementById('detalhes-imovel').innerText = info ? `Restam ${info.estoque} unidades.` : "Informações não disponíveis.";
+            };
+        }
         g.appendChild(path);
     });
 
     svg.appendChild(g);
-    containerMapa.innerHTML = "";
-    containerMapa.appendChild(svg);
-    console.log("Bloco 30: Mapa v39 renderizado.");
+    container.innerHTML = "";
+    container.appendChild(svg);
 }
 
 /* ==========================================================================
-   BLOCO 40: INICIALIZAÇÃO (HÍBRIDA)
+   BLOCO 30: LÓGICA DE INTERCAMBIO (TOGGLE)
+   ========================================================================== */
+function trocarMapas() {
+    if (mapaAtivo === "GSP") {
+        mapaAtivo = "INTERIOR";
+        desenharMapa(MAPA_INTERIOR, "mapa-container", false);
+        desenharMapa(MAPA_GSP, "mapa-minimizado", true);
+    } else {
+        mapaAtivo = "GSP";
+        desenharMapa(MAPA_GSP, "mapa-container", false);
+        desenharMapa(MAPA_INTERIOR, "mapa-minimizado", true);
+    }
+    console.log("Troca de mapa realizada para: " + mapaAtivo);
+}
+
+/* ==========================================================================
+   BLOCO 40: INICIALIZAÇÃO
    ========================================================================== */
 window.onload = () => {
-    // 1. Carrega o visual do mapa
-    if (typeof MAPA_GSP !== 'undefined') {
-        renderizarMapa(MAPA_GSP);
+    if (typeof MAPA_GSP !== 'undefined' && typeof MAPA_INTERIOR !== 'undefined') {
+        // Inicia GSP Grande e Interior Mini
+        desenharMapa(MAPA_GSP, "mapa-container", false);
+        desenharMapa(MAPA_INTERIOR, "mapa-minimizado", true);
+        
+        // Ativa o clique na miniatura
+        document.getElementById('mapa-minimizado').onclick = trocarMapas;
     } else {
-        console.error("MAPA_GSP não encontrado!");
+        console.error("v101: Erro ao carregar constantes do mapa-SP.js");
     }
-    
-    // 2. Carrega os dados da planilha em segundo plano
-    carregarDadosPlanilha();
+    carregarPlanilha();
 };
