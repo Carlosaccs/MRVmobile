@@ -1,19 +1,42 @@
 /* ==========================================================================
-   BLINDAGEM v121 - ESTRUTURA FIXA
+   v125 - ARQUIVO CSS CONSOLIDADO
    ========================================================================== */
-html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #fff; }
-* { box-sizing: border-box; font-family: sans-serif; }
-.mobile-wrapper { display: flex; width: 100vw; height: 100vh; position: relative; overflow: hidden; }
 
-/* 2. FAIXA VERDE */
+/* 1. FUNDAÇÃO E RESET */
+html, body { 
+    margin: 0; padding: 0; width: 100%; height: 100%; 
+    overflow: hidden; background: #fff; 
+}
+* { box-sizing: border-box; font-family: sans-serif; }
+
+.mobile-wrapper { 
+    display: flex; width: 100vw; height: 100%; 
+    position: relative; overflow: hidden; 
+}
+
+/* 2. FAIXA VERDE LATERAL */
 .faixa-verde-vertical { 
     position: absolute; left: 0; top: 0; width: 52px; height: 100vh; 
     background: #00713a; z-index: 2000;
-    display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 20px 0;
+    display: flex; flex-direction: column; align-items: center; 
+    justify-content: space-between; padding: 20px 0;
 }
-.titulo-vertical { writing-mode: vertical-rl; transform: rotate(180deg); color: white; font-weight: bold; font-size: 1rem; letter-spacing: 2px; }
+.titulo-vertical { 
+    writing-mode: vertical-rl; transform: rotate(180deg); 
+    color: white; font-weight: bold; font-size: 1rem; 
+    letter-spacing: 2px; white-space: nowrap; 
+}
 
-/* 3. MAPA PRINCIPAL - ZOOM E POSIÇÃO BLINDADOS NO JS */
+/* 3. CONTAINER DO MAPA PRINCIPAL */
+#mapa-container {
+    position: absolute;
+    left: 0; top: 0;
+    width: 100%; height: 100%;
+    z-index: 10;
+    display: flex; align-items: center; justify-content: center;
+    overflow: hidden;
+}
+
 #mapa-container svg { 
     width: 130% !important; 
     height: auto;
@@ -22,23 +45,65 @@ html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden;
     transform-origin: center top; 
 }
 
-/* Transição suave para a troca de cores nos paths */
 #mapa-container path {
-    transition: fill 0.2s ease, stroke-width 0.2s ease;
+    transition: fill 0.15s ease, stroke-width 0.2s ease;
     cursor: pointer;
 }
 
-/* 4. MINIATURA */
+/* 4. MAPA MINIMIZADO (v127) - Posicionado à direita da área do mapa */
 #mapa-minimizado {
-    position: absolute; right: 46%; bottom: 30px; width: 110px; height: 110px;
-    background: #fff; border: 3px solid #00713a; border-radius: 12px;
-    z-index: 1500; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-    display: flex; align-items: center; justify-content: center; overflow: hidden;
+    position: absolute;
+    bottom: 20px;
+    right: 45%; /* Coloca o botão no limite da área do mapa com a ficha técnica */
+    width: 90px;
+    height: 70px;
+    background: white;
+    border: 2px solid #00713a;
+    border-radius: 10px;
+    cursor: pointer;
+    z-index: 2500;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s ease;
 }
 
-/* 5. FICHA TÉCNICA */
+#mapa-minimizado:active { transform: scale(0.95); }
+
+/* Classes de cursor para diferenciar os paths */
+path.commrv { cursor: pointer; }
+path.semmrv { cursor: default; }
+
+/* 5. FICHA TÉCNICA (LATERAL DIREITA) */
 .ficha-tecnica {
-    position: absolute; right: 0; top: 0; width: 44%; height: 100%;
-    background: rgba(60, 60, 60, 0.95); backdrop-filter: blur(10px); color: white;
-    padding: 35px; z-index: 1000;
+    position: absolute; right: 0; top: 0; 
+    width: 44%; height: 100%;
+    background: rgba(60, 60, 60, 0.95);
+    backdrop-filter: blur(10px); color: white;
+    padding: 35px; z-index: 1000; 
+    box-shadow: -10px 0 25px rgba(0,0,0,0.4);
+}
+#nome-imovel { 
+    color: #50c878; margin: 0 0 15px 0; font-size: 1.6rem; 
+    border-bottom: 2px solid #50c878; padding-bottom: 10px; 
+}
+#detalhes-imovel { font-size: 1.2rem; line-height: 1.6; }
+
+/* 6. IDENTIFICADOR DE CIDADE (CENTRO SUPERIOR) - v125 */
+#identificador-cidade {
+    position: absolute;
+    top: 30px;
+    left: 28%; /* Centralizado em relação à área visível do mapa */
+    transform: translateX(-50%);
+    z-index: 1500;
+    font-size: 2rem;
+    font-weight: 800;
+    color: #333;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    pointer-events: none; /* FUNDAMENTAL: permite clicar no mapa através do texto */
+    text-shadow: 2px 2px 4px rgba(255,255,255,0.9);
+    white-space: nowrap;
 }
