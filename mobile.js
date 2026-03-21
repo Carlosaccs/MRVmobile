@@ -1,5 +1,5 @@
 /* ==========================================================================
-   v124 - VERSÃO FINALIZADA E TESTADA
+   v125 - RESTAURAÇÃO DE RENDERIZAÇÃO E BLINDAGEM
    ========================================================================== */
 const svgNS = "http://www.w3.org/2000/svg";
 const URL_PLANILHA = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSRKdJctOPQjKAtOZSDHyArD_H8SgKIouelAS1vF1d_-13pu7u_ic6J8nP3r0Ijd56WA-mbUmHjb4Me/pub?output=csv';
@@ -16,6 +16,7 @@ const AJUSTES_MAPA = {
 async function carregarPlanilha() {
     try {
         const res = await fetch(URL_PLANILHA);
+        if (!res.ok) throw new Error("Erro na rede");
         const csv = await res.text();
         const linhas = csv.split('\n').slice(1);
         
@@ -34,10 +35,11 @@ async function carregarPlanilha() {
                 };
             }
         });
-        atualizarVisualizacao();
     } catch (e) { 
-        console.error("Erro ao carregar dados da planilha:", e);
-        atualizarVisualizacao(); // Desenha o mapa mesmo sem dados para não ficar branco
+        console.warn("Aviso: Planilha não carregada, usando apenas dados locais do SVG.");
+    } finally {
+        // SEMPRE tenta desenhar, mesmo que a planilha falhe
+        atualizarVisualizacao(); 
     }
 }
 
@@ -71,7 +73,7 @@ function desenharMapa(dados, targetId, ehMinimizado) {
         const corVerde = "#00713a";
         const corCinzaClaro = "#cccccc";
         const corCinzaEscuro = "#888888";
-        const corLaranjaVivo = "#FF4500";
+        const corLaranjaVivo = "#FF4500"; // Laranja Vibrante v124
 
         const corOriginal = (info && pData.class !== "semmrv") ? corVerde : corCinzaClaro;
         
@@ -112,10 +114,7 @@ function desenharMapa(dados, targetId, ehMinimizado) {
                     document.getElementById('nome-imovel').innerText = info.nomeCurto || info.nomeFull;
                     document.getElementById('detalhes-imovel').innerHTML = `
                         <p><strong>Estoque:</strong> ${info.estoque}</p>
-                        <p><strong>Previsão:</strong> ${info.entrega}</p>
                         <p><strong>Status:</strong> ${info.statusObra}</p>
-                        <hr style="border:0; border-top:1px solid #777">
-                        <p style="font-style:italic">${info.dica}</p>
                     `;
                 } else {
                     document.getElementById('nome-imovel').innerText = nomeCidade;
@@ -131,13 +130,12 @@ function desenharMapa(dados, targetId, ehMinimizado) {
 }
 
 function atualizarVisualizacao() {
-    // Tenta carregar os mapas dos objetos globais vindos do mapa-SP.js
-    if (typeof MAPA_GSP !== 'undefined' && typeof MAPA_INTERIOR !== 'undefined') {
-        desenharMapa(mapaAtivo === "GSP" ? MAPA_GSP : MAPA_INTERIOR, "mapa-container", false);
-        desenharMapa(mapaAtivo === "GSP" ? MAPA_INTERIOR : MAPA_GSP, "mapa-minimizado", true);
-    } else {
-        console.error("ERRO: Objetos MAPA_GSP ou MAPA_INTERIOR não encontrados. Verifique o arquivo mapa-SP.js");
-    }
+    // IMPORTANTE: Verifique se estes nomes batem com o seu mapa-SP.js
+    const dadosPrincipal = (mapaAtivo === "GSP") ? MAPA_GSP : MAPA_INTERIOR;
+    const dadosMini = (mapaAtivo === "GSP") ? MAPA_INTERIOR : MAPA_GSP;
+
+    desenharMapa(dadosPrincipal, "mapa-container", false);
+    desenharMapa(dadosMini, "mapa-minimizado", true);
 }
 
 function trocarMapas() {
@@ -148,8 +146,9 @@ function trocarMapas() {
     atualizarVisualizacao();
 }
 
-window.onload = async () => {
-    await carregarPlanilha();
+// Inicialização segura
+window.addEventListener('load', () => {
+    carregarPlanilha();
     const mini = document.getElementById('mapa-minimizado');
     if(mini) mini.onclick = trocarMapas;
-};
+});
