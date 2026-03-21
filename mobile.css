@@ -94,19 +94,28 @@ path.semmrv { cursor: default; }
 }
 #detalhes-imovel { font-size: 1.2rem; line-height: 1.6; }
 
-/* 6. IDENTIFICADOR DE CIDADE (CENTRO SUPERIOR) - v125 */
+/* 6. IDENTIFICADOR DE CIDADE (v128) */
 #identificador-cidade {
     position: absolute;
-    top: 30px;
-    left: 28%; /* Centralizado em relação à área visível do mapa */
+    top: 25px;
+    left: 28%; /* Centralizado na área do mapa */
     transform: translateX(-50%);
     z-index: 1500;
-    font-size: 2rem;
-    font-weight: 800;
+    
+    /* Tamanho de fonte igual à faixa verde */
+    font-size: 1rem; 
+    font-weight: bold;
     color: #333;
     text-transform: uppercase;
     letter-spacing: 2px;
-    pointer-events: none; /* FUNDAMENTAL: permite clicar no mapa através do texto */
-    text-shadow: 2px 2px 4px rgba(255,255,255,0.9);
+    
+    /* Prevenção de estouro */
     white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis; 
+    max-width: 50%; /* Garante que não invada a ficha técnica */
+    
+    pointer-events: none;
+    text-shadow: 1px 1px 2px rgba(255,255,255,0.8);
+    transition: all 0.2s ease;
 }
