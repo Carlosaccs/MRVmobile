@@ -1,71 +1,75 @@
 /* ==========================================================================
-   CONFIGURAÇÕES GERAIS
+   BLOCO 10: FUNDAÇÃO (SEM ALTERAÇÕES)
    ========================================================================== */
 html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #fff; }
 * { box-sizing: border-box; font-family: sans-serif; }
 .mobile-wrapper { display: flex; width: 100vw; height: 100vh; position: relative; overflow: hidden; }
 
 /* ==========================================================================
-   FAIXA VERDE (ESQUERDA)
+   BLOCO 20: FAIXA VERDE (FLUTUANTE)
    ========================================================================== */
 .faixa-verde-vertical { 
     position: absolute; left: 0; top: 0; width: 52px; height: 100vh; 
-    background: #00713a; z-index: 2000; 
+    background: #00713a; z-index: 2000; /* Mais alto que o mapa e ficha */
     display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 20px 0;
 }
 .titulo-vertical { writing-mode: vertical-rl; transform: rotate(180deg); color: white; font-weight: bold; font-size: 1rem; letter-spacing: 2px; white-space: nowrap; }
 
 /* ==========================================================================
-   CONTAINER DO MAPA (OCUPA O FUNDO)
+   BLOCO 30: MAPA (OCUPA TUDO NO FUNDO - O SEGREDO)
    ========================================================================== */
 #mapa-container {
     position: absolute;
-    left: 0; top: 0;
-    width: 100%; /* Agora ocupa o fundo total para a ficha técnica sobrepor */
+    left: 0;
+    top: 0;
+    width: 100%; /* Ocupa a tela inteira, ignorando os limites da faixa */
     height: 100%;
-    display: flex; align-items: center; 
-    justify-content: flex-start;
-    z-index: 10;
-    overflow: hidden;
+    z-index: 10; /* Z-index mais baixo do que a ficha */
+    display: flex;
+    align-items: center;
+    justify-content: center; /* Centraliza o mapa na tela inteira */
 }
 #mapa-container svg { 
-    width: 90% !important; /* Ajustado para o mapa não sumir sob a ficha larga */
+    width: 95%; /* Ligeiramente maior para compensar a sobreposição */
     height: auto;
     max-height: 90%;
-    margin-left: -40px; /* Mergulho sob a faixa verde */
+    /* margin-left removido para não 'puxar' o mapa para longe do centro */
 }
 
 /* ==========================================================================
-   MINIATURA (DESLOCADA COM A COLUNA)
+   BLOCO 40: MINIATURA (ANCORADA NA BORDA DA FICHA)
    ========================================================================== */
 #mapa-minimizado {
     position: absolute;
-    right: 37% !important; /* Move o botão para o limite da nova coluna de 35% */
+    right: 37%; /* Posicionado exatamente no limite dos 35% da ficha */
     bottom: 30px;
     width: 110px; height: 110px;
     background: #ffffff;
     border: 3px solid #00713a;
     border-radius: 12px;
-    z-index: 1500;
+    z-index: 1500; /* Mais alto que a ficha (1000) */
     cursor: pointer;
     box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-    display: flex; align-items: center; justify-content: center; overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+    overflow: hidden;
 }
 #mapa-minimizado svg { width: 90%; height: 90%; pointer-events: none; }
 
 /* ==========================================================================
-   FICHA TÉCNICA (AMPLIADA PARA 35%)
+   BLOCO 50: FICHA TÉCNICA (AMPLIADA E SOBREPOSTA)
    ========================================================================== */
 .ficha-tecnica {
-    position: absolute; right: 0; top: 0; 
-    width: 35% !important; /* Força a largura de 35% sobre o mapa */
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 35%; /* Ocupa 35% da largura total */
     height: 100%;
     background: rgba(80, 80, 80, 0.9); /* Um pouco mais opaco para legibilidade */
     backdrop-filter: blur(8px); 
     color: white;
-    padding: 40px 30px; 
-    z-index: 100; 
+    padding: 30px;
+    z-index: 1000; /* Mais alto que o mapa (10) */
     box-shadow: -10px 0 20px rgba(0,0,0,0.3);
 }
-#nome-imovel { color: #50c878; margin: 0 0 15px 0; font-size: 1.6rem; border-bottom: 2px solid #50c878; padding-bottom: 10px; }
-#detalhes-imovel { font-size: 1.2rem; line-height: 1.6; }
+#nome-imovel { color: #50c878; margin: 0 0 15px 0; font-size: 1.4rem; border-bottom: 1px solid #777; padding-bottom: 10px; }
+#detalhes-imovel { font-size: 1.1rem; line-height: 1.5; }
