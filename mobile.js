@@ -1,18 +1,15 @@
 /* ==========================================================================
-   BLOCO 10: CONFIGURAÇÕES E CONSTANTES
+   BLOCO 10: CONFIGURAÇÕES E SELEÇÃO DE ELEMENTOS
    ========================================================================== */
-const containerMapa = document.getElementById('mapa-container');
 const svgNS = "http://www.w3.org/2000/svg";
 
 /* ==========================================================================
-   BLOCO 20: RENDERIZAÇÃO DO MAPA (SVG)
+   BLOCO 20: FUNÇÃO DE RENDERIZAÇÃO
    ========================================================================== */
 function renderizarMapa(dados) {
-    if (!containerMapa || !dados) {
-        console.error("Erro Bloco 20: Container ou Dados ausentes.");
-        return;
-    }
-    
+    const container = document.getElementById('mapa-container');
+    if (!container) return;
+
     const svg = document.createElementNS(svgNS, "svg");
     svg.setAttribute("viewBox", dados.viewBox);
     svg.setAttribute("preserveAspectRatio", "xMidYMid meet");
@@ -25,44 +22,44 @@ function renderizarMapa(dados) {
         path.setAttribute("d", pData.d);
         path.setAttribute("id", pData.id);
         
-        // Cores base v27
         const corBase = pData.class === "semmrv" ? "#cccccc" : "#00713a";
         path.style.fill = corBase;
         path.style.stroke = "#ffffff";
         path.style.strokeWidth = "2";
         path.setAttribute('data-original-fill', corBase);
         
-        // BLOCO 25: INTERAÇÃO
         path.onclick = () => {
             document.querySelectorAll('path').forEach(p => {
                 p.style.fill = p.getAttribute('data-original-fill');
             });
             path.style.fill = "#ff8c00";
-            
-            const nomeImovel = document.getElementById('nome-imovel');
-            if (nomeImovel) nomeImovel.innerText = pData.id.replace(/-/g, ' ').toUpperCase();
+            document.getElementById('nome-imovel').innerText = pData.id.toUpperCase();
         };
 
         g.appendChild(path);
     });
 
     svg.appendChild(g);
-    containerMapa.innerHTML = "";
-    containerMapa.appendChild(svg);
-    console.log("Bloco 20: Mapa injetado no DOM.");
+    container.innerHTML = "";
+    container.appendChild(svg);
+    console.log("Mapa renderizado com sucesso!");
 }
 
 /* ==========================================================================
-   BLOCO 30: INICIALIZAÇÃO (CORRIGIDA)
+   BLOCO 30: INICIALIZAÇÃO COM VERIFICAÇÃO CONTÍNUA
    ========================================================================== */
-function iniciarSistema() {
+function inicializar() {
+    console.log("Tentando inicializar v38...");
+    
+    // Verifica se os dados do mapa existem na memória
     if (typeof MAPA_GSP !== 'undefined') {
         renderizarMapa(MAPA_GSP);
     } else {
-        console.error("Bloco 30: MAPA_GSP não definido. Tentando novamente em 500ms...");
-        setTimeout(iniciarSistema, 500); // Tenta carregar de novo se o arquivo de dados atrasar
+        console.warn("Aguardando mapa-dados.js...");
+        // Se não encontrar, tenta de novo em 300 milisegundos
+        setTimeout(inicializar, 300);
     }
 }
 
-// Dispara a inicialização
-window.onload = iniciarSistema;
+// Garante que o navegador carregou a estrutura básica antes de começar
+document.addEventListener("DOMContentLoaded", inicializar);
