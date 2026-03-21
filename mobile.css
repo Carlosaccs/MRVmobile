@@ -6,7 +6,7 @@ html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden;
 .mobile-wrapper { display: flex; width: 100vw; height: 100vh; position: relative; overflow: hidden; }
 
 /* ==========================================================================
-   BLOCO 20: FAIXA VERDE (FLUTUANTE)
+   BLOCO 20: FAIXA VERDE
    ========================================================================== */
 .faixa-verde-vertical { 
     position: absolute; left: 0; top: 0; width: 52px; height: 100vh; 
@@ -14,25 +14,27 @@ html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden;
     display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 20px 0;
 }
 .titulo-vertical { writing-mode: vertical-rl; transform: rotate(180deg); color: white; font-weight: bold; font-size: 1rem; letter-spacing: 2px; white-space: nowrap; }
-.icon-top, .icon-bottom { color: #ffffff; font-size: 2rem; cursor: pointer; }
 
 /* ==========================================================================
-   BLOCO 30: MAPA (MERGULHANDO NA ESQUERDA)
+   BLOCO 30: MAPA (CENTRALIZADO NA ÁREA ÚTIL)
    ========================================================================== */
 #mapa-container {
     position: absolute;
-    left: 0; /* Colado na borda esquerda real */
+    left: 0;
     top: 0;
-    width: 70%; /* Ocupa até onde começa a ficha técnica */
+    width: 100%; /* Ocupa a tela toda por baixo */
     height: 100%;
-    display: flex; align-items: center; justify-content: center;
     z-index: 10;
-    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 #mapa-container svg { 
-    width: 110% !important; /* Aumentado para garantir o mergulho */
-    height: auto; 
-    margin-left: -50px; /* Puxa o mapa para debaixo da faixa verde */
+    width: 85%; /* Ajustado para não bater na ficha técnica */
+    height: auto;
+    max-height: 90%;
+    /* O padding-left garante que o conteúdo do mapa não fique escondido sob a faixa verde */
+    padding-left: 60px; 
 }
 
 /* ==========================================================================
@@ -49,7 +51,8 @@ html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden;
     z-index: 1500;
     cursor: pointer;
     box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-    display: flex; align-items: center; justify-content: center; overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+    overflow: hidden;
 }
 #mapa-minimizado svg { width: 90%; height: 90%; pointer-events: none; }
 
