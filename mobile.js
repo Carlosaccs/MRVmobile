@@ -2,23 +2,7 @@ const svgNS = "http://www.w3.org/2000/svg";
 const URL_PLANILHA = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSRKdJctOPQjKAtOZSDHyArD_H8SgKIouelAS1vF1d_-13pu7u_ic6J8nP3r0Ijd56WA-mbUmHjb4Me/pub?output=csv';
 let mapaAtivo = "GSP";
 
-async function carregarPlanilha() {
-    try {
-        const res = await fetch(URL_PLANILHA);
-        const csv = await res.text();
-        const linhas = csv.split('\n').slice(1);
-        window.bancoDados = {};
-        linhas.forEach(l => {
-            const c = l.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
-            if (c.length < 5) return;
-            const id = c[0].replace(/"/g, '').trim();
-            window.bancoDados[id] = {
-                nome: c[3]?.replace(/"/g, '').trim() || "Residencial",
-                estoque: c[5]?.replace(/"/g, '').trim() || "0"
-            };
-        });
-    } catch (e) { console.warn("Planilha carregando..."); }
-}
+// ... (mantenha a função carregarPlanilha igual) ...
 
 function desenharMapa(dados, targetId, ehMinimizado) {
     const container = document.getElementById(targetId);
@@ -48,10 +32,10 @@ function desenharMapa(dados, targetId, ehMinimizado) {
                 document.querySelectorAll('#mapa-container path').forEach(p => {
                     p.style.fill = p.getAttribute('data-fill-original');
                 });
-                path.style.fill = "#ffb347"; // Destaque laranja
+                path.style.fill = "#ffb347";
                 const info = window.bancoDados ? window.bancoDados[pData.id] : null;
                 document.getElementById('nome-imovel').innerText = info ? info.nome : pData.id.toUpperCase();
-                document.getElementById('detalhes-imovel').innerText = info ? `Restam ${info.estoque} unidades disponíveis.` : "Informações não disponíveis.";
+                document.getElementById('detalhes-imovel').innerText = info ? `Unidades: ${info.estoque}` : "Sem unidades.";
             };
         }
         g.appendChild(path);
@@ -61,23 +45,17 @@ function desenharMapa(dados, targetId, ehMinimizado) {
     container.appendChild(svg);
 }
 
-// ... (Mantenha as funções carregarPlanilha e desenharMapa iguais) ...
-
-// ... (Funções carregarPlanilha e desenharMapa seguem iguais) ...
-
 function trocarMapas() {
     const container = document.getElementById('mapa-container');
     
     if (mapaAtivo === "GSP") {
         mapaAtivo = "INTERIOR";
-        container.classList.remove('modo-gsp');
-        container.classList.add('modo-interior');
+        container.className = "modo-interior"; // Define a classe de movimento
         desenharMapa(MAPA_INTERIOR, "mapa-container", false);
         desenharMapa(MAPA_GSP, "mapa-minimizado", true);
     } else {
         mapaAtivo = "GSP";
-        container.classList.remove('modo-interior');
-        container.classList.add('modo-gsp');
+        container.className = "modo-gsp"; // Volta para a posição original
         desenharMapa(MAPA_GSP, "mapa-container", false);
         desenharMapa(MAPA_INTERIOR, "mapa-minimizado", true);
     }
@@ -86,16 +64,11 @@ function trocarMapas() {
 window.onload = async () => {
     await carregarPlanilha();
     const container = document.getElementById('mapa-container');
-    
+    if (container) container.className = "modo-gsp"; // Inicia com a classe correta
+
     if (typeof MAPA_GSP !== 'undefined' && typeof MAPA_INTERIOR !== 'undefined') {
-        // Inicializa com a classe da Grande SP
-        container.classList.add('modo-gsp');
         desenharMapa(MAPA_GSP, "mapa-container", false);
         desenharMapa(MAPA_INTERIOR, "mapa-minimizado", true);
-        
-        document.getElementById('mapa-minimizado').onclick = trocarMapas;
-    }
-};
         document.getElementById('mapa-minimizado').onclick = trocarMapas;
     }
 };
