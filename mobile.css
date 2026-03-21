@@ -1,12 +1,12 @@
 /* ==========================================================================
-   BLOCO 10: FUNDAÇÃO
+   CONFIGURAÇÕES GERAIS
    ========================================================================== */
 html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #fff; }
 * { box-sizing: border-box; font-family: sans-serif; }
 .mobile-wrapper { display: flex; width: 100vw; height: 100vh; position: relative; overflow: hidden; }
 
 /* ==========================================================================
-   BLOCO 20: FAIXA VERDE
+   FAIXA VERDE (ESQUERDA)
    ========================================================================== */
 .faixa-verde-vertical { 
     position: absolute; left: 0; top: 0; width: 52px; height: 100vh; 
@@ -14,15 +14,14 @@ html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden;
     display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 20px 0;
 }
 .titulo-vertical { writing-mode: vertical-rl; transform: rotate(180deg); color: white; font-weight: bold; font-size: 1rem; letter-spacing: 2px; white-space: nowrap; }
-.icon-top, .icon-bottom { color: #ffffff; font-size: 2rem; cursor: pointer; }
 
 /* ==========================================================================
-   BLOCO 30: MAPA (OCUPA O FUNDO)
+   CONTAINER DO MAPA (OCUPA O FUNDO)
    ========================================================================== */
 #mapa-container {
     position: absolute;
     left: 0; top: 0;
-    width: 65%; /* Reduzido para dar espaço à nova largura da ficha (100% - 35%) */
+    width: 100%; /* Agora ocupa o fundo total para a ficha técnica sobrepor */
     height: 100%;
     display: flex; align-items: center; 
     justify-content: flex-start;
@@ -30,18 +29,18 @@ html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden;
     overflow: hidden;
 }
 #mapa-container svg { 
-    width: 115% !important; /* Ligeiramente maior para compensar a ficha mais larga */
+    width: 90% !important; /* Ajustado para o mapa não sumir sob a ficha larga */
     height: auto;
-    max-height: 95%;
-    margin-left: -60px; /* Mergulho acentuado sob a faixa verde */
+    max-height: 90%;
+    margin-left: -40px; /* Mergulho sob a faixa verde */
 }
 
 /* ==========================================================================
-   BLOCO 40: MINIATURA (DESLOCADA JUNTO COM A COLUNA)
+   MINIATURA (DESLOCADA COM A COLUNA)
    ========================================================================== */
 #mapa-minimizado {
     position: absolute;
-    right: 37%; /* Ajustado de 32% para 37% para ficar ao lado da nova ficha de 35% */
+    right: 37% !important; /* Move o botão para o limite da nova coluna de 35% */
     bottom: 30px;
     width: 110px; height: 110px;
     background: #ffffff;
@@ -55,14 +54,18 @@ html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden;
 #mapa-minimizado svg { width: 90%; height: 90%; pointer-events: none; }
 
 /* ==========================================================================
-   BLOCO 50: FICHA TÉCNICA (LARGURA DE 35%)
+   FICHA TÉCNICA (AMPLIADA PARA 35%)
    ========================================================================== */
 .ficha-tecnica {
     position: absolute; right: 0; top: 0; 
-    width: 35%; /* Aumentado conforme solicitado */
+    width: 35% !important; /* Força a largura de 35% sobre o mapa */
     height: 100%;
-    background: rgba(80, 80, 80, 0.85); backdrop-filter: blur(5px); color: white;
-    padding: 30px; z-index: 100; box-shadow: -5px 0 15px rgba(0,0,0,0.2);
+    background: rgba(80, 80, 80, 0.9); /* Um pouco mais opaco para legibilidade */
+    backdrop-filter: blur(8px); 
+    color: white;
+    padding: 40px 30px; 
+    z-index: 100; 
+    box-shadow: -10px 0 20px rgba(0,0,0,0.3);
 }
-#nome-imovel { color: #50c878; margin: 0 0 15px 0; font-size: 1.4rem; border-bottom: 1px solid #777; padding-bottom: 10px; }
-#detalhes-imovel { font-size: 1.1rem; line-height: 1.5; }
+#nome-imovel { color: #50c878; margin: 0 0 15px 0; font-size: 1.6rem; border-bottom: 2px solid #50c878; padding-bottom: 10px; }
+#detalhes-imovel { font-size: 1.2rem; line-height: 1.6; }
