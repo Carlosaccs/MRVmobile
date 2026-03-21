@@ -5,37 +5,31 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>MRV Mobile - Real Estate</title>
     <link rel="stylesheet" href="mobile.css">
-    
-    <script src="mapa-dados.js"></script>
-    
-    <script src="mobile.js" defer></script>
 </head>
 <body>
 
     <div class="mobile-wrapper">
-        
-        <div style="position: absolute; top: 10px; right: 15px; z-index: 3000; color: #00713a; font-family: sans-serif; font-size: 10px; font-weight: bold; opacity: 0.6;">
-            VERSÃO v39
-        </div>
 
-        <div class="faixa-verde-vertical">
-            <div class="icon-top">
-                <i class="fas fa-expand"></i>
+        <aside class="faixa-verde-vertical">
+            <div class="icon-top" style="color:white; font-size:1.5rem;">⛶</div>
+            <div class="titulo-vertical">RESIDENCIAIS MRV</div>
+            <div class="icon-bottom" style="color:white; font-size:1.5rem;">☰</div>
+        </aside>
+
+        <main class="area-mapa" id="mapa-container">
+            <p style="color:#999; font-size: 0.8rem;">Carregando mapa...</p>
+        </main>
+
+        <aside class="ficha-tecnica" id="ficha-tecnica">
+            <h3 id="nome-imovel" style="color: #00713a; font-size: 1rem; margin-bottom: 5px;">Selecione</h3>
+            <div id="detalhes-imovel" style="font-size: 0.85rem; color: #444;">
+                Toque em um ponto do mapa para ver os detalhes do residencial.
             </div>
-            <div class="titulo-vertical">MRV EM SP</div>
-            <div class="icon-bottom">
-                <i class="fas fa-bars"></i>
-            </div>
-        </div>
-
-        <div id="mapa-container"></div>
-
-        <div class="ficha-tecnica">
-            <h2 id="nome-imovel">Selecione</h2>
-            <p id="detalhes-imovel">Toque em um ponto do mapa para ver os detalhes do residencial.</p>
-        </div>
+        </aside>
 
     </div>
 
-    </body>
+    <script src="mrv-data.js"></script>
+    <script src="mobile.js"></script>
+</body>
 </html>
