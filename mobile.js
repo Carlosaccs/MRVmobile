@@ -63,23 +63,21 @@ function desenharMapa(dados, targetId, ehMinimizado) {
 
 // ... (Mantenha as funções carregarPlanilha e desenharMapa iguais) ...
 
+// ... (Funções carregarPlanilha e desenharMapa seguem iguais) ...
+
 function trocarMapas() {
     const container = document.getElementById('mapa-container');
     
     if (mapaAtivo === "GSP") {
         mapaAtivo = "INTERIOR";
-        // Troca a classe para aplicar o CSS do Interior
         container.classList.remove('modo-gsp');
         container.classList.add('modo-interior');
-        
         desenharMapa(MAPA_INTERIOR, "mapa-container", false);
         desenharMapa(MAPA_GSP, "mapa-minimizado", true);
     } else {
         mapaAtivo = "GSP";
-        // Troca a classe para aplicar o CSS da Grande SP
         container.classList.remove('modo-interior');
         container.classList.add('modo-gsp');
-        
         desenharMapa(MAPA_GSP, "mapa-container", false);
         desenharMapa(MAPA_INTERIOR, "mapa-minimizado", true);
     }
@@ -90,11 +88,14 @@ window.onload = async () => {
     const container = document.getElementById('mapa-container');
     
     if (typeof MAPA_GSP !== 'undefined' && typeof MAPA_INTERIOR !== 'undefined') {
-        // Inicializa como GSP
+        // Inicializa com a classe da Grande SP
         container.classList.add('modo-gsp');
         desenharMapa(MAPA_GSP, "mapa-container", false);
         desenharMapa(MAPA_INTERIOR, "mapa-minimizado", true);
         
+        document.getElementById('mapa-minimizado').onclick = trocarMapas;
+    }
+};
         document.getElementById('mapa-minimizado').onclick = trocarMapas;
     }
 };
