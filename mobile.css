@@ -2,11 +2,11 @@
    BLOCO 10: FUNDAÇÃO
    ========================================================================== */
 html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #fff; }
-* { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+* { box-sizing: border-box; font-family: sans-serif; }
 .mobile-wrapper { display: flex; width: 100vw; height: 100vh; position: relative; overflow: hidden; }
 
 /* ==========================================================================
-   BLOCO 30: FAIXA VERDE LATERAL (FIXA)
+   BLOCO 30: FAIXA VERDE LATERAL
    ========================================================================== */
 .faixa-verde-vertical { 
     position: absolute; left: 0; top: 0; width: 52px; height: 100vh; 
@@ -16,53 +16,37 @@ html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden;
 }
 .titulo-vertical {
     writing-mode: vertical-rl; transform: rotate(180deg);
-    color: white; font-weight: bold; font-size: 1rem; letter-spacing: 1px;
+    color: white; font-weight: bold; font-size: 1rem; white-space: nowrap;
 }
 
 /* ==========================================================================
-   BLOCO 40: ÁREA DO MAPA (RESTAURADA PARA NÃO ESTOURAR)
+   BLOCO 40: ÁREA DO MAPA (ESTÁVEL)
    ========================================================================== */
 #mapa-container {
     width: calc(100% - 52px); height: 100%; margin-left: 52px;
     display: flex; align-items: center; justify-content: center;
 }
 #mapa-container svg {
-    width: 85% !important; /* Tamanho seguro da v29 */
+    width: 90% !important; /* Tamanho seguro que não estoura */
     height: auto;
-    max-height: 90vh;
 }
 
 /* ==========================================================================
-   BLOCO 50: FICHA TÉCNICA (PAINEL DIREITO)
-   ========================================================================== */
-.ficha-tecnica {
-    position: absolute; right: 0; top: 0; width: 35%; height: 100%;
-    background: rgba(128, 128, 128, 0.95); color: white; padding: 25px;
-    z-index: 500;
-}
-
-/* ==========================================================================
-   BLOCO 70.1: MENU LATERAL (COLADO NA FAIXA)
+   BLOCO 70.1: MENU LATERAL
    ========================================================================== */
 .menu-lateral {
-    position: absolute; top: 0; left: 52px; width: 300px; height: 100vh;
-    background: #f8f8f8; z-index: 999; 
+    position: absolute; top: 0; left: 52px; width: 280px; height: 100vh;
+    background: #ffffff; z-index: 999; 
     transition: transform 0.3s ease; transform: translateX(-110%);
-    box-shadow: 4px 0 10px rgba(0,0,0,0.1);
+    box-shadow: 2px 0 10px rgba(0,0,0,0.1);
 }
 .menu-lateral.aberto { transform: translateX(0); }
 
 /* ==========================================================================
-   BLOCO 70.3: BOTÕES (BORDA COLORIDA E TEXTO LIMPO)
+   BLOCO 70.3: BOTÕES DO MENU (v27)
    ========================================================================== */
 .btn-empreendimento {
-    width: 92%; margin: 12px auto; background: #fff; border-radius: 8px; 
-    padding: 15px; box-shadow: 0 2px 6px rgba(0,0,0,0.08); border: none;
-    border-left: 10px solid #00713a; /* Borda na esquerda */
-    display: flex; flex-direction: column; gap: 4px;
+    width: 90%; margin: 10px auto; background: #fff; border-radius: 5px; 
+    padding: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); border: none;
+    border-left: 6px solid #00713a; text-align: left;
 }
-/* Cores por Zona conforme sua planilha (Coluna B) */
-.btn-empreendimento[data-zona="ZO"] { border-left-color: #e07b39 !important; }
-.btn-empreendimento[data-zona="ZL"] { border-left-color: #004d28 !important; }
-.btn-empreendimento[data-zona="ZN"] { border-left-color: #ffd700 !important; }
-.btn-empreendimento[data-zona="ZS"] { border-left-color: #e6007e !important; }
