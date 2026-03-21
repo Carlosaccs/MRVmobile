@@ -10,21 +10,23 @@ html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden;
 }
 .titulo-vertical { writing-mode: vertical-rl; transform: rotate(180deg); color: white; font-weight: bold; font-size: 1rem; letter-spacing: 2px; white-space: nowrap; }
 
-/* CONTAINER DO MAPA */
+/* CONTAINER DO MAPA (REAJUSTADO v111) */
 #mapa-container {
     position: absolute;
-    left: 0; top: 0;
-    width: 100%; height: 100%;
+    left: 52px; /* Começa após a faixa verde */
+    top: 0;
+    width: calc(100% - 35% - 52px); /* Ocupa apenas o espaço visível (Total menos Ficha menos Faixa) */
+    height: 100%;
     z-index: 10;
-    display: flex; align-items: center; justify-content: center;
+    display: flex; 
+    align-items: center; 
+    justify-content: center; /* Agora o 'centro' é o meio da área branca */
 }
 #mapa-container svg { 
-    width: 85% !important; 
+    width: 95% !important; 
     height: auto;
-    max-height: 85%;
-    /* AJUSTE v110: Empurra o mapa para a esquerda para fugir da ficha técnica */
-    margin-right: 18%; 
-    margin-left: -20px; /* Mantém o mergulho sob a faixa verde */
+    max-height: 90%;
+    margin: 0; /* Limpamos as margens manuais para deixar o flexbox trabalhar */
 }
 
 /* MINIATURA */
@@ -32,7 +34,7 @@ html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden;
     position: absolute;
     right: 37%; 
     bottom: 30px;
-    width: 110px; height: 110px;
+    width: 100px; height: 100px;
     background: #ffffff;
     border: 3px solid #00713a;
     border-radius: 12px;
@@ -41,13 +43,12 @@ html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden;
     box-shadow: 0 4px 15px rgba(0,0,0,0.3);
     display: flex; align-items: center; justify-content: center; overflow: hidden;
 }
-#mapa-minimizado svg { width: 90%; height: 90%; pointer-events: none; }
 
 /* FICHA TÉCNICA */
 .ficha-tecnica {
     position: absolute; right: 0; top: 0; 
     width: 35%; height: 100%;
-    background: rgba(60, 60, 60, 0.9);
+    background: rgba(60, 60, 60, 0.95);
     backdrop-filter: blur(10px); color: white;
     padding: 35px; z-index: 1000; box-shadow: -10px 0 25px rgba(0,0,0,0.4);
 }
