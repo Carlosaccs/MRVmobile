@@ -4,40 +4,31 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>MRV Mobile - Real Estate</title>
-    <link rel="stylesheet" href="mobile.css?v=34">
+    <link rel="stylesheet" href="mobile.css">
+    <script src="mapa-dados.js"></script> 
 </head>
 <body>
 
     <div class="mobile-wrapper">
-
+        
         <div class="faixa-verde-vertical">
-            <div class="icon-top">⛶</div>
-            <div class="titulo-vertical">MRV EM SP</div> <div class="icon-bottom">☰</div>
+            <div class="icon-top">
+                <i class="fas fa-expand"></i> </div>
+            <div class="titulo-vertical">MRV EM SP</div>
+            <div class="icon-bottom">
+                <i class="fas fa-bars"></i> </div>
         </div>
-        
-        <nav id="menu-empreendimentos" class="menu-lateral">
-            <div class="menu-header">EMPREENDIMENTOS</div>
-            <div id="lista-botoes" class="carrossel-botoes">
-                </div>
-        </nav>
-        
-        <main class="area-mapa" id="mapa-container">
-            <p style="color:#999; font-size: 0.8rem;">Carregando mapa...</p>
-        </main>
 
-        <aside class="ficha-tecnica" id="ficha-tecnica">
-            <h3 id="nome-imovel">Selecione</h3> 
-            
-            <div id="detalhes-imovel">
-                Toque em um ponto do mapa para ver os detalhes do residencial.
+        <div id="mapa-container">
             </div>
-        </aside>
+
+        <div class="ficha-tecnica">
+            <h2 id="nome-imovel">Selecione</h2>
+            <p id="detalhes-imovel">Toque em um ponto do mapa para ver os detalhes do residencial.</p>
+        </div>
 
     </div>
 
-        <link rel="stylesheet" href="mobile.css?v=26">
-        
-        <script src="mapa-SP.js"></script>
-        <script src="mobile.js?v=26"></script>
+    <script src="mobile.js"></script>
 </body>
 </html>
