@@ -13,17 +13,18 @@ async function carregarPlanilha() {
             if (c.length < 5) return;
             const id = c[0].replace(/"/g, '').trim();
             window.bancoDados[id] = {
-                nome: c[3]?.replace(/"/g, '').trim() || "Residencial MRV",
+                nome: c[3]?.replace(/"/g, '').trim() || "Residencial",
                 estoque: c[5]?.replace(/"/g, '').trim() || "0"
             };
         });
-    } catch (e) { console.error("Erro Planilha:", e); }
+    } catch (e) { console.warn("Planilha offline, usando nomes do SVG."); }
 }
 
 function desenharMapa(dados, targetId, ehMinimizado) {
     const container = document.getElementById(targetId);
     if (!container || !dados) return;
 
+    container.innerHTML = ""; // Limpa antes de desenhar
     const svg = document.createElementNS(svgNS, "svg");
     svg.setAttribute("viewBox", dados.viewBox);
     svg.setAttribute("preserveAspectRatio", "xMidYMid meet");
@@ -39,10 +40,11 @@ function desenharMapa(dados, targetId, ehMinimizado) {
         const corBase = pData.class === "semmrv" ? "#cccccc" : "#00713a";
         path.style.fill = corBase;
         path.style.stroke = "#ffffff";
-        path.style.strokeWidth = ehMinimizado ? "5" : "1.5";
+        path.style.strokeWidth = ehMinimizado ? "6" : "1.5";
 
         if (!ehMinimizado) {
             path.setAttribute('data-fill-original', corBase);
+            path.style.cursor = "pointer";
             path.onclick = () => {
                 document.querySelectorAll('#mapa-container path').forEach(p => {
                     p.style.fill = p.getAttribute('data-fill-original');
@@ -50,13 +52,13 @@ function desenharMapa(dados, targetId, ehMinimizado) {
                 path.style.fill = "#ff8c00";
                 const info = window.bancoDados ? window.bancoDados[pData.id] : null;
                 document.getElementById('nome-imovel').innerText = info ? info.nome : pData.id.toUpperCase();
-                document.getElementById('detalhes-imovel').innerText = info ? `Restam ${info.estoque} unidades.` : "Unidade selecionada.";
+                document.getElementById('detalhes-imovel').innerText = info ? `Restam ${info.estoque} unidades.` : "Toque para ver detalhes.";
             };
         }
         g.appendChild(path);
     });
 
-    container.innerHTML = "";
+    svg.appendChild(g);
     container.appendChild(svg);
 }
 
@@ -72,11 +74,11 @@ function trocarMapas() {
     }
 }
 
-window.onload = () => {
+window.onload = async () => {
+    await carregarPlanilha();
     if (typeof MAPA_GSP !== 'undefined' && typeof MAPA_INTERIOR !== 'undefined') {
         desenharMapa(MAPA_GSP, "mapa-container", false);
         desenharMapa(MAPA_INTERIOR, "mapa-minimizado", true);
         document.getElementById('mapa-minimizado').onclick = trocarMapas;
     }
-    carregarPlanilha();
 };
