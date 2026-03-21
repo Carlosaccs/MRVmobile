@@ -1,5 +1,5 @@
 /* ==========================================================================
-   BLOCO 10: MOTOR DA PLANILHA (MAPEAMENTO SEGURO)
+   BLOCO 10: MOTOR DA PLANILHA (v27)
    ========================================================================== */
 const URL_PLANILHA_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSRKdJctOPQjKAtOZSDHyArD_H8SgKIouelAS1vF1d_-13pu7u_ic6J8nP3r0Ijd56WA-mbUmHjb4Me/pub?output=csv';
 
@@ -14,31 +14,31 @@ async function carregarDadosPlanilha() {
 
         linhas.forEach(linha => {
             const col = linha.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
-            if (col.length < 5) return;
+            if (col.length < 4) return;
 
             const registro = {
                 idPath: col[0].replace(/"/g, '').trim(),
-                zona: col[1]?.replace(/"/g, '').trim().toUpperCase() || "", // Coluna B
-                valor: col[2]?.replace(/"/g, '').trim() || "",              // Coluna C
-                nome: col[3]?.replace(/"/g, '').trim() || "Sem Nome",       // Coluna D
-                estoque: col[5]?.replace(/"/g, '').trim() || "0"            // Coluna F
+                nome: col[3]?.replace(/"/g, '').trim() || "Sem Nome", // Coluna D
+                estoque: col[5]?.replace(/"/g, '').trim() || "0"      // Coluna F
             };
 
             const btn = document.createElement('div');
             btn.className = 'btn-empreendimento';
-            btn.setAttribute('data-zona', registro.zona);
-            
-            // Estrutura de texto em blocos para não encavalar
             btn.innerHTML = `
-                <div style="font-size: 0.7rem; color: #666; font-weight: bold;">${registro.valor}</div>
-                <div style="font-size: 0.95rem; color: #222; font-weight: 800;">${registro.nome}</div>
-                <div style="font-size: 0.65rem; color: #999; text-transform: uppercase;">Restam ${registro.estoque} unidades</div>
+                <div style="font-weight: bold; color: #333;">${registro.nome}</div>
+                <div style="font-size: 0.7rem; color: #777;">RESTAM ${registro.estoque} UNIDADES</div>
             `;
             
-            btn.onclick = () => selecionarEmpreendimento(registro, btn);
+            btn.onclick = () => {
+                document.getElementById('nome-imovel').innerText = registro.nome;
+                // Lógica de destaque do mapa simplificada
+                document.querySelectorAll('path').forEach(p => p.style.fill = p.getAttribute('data-original-fill'));
+                const shape = document.getElementById(registro.idPath);
+                if (shape) shape.style.fill = "#ff8c00";
+            };
             lista.appendChild(btn);
         });
-    } catch (e) { console.error("Erro v36:", e); }
+    } catch (e) { console.error("Erro na restauração v27:", e); }
 }
 
 /* ==========================================================================
@@ -74,7 +74,7 @@ function renderizarMapa(dados) {
 }
 
 /* ==========================================================================
-   BLOCO 40: EVENTOS
+   BLOCO 40: INICIALIZAÇÃO
    ========================================================================== */
 window.onload = () => {
     if (typeof MAPA_GSP !== 'undefined') renderizarMapa(MAPA_GSP);
