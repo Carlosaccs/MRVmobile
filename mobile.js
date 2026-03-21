@@ -1,5 +1,5 @@
 /* ==========================================================================
-   v130 - CARREGAMENTO IMEDIATO (ANTI-TELA BRANCA)
+   v131 - PROTOCOLO DE CARREGAMENTO SEGURO (ANTI-CONFLITO)
    ========================================================================== */
 const svgNS = "http://www.w3.org/2000/svg";
 const URL_PLANILHA = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSRKdJctOPQjKAtOZSDHyArD_H8SgKIouelAS1vF1d_-13pu7u_ic6J8nP3r0Ijd56WA-mbUmHjb4Me/pub?output=csv';
@@ -13,11 +13,22 @@ const AJUSTES_MAPA = {
     INTERIOR: { marginRight: "50%", marginLeft: "-100px", scale: "1.15" }
 };
 
-// 1. CARREGAMENTO INICIAL (Não espera a planilha para desenhar)
-window.addEventListener('DOMContentLoaded', () => {
-    atualizarVisualizacao(); // Desenha os mapas primeiro
-    carregarPlanilha();      // Busca os dados em segundo plano
-});
+// FUNÇÃO DE VERIFICAÇÃO CRÍTICA
+function verificarEDesenhar() {
+    // Verifica se as variáveis do arquivo mapa-SP.js já existem na memória
+    if (typeof MAPA_GSP !== 'undefined' && typeof MAPA_INTERIOR !== 'undefined') {
+        console.log("Mapas detectados! Iniciando renderização...");
+        atualizarVisualizacao();
+        carregarPlanilha();
+    } else {
+        console.warn("Aguardando dados do mapa-SP.js...");
+        // Tenta novamente em 500ms se ainda não carregou
+        setTimeout(verificarEDesenhar, 500);
+    }
+}
+
+// Inicia o processo assim que a página base carregar
+window.addEventListener('load', verificarEDesenhar);
 
 async function carregarPlanilha() {
     try {
@@ -36,10 +47,7 @@ async function carregarPlanilha() {
                 };
             }
         });
-        console.log("Dados da planilha carregados.");
-    } catch (e) { 
-        console.warn("Aviso: Dados da planilha indisponíveis."); 
-    }
+    } catch (e) { console.error("Erro na planilha:", e); }
 }
 
 function desenharMapa(dados, targetId, ehMinimizado) {
@@ -100,16 +108,13 @@ function desenharMapa(dados, targetId, ehMinimizado) {
 
             path.onclick = () => {
                 if (!ehMRV) return;
-                
                 document.querySelectorAll('#mapa-container path').forEach(p => {
                     p.setAttribute('data-selecionado', 'false');
                     p.style.fill = p.getAttribute('data-cor-base');
                 });
-
                 path.setAttribute('data-selecionado', 'true');
                 path.style.fill = corLaranjaVivo;
                 cidadeSelecionada = nomeCidade;
-                
                 const display = document.getElementById('identificador-cidade');
                 if(display) display.innerText = nomeCidade;
 
@@ -131,10 +136,8 @@ function desenharMapa(dados, targetId, ehMinimizado) {
 }
 
 function atualizarVisualizacao() {
-    if (typeof MAPA_GSP !== 'undefined' && typeof MAPA_INTERIOR !== 'undefined') {
-        desenharMapa(mapaAtivo === "GSP" ? MAPA_GSP : MAPA_INTERIOR, "mapa-container", false);
-        desenharMapa(mapaAtivo === "GSP" ? MAPA_INTERIOR : MAPA_GSP, "mapa-minimizado", true);
-    }
+    desenharMapa(mapaAtivo === "GSP" ? MAPA_GSP : MAPA_INTERIOR, "mapa-container", false);
+    desenharMapa(mapaAtivo === "GSP" ? MAPA_INTERIOR : MAPA_GSP, "mapa-minimizado", true);
 }
 
 function trocarMapas() {
@@ -145,14 +148,7 @@ function trocarMapas() {
     atualizarVisualizacao();
 }
 
-// Clique no mini mapa (Garante funcionamento no mobile)
-document.addEventListener('touchstart', (e) => {
-    if (e.target.closest('#mapa-minimizado')) {
-        e.preventDefault();
-        trocarMapas();
-    }
-}, {passive: false});
-
+// Ouvinte para o mini mapa
 document.addEventListener('click', (e) => {
     if (e.target.closest('#mapa-minimizado')) trocarMapas();
 });
