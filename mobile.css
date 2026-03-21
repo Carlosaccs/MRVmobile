@@ -6,35 +6,41 @@ html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden;
 .mobile-wrapper { display: flex; width: 100vw; height: 100vh; position: relative; overflow: hidden; }
 
 /* ==========================================================================
-   BLOCO 20: FAIXA VERDE (Z-INDEX ALTO PARA SOBREPOR O MAPA)
+   BLOCO 20: FAIXA VERDE (FLUTUANTE)
    ========================================================================== */
 .faixa-verde-vertical { 
     position: absolute; left: 0; top: 0; width: 52px; height: 100vh; 
-    background: #00713a; z-index: 2000; /* Garante que fique por cima */
+    background: #00713a; z-index: 2000; 
     display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 20px 0;
 }
 .titulo-vertical { writing-mode: vertical-rl; transform: rotate(180deg); color: white; font-weight: bold; font-size: 1rem; letter-spacing: 2px; white-space: nowrap; }
+.icon-top, .icon-bottom { color: #ffffff; font-size: 2rem; cursor: pointer; }
 
 /* ==========================================================================
-   BLOCO 30: MAPA PRINCIPAL (OCUPA TUDO DESDE A ESQUERDA)
+   BLOCO 30: MAPA (MERGULHANDO NA ESQUERDA)
    ========================================================================== */
 #mapa-container {
     position: absolute;
-    left: 0; /* Começa do zero para mergulhar sob a faixa */
+    left: 0; /* Colado na borda esquerda real */
     top: 0;
-    width: 100%; /* Ocupa a largura total */
+    width: 70%; /* Ocupa até onde começa a ficha técnica */
     height: 100%;
     display: flex; align-items: center; justify-content: center;
     z-index: 10;
+    overflow: hidden;
 }
-#mapa-container svg { width: 95%; height: auto; padding-left: 52px; } /* Padding interno para compensar a faixa */
+#mapa-container svg { 
+    width: 110% !important; /* Aumentado para garantir o mergulho */
+    height: auto; 
+    margin-left: -50px; /* Puxa o mapa para debaixo da faixa verde */
+}
 
 /* ==========================================================================
-   BLOCO 40: MINIATURA DE TROCA (LADO DIREITO)
+   BLOCO 40: MINIATURA (DIREITA)
    ========================================================================== */
 #mapa-minimizado {
     position: absolute;
-    right: 32%; /* Posicionado logo à esquerda da ficha técnica */
+    right: 32%; 
     bottom: 30px;
     width: 110px; height: 110px;
     background: #ffffff;
@@ -45,6 +51,7 @@ html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden;
     box-shadow: 0 4px 15px rgba(0,0,0,0.3);
     display: flex; align-items: center; justify-content: center; overflow: hidden;
 }
+#mapa-minimizado svg { width: 90%; height: 90%; pointer-events: none; }
 
 /* ==========================================================================
    BLOCO 50: FICHA TÉCNICA
@@ -54,4 +61,4 @@ html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden;
     background: rgba(80, 80, 80, 0.85); backdrop-filter: blur(5px); color: white;
     padding: 25px; z-index: 100; box-shadow: -5px 0 15px rgba(0,0,0,0.2);
 }
-#nome-imovel { color: #50c878; margin-top: 0; font-size: 1.2rem; border-bottom: 1px solid #777; padding-bottom: 10px; }
+#nome-imovel { color: #50c878; margin: 0 0 10px 0; font-size: 1.2rem; border-bottom: 1px solid #777; padding-bottom: 10px; }
