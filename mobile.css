@@ -50,18 +50,18 @@ html, body {
     cursor: pointer;
 }
 
-/* 4. MAPA MINIMIZADO (O BOTÃO DE TROCA) - v125 */
+/* 4. MAPA MINIMIZADO (LADO DIREITO) - v126 */
 #mapa-minimizado {
     position: absolute;
-    bottom: 20px; /* Ajustado para ficar visível */
-    left: 70px;   /* Ao lado da faixa verde */
+    bottom: 20px;
+    right: 20px; /* Movido para a direita */
     width: 100px;
     height: 80px;
     background: white;
     border: 2px solid #00713a;
     border-radius: 12px;
     cursor: pointer;
-    z-index: 2500; /* Garante que fique acima de tudo para clicar */
+    z-index: 2500;
     overflow: hidden;
     box-shadow: 0 4px 15px rgba(0,0,0,0.3);
     display: flex;
@@ -72,10 +72,9 @@ html, body {
 
 #mapa-minimizado:active { transform: scale(0.95); }
 
-#mapa-minimizado svg {
-    width: 90% !important;
-    height: 90% !important;
-}
+/* Cursor apenas para o que é clicável */
+path.commrv { cursor: pointer; }
+path.semmrv { cursor: default; }
 
 /* 5. FICHA TÉCNICA (LATERAL DIREITA) */
 .ficha-tecnica {
