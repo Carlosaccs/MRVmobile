@@ -51,7 +51,7 @@ function desenharMapa(dados, targetId, ehMinimizado) {
                 path.style.fill = "#ff8c00";
                 const info = window.bancoDados ? window.bancoDados[pData.id] : null;
                 document.getElementById('nome-imovel').innerText = info ? info.nome : pData.id.toUpperCase();
-                document.getElementById('detalhes-imovel').innerText = info ? `Restam ${info.estoque} unidades em estoque.` : "Informações não encontradas.";
+                document.getElementById('detalhes-imovel').innerText = info ? `Restam ${info.estoque} unidades disponíveis.` : "Selecione uma unidade no mapa.";
             };
         }
         g.appendChild(path);
