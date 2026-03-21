@@ -17,14 +17,14 @@ async function carregarPlanilha() {
                 estoque: c[5]?.replace(/"/g, '').trim() || "0"
             };
         });
-    } catch (e) { console.warn("Planilha offline, usando nomes do SVG."); }
+    } catch (e) { console.warn("Planilha carregando em segundo plano..."); }
 }
 
 function desenharMapa(dados, targetId, ehMinimizado) {
     const container = document.getElementById(targetId);
     if (!container || !dados) return;
 
-    container.innerHTML = ""; // Limpa antes de desenhar
+    container.innerHTML = "";
     const svg = document.createElementNS(svgNS, "svg");
     svg.setAttribute("viewBox", dados.viewBox);
     svg.setAttribute("preserveAspectRatio", "xMidYMid meet");
@@ -44,7 +44,6 @@ function desenharMapa(dados, targetId, ehMinimizado) {
 
         if (!ehMinimizado) {
             path.setAttribute('data-fill-original', corBase);
-            path.style.cursor = "pointer";
             path.onclick = () => {
                 document.querySelectorAll('#mapa-container path').forEach(p => {
                     p.style.fill = p.getAttribute('data-fill-original');
@@ -52,7 +51,7 @@ function desenharMapa(dados, targetId, ehMinimizado) {
                 path.style.fill = "#ff8c00";
                 const info = window.bancoDados ? window.bancoDados[pData.id] : null;
                 document.getElementById('nome-imovel').innerText = info ? info.nome : pData.id.toUpperCase();
-                document.getElementById('detalhes-imovel').innerText = info ? `Restam ${info.estoque} unidades.` : "Toque para ver detalhes.";
+                document.getElementById('detalhes-imovel').innerText = info ? `Restam ${info.estoque} unidades.` : "Selecione para detalhes.";
             };
         }
         g.appendChild(path);
