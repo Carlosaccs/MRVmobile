@@ -1,5 +1,5 @@
 /* ==========================================================================
-   v131 - PROTOCOLO DE CARREGAMENTO SEGURO (ANTI-CONFLITO)
+   v132 - RETORNO À ESTABILIDADE DA v127
    ========================================================================== */
 const svgNS = "http://www.w3.org/2000/svg";
 const URL_PLANILHA = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSRKdJctOPQjKAtOZSDHyArD_H8SgKIouelAS1vF1d_-13pu7u_ic6J8nP3r0Ijd56WA-mbUmHjb4Me/pub?output=csv';
@@ -13,28 +13,12 @@ const AJUSTES_MAPA = {
     INTERIOR: { marginRight: "50%", marginLeft: "-100px", scale: "1.15" }
 };
 
-// FUNÇÃO DE VERIFICAÇÃO CRÍTICA
-function verificarEDesenhar() {
-    // Verifica se as variáveis do arquivo mapa-SP.js já existem na memória
-    if (typeof MAPA_GSP !== 'undefined' && typeof MAPA_INTERIOR !== 'undefined') {
-        console.log("Mapas detectados! Iniciando renderização...");
-        atualizarVisualizacao();
-        carregarPlanilha();
-    } else {
-        console.warn("Aguardando dados do mapa-SP.js...");
-        // Tenta novamente em 500ms se ainda não carregou
-        setTimeout(verificarEDesenhar, 500);
-    }
-}
-
-// Inicia o processo assim que a página base carregar
-window.addEventListener('load', verificarEDesenhar);
-
 async function carregarPlanilha() {
     try {
         const res = await fetch(URL_PLANILHA);
         const csv = await res.text();
         const linhas = csv.split('\n').slice(1);
+        window.bancoDados = {};
         linhas.forEach(linha => {
             const c = linha.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
             if (c.length >= 5) {
@@ -47,7 +31,8 @@ async function carregarPlanilha() {
                 };
             }
         });
-    } catch (e) { console.error("Erro na planilha:", e); }
+    } catch (e) { console.warn("Planilha Offline"); }
+    atualizarVisualizacao();
 }
 
 function desenharMapa(dados, targetId, ehMinimizado) {
@@ -71,6 +56,7 @@ function desenharMapa(dados, targetId, ehMinimizado) {
     dados.paths.forEach(pData => {
         const path = document.createElementNS(svgNS, "path");
         const idLimpo = pData.id.toLowerCase();
+        const info = window.bancoDados[idLimpo];
         const nomeCidade = pData.name || pData.id;
         const ehMRV = pData.class === "commrv";
 
@@ -89,36 +75,35 @@ function desenharMapa(dados, targetId, ehMinimizado) {
         path.setAttribute('data-cor-base', corOriginal);
 
         if (!ehMinimizado) {
-            const focar = () => {
-                if (!ehMRV) return;
-                const display = document.getElementById('identificador-cidade');
-                if(display) display.innerText = nomeCidade;
-                if (path.getAttribute('data-selecionado') !== 'true') path.style.fill = corLaranjaVivo;
+            path.onmouseover = () => {
+                if (ehMRV) {
+                    const display = document.getElementById('identificador-cidade');
+                    if(display) display.innerText = nomeCidade;
+                    if (path.getAttribute('data-selecionado') !== 'true') path.style.fill = corLaranjaVivo;
+                }
             };
 
-            const desfocar = () => {
+            path.onmouseout = () => {
                 const display = document.getElementById('identificador-cidade');
                 if(display) display.innerText = cidadeSelecionada;
                 if (path.getAttribute('data-selecionado') !== 'true') path.style.fill = corOriginal;
             };
 
-            path.onmouseover = focar;
-            path.onmouseout = desfocar;
-            path.ontouchstart = (e) => { focar(); };
-
             path.onclick = () => {
                 if (!ehMRV) return;
+
                 document.querySelectorAll('#mapa-container path').forEach(p => {
                     p.setAttribute('data-selecionado', 'false');
                     p.style.fill = p.getAttribute('data-cor-base');
                 });
+
                 path.setAttribute('data-selecionado', 'true');
                 path.style.fill = corLaranjaVivo;
                 cidadeSelecionada = nomeCidade;
+                
                 const display = document.getElementById('identificador-cidade');
                 if(display) display.innerText = nomeCidade;
 
-                const info = window.bancoDados[idLimpo];
                 if (info) {
                     document.getElementById('nome-imovel').innerText = info.nomeCurto || info.nomeFull;
                     document.getElementById('detalhes-imovel').innerHTML = `
@@ -136,8 +121,10 @@ function desenharMapa(dados, targetId, ehMinimizado) {
 }
 
 function atualizarVisualizacao() {
-    desenharMapa(mapaAtivo === "GSP" ? MAPA_GSP : MAPA_INTERIOR, "mapa-container", false);
-    desenharMapa(mapaAtivo === "GSP" ? MAPA_INTERIOR : MAPA_GSP, "mapa-minimizado", true);
+    if (typeof MAPA_GSP !== 'undefined' && typeof MAPA_INTERIOR !== 'undefined') {
+        desenharMapa(mapaAtivo === "GSP" ? MAPA_GSP : MAPA_INTERIOR, "mapa-container", false);
+        desenharMapa(mapaAtivo === "GSP" ? MAPA_INTERIOR : MAPA_GSP, "mapa-minimizado", true);
+    }
 }
 
 function trocarMapas() {
@@ -148,7 +135,8 @@ function trocarMapas() {
     atualizarVisualizacao();
 }
 
-// Ouvinte para o mini mapa
+window.onload = carregarPlanilha;
+
 document.addEventListener('click', (e) => {
     if (e.target.closest('#mapa-minimizado')) trocarMapas();
 });
