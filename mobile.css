@@ -1,13 +1,15 @@
 /* ==========================================================================
-   BLOCO 10: FUNDAÇÃO (SEM ALTERAÇÕES)
-   ========================================================================== */
+   1. FUNDAÇÃO E RESET
+   ========================================================================== 
+*/
 html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #fff; }
 * { box-sizing: border-box; font-family: sans-serif; }
 .mobile-wrapper { display: flex; width: 100vw; height: 100vh; position: relative; overflow: hidden; }
 
 /* ==========================================================================
-   BLOCO 20: FAIXA VERDE (FLUTUANTE - SEM ALTERAÇÕES)
-   ========================================================================== */
+   2. FAIXA VERDE LATERAL
+   ========================================================================== 
+*/
 .faixa-verde-vertical { 
     position: absolute; left: 0; top: 0; width: 52px; height: 100vh; 
     background: #00713a; z-index: 2000;
@@ -15,10 +17,10 @@ html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden;
 }
 .titulo-vertical { writing-mode: vertical-rl; transform: rotate(180deg); color: white; font-weight: bold; font-size: 1rem; letter-spacing: 2px; white-space: nowrap; }
 
-/* ... (Mantenha os blocos 10, 20, 40 e 50 iguais à v116) ... */
-
-/* ... (mantenha os estilos gerais de wrapper e faixa verde) ... */
-
+/* ==========================================================================
+   3. CONTAINER DO MAPA PRINCIPAL
+   ========================================================================== 
+*/
 #mapa-container {
     position: absolute;
     left: 0; top: 0;
@@ -32,26 +34,17 @@ html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden;
     width: 125% !important; 
     height: auto;
     max-height: 95%;
+    /* O posicionamento específico é controlado via JS (mobile.js) */
+    transition: margin 0.3s ease; 
 }
 
-/* CONFIGURAÇÃO GRANDE SP (v119) - Fica exatamente como você gostava */
-#mapa-container.modo-gsp svg {
-    margin-right: 35%; 
-    margin-left: -70px;
-}
-
-/* CONFIGURAÇÃO INTERIOR (v119) - Move para a esquerda para liberar as áreas verdes */
-#mapa-container.modo-interior svg {
-    margin-right: 48%; /* Aumentamos aqui para empurrar mais para a esquerda */
-    margin-left: -120px; /* Ajuste compensatório */
-}
 /* ==========================================================================
-   BLOCO 40: MINIATURA (AGORA FORA DA FICHA TÉCNICA v115 - SEM ALTERAÇÕES)
-   ========================================================================== */
+   4. MINIATURA (BOTÃO DE TROCA)
+   ========================================================================== 
+*/
 #mapa-minimizado {
     position: absolute;
-    right: 46%; 
-    bottom: 30px;
+    right: 46%; bottom: 30px;
     width: 110px; height: 110px;
     background: #ffffff;
     border: 3px solid #00713a;
@@ -59,24 +52,19 @@ html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden;
     z-index: 1500;
     cursor: pointer;
     box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-    display: flex; align-items: center; justify-content: center;
-    overflow: hidden;
+    display: flex; align-items: center; justify-content: center; overflow: hidden;
 }
-#mapa-minimizado svg { width: 90%; height: 90%; pointer-events: none; }
 
 /* ==========================================================================
-   BLOCO 50: FICHA TÉCNICA (MANTIDA EM 44% - SEM ALTERAÇÕES)
-   ========================================================================== */
+   5. FICHA TÉCNICA (LATERAL DIREITA)
+   ========================================================================== 
+*/
 .ficha-tecnica {
     position: absolute; right: 0; top: 0; 
-    width: 44%;
-    height: 100%;
-    background: rgba(80, 80, 80, 0.95);
-    backdrop-filter: blur(10px); 
-    color: white;
-    padding: 30px;
-    z-index: 1000;
-    box-shadow: -10px 0 25px rgba(0,0,0,0.4);
+    width: 44%; height: 100%;
+    background: rgba(60, 60, 60, 0.95);
+    backdrop-filter: blur(10px); color: white;
+    padding: 35px; z-index: 1000; box-shadow: -10px 0 25px rgba(0,0,0,0.4);
 }
-#nome-imovel { color: #50c878; margin: 0 0 15px 0; font-size: 1.4rem; border-bottom: 1px solid #777; padding-bottom: 10px; }
-#detalhes-imovel { font-size: 1.1rem; line-height: 1.5; }
+#nome-imovel { color: #50c878; margin: 0 0 15px 0; font-size: 1.6rem; border-bottom: 2px solid #50c878; padding-bottom: 10px; }
+#detalhes-imovel { font-size: 1.2rem; line-height: 1.6; }
