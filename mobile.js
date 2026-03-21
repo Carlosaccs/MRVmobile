@@ -1,13 +1,7 @@
-/* ==========================================================================
-   BLOCO 01: CONFIGURAÇÕES
-   ========================================================================== */
 const svgNS = "http://www.w3.org/2000/svg";
 const URL_PLANILHA = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSRKdJctOPQjKAtOZSDHyArD_H8SgKIouelAS1vF1d_-13pu7u_ic6J8nP3r0Ijd56WA-mbUmHjb4Me/pub?output=csv';
 let mapaAtivo = "GSP";
 
-/* ==========================================================================
-   BLOCO 10: DADOS DA PLANILHA
-   ========================================================================== */
 async function carregarPlanilha() {
     try {
         const res = await fetch(URL_PLANILHA);
@@ -26,9 +20,6 @@ async function carregarPlanilha() {
     } catch (e) { console.error("Erro Planilha:", e); }
 }
 
-/* ==========================================================================
-   BLOCO 20: DESENHO DOS MAPAS
-   ========================================================================== */
 function desenharMapa(dados, targetId, ehMinimizado) {
     const container = document.getElementById(targetId);
     if (!container || !dados) return;
@@ -65,14 +56,10 @@ function desenharMapa(dados, targetId, ehMinimizado) {
         g.appendChild(path);
     });
 
-    svg.appendChild(g);
     container.innerHTML = "";
     container.appendChild(svg);
 }
 
-/* ==========================================================================
-   BLOCO 30: TOGGLE E INIT
-   ========================================================================== */
 function trocarMapas() {
     if (mapaAtivo === "GSP") {
         mapaAtivo = "INTERIOR";
