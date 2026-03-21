@@ -15,27 +15,35 @@ html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden;
 }
 .titulo-vertical { writing-mode: vertical-rl; transform: rotate(180deg); color: white; font-weight: bold; font-size: 1rem; letter-spacing: 2px; white-space: nowrap; }
 
-/* ==========================================================================
-   BLOCO 30: MAPA (OCUPA TUDO NO FUNDO v115 - PUXADO PARA A ESQUERDA)
-   ========================================================================== */
+/* ... (Mantenha os blocos 10, 20, 40 e 50 iguais à v116) ... */
+
+/* BLOCO 30: MAPA (AGORA DINÂMICO v117) */
 #mapa-container {
     position: absolute;
     left: 0; top: 0;
-    width: 100%; /* Ocupa 100% da tela real, por baixo de tudo */
-    height: 100%;
+    width: 100%; height: 100%;
     z-index: 10;
-    display: flex; align-items: center; 
-    justify-content: center; /* Centraliza o mapa na tela INTEIRA */
+    display: flex; align-items: center; justify-content: center;
     overflow: hidden;
 }
+
 #mapa-container svg { 
-    /* Mantemos o zoom de 20% no SVG diretamente */
-    width: 120% !important;
+    width: 125% !important;
     height: auto;
     max-height: 95%;
-    /* COMPENSAÇÃO v115: 'Puxa' o mapa mais agressivamente para a esquerda */
-    margin-right: 35%; /* Aumentado de 25% para 35% para fugir mais da ficha */
-    margin-left: -70px; /* Aumentado de -60px para -70px para a faixa verde */
+    transition: margin 0.3s ease; /* Transição suave ao trocar */
+}
+
+/* AJUSTE ESPECÍFICO PARA GRANDE SÃO PAULO */
+#mapa-container.modo-gsp svg {
+    margin-right: 45%; /* Puxa bem para a esquerda para liberar os pontos verdes */
+    margin-left: -80px;
+}
+
+/* AJUSTE ESPECÍFICO PARA INTERIOR (ESTADO) */
+#mapa-container.modo-interior svg {
+    margin-right: 15%; /* Deixa mais centralizado para o 'rabo' do estado não sumir */
+    margin-left: 0;
 }
 
 /* ==========================================================================
