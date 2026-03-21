@@ -3,13 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>MRV Mobile - Real Estate</title>
-    <link rel="stylesheet" href="mobile.css?v=39">
+    <title>MRV Mobile - v101</title>
+    <link rel="stylesheet" href="mobile.css?v=101">
 </head>
 <body>
 
     <div class="mobile-wrapper">
-
         <aside class="faixa-verde-vertical">
             <div class="icon-top">⛶</div>
             <div class="titulo-vertical">RESIDENCIAIS MRV</div>
@@ -17,19 +16,22 @@
         </aside>
 
         <main class="area-mapa" id="mapa-container">
-            <p style="color:#999; font-size: 0.8rem;">Carregando mapa...</p>
+            <p style="color:#999; font-size: 0.8rem;">Carregando mapa principal...</p>
         </main>
 
+        <div id="mapa-minimizado" title="Clique para alternar mapa">
+            </div>
+
         <aside class="ficha-tecnica" id="ficha-tecnica">
-            <h3 id="nome-imovel" style="color: #00713a; font-size: 1rem; margin-bottom: 5px;">Selecione</h3>
-            <div id="detalhes-imovel" style="font-size: 0.85rem; color: #444;">
+            <h3 id="nome-imovel">Selecione</h3>
+            <div id="detalhes-imovel">
                 Toque em um ponto do mapa para ver os detalhes do residencial.
             </div>
+            <div id="versao-tag" style="position:absolute; bottom:10px; right:10px; font-size:10px; color:#666;">v101</div>
         </aside>
-
     </div>
 
     <script src="mapa-SP.js"></script>
-    <script src="mobile.js"></script>
+    <script src="mobile.js?v=101"></script>
 </body>
 </html>
