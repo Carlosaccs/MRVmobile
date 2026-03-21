@@ -40,7 +40,7 @@ function desenharMapa(dados, targetId, ehMinimizado) {
         const corBase = pData.class === "semmrv" ? "#cccccc" : "#00713a";
         path.style.fill = corBase;
         path.style.stroke = "#ffffff";
-        path.style.strokeWidth = ehMinimizado ? "5" : "1.5";
+        path.style.strokeWidth = ehMinimizado ? "6" : "1.5";
 
         if (!ehMinimizado) {
             path.setAttribute('data-fill-original', corBase);
@@ -51,7 +51,7 @@ function desenharMapa(dados, targetId, ehMinimizado) {
                 path.style.fill = "#ff8c00";
                 const info = window.bancoDados ? window.bancoDados[pData.id] : null;
                 document.getElementById('nome-imovel').innerText = info ? info.nome : pData.id.toUpperCase();
-                document.getElementById('detalhes-imovel').innerText = info ? `Restam ${info.estoque} unidades disponíveis.` : "Selecione uma unidade no mapa.";
+                document.getElementById('detalhes-imovel').innerText = info ? `Restam ${info.estoque} unidades disponíveis.` : "Toque em uma unidade para detalhes.";
             };
         }
         g.appendChild(path);
