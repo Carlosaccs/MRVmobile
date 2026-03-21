@@ -1,52 +1,69 @@
 /* ==========================================================================
    BLOCO 10: FUNDAÇÃO
    ========================================================================== */
-html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #fff; }
-* { box-sizing: border-box; font-family: sans-serif; }
-.mobile-wrapper { display: flex; width: 100vw; height: 100vh; position: relative; overflow: hidden; }
+html, body { 
+    margin: 0 !important; padding: 0 !important; 
+    width: 100% !important; height: 100% !important; 
+    overflow: hidden !important; background: #fff; 
+}
+* { box-sizing: border-box !important; font-family: sans-serif; }
+
+.mobile-wrapper { 
+    display: flex !important; width: 100vw !important; height: 100vh !important; 
+    position: relative !important; overflow: hidden !important; 
+}
 
 /* ==========================================================================
-   BLOCO 30: FAIXA VERDE LATERAL
+   BLOCO 30: FAIXA VERDE (FLUTUANTE SOBRE O MAPA)
    ========================================================================== */
 .faixa-verde-vertical { 
-    position: absolute; left: 0; top: 0; width: 52px; height: 100vh; 
-    background: #00713a; z-index: 2000;
-    display: flex; flex-direction: column; align-items: center; 
-    justify-content: space-between; padding: 20px 0;
+    position: absolute !important; left: 0 !important; top: 0 !important;
+    width: 52px !important; height: 100vh !important; 
+    background: #00713a !important; z-index: 2000 !important;
+    display: flex !important; flex-direction: column !important;
+    align-items: center !important; justify-content: space-between !important; 
+    padding: 20px 0 !important;
 }
 .titulo-vertical {
-    writing-mode: vertical-rl; transform: rotate(180deg);
-    color: white; font-weight: bold; font-size: 1rem; white-space: nowrap;
+    writing-mode: vertical-rl !important; transform: rotate(180deg) !important;
+    color: white !important; font-weight: bold !important; font-size: 1rem !important;
+    letter-spacing: 2px !important; white-space: nowrap !important;
+}
+.icon-top, .icon-bottom {
+    color: #ffffff !important; font-size: 2.2rem !important; cursor: pointer !important;
 }
 
 /* ==========================================================================
-   BLOCO 40: ÁREA DO MAPA (ESTÁVEL)
+   BLOCO 40: ÁREA DO MAPA (OCUPANDO A TELA TODA NO FUNDO)
    ========================================================================== */
 #mapa-container {
-    width: calc(100% - 52px); height: 100%; margin-left: 52px;
-    display: flex; align-items: center; justify-content: center;
+    position: absolute !important;
+    left: 0 !important; top: 0 !important;
+    width: 100% !important; height: 100% !important; 
+    display: flex !important; align-items: center !important; justify-content: center !important;
+    z-index: 100 !important; /* Fica atrás da faixa verde (2000) e menu (999) */
 }
 #mapa-container svg {
-    width: 90% !important; /* Tamanho seguro que não estoura */
-    height: auto;
+    width: 90% !important; /* Tamanho seguro da v27 */
+    height: auto !important; 
 }
 
 /* ==========================================================================
-   BLOCO 70.1: MENU LATERAL
+   BLOCO 70.1: MENU LATERAL (v27)
    ========================================================================== */
 .menu-lateral {
-    position: absolute; top: 0; left: 52px; width: 280px; height: 100vh;
-    background: #ffffff; z-index: 999; 
-    transition: transform 0.3s ease; transform: translateX(-110%);
-    box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+    position: absolute !important; top: 0 !important;
+    left: 52px !important; width: 280px !important; height: 100vh !important;
+    background: #ffffff !important; z-index: 999 !important;
+    transition: transform 0.3s ease !important;
+    transform: translateX(-115%) !important;
+    box-shadow: 2px 0 10px rgba(0,0,0,0.1) !important;
 }
-.menu-lateral.aberto { transform: translateX(0); }
+.menu-lateral.aberto { transform: translateX(0) !important; }
 
-/* ==========================================================================
-   BLOCO 70.3: BOTÕES DO MENU (v27)
-   ========================================================================== */
 .btn-empreendimento {
-    width: 90%; margin: 10px auto; background: #fff; border-radius: 5px; 
-    padding: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); border: none;
-    border-left: 6px solid #00713a; text-align: left;
+    width: 90% !important; margin: 10px auto !important; background: #fff !important; 
+    border-radius: 5px !important; padding: 12px !important;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1) !important; border: none !important;
+    border-left: 6px solid #00713a !important; text-align: left !important;
 }
