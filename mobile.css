@@ -10,7 +10,7 @@ html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden;
 }
 .titulo-vertical { writing-mode: vertical-rl; transform: rotate(180deg); color: white; font-weight: bold; font-size: 1rem; letter-spacing: 2px; white-space: nowrap; }
 
-/* CONTAINER DO MAPA (RESTAURADO v112) */
+/* CONTAINER DO MAPA (REAJUSTE v113) */
 #mapa-container {
     position: absolute;
     left: 0; top: 0;
@@ -18,22 +18,21 @@ html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden;
     z-index: 10;
     display: flex; align-items: center; 
     justify-content: center;
-    /* Adicionamos padding na direita para 'empurrar' o mapa para a esquerda 
-       sem reduzir o espaço de renderização do SVG */
-    padding-right: 25%; 
+    /* Aumentamos o recuo à direita para empurrar o mapa para a esquerda */
+    padding-right: 45%; 
     padding-left: 52px;
 }
 #mapa-container svg { 
-    width: 110% !important; /* Aumentamos a escala para o mapa voltar a ficar grande */
+    width: 115% !important; /* Mantemos o mapa grande */
     height: auto;
     max-height: 95%;
-    transition: all 0.3s ease; /* Transição suave para futuras mudanças */
 }
 
 /* MINIATURA */
 #mapa-minimizado {
     position: absolute;
-    right: 37%; bottom: 30px;
+    right: 46%; /* Ajustado para acompanhar a nova largura da ficha */
+    bottom: 30px;
     width: 110px; height: 110px;
     background: #ffffff;
     border: 3px solid #00713a;
@@ -44,13 +43,14 @@ html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden;
     display: flex; align-items: center; justify-content: center; overflow: hidden;
 }
 
-/* FICHA TÉCNICA */
+/* FICHA TÉCNICA (LARGURA AUMENTADA v113) */
 .ficha-tecnica {
     position: absolute; right: 0; top: 0; 
-    width: 35%; height: 100%;
-    background: rgba(70, 70, 70, 0.9);
+    width: 44%; /* Aumentado em ~25% em relação aos 35% anteriores */
+    height: 100%;
+    background: rgba(60, 60, 60, 0.95);
     backdrop-filter: blur(10px); color: white;
-    padding: 35px; z-index: 1000; box-shadow: -10px 0 25px rgba(0,0,0,0.4);
+    padding: 40px; z-index: 1000; box-shadow: -10px 0 25px rgba(0,0,0,0.4);
 }
-#nome-imovel { color: #50c878; margin: 0 0 15px 0; font-size: 1.6rem; border-bottom: 2px solid #50c878; padding-bottom: 10px; }
-#detalhes-imovel { font-size: 1.2rem; line-height: 1.6; }
+#nome-imovel { color: #50c878; margin: 0 0 20px 0; font-size: 1.8rem; border-bottom: 2px solid #50c878; padding-bottom: 10px; }
+#detalhes-imovel { font-size: 1.3rem; line-height: 1.6; }
