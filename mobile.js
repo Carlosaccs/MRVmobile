@@ -48,10 +48,10 @@ function desenharMapa(dados, targetId, ehMinimizado) {
                 document.querySelectorAll('#mapa-container path').forEach(p => {
                     p.style.fill = p.getAttribute('data-fill-original');
                 });
-                path.style.fill = "#ffb347";
+                path.style.fill = "#ffb347"; // Destaque laranja
                 const info = window.bancoDados ? window.bancoDados[pData.id] : null;
                 document.getElementById('nome-imovel').innerText = info ? info.nome : pData.id.toUpperCase();
-                document.getElementById('detalhes-imovel').innerText = info ? `Disponíveis: ${info.estoque}` : "Toque em um ponto.";
+                document.getElementById('detalhes-imovel').innerText = info ? `Restam ${info.estoque} unidades disponíveis.` : "Informações não disponíveis.";
             };
         }
         g.appendChild(path);
@@ -62,9 +62,15 @@ function desenharMapa(dados, targetId, ehMinimizado) {
 }
 
 function trocarMapas() {
-    mapaAtivo = (mapaAtivo === "GSP") ? "INTERIOR" : "GSP";
-    desenharMapa(mapaAtivo === "GSP" ? MAPA_GSP : MAPA_INTERIOR, "mapa-container", false);
-    desenharMapa(mapaAtivo === "GSP" ? MAPA_INTERIOR : MAPA_GSP, "mapa-minimizado", true);
+    if (mapaAtivo === "GSP") {
+        mapaAtivo = "INTERIOR";
+        desenharMapa(MAPA_INTERIOR, "mapa-container", false);
+        desenharMapa(MAPA_GSP, "mapa-minimizado", true);
+    } else {
+        mapaAtivo = "GSP";
+        desenharMapa(MAPA_GSP, "mapa-container", false);
+        desenharMapa(MAPA_INTERIOR, "mapa-minimizado", true);
+    }
 }
 
 window.onload = async () => {
