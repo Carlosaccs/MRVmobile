@@ -14,8 +14,19 @@ html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden;
 .titulo-vertical { writing-mode: vertical-rl; transform: rotate(180deg); color: white; font-weight: bold; font-size: 1rem; letter-spacing: 2px; }
 
 /* 3. MAPA PRINCIPAL - ZOOM E POSIÇÃO BLINDADOS NO JS */
-#mapa-container { position: absolute; left: 0; top: 0; width: 100%; height: 100%; z-index: 10; display: flex; align-items: center; justify-content: center; overflow: hidden; }
-#mapa-container svg { width: 130% !important; height: auto; max-height: 98%; transition: all 0.3s ease; transform-origin: center top; }
+#mapa-container svg { 
+    width: 130% !important; 
+    height: auto;
+    max-height: 98%; 
+    transition: all 0.3s ease; 
+    transform-origin: center top; 
+}
+
+/* Transição suave para a troca de cores nos paths */
+#mapa-container path {
+    transition: fill 0.2s ease, stroke-width 0.2s ease;
+    cursor: pointer;
+}
 
 /* 4. MINIATURA */
 #mapa-minimizado {
