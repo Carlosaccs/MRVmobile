@@ -17,7 +17,7 @@ async function carregarPlanilha() {
                 estoque: c[5]?.replace(/"/g, '').trim() || "0"
             };
         });
-    } catch (e) { console.warn("Planilha offline, usando nomes do SVG."); }
+    } catch (e) { console.warn("Planilha carregando..."); }
 }
 
 function desenharMapa(dados, targetId, ehMinimizado) {
@@ -51,7 +51,7 @@ function desenharMapa(dados, targetId, ehMinimizado) {
                 path.style.fill = "#ff8c00";
                 const info = window.bancoDados ? window.bancoDados[pData.id] : null;
                 document.getElementById('nome-imovel').innerText = info ? info.nome : pData.id.toUpperCase();
-                document.getElementById('detalhes-imovel').innerText = info ? `Restam ${info.estoque} unidades.` : "Unidade selecionada.";
+                document.getElementById('detalhes-imovel').innerText = info ? `Restam ${info.estoque} unidades em estoque.` : "Informações não encontradas.";
             };
         }
         g.appendChild(path);
