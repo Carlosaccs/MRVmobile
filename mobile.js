@@ -1,5 +1,5 @@
 /* ==========================================================================
-   v129 - RESTAURAÇÃO TOTAL E COMPATIBILIDADE TOUCH
+   v130 - CARREGAMENTO IMEDIATO (ANTI-TELA BRANCA)
    ========================================================================== */
 const svgNS = "http://www.w3.org/2000/svg";
 const URL_PLANILHA = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSRKdJctOPQjKAtOZSDHyArD_H8SgKIouelAS1vF1d_-13pu7u_ic6J8nP3r0Ijd56WA-mbUmHjb4Me/pub?output=csv';
@@ -13,12 +13,17 @@ const AJUSTES_MAPA = {
     INTERIOR: { marginRight: "50%", marginLeft: "-100px", scale: "1.15" }
 };
 
+// 1. CARREGAMENTO INICIAL (Não espera a planilha para desenhar)
+window.addEventListener('DOMContentLoaded', () => {
+    atualizarVisualizacao(); // Desenha os mapas primeiro
+    carregarPlanilha();      // Busca os dados em segundo plano
+});
+
 async function carregarPlanilha() {
     try {
         const res = await fetch(URL_PLANILHA);
         const csv = await res.text();
         const linhas = csv.split('\n').slice(1);
-        window.bancoDados = {};
         linhas.forEach(linha => {
             const c = linha.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
             if (c.length >= 5) {
@@ -31,10 +36,9 @@ async function carregarPlanilha() {
                 };
             }
         });
+        console.log("Dados da planilha carregados.");
     } catch (e) { 
-        console.warn("Aviso: Rodando com dados locais."); 
-    } finally {
-        atualizarVisualizacao(); 
+        console.warn("Aviso: Dados da planilha indisponíveis."); 
     }
 }
 
@@ -59,7 +63,6 @@ function desenharMapa(dados, targetId, ehMinimizado) {
     dados.paths.forEach(pData => {
         const path = document.createElementNS(svgNS, "path");
         const idLimpo = pData.id.toLowerCase();
-        const info = window.bancoDados[idLimpo];
         const nomeCidade = pData.name || pData.id;
         const ehMRV = pData.class === "commrv";
 
@@ -78,37 +81,26 @@ function desenharMapa(dados, targetId, ehMinimizado) {
         path.setAttribute('data-cor-base', corOriginal);
 
         if (!ehMinimizado) {
-            // Função de interação simplificada
-            const focarCidade = () => {
+            const focar = () => {
                 if (!ehMRV) return;
                 const display = document.getElementById('identificador-cidade');
                 if(display) display.innerText = nomeCidade;
-                if (path.getAttribute('data-selecionado') !== 'true') {
-                    path.style.fill = corLaranjaVivo;
-                }
+                if (path.getAttribute('data-selecionado') !== 'true') path.style.fill = corLaranjaVivo;
             };
 
-            const desfocarCidade = () => {
+            const desfocar = () => {
                 const display = document.getElementById('identificador-cidade');
                 if(display) display.innerText = cidadeSelecionada;
-                if (path.getAttribute('data-selecionado') !== 'true') {
-                    path.style.fill = corOriginal;
-                }
+                if (path.getAttribute('data-selecionado') !== 'true') path.style.fill = corOriginal;
             };
 
-            // Eventos Desktop
-            path.onmouseover = focarCidade;
-            path.onmouseout = desfocarCidade;
+            path.onmouseover = focar;
+            path.onmouseout = desfocar;
+            path.ontouchstart = (e) => { focar(); };
 
-            // Evento Mobile (Touch)
-            path.ontouchstart = (e) => {
-                focarCidade();
-            };
-
-            path.onclick = (e) => {
+            path.onclick = () => {
                 if (!ehMRV) return;
                 
-                // Limpa seleções anteriores
                 document.querySelectorAll('#mapa-container path').forEach(p => {
                     p.setAttribute('data-selecionado', 'false');
                     p.style.fill = p.getAttribute('data-cor-base');
@@ -121,6 +113,7 @@ function desenharMapa(dados, targetId, ehMinimizado) {
                 const display = document.getElementById('identificador-cidade');
                 if(display) display.innerText = nomeCidade;
 
+                const info = window.bancoDados[idLimpo];
                 if (info) {
                     document.getElementById('nome-imovel').innerText = info.nomeCurto || info.nomeFull;
                     document.getElementById('detalhes-imovel').innerHTML = `
@@ -152,9 +145,14 @@ function trocarMapas() {
     atualizarVisualizacao();
 }
 
-window.onload = carregarPlanilha;
+// Clique no mini mapa (Garante funcionamento no mobile)
+document.addEventListener('touchstart', (e) => {
+    if (e.target.closest('#mapa-minimizado')) {
+        e.preventDefault();
+        trocarMapas();
+    }
+}, {passive: false});
 
-// Clique no mini mapa
 document.addEventListener('click', (e) => {
     if (e.target.closest('#mapa-minimizado')) trocarMapas();
 });
