@@ -6,39 +6,40 @@ html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden;
 .mobile-wrapper { display: flex; width: 100vw; height: 100vh; position: relative; overflow: hidden; }
 
 /* ==========================================================================
-   BLOCO 20: FAIXA VERDE (FLUTUANTE SOBRE O MAPA)
+   BLOCO 20: FAIXA VERDE (FLUTUANTE)
    ========================================================================== */
 .faixa-verde-vertical { 
     position: absolute; left: 0; top: 0; width: 52px; height: 100vh; 
-    background: #00713a; z-index: 2000; 
+    background: #00713a; z-index: 2000; /* Garante que fique por cima de tudo */
     display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 20px 0;
 }
 .titulo-vertical { writing-mode: vertical-rl; transform: rotate(180deg); color: white; font-weight: bold; font-size: 1rem; letter-spacing: 2px; white-space: nowrap; }
+.icon-top, .icon-bottom { color: #ffffff; font-size: 2rem; cursor: pointer; }
 
 /* ==========================================================================
-   BLOCO 30: MAPA (OCUPA TUDO E MERGULHA NA ESQUERDA)
+   BLOCO 30: MAPA (MERGULHANDO NA ESQUERDA)
    ========================================================================== */
 #mapa-container {
     position: absolute;
-    left: 0; top: 0;
+    left: 0; /* Colado na borda esquerda real */
+    top: 0;
     width: 70%; /* Limita a área útil para não ficar sob a ficha técnica */
     height: 100%;
-    z-index: 10;
-    display: flex;
-    align-items: center;
+    display: flex; align-items: center; 
     justify-content: flex-start; /* Alinha o mapa à esquerda */
-    overflow: visible; /* Permite que o SVG "saia" do container se necessário */
+    z-index: 10;
+    overflow: hidden; /* Corta o mapa se ele tentar sair do container */
 }
 #mapa-container svg { 
-    width: 100%; /* Ocupa toda a largura do container de 70% */
+    width: 110% !important; /* Aumentado para garantir o mergulho */
     height: auto;
     max-height: 95%;
-    /* O segredo do mergulho: margem negativa para ignorar o limite da faixa verde */
-    margin-left: -20px; 
+    /* O SEGREDO: Margem negativa agressiva para ignorar o limite da faixa verde */
+    margin-left: -50px; 
 }
 
 /* ==========================================================================
-   BLOCO 40: MINIATURA (LADO DIREITO)
+   BLOCO 40: MINIATURA (DIREITA)
    ========================================================================== */
 #mapa-minimizado {
     position: absolute;
