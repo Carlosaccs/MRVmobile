@@ -130,12 +130,16 @@ function desenharMapa(dados, targetId, ehMinimizado) {
 }
 
 function atualizarVisualizacao() {
-    // IMPORTANTE: Verifique se estes nomes batem com o seu mapa-SP.js
-    const dadosPrincipal = (mapaAtivo === "GSP") ? MAPA_GSP : MAPA_INTERIOR;
-    const dadosMini = (mapaAtivo === "GSP") ? MAPA_INTERIOR : MAPA_GSP;
+    // Verifica se os objetos globais existem antes de tentar desenhar
+    if (typeof MAPA_GSP !== 'undefined' && typeof MAPA_INTERIOR !== 'undefined') {
+        const principal = (mapaAtivo === "GSP") ? MAPA_GSP : MAPA_INTERIOR;
+        const mini = (mapaAtivo === "GSP") ? MAPA_INTERIOR : MAPA_GSP;
 
-    desenharMapa(dadosPrincipal, "mapa-container", false);
-    desenharMapa(dadosMini, "mapa-minimizado", true);
+        desenharMapa(principal, "mapa-container", false);
+        desenharMapa(mini, "mapa-minimizado", true);
+    } else {
+        console.error("Arquivos de mapa não carregados corretamente.");
+    }
 }
 
 function trocarMapas() {
