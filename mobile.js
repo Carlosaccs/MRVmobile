@@ -1,11 +1,15 @@
 /* ==========================================================================
-   BLOCO 10: RENDERIZAÇÃO DO MAPA (PURO)
+   BLOCO 10: CONFIGURAÇÕES E CONSTANTES
+   ========================================================================== */
+const containerMapa = document.getElementById('mapa-container');
+const svgNS = "http://www.w3.org/2000/svg";
+
+/* ==========================================================================
+   BLOCO 20: RENDERIZAÇÃO DO MAPA (SVG)
    ========================================================================== */
 function renderizarMapa(dados) {
-    const container = document.getElementById('mapa-container');
-    if (!container || !dados) return;
+    if (!containerMapa || !dados) return;
     
-    const svgNS = "http://www.w3.org/2000/svg";
     const svg = document.createElementNS(svgNS, "svg");
     svg.setAttribute("viewBox", dados.viewBox);
     svg.setAttribute("preserveAspectRatio", "xMidYMid meet");
@@ -18,35 +22,45 @@ function renderizarMapa(dados) {
         path.setAttribute("d", pData.d);
         path.setAttribute("id", pData.id);
         
-        // Cores base do projeto
+        // Definição de cores base (Verde MRV e Cinza para outros)
         const corBase = pData.class === "semmrv" ? "#cccccc" : "#00713a";
         path.style.fill = corBase;
         path.style.stroke = "#ffffff";
         path.style.strokeWidth = "2";
+        path.setAttribute('data-original-fill', corBase);
         
-        // Evento de clique apenas para teste visual de seleção no mapa
+        // BLOCO 25: INTERAÇÃO DE CLIQUE NO MAPA
         path.onclick = () => {
+            // Reseta cores de todos os paths antes de destacar
             document.querySelectorAll('path').forEach(p => {
-                const c = p.id.includes('semmrv') ? "#cccccc" : "#00713a";
-                p.style.fill = c;
+                p.style.fill = p.getAttribute('data-original-fill');
             });
-            path.style.fill = "#ff8c00"; // Destaque laranja ao clicar
+            
+            // Destaque em Laranja
+            path.style.fill = "#ff8c00";
+            
+            // Atualiza a Ficha Técnica
+            const nomeImovel = document.getElementById('nome-imovel');
+            if (nomeImovel) nomeImovel.innerText = pData.id.replace(/-/g, ' ').toUpperCase();
         };
 
         g.appendChild(path);
     });
 
     svg.appendChild(g);
-    container.innerHTML = "";
-    container.appendChild(svg);
+    containerMapa.innerHTML = "";
+    containerMapa.appendChild(svg);
 }
 
 /* ==========================================================================
-   BLOCO 20: INICIALIZAÇÃO
+   BLOCO 30: INICIALIZAÇÃO DO SISTEMA
    ========================================================================== */
 window.onload = () => {
-    // Carrega o mapa GSP se o arquivo de dados estiver presente
+    // Verifica se os dados do mapa (MAPA_GSP) foram carregados via HTML
     if (typeof MAPA_GSP !== 'undefined') {
         renderizarMapa(MAPA_GSP);
+        console.log("Mapa v38 carregado com sucesso.");
+    } else {
+        console.error("Erro Crítico: Dados do mapa não encontrados.");
     }
 };
