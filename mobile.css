@@ -54,16 +54,16 @@ html, body {
 #mapa-minimizado {
     position: absolute;
     bottom: 20px;
-    right: 20px; /* Movido para a direita */
-    width: 100px;
-    height: 80px;
+    right: 45%; /* Coloca o botão no limite da área do mapa com a ficha técnica */
+    width: 90px;
+    height: 70px;
     background: white;
     border: 2px solid #00713a;
-    border-radius: 12px;
+    border-radius: 10px;
     cursor: pointer;
     z-index: 2500;
     overflow: hidden;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -72,6 +72,9 @@ html, body {
 
 #mapa-minimizado:active { transform: scale(0.95); }
 
+/* Classes de cursor para diferenciar os paths */
+path.commrv { cursor: pointer; }
+path.semmrv { cursor: default; }
 /* Cursor apenas para o que é clicável */
 path.commrv { cursor: pointer; }
 path.semmrv { cursor: default; }
