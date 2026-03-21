@@ -40,7 +40,7 @@ function desenharMapa(dados, targetId, ehMinimizado) {
         const corBase = pData.class === "semmrv" ? "#cccccc" : "#00713a";
         path.style.fill = corBase;
         path.style.stroke = "#ffffff";
-        path.style.strokeWidth = ehMinimizado ? "6" : "1.5";
+        path.style.strokeWidth = ehMinimizado ? "6" : "1.8";
 
         if (!ehMinimizado) {
             path.setAttribute('data-fill-original', corBase);
@@ -48,10 +48,10 @@ function desenharMapa(dados, targetId, ehMinimizado) {
                 document.querySelectorAll('#mapa-container path').forEach(p => {
                     p.style.fill = p.getAttribute('data-fill-original');
                 });
-                path.style.fill = "#ff8c00";
+                path.style.fill = "#ffb347";
                 const info = window.bancoDados ? window.bancoDados[pData.id] : null;
                 document.getElementById('nome-imovel').innerText = info ? info.nome : pData.id.toUpperCase();
-                document.getElementById('detalhes-imovel').innerText = info ? `Restam ${info.estoque} unidades disponíveis.` : "Toque em uma unidade para detalhes.";
+                document.getElementById('detalhes-imovel').innerText = info ? `Unidades disponíveis: ${info.estoque}` : "Detalhes em breve.";
             };
         }
         g.appendChild(path);
@@ -62,15 +62,9 @@ function desenharMapa(dados, targetId, ehMinimizado) {
 }
 
 function trocarMapas() {
-    if (mapaAtivo === "GSP") {
-        mapaAtivo = "INTERIOR";
-        desenharMapa(MAPA_INTERIOR, "mapa-container", false);
-        desenharMapa(MAPA_GSP, "mapa-minimizado", true);
-    } else {
-        mapaAtivo = "GSP";
-        desenharMapa(MAPA_GSP, "mapa-container", false);
-        desenharMapa(MAPA_INTERIOR, "mapa-minimizado", true);
-    }
+    mapaAtivo = (mapaAtivo === "GSP") ? "INTERIOR" : "GSP";
+    desenharMapa(mapaAtivo === "GSP" ? MAPA_GSP : MAPA_INTERIOR, "mapa-container", false);
+    desenharMapa(mapaAtivo === "GSP" ? MAPA_INTERIOR : MAPA_GSP, "mapa-minimizado", true);
 }
 
 window.onload = async () => {
