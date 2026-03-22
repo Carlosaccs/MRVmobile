@@ -1,5 +1,5 @@
 /* ==========================================================================
-   v135 - DESAFIO TOUCH: EFEITO HOVER NO CELULAR (ESTÁVEL)
+   v136 - DESAFIO TOUCH: EFEITO HOVER NO CELULAR (ESTÁVEL)
    ========================================================================== */
 
 // 1. Configurações Iniciais
