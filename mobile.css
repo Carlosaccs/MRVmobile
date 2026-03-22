@@ -175,9 +175,10 @@ path.semmrv { cursor: default; }
 
 #menu-lateral-container.aberto {
     left: 40px; 
-    pointer-events: auto !important; /* ISSO DESTRAVA O TOQUE NO CELULAR */
+    z-index: 3000 !important; /* Maior que os 2000 da faixa */
+    display: block !important;
     visibility: visible !important;
-    z-index: 2500; /* Garante que fique acima de quase tudo */
+    pointer-events: auto !important;
 }
 
 #trilho-infinito {
