@@ -152,68 +152,56 @@ path.semmrv { cursor: default; }
 }
 
 /* ==========================================================================
-   7. MENU LATERAL (v139) - AJUSTE DE CAMADAS E SCROLL
+   7. MENU LATERAL (v139.1) - AJUSTE DE POSICIONAMENTO E COMPACTAÇÃO
    ========================================================================== */
 
 #menu-lateral-container {
     position: absolute;
     top: 0;
-    left: -280px; /* Escondido atrás do limite da tela */
-    width: 250px;
+    left: -320px; /* Escondido mais atrás */
+    width: 300px; /* Aumentado para acomodar o deslocamento do texto */
     height: 100%;
     background: transparent;
-    
-    /* PILHA DE CAMADAS: Abaixo da faixa (2000), acima do mapa (10) */
     z-index: 1500; 
-    
     transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
     padding: 20px 10px;
-    
-    /* REMOVE BARRAS DE ROLAGEM VISÍVEIS */
     overflow-y: auto;
-    -ms-overflow-style: none;  /* IE/Edge */
-    scrollbar-width: none;     /* Firefox */
-    
-    /* Garante que toques não vazem para o mapa quando fechado */
+    scrollbar-width: none;
     pointer-events: none;
 }
 
-/* Esconde barra no Chrome, Safari e Opera */
-#menu-lateral-container::-webkit-scrollbar {
-    display: none;
-}
-
 #menu-lateral-container.aberto {
-    left: 60px; /* Brota exatamente onde a faixa verde termina */
+    /* O menu agora começa 20px ANTES de terminar a faixa verde (60px) 
+       para garantir que ele saia de "dentro" dela */
+    left: 40px; 
     pointer-events: auto;
 }
 
 #trilho-infinito {
     display: flex;
     flex-direction: column;
-    gap: 12px;
-    padding-bottom: 50px; /* Espaço para o último item não colar no fundo */
+    gap: 8px; /* Reduzido em 25% a distância entre itens */
+    padding-bottom: 50px;
 }
 
-/* O "Card" branco que você desenhou */
 .card-residencial {
     background: #ffffff;
-    border: 2px solid #00713a; /* Verde MRV */
-    border-right: 15px solid #00713a; /* Borda larga para futuras cores de zona */
-    padding: 12px 15px;
-    font-size: 0.85rem;
+    border: 2px solid #00713a;
+    border-right: 15px solid #00713a;
+    
+    /* AJUSTES DE ALTURA E DISTÂNCIA INTERNA */
+    padding: 8px 15px 8px 35px; /* 35px na esquerda para o texto não sumir sob a faixa */
+    height: auto; /* Deixa a altura ser definida pelo novo padding menor */
+    
+    font-size: 0.82rem;
     font-weight: bold;
     color: #333;
     border-radius: 4px;
     text-transform: uppercase;
     box-shadow: 3px 3px 10px rgba(0,0,0,0.2);
     cursor: pointer;
-    transition: transform 0.1s ease;
+    white-space: nowrap;
 }
 
-.card-residencial:active {
-    transform: scale(0.96);
-    background-color: #f9f9f9;
-}
-    transform: scale(0.96);
-}
+/* Esconder barra de rolagem */
+#menu-lateral-container::-webkit-scrollbar { display: none; }
