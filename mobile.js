@@ -177,3 +177,9 @@ document.addEventListener('click', (e) => {
 });
 
 document.addEventListener('fullscreenchange', atualizarVisualIconeFullscreen);
+
+// 7. Função de Abrir/Fechar o menu da lateral esquerda (Sem estragar o mapa)
+function toggleMenuLateral() {
+    const menu = document.getElementById('menu-lateral-container');
+    menu.classList.toggle('aberto');
+}
