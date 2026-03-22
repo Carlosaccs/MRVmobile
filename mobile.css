@@ -175,9 +175,9 @@ path.semmrv { cursor: default; }
 
 #menu-lateral-container.aberto {
     left: 40px; 
-    /* IMPORTANTE: Reativa cliques e visibilidade quando aberto */
-    pointer-events: auto; 
-    visibility: visible;
+    pointer-events: auto !important; /* ISSO DESTRAVA O TOQUE NO CELULAR */
+    visibility: visible !important;
+    z-index: 2500; /* Garante que fique acima de quase tudo */
 }
 
 #trilho-infinito {
