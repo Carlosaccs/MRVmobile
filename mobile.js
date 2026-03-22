@@ -79,50 +79,62 @@ function desenharMapa(dados, targetId, ehMinimizado) {
         path.style.strokeWidth = ehMinimizado ? "6" : "1.2";
         path.setAttribute('data-cor-base', corOriginal);
 
-        // 4. Lógica de Interação (v135 - Ajustada para o Desafio Touch)
         if (!ehMinimizado) {
             
             const ativarFoco = (e) => {
-                // Impede o travamento do navegador no celular
+                // Não interrompe se já estiver selecionado
+                if (path.getAttribute('data-selecionado') === 'true') return;
+
                 if (e && e.type === 'touchstart' && e.cancelable) {
-                    e.preventDefault();
+                    // Não usamos preventDefault aqui para permitir que o 'click' ainda ocorra
                 }
 
                 const display = document.getElementById('identificador-cidade');
                 if(display) display.innerText = nomeCidade;
                 
-                if (path.getAttribute('data-selecionado') !== 'true') {
-                    path.style.fill = ehMRV ? corLaranjaVivo : corCinzaEscuro;
-                }
+                path.style.fill = ehMRV ? corLaranjaVivo : corCinzaEscuro;
             };
 
             const desativarFoco = () => {
+                // SÓ limpa se o path NÃO for o selecionado atual
+                if (path.getAttribute('data-selecionado') === 'true') return;
+
                 const display = document.getElementById('identificador-cidade');
                 if(display) display.innerText = cidadeSelecionada;
-                if (path.getAttribute('data-selecionado') !== 'true') {
-                    path.style.fill = corOriginal;
-                }
+                path.style.fill = corOriginal;
             };
 
-            // Notebook
+            // Eventos de Mouse
             path.onmouseover = ativarFoco;
             path.onmouseout = desativarFoco;
 
-            // CELULAR (O desafio!)
+            // Eventos de Toque
             path.ontouchstart = ativarFoco;
             path.ontouchend = () => {
-                // Deixa o nome por 1 segundo antes de voltar ao estado anterior
-                setTimeout(desativarFoco, 1000);
+                // O "Pulo do Gato": Se for verde, ele não limpa no timer, 
+                // espera o 'onclick' decidir se trava ou não.
+                if (!ehMRV) {
+                    setTimeout(desativarFoco, 1200); // 1.2s para os cinzas
+                } else {
+                    // Para os verdes, só limpa se o usuário não tiver clicado de fato
+                    setTimeout(() => {
+                        if (path.getAttribute('data-selecionado') !== 'true') {
+                            desativarFoco();
+                        }
+                    }, 1200);
+                }
             };
 
             path.onclick = (e) => {
                 if (!ehMRV) return;
 
+                // 1. Limpa TODOS os paths antes de marcar o novo
                 document.querySelectorAll('#mapa-container path').forEach(p => {
                     p.setAttribute('data-selecionado', 'false');
                     p.style.fill = p.getAttribute('data-cor-base');
                 });
 
+                // 2. Trava o path atual como selecionado
                 path.setAttribute('data-selecionado', 'true');
                 path.style.fill = corLaranjaVivo;
                 cidadeSelecionada = nomeCidade;
