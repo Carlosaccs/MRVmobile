@@ -25,74 +25,85 @@ async function carregarPlanilha() {
     try {
         const res = await fetch(URL_PLANILHA);
         const csv = await res.text();
-        const linhas = csv.split(/\r?\n/).filter(l => l.trim() !== "");
+        
+        // Divide por linhas e remove linhas vazias
+        const linhas = csv.split(/\r?\n/).filter(l => l.trim().length > 0);
         
         window.bancoDados = {}; 
+        
+        // Pula o cabeçalho (slice(1))
         linhas.slice(1).forEach(linha => {
+            // Regex para lidar com vírgulas dentro de aspas
             const c = linha.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+            
             if (c.length >= 5) {
-                const id = c[0].replace(/"/g, '').trim().toLowerCase();
-                window.bancoDados[id] = {
-                    nomeCurto: c[3]?.replace(/"/g, '').trim() || "",
-                    nomeFull: c[4]?.replace(/"/g, '').trim() || "",
-                    estoque: c[5]?.replace(/"/g, '').trim() || "0",
-                    statusObra: c[11]?.replace(/"/g, '').trim() || "N/A"
-                };
+                const idOriginal = c[0].replace(/"/g, '').trim();
+                const idLimpo = idOriginal.toLowerCase();
+                
+                // Só adiciona se tiver pelo menos um nome
+                const nomeC = c[3]?.replace(/"/g, '').trim() || "";
+                if (nomeC !== "") {
+                    window.bancoDados[idLimpo] = {
+                        nomeCurto: nomeC,
+                        nomeFull: c[4]?.replace(/"/g, '').trim() || nomeC,
+                        estoque: c[5]?.replace(/"/g, '').trim() || "0",
+                        statusObra: c[11]?.replace(/"/g, '').trim() || "Consulte"
+                    };
+                }
             }
         });
         
-        console.log("✅ Banco carregado. Registros:", Object.keys(window.bancoDados).length);
+        console.log("✅ Total de registros válidos carregados:", Object.keys(window.bancoDados).length);
         atualizarVisualizacao();
         popularMenuResidenciais(); 
-    } catch (e) { console.error("❌ Erro CSV"); }
-}
-
-// 3. LOGICA DO MENU LATERAL (v139.5)
-function toggleMenuLateral() {
-    const menu = document.getElementById('menu-lateral-container');
-    if (!menu) return;
-    
-    menu.classList.toggle('aberto');
-    if (menu.classList.contains('aberto')) {
-        popularMenuResidenciais();
+    } catch (e) { 
+        console.error("❌ Erro ao processar CSV:", e); 
     }
 }
 
+// 3. LOGICA DO MENU LATERAL (v139.6)
 function popularMenuResidenciais() {
     const trilho = document.getElementById('trilho-infinito');
     const contador = document.getElementById('contador-registros');
     if (!trilho) return;
 
     trilho.innerHTML = "";
-    const ids = Object.keys(window.bancoDados);
-    let totalGerado = 0;
+    // Pega os IDs e ordena por ordem alfabética do nome curto
+    const entradas = Object.entries(window.bancoDados);
+    entradas.sort((a, b) => a[1].nomeCurto.localeCompare(b[1].nomeCurto));
 
-    ids.forEach(id => {
-        const info = window.bancoDados[id];
-        if (info && info.nomeCurto && info.nomeCurto.trim() !== "") {
-            const card = document.createElement('div');
-            card.className = 'card-residencial';
-            card.innerText = info.nomeCurto.toUpperCase();
-            
-            card.onclick = (e) => {
-                e.stopPropagation();
-                const path = document.getElementById(id);
-                if (path) {
-                    path.dispatchEvent(new Event('click'));
-                    toggleMenuLateral();
-                }
-            };
-            trilho.appendChild(card);
-            totalGerado++;
-        }
+    entradas.forEach(([id, info]) => {
+        const card = document.createElement('div');
+        card.className = 'card-residencial';
+        card.innerText = info.nomeCurto.toUpperCase();
+        
+        card.onclick = (e) => {
+            e.stopPropagation();
+            // Tenta clicar no mapa (id original)
+            const path = document.getElementById(id);
+            if (path) {
+                path.dispatchEvent(new Event('click'));
+                toggleMenuLateral();
+            } else {
+                // Se não achar o ID no mapa, apenas mostra os detalhes na ficha
+                document.getElementById('nome-imovel').innerText = info.nomeCurto;
+                document.getElementById('detalhes-imovel').innerHTML = `
+                    <p><strong>Estoque:</strong> ${info.estoque}</p>
+                    <p><strong>Status:</strong> ${info.statusObra}</p>
+                `;
+                toggleMenuLateral();
+            }
+        };
+        trilho.appendChild(card);
     });
 
     if (contador) {
-        contador.innerText = totalGerado.toString().padStart(2, '0');
-        contador.style.color = (totalGerado >= 42) ? "white" : "#ffff00";
+        const total = entradas.length;
+        contador.innerText = total.toString().padStart(2, '0');
+        // Muda para verde limão se chegar nos 42
+        contador.style.color = (total >= 42) ? "#ADFF2F" : "#ffff00";
     }
 }
-
 // 4. DESENHO DOS MAPAS (GSP & INTERIOR)
 function desenharMapa(dados, targetId, ehMinimizado) {
     const container = document.getElementById(targetId);
