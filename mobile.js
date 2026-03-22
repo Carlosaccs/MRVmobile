@@ -1,8 +1,8 @@
 /* ==========================================================================
-   v137 - DESAFIO TOUCH: EFEITO HOVER NO CELULAR (ESTÁVEL)
+   v137 - INTEGRAL: MAPA + TELA CHEIA + ÍCONES INKSCAPE
    ========================================================================== */
 
-// 1. Configurações Iniciais
+// 1. Configurações Iniciais e Dados
 const svgNS = "http://www.w3.org/2000/svg";
 const URL_PLANILHA = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSRKdJctOPQjKAtOZSDHyArD_H8SgKIouelAS1vF1d_-13pu7u_ic6J8nP3r0Ijd56WA-mbUmHjb4Me/pub?output=csv';
 
@@ -15,7 +15,11 @@ const AJUSTES_MAPA = {
     INTERIOR: { marginRight: "50%", marginLeft: "-100px", scale: "1.15" }
 };
 
-// 2. Carregamento de Dados
+// DNA DOS ÍCONES (Caminhos extraídos do seu Inkscape)
+const DNA_AMPLIAR = "M 75.757133 114.16926 L 75.757133 124.7898 L 75.757133 135.41086 L 78.412268 135.41086 L 81.067403 135.41086 L 81.067403 127.44493 L 81.067403 119.47953 L 89.032808 119.47953 L 96.99873 119.47953 L 96.99873 116.82439 L 96.99873 114.16926 L 86.377673 114.16926 L 75.757133 114.16926 z M 115.58468 114.16926 L 115.58468 116.82439 L 115.58468 119.47953 L 123.36043 119.47953 L 131.13618 119.47953 L 131.13618 127.44493 L 131.13618 135.41086 L 133.79183 135.41086 L 136.44697 135.41086 L 136.44697 124.7898 L 136.44697 114.16926 L 126.01556 114.16926 L 115.58468 114.16926 z M 75.757133 153.9968 L 75.757133 164.61734 L 75.757133 175.2384 L 86.377673 175.2384 L 96.99873 175.2384 L 96.99873 172.39361 L 96.99873 169.54882 L 89.032808 169.54882 L 81.067403 169.54882 L 81.067403 161.77255 L 81.067403 153.9968 L 78.412268 153.9968 L 75.757133 153.9968 z M 131.13618 153.9968 L 131.13618 161.77255 L 131.13618 169.54882 L 123.36043 169.54882 L 115.58468 169.54882 L 115.58468 172.39361 L 115.58468 175.2384 L 126.01556 175.2384 L 136.44697 175.2384 L 136.44697 164.61734 L 136.44697 153.9968 L 133.79183 153.9968 L 131.13618 153.9968 z";
+const DNA_REDUZIR = "M 78.408134 124.88437 L 78.408134 132.66012 L 78.408134 140.43587 L 70.442729 140.43587 L 62.476807 140.43587 L 62.476807 143.28066 L 62.476807 146.12596 L 73.097864 146.12596 L 83.718404 146.12596 L 83.718404 135.50491 L 83.718404 124.88437 L 81.063269 124.88437 L 78.408134 124.88437 z M 102.30435 124.88437 L 102.30435 135.50491 L 102.30435 146.12596 L 112.92541 146.12596 L 123.54595 146.12596 L 123.54595 143.28066 L 123.54595 140.43587 L 115.58054 140.43587 L 107.61514 140.43587 L 107.61514 132.66012 L 107.61514 124.88437 L 104.96 124.88437 L 102.30435 124.88437 z M 62.476807 164.3326 L 62.476807 167.17739 L 62.476807 170.02218 L 70.442729 170.02218 L 78.408134 170.02218 L 78.408134 177.79793 L 78.408134 185.5742 L 81.063269 185.5742 L 83.718404 185.5742 L 83.718404 174.95315 L 83.718404 164.3326 L 73.097864 164.3326 L 62.476807 164.3326 z M 102.30435 164.3326 L 102.30435 174.95315 L 102.30435 185.5742 L 104.96 185.5742 L 107.61514 185.5742 L 107.61514 177.79793 L 107.61514 170.02218 L 115.58054 170.02218 L 123.54595 170.02218 L 123.54595 167.17739 L 123.54595 164.3326 L 112.92541 164.3326 L 102.30435 164.3326 z";
+
+// 2. Carregamento de Dados da Planilha
 async function carregarPlanilha() {
     try {
         const res = await fetch(URL_PLANILHA);
@@ -38,7 +42,7 @@ async function carregarPlanilha() {
     atualizarVisualizacao();
 }
 
-// 3. Função de Desenho
+// 3. Função de Desenho do Mapa
 function desenharMapa(dados, targetId, ehMinimizado) {
     const container = document.getElementById(targetId);
     if (!container || !dados) return;
@@ -80,65 +84,34 @@ function desenharMapa(dados, targetId, ehMinimizado) {
         path.setAttribute('data-cor-base', corOriginal);
 
         if (!ehMinimizado) {
-            
-            const ativarFoco = (e) => {
-                // Não interrompe se já estiver selecionado
+            const ativarFoco = () => {
                 if (path.getAttribute('data-selecionado') === 'true') return;
-
-                if (e && e.type === 'touchstart' && e.cancelable) {
-                    // Não usamos preventDefault aqui para permitir que o 'click' ainda ocorra
-                }
-
                 const display = document.getElementById('identificador-cidade');
                 if(display) display.innerText = nomeCidade;
-                
                 path.style.fill = ehMRV ? corLaranjaVivo : corCinzaEscuro;
             };
 
             const desativarFoco = () => {
-                // SÓ limpa se o path NÃO for o selecionado atual
                 if (path.getAttribute('data-selecionado') === 'true') return;
-
                 const display = document.getElementById('identificador-cidade');
                 if(display) display.innerText = cidadeSelecionada;
                 path.style.fill = corOriginal;
             };
 
-            // Eventos de Mouse
             path.onmouseover = ativarFoco;
             path.onmouseout = desativarFoco;
-
-            // Eventos de Toque
             path.ontouchstart = ativarFoco;
-            path.ontouchend = () => {
-                // O "Pulo do Gato": Se for verde, ele não limpa no timer, 
-                // espera o 'onclick' decidir se trava ou não.
-                if (!ehMRV) {
-                    setTimeout(desativarFoco, 1200); // 1.2s para os cinzas
-                } else {
-                    // Para os verdes, só limpa se o usuário não tiver clicado de fato
-                    setTimeout(() => {
-                        if (path.getAttribute('data-selecionado') !== 'true') {
-                            desativarFoco();
-                        }
-                    }, 1200);
-                }
-            };
+            path.ontouchend = () => setTimeout(desativarFoco, 1200);
 
-            path.onclick = (e) => {
+            path.onclick = () => {
                 if (!ehMRV) return;
-
-                // 1. Limpa TODOS os paths antes de marcar o novo
                 document.querySelectorAll('#mapa-container path').forEach(p => {
                     p.setAttribute('data-selecionado', 'false');
                     p.style.fill = p.getAttribute('data-cor-base');
                 });
-
-                // 2. Trava o path atual como selecionado
                 path.setAttribute('data-selecionado', 'true');
                 path.style.fill = corLaranjaVivo;
                 cidadeSelecionada = nomeCidade;
-                
                 const display = document.getElementById('identificador-cidade');
                 if(display) display.innerText = nomeCidade;
 
@@ -153,12 +126,11 @@ function desenharMapa(dados, targetId, ehMinimizado) {
         }
         g.appendChild(path);
     });
-
     svg.appendChild(g);
     container.appendChild(svg);
 }
 
-// 5. Controles Finais
+// 4. Controles de Visualização e Troca de Mapa
 function atualizarVisualizacao() {
     if (typeof MAPA_GSP !== 'undefined' && typeof MAPA_INTERIOR !== 'undefined') {
         desenharMapa(mapaAtivo === "GSP" ? MAPA_GSP : MAPA_INTERIOR, "mapa-container", false);
@@ -174,52 +146,34 @@ function trocarMapas() {
     atualizarVisualizacao();
 }
 
+// 5. Funções de Tela Cheia e Ícones
+function toggleFullscreen() {
+    if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(err => console.warn(err.message));
+    } else {
+        if (document.exitFullscreen) document.exitFullscreen();
+    }
+}
+
+function atualizarVisualIconeFullscreen() {
+    const path = document.getElementById('path-fullscreen');
+    const svg = path?.closest('svg');
+    if (!path || !svg) return;
+
+    if (document.fullscreenElement) {
+        path.setAttribute('d', DNA_REDUZIR);
+        svg.setAttribute('viewBox', '55 120 80 80');
+    } else {
+        path.setAttribute('d', DNA_AMPLIAR);
+        svg.setAttribute('viewBox', '60 110 90 90');
+    }
+}
+
+// 6. Inicialização e Eventos Globais
 window.onload = carregarPlanilha;
 
 document.addEventListener('click', (e) => {
     if (e.target.closest('#mapa-minimizado')) trocarMapas();
 });
 
-// Função para o botão de ampliar/reduzir a tela no celular
-function toggleFullscreen() {
-    const path = document.getElementById('path-fullscreen');
-    const svg = path.closest('svg');
-
-    // DNA dos seus ícones do Inkscape
-    const pathAmpliar = "M 75.757133 114.16926 L 75.757133 124.7898 L 75.757133 135.41086 L 78.412268 135.41086 L 81.067403 135.41086 L 81.067403 127.44493 L 81.067403 119.47953 L 89.032808 119.47953 L 96.99873 119.47953 L 96.99873 116.82439 L 96.99873 114.16926 L 86.377673 114.16926 L 75.757133 114.16926 z M 115.58468 114.16926 L 115.58468 116.82439 L 115.58468 119.47953 L 123.36043 119.47953 L 131.13618 119.47953 L 131.13618 127.44493 L 131.13618 135.41086 L 133.79183 135.41086 L 136.44697 135.41086 L 136.44697 124.7898 L 136.44697 114.16926 L 126.01556 114.16926 L 115.58468 114.16926 z M 75.757133 153.9968 L 75.757133 164.61734 L 75.757133 175.2384 L 86.377673 175.2384 L 96.99873 175.2384 L 96.99873 172.39361 L 96.99873 169.54882 L 89.032808 169.54882 L 81.067403 169.54882 L 81.067403 161.77255 L 81.067403 153.9968 L 78.412268 153.9968 L 75.757133 153.9968 z M 131.13618 153.9968 L 131.13618 161.77255 L 131.13618 169.54882 L 123.36043 169.54882 L 115.58468 169.54882 L 115.58468 172.39361 L 115.58468 175.2384 L 126.01556 175.2384 L 136.44697 175.2384 L 136.44697 164.61734 L 136.44697 153.9968 L 133.79183 153.9968 L 131.13618 153.9968 z";
-    
-    const pathReduzir = "M 78.408134 124.88437 L 78.408134 132.66012 L 78.408134 140.43587 L 70.442729 140.43587 L 62.476807 140.43587 L 62.476807 143.28066 L 62.476807 146.12596 L 73.097864 146.12596 L 83.718404 146.12596 L 83.718404 135.50491 L 83.718404 124.88437 L 81.063269 124.88437 L 78.408134 124.88437 z M 102.30435 124.88437 L 102.30435 135.50491 L 102.30435 146.12596 L 112.92541 146.12596 L 123.54595 146.12596 L 123.54595 143.28066 L 123.54595 140.43587 L 115.58054 140.43587 L 107.61514 140.43587 L 107.61514 132.66012 L 107.61514 124.88437 L 104.96 124.88437 L 102.30435 124.88437 z M 62.476807 164.3326 L 62.476807 167.17739 L 62.476807 170.02218 L 70.442729 170.02218 L 78.408134 170.02218 L 78.408134 177.79793 L 78.408134 185.5742 L 81.063269 185.5742 L 83.718404 185.5742 L 83.718404 174.95315 L 83.718404 164.3326 L 73.097864 164.3326 L 62.476807 164.3326 z M 102.30435 164.3326 L 102.30435 174.95315 L 102.30435 185.5742 L 104.96 185.5742 L 107.61514 185.5742 L 107.61514 177.79793 L 107.61514 170.02218 L 115.58054 170.02218 L 123.54595 170.02218 L 123.54595 167.17739 L 123.54595 164.3326 L 112.92541 164.3326 L 102.30435 164.3326 z";
-
-    if (!document.fullscreenElement) {
-        document.documentElement.requestFullscreen().then(() => {
-            path.setAttribute('d', pathReduzir);
-            svg.setAttribute('viewBox', '55 120 80 80'); // Ajuste leve para centralizar o de reduzir
-        }).catch(err => console.warn(err.message));
-    } else {
-        if (document.exitFullscreen) {
-            document.exitFullscreen().then(() => {
-                path.setAttribute('d', pathAmpliar);
-                svg.setAttribute('viewBox', '60 110 90 90'); // Volta para o viewBox original
-            });
-        }
-    }
-}
-// Garante que o ícone mude mesmo se o usuário sair pelo 'Esc' ou botão 'Voltar' do Android
-document.addEventListener('fullscreenchange', () => {
-    const path = document.getElementById('path-fullscreen');
-    const svg = path.closest('svg');
-
-    // Reutilizamos os mesmos caminhos (Paths) que você extraiu do Inkscape
-    const pathAmpliar = "M 75.757133 114.16926 ..."; // (cole o código completo aqui)
-    const pathReduzir = "M 78.408134 124.88437 ..."; // (cole o código completo aqui)
-
-    if (!document.fullscreenElement) {
-        // Voltou ao normal (Esc pressionado)
-        path.setAttribute('d', pathAmpliar);
-        svg.setAttribute('viewBox', '60 110 90 90');
-    } else {
-        // Entrou em tela cheia (por qualquer outro método)
-        path.setAttribute('d', pathReduzir);
-        svg.setAttribute('viewBox', '55 120 80 80');
-    }
-});
+document.addEventListener('fullscreenchange', atualizarVisualIconeFullscreen);
