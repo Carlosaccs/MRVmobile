@@ -30,12 +30,20 @@ html, body {
 /* 3. CONTAINER DO MAPA PRINCIPAL */
 #mapa-container {
     position: absolute;
-    left: 0; top: 0;
-    width: 100%; height: 100%;
+    left: 0; 
+    top: 0;
+    width: 100%; 
+    height: 100%;
     z-index: 10;
-    display: flex; align-items: center; justify-content: center;
+    display: flex; 
+    align-items: center; 
+    justify-content: center;
     overflow: hidden;
-    touch-action: none; /* NOVO: Impede a tela de balançar no toque */
+    touch-action: none;
+
+    /* --- AJUSTE DE SEGURANÇA (OPÇÃO 1) --- */
+    padding-left: 60px;       /* Empurra o mapa para a direita da faixa verde */
+    box-sizing: border-box;   /* Garante que o padding não aumente o tamanho da tela */
 }
 
 #mapa-container svg { 
