@@ -61,47 +61,17 @@ async function carregarPlanilha() {
     }
 }
 
-// 3. LOGICA DO MENU LATERAL (v139.6)
-function popularMenuResidenciais() {
-    const trilho = document.getElementById('trilho-infinito');
-    const contador = document.getElementById('contador-registros');
-    if (!trilho) return;
-
-    trilho.innerHTML = "";
-    // Pega os IDs e ordena por ordem alfabética do nome curto
-    const entradas = Object.entries(window.bancoDados);
-    entradas.sort((a, b) => a[1].nomeCurto.localeCompare(b[1].nomeCurto));
-
-    entradas.forEach(([id, info]) => {
-        const card = document.createElement('div');
-        card.className = 'card-residencial';
-        card.innerText = info.nomeCurto.toUpperCase();
-        
-        card.onclick = (e) => {
-            e.stopPropagation();
-            // Tenta clicar no mapa (id original)
-            const path = document.getElementById(id);
-            if (path) {
-                path.dispatchEvent(new Event('click'));
-                toggleMenuLateral();
-            } else {
-                // Se não achar o ID no mapa, apenas mostra os detalhes na ficha
-                document.getElementById('nome-imovel').innerText = info.nomeCurto;
-                document.getElementById('detalhes-imovel').innerHTML = `
-                    <p><strong>Estoque:</strong> ${info.estoque}</p>
-                    <p><strong>Status:</strong> ${info.statusObra}</p>
-                `;
-                toggleMenuLateral();
-            }
-        };
-        trilho.appendChild(card);
-    });
-
-    if (contador) {
-        const total = entradas.length;
-        contador.innerText = total.toString().padStart(2, '0');
-        // Muda para verde limão se chegar nos 42
-        contador.style.color = (total >= 42) ? "#ADFF2F" : "#ffff00";
+// 3. LOGICA DO MENU (AJUSTE TOUCH)
+function toggleMenuLateral(e) {
+    if (e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+    const menu = document.getElementById('menu-lateral-container');
+    if (menu) {
+        menu.classList.toggle('aberto');
+        console.log("Menu disparado via touch/click");
+        if (menu.classList.contains('aberto')) popularMenuResidenciais();
     }
 }
 // 4. DESENHO DOS MAPAS (GSP & INTERIOR)
@@ -206,9 +176,15 @@ function atualizarVisualIconeFullscreen() {
     }
 }
 
-// 7. INICIALIZAÇÃO DO SISTEMA
+// 7. INICIALIZAÇÃO E EVENTOS
 window.onload = () => {
     carregarPlanilha();
+    
+    // Seleciona o ícone de hambúrguer (ajuste o seletor se necessário)
+    const btnMenu = document.querySelector('.icon-bottom'); 
+    if (btnMenu) {
+        // pointerdown mata o atraso do touch no mobile
+        btnMenu.addEventListener('pointerdown', toggleMenuLateral);
+    }
 };
-
 document.addEventListener('fullscreenchange', atualizarVisualIconeFullscreen);
