@@ -200,17 +200,23 @@ document.addEventListener('click', (e) => {
 document.addEventListener('fullscreenchange', atualizarVisualIconeFullscreen);
 
 // 7. Função de Abrir/Fechar o menu da lateral esquerda (Sem estragar o mapa)
-function toggleMenuLateral() {
-    const menu = document.getElementById('menu-lateral-container');
-    menu.classList.toggle('aberto');
-}
+
 /* ==========================================================================
    v138 - LÓGICA DO MENU LATERAL (COLUNA D)
    ========================================================================== */
 
+// Função de Abrir/Fechar o Menu
 function toggleMenuLateral() {
     const menu = document.getElementById('menu-lateral-container');
     if (!menu) return;
+
+    menu.classList.toggle('aberto');
+
+    // Se abriu, popula. Se fechou, não faz nada.
+    if (menu.classList.contains('aberto')) {
+        popularMenuResidenciais();
+    }
+}
 
     menu.classList.toggle('aberto');
 
