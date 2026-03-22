@@ -179,3 +179,18 @@ window.onload = carregarPlanilha;
 document.addEventListener('click', (e) => {
     if (e.target.closest('#mapa-minimizado')) trocarMapas();
 });
+
+// Função para o botão de ampliar/reduzir a tela no celular
+function toggleFullscreen() {
+    if (!document.fullscreenElement) {
+        // Tenta entrar em tela cheia
+        document.documentElement.requestFullscreen().catch(err => {
+            console.warn(`Erro ao ativar tela cheia: ${err.message}`);
+        });
+    } else {
+        // Sai da tela cheia se já estiver nela
+        if (document.exitFullscreen) {
+            document.exitFullscreen();
+        }
+    }
+}
