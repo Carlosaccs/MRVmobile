@@ -151,50 +151,69 @@ path.semmrv { cursor: default; }
     text-shadow: 1px 1px 2px rgba(255,255,255,0.8);
 }
 
-/* 7. MENU LATERAL (v138) */
+/* ==========================================================================
+   7. MENU LATERAL (v139) - AJUSTE DE CAMADAS E SCROLL
+   ========================================================================== */
+
 #menu-lateral-container {
     position: absolute;
     top: 0;
-    left: -280px; /* Escondido mais à esquerda */
-    width: 260px;
+    left: -280px; /* Escondido atrás do limite da tela */
+    width: 250px;
     height: 100%;
-    background: rgba(255, 255, 255, 0.05); /* Quase invisível, mas ajuda no toque */
-    z-index: 2500; /* MAIOR que o mapa-container (10) e ficha-tecnica (1000) */
-    transition: all 0.4s ease-out;
+    background: transparent;
+    
+    /* PILHA DE CAMADAS: Abaixo da faixa (2000), acima do mapa (10) */
+    z-index: 1500; 
+    
+    transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
     padding: 20px 10px;
-    overflow-y: auto; /* Permite rolar se a lista for grande */
-    pointer-events: none; /* Não atrapalha o mapa quando fechado */
+    
+    /* REMOVE BARRAS DE ROLAGEM VISÍVEIS */
+    overflow-y: auto;
+    -ms-overflow-style: none;  /* IE/Edge */
+    scrollbar-width: none;     /* Firefox */
+    
+    /* Garante que toques não vazem para o mapa quando fechado */
+    pointer-events: none;
+}
+
+/* Esconde barra no Chrome, Safari e Opera */
+#menu-lateral-container::-webkit-scrollbar {
+    display: none;
 }
 
 #menu-lateral-container.aberto {
-    left: 60px; /* Brota ao lado da faixa verde */
-    pointer-events: auto; /* Ativa cliques quando aberto */
+    left: 60px; /* Brota exatamente onde a faixa verde termina */
+    pointer-events: auto;
 }
-/* O "Trilho" para o efeito de rolagem infinita */
+
 #trilho-infinito {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 12px;
+    padding-bottom: 50px; /* Espaço para o último item não colar no fundo */
 }
 
-/* As Caixas de Texto Brancas conforme sua descrição */
+/* O "Card" branco que você desenhou */
 .card-residencial {
     background: #ffffff;
-    border: 2px solid #00713a; /* Contorno verde escuro MRV */
-    border-right: 15px solid #00713a; /* Borda direita mais larga para cores de zona */
+    border: 2px solid #00713a; /* Verde MRV */
+    border-right: 15px solid #00713a; /* Borda larga para futuras cores de zona */
     padding: 12px 15px;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     font-weight: bold;
     color: #333;
     border-radius: 4px;
     text-transform: uppercase;
-    box-shadow: 3px 3px 8px rgba(0,0,0,0.2);
+    box-shadow: 3px 3px 10px rgba(0,0,0,0.2);
     cursor: pointer;
-    white-space: nowrap;
-    user-select: none;
-    transition: transform 0.2s ease;
+    transition: transform 0.1s ease;
 }
 
 .card-residencial:active {
+    transform: scale(0.96);
+    background-color: #f9f9f9;
+}
     transform: scale(0.96);
 }
