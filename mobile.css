@@ -15,14 +15,20 @@ html, body {
 }
 
 /* 2. FAIXA VERDE LATERAL */
-.titulo-vertical {
-    writing-mode: vertical-rl;
-    transform: rotate(180deg);
-    font-weight: bold;
-    font-size: 1.1rem; /* Um pouco maior e mais visível */
-    letter-spacing: 2px;
-    color: white !important;
-    white-space: nowrap;
+.faixa-verde-vertical {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 60px; /* Largura que bate com o padding-left do mapa */
+    height: 100%;
+    background-color: #00713a; /* Verde oficial MRV */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 0;
+    z-index: 2000; /* Fica acima do mapa e da ficha */
+    box-shadow: 2px 0 10px rgba(0,0,0,0.3);
 }
 
 /* ÍCONES (Topo e Base) */
