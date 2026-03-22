@@ -183,3 +183,49 @@ function toggleMenuLateral() {
     const menu = document.getElementById('menu-lateral-container');
     menu.classList.toggle('aberto');
 }
+/* ==========================================================================
+   v138 - LÓGICA DO MENU LATERAL (COLUNA D)
+   ========================================================================== */
+
+function toggleMenuLateral() {
+    const menu = document.getElementById('menu-lateral-container');
+    if (!menu) return;
+
+    menu.classList.toggle('aberto');
+
+    // Se abriu, vamos montar a lista de residenciais
+    if (menu.classList.contains('aberto')) {
+        popularMenuResidenciais();
+    }
+}
+
+function popularMenuResidenciais() {
+    const trilho = document.getElementById('trilho-infinito');
+    if (!trilho || !window.bancoDados) return;
+
+    // 1. Limpa o menu para não duplicar toda vez que abrir
+    trilho.innerHTML = "";
+
+    // 2. Transforma o bancoDados em uma lista e pega apenas a Coluna D (nomeCurto)
+    const listaIds = Object.keys(window.bancoDados);
+
+    listaIds.forEach(id => {
+        const info = window.bancoDados[id];
+        
+        // Só cria o card se existir um nome na Coluna D
+        if (info.nomeCurto && info.nomeCurto.trim() !== "") {
+            const card = document.createElement('div');
+            card.className = 'card-residencial';
+            card.innerText = info.nomeCurto;
+
+            // Ao clicar no nome no menu, ele seleciona a cidade no mapa
+            card.onclick = () => {
+                const pathMapa = document.getElementById(id);
+                if (pathMapa) pathMapa.click(); // Simula o clique no mapa
+                toggleMenuLateral(); // Fecha o menu
+            };
+
+            trilho.appendChild(card);
+        }
+    });
+}
