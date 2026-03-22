@@ -227,13 +227,36 @@ function toggleMenuLateral() {
 }
 
 /* ==========================================================================
-   v139.3 - MENU COM CONTADOR DE SEGURANÇA
+   CONTROLE DO MENU LATERAL - v139.4
    ========================================================================== */
+
+function toggleMenuLateral() {
+    console.log("Botão do menu clicado!"); // Isso ajuda a testar no F12
+    const menu = document.getElementById('menu-lateral-container');
+    
+    if (!menu) {
+        console.error("Erro: Elemento 'menu-lateral-container' não encontrado no HTML!");
+        return;
+    }
+
+    // Alterna a classe 'aberto'
+    menu.classList.toggle('aberto');
+
+    // Se o menu abriu, popula a lista e atualiza o contador
+    if (menu.classList.contains('aberto')) {
+        popularMenuResidenciais();
+    }
+}
 
 function popularMenuResidenciais() {
     const trilho = document.getElementById('trilho-infinito');
     const contador = document.getElementById('contador-registros');
-    if (!trilho || !window.bancoDados) return;
+    
+    if (!trilho) return;
+    if (!window.bancoDados || Object.keys(window.bancoDados).length === 0) {
+        console.warn("Banco de dados vazio ou não carregado ainda.");
+        return;
+    }
 
     trilho.innerHTML = ""; 
 
@@ -243,17 +266,18 @@ function popularMenuResidenciais() {
     ids.forEach(id => {
         const info = window.bancoDados[id];
         
-        // Critério: Tem que ter nome na Coluna D
+        // Só cria o card se tiver o nome na Coluna D (nomeCurto)
         if (info && info.nomeCurto && info.nomeCurto.toString().trim() !== "") {
             const card = document.createElement('div');
             card.className = 'card-residencial';
             card.innerText = info.nomeCurto.toUpperCase();
 
-            card.onclick = () => {
+            card.onclick = (e) => {
+                e.stopPropagation(); // Evita bugs de clique duplo
                 const elementoMapa = document.getElementById(id);
                 if (elementoMapa) {
                     elementoMapa.dispatchEvent(new Event('click'));
-                    toggleMenuLateral();
+                    toggleMenuLateral(); // Fecha após selecionar
                 }
             };
 
@@ -262,10 +286,9 @@ function popularMenuResidenciais() {
         }
     });
 
-    // Atualiza o número na faixa verde para conferência
+    // Atualiza o contador na faixa verde
     if (contador) {
         contador.innerText = totalGerado.toString().padStart(2, '0');
-        // Se for diferente de 42, ele fica amarelo para te avisar
         contador.style.color = (totalGerado >= 42) ? "white" : "#ffff00";
     }
 }
