@@ -15,16 +15,27 @@ html, body {
 }
 
 /* 2. FAIXA VERDE LATERAL */
-.faixa-verde-vertical { 
-    position: absolute; left: 0; top: 0; width: 52px; height: 100vh; 
-    background: #00713a; z-index: 2000;
-    display: flex; flex-direction: column; align-items: center; 
-    justify-content: space-between; padding: 20px 0;
+.titulo-vertical {
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    font-weight: bold;
+    font-size: 1.1rem; /* Um pouco maior e mais visível */
+    letter-spacing: 2px;
+    color: white !important;
+    white-space: nowrap;
 }
-.titulo-vertical { 
-    writing-mode: vertical-rl; transform: rotate(180deg); 
-    color: white; font-weight: bold; font-size: 1rem; 
-    letter-spacing: 2px; white-space: nowrap; 
+
+/* ÍCONES (Topo e Base) */
+.icon-top, .icon-bottom {
+    font-size: 28px; /* Ícones maiores para facilitar o toque */
+    color: white !important;
+    cursor: pointer;
+    user-select: none;
+    transition: transform 0.2s ease;
+}
+
+.icon-top:active {
+    transform: scale(1.3); /* Feedback visual ao clicar */
 }
 
 /* 3. CONTAINER DO MAPA PRINCIPAL */
