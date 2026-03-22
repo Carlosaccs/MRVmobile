@@ -182,15 +182,33 @@ document.addEventListener('click', (e) => {
 
 // Função para o botão de ampliar/reduzir a tela no celular
 function toggleFullscreen() {
+    const btn = document.querySelector('.icon-top'); // Captura o ícone
+    
     if (!document.fullscreenElement) {
-        // Tenta entrar em tela cheia
-        document.documentElement.requestFullscreen().catch(err => {
+        // ENTRAR EM TELA CHEIA
+        document.documentElement.requestFullscreen().then(() => {
+            btn.innerText = "内"; // Ícone de contrair (ou use o símbolo ⛶ se preferir outro)
+            // Dica: Muitos usam o símbolo ❐ ou ⧉ para indicar redução
+            btn.innerHTML = "&#10065;"; // Símbolo de "diminuir" (quadrados sobrepostos)
+        }).catch(err => {
             console.warn(`Erro ao ativar tela cheia: ${err.message}`);
         });
     } else {
-        // Sai da tela cheia se já estiver nela
+        // SAIR DA TELA CHEIA
         if (document.exitFullscreen) {
-            document.exitFullscreen();
+            document.exitFullscreen().then(() => {
+                btn.innerHTML = "&#10038;"; // Volta para o símbolo ⛶ (quatro cantos para fora)
+            });
         }
     }
 }
+
+// Opcional: Garante que o ícone mude mesmo se o usuário sair da tela cheia pela tecla 'Esc'
+document.addEventListener('fullscreenchange', () => {
+    const btn = document.querySelector('.icon-top');
+    if (!document.fullscreenElement) {
+        btn.innerHTML = "&#10038;"; // Símbolo original de ampliar
+    } else {
+        btn.innerHTML = "&#10065;"; // Símbolo de reduzir
+    }
+});
