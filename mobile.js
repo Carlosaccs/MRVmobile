@@ -1,5 +1,5 @@
 /* ==========================================================================
-   v134 - DESTAQUE DIFERENCIADO: LARANJA (MRV) VS CINZA ESCURO (OUTROS)
+   v135 - DESAFIO TOUCH: EFEITO HOVER NO CELULAR (ESTÁVEL)
    ========================================================================== */
 
 // 1. Configurações Iniciais
@@ -71,7 +71,7 @@ function desenharMapa(dados, targetId, ehMinimizado) {
         const corVerde = "#00713a";
         const corCinzaClaro = "#cccccc";
         const corLaranjaVivo = "#FF4500";
-        const corCinzaEscuro = "#777777"; // Cor pedida para o destaque dos cinzas
+        const corCinzaEscuro = "#777777";
 
         const corOriginal = ehMRV ? corVerde : corCinzaClaro;
         path.style.fill = corOriginal;
@@ -79,15 +79,19 @@ function desenharMapa(dados, targetId, ehMinimizado) {
         path.style.strokeWidth = ehMinimizado ? "6" : "1.2";
         path.setAttribute('data-cor-base', corOriginal);
 
-        // 4. Lógica de Interação com Cores Específicas
+        // 4. Lógica de Interação (v135 - Ajustada para o Desafio Touch)
         if (!ehMinimizado) {
             
-            const ativarFoco = () => {
+            const ativarFoco = (e) => {
+                // Impede o travamento do navegador no celular
+                if (e && e.type === 'touchstart' && e.cancelable) {
+                    e.preventDefault();
+                }
+
                 const display = document.getElementById('identificador-cidade');
                 if(display) display.innerText = nomeCidade;
                 
                 if (path.getAttribute('data-selecionado') !== 'true') {
-                    // SE FOR MRV -> LARANJA | SE FOR CINZA -> CINZA ESCURO
                     path.style.fill = ehMRV ? corLaranjaVivo : corCinzaEscuro;
                 }
             };
@@ -100,11 +104,18 @@ function desenharMapa(dados, targetId, ehMinimizado) {
                 }
             };
 
+            // Notebook
             path.onmouseover = ativarFoco;
             path.onmouseout = desativarFoco;
-            path.ontouchstart = (e) => { ativarFoco(); };
 
-            path.onclick = () => {
+            // CELULAR (O desafio!)
+            path.ontouchstart = ativarFoco;
+            path.ontouchend = () => {
+                // Deixa o nome por 1 segundo antes de voltar ao estado anterior
+                setTimeout(desativarFoco, 1000);
+            };
+
+            path.onclick = (e) => {
                 if (!ehMRV) return;
 
                 document.querySelectorAll('#mapa-container path').forEach(p => {
