@@ -1,5 +1,5 @@
 /* ==========================================================================
-   v137 - INTEGRAL: MAPA + TELA CHEIA + ÍCONES INKSCAPE
+   v139 - INTEGRAL: MAPA + TELA CHEIA + ÍCONES INKSCAPE
    ========================================================================== */
 
 // 1. Configurações Iniciais e Dados
