@@ -15,6 +15,7 @@ html, body {
 }
 
 /* 2. FAIXA VERDE LATERAL */
+/* 2. FAIXA VERDE LATERAL - v136 FINAL */
 .faixa-verde-vertical {
     position: absolute;
     left: 0;
@@ -26,39 +27,43 @@ html, body {
     flex-direction: column;
     align-items: center;
     justify-content: space-between;
-    padding: 15px 0; /* Diminuí levemente o padding para dar mais espaço ao texto */
+    padding: 10px 0; /* Reduzi para dar mais fôlego ao título */
     z-index: 2000;
     box-shadow: 2px 0 10px rgba(0,0,0,0.3);
 }
 
+/* TÍTULO CENTRALIZADO */
 .titulo-vertical {
     writing-mode: vertical-rl;
     transform: rotate(180deg);
     font-weight: bold;
-    font-size: 1.2rem; /* Aumentado para destaque */
+    font-size: 1.1rem; 
     letter-spacing: 1px;
     color: white !important;
-    white-space: nowrap; /* IMPEDE A QUEBRA DE LINHA RUIM */
-    text-align: center;
-    flex-grow: 1; /* Faz o título ocupar o espaço central disponível */
+    white-space: nowrap; 
+    flex-grow: 1; /* Ocupa todo o meio da barra */
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
-/* ÍCONES (Topo e Base) */
+/* ÍCONES BRANCOS E MAIORES */
 .icon-top, .icon-bottom {
-    font-size: 28px; /* Ícones maiores para facilitar o toque */
+    font-size: 26px; /* Tamanho ideal para o dedo */
     color: white !important;
     cursor: pointer;
+    padding: 10px;
     user-select: none;
-    transition: transform 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.icon-top:active {
-    transform: scale(1.3); /* Feedback visual ao clicar */
+/* Efeito de clique nos ícones */
+.icon-top:active, .icon-bottom:active {
+    transform: scale(1.2);
+    opacity: 0.8;
 }
-
 /* 3. CONTAINER DO MAPA PRINCIPAL */
 #mapa-container {
     position: absolute;
