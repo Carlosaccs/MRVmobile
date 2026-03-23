@@ -1,77 +1,86 @@
 /* ==========================================================================
-   DASHBOARD MRV MOBILE - v166 (ESTILIZAÇÃO COMPLETA)
+   DASHBOARD MRV MOBILE - v167 (MENU +10% LARGURA)
    ========================================================================== */
 
-/* 1. CONFIGURAÇÕES GERAIS E FONTE */
+/* 1. CONFIGURAÇÕES GERAIS */
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800&display=swap');
 
 html, body { 
-    margin: 0; 
-    padding: 0; 
-    width: 100%; 
-    height: 100%; 
-    overflow: hidden; 
-    background: #fff; 
-    font-family: 'Montserrat', sans-serif !important; /* Estilo padrão do Dashboard */
+    margin: 0; padding: 0; width: 100%; height: 100%; 
+    overflow: hidden; background: #fff; 
+    font-family: 'Montserrat', sans-serif !important;
 }
 
 * { box-sizing: border-box; }
 
-/* 2. FAIXA VERDE VERTICAL (LATERAL ESQUERDA) */
+/* 2. FAIXA VERDE VERTICAL */
 .faixa-verde-vertical {
-    position: fixed; 
-    left: 0; 
-    top: 0;
-    width: 60px; 
-    height: 100%;
-    background-color: #00713a; /* Verde Institucional MRV */
-    display: flex; 
-    flex-direction: column;
-    align-items: center; 
-    justify-content: space-between;
-    padding: 15px 0; 
-    z-index: 5000; /* Garante que fique acima do menu lateral */
+    position: fixed; left: 0; top: 0;
+    width: 60px; height: 100%;
+    background-color: #00713a; 
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: space-between;
+    padding: 15px 0; z-index: 5000;
     box-shadow: 2px 0 10px rgba(0,0,0,0.3);
 }
 
-/* 3. CONTADOR DE REGISTROS (TOPO DA FAIXA) */
 #contador-registros {
-    color: white; 
-    font-size: 14px; 
-    font-weight: 800; 
-    margin-bottom: 5px; 
-    text-align: center;
-    width: 100%;
+    color: white; font-size: 14px; font-weight: 800;
+    margin-bottom: 5px; text-align: center; width: 100%;
 }
 
-/* 4. TÍTULO VERTICAL */
 .titulo-vertical {
-    writing-mode: vertical-rl; 
-    transform: rotate(180deg);
-    font-weight: 800; 
-    font-size: 1.1rem; 
-    color: white;
-    text-transform: uppercase; 
-    letter-spacing: 1px;
+    writing-mode: vertical-rl; transform: rotate(180deg);
+    font-weight: 800; font-size: 1.1rem; color: white;
+    text-transform: uppercase; letter-spacing: 1px;
 }
 
-/* 5. MENU LATERAL (SLIDE-OUT) */
+/* 3. MENU LATERAL (+10% LARGURA) */
 #menu-lateral-container {
-    position: fixed; 
-    top: 0; 
-    left: -350px; /* Escondido por padrão */
-    width: 320px; 
+    position: fixed; top: 0; 
+    left: -380px; /* Ajustado para a nova largura */
+    width: 352px; /* Largura aumentada em 10% */
     height: 100%;
-    background: #fdfdfd; 
-    z-index: 4000; /* Atrás da faixa verde, à frente do mapa */
+    background: #fdfdfd; z-index: 4000;
     transition: left 0.4s cubic-bezier(0.25, 1, 0.5, 1);
-    padding: 20px 10px 20px 75px; /* Espaço para não sobrepor a faixa verde */
-    overflow-y: auto; 
-    scrollbar-width: none;
+    padding: 20px 10px 20px 75px; 
+    overflow-y: auto; scrollbar-width: none;
 }
 
 #menu-lateral-container.aberto { 
-    left: 0; /* Desliza para aparecer */
+    left: 0; 
+}
+
+/* 4. CARDS DOS RESIDENCIAIS */
+.card-residencial {
+    display: flex; justify-content: space-between; align-items: center;
+    background: white; margin-bottom: 8px; padding: 12px 15px;
+    border-radius: 4px; font-size: 0.75rem; font-weight: 700;
+    color: #333; text-transform: uppercase;
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.05);
+    border-right: 8px solid #ccc;
+    cursor: pointer;
+}
+
+/* CORES DAS TARJAS */
+.zona-zo { border-right-color: #FF8C00 !important; } 
+.zona-zl { border-right-color: #000080 !important; } 
+.zona-zn { border-right-color: #FFD700 !important; } 
+.zona-zs { border-right-color: #C71585 !important; } 
+
+/* 5. ÁREA DO MAPA E FICHA TÉCNICA */
+#mapa-container {
+    position: fixed; left: 0; top: 0;
+    width: 100%; height: 100%;
+    padding-left: 60px; z-index: 10;
+    display: flex; align-items: center; justify-content: center;
+}
+
+.ficha-tecnica {
+    position: fixed; right: 0; top: 0; 
+    width: 44%; height: 100%;
+    background: rgba(50, 50, 50, 0.98);
+    color: white; padding: 30px; z-index: 2000;
 }
 
 /* 6. CARDS DOS RESIDENCIAIS (MENU) */
