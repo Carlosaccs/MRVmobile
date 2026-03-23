@@ -187,37 +187,56 @@ path.semmrv { cursor: default; }
     padding-bottom: 50px;
 }
 
-/* Card padrão (Residencial) */
+/* Card com bordas mais nítidas e aba lateral visível */
 .card-residencial {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 10px 15px;
-    margin-bottom: 8px;
-    background: #ffffff; /* Fundo branco para residenciais */
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-family: sans-serif;
+    padding: 12px 15px; /* Aumentei um pouco o respiro */
+    margin: 8px 10px;    /* Margem lateral para não encostar na borda verde */
+    background: #ffffff;
+    border: 1px solid #999; /* Borda mais escura como você pediu */
+    border-radius: 5px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     cursor: pointer;
-    transition: all 0.2s;
+    box-sizing: border-box; /* Garante que a borda de 6px não "empurre" o card */
+    position: relative;
 }
 
-/* Estilo específico para COMPLEXO (Fundo Cinza) */
+
+/* Estilo para COMPLEXO (Fundo Cinza mais visível) */
 .card-residencial.card-complexo {
-    background: #f0f0f0; /* Cinza claro sugerido */
-    border: 1px solid #ccc;
-    font-weight: bold; /* Um pouco mais de destaque no texto */
+    background: #e8e8e8;
+    border: 1px solid #888;
 }
 
-/* As abas laterais continuam funcionando normalmente */
-.card-residencial.zona-zo { border-left: 6px solid #f39200; }
-.card-residencial.zona-zl { border-left: 6px solid #f39200; }
-.card-residencial.zona-zn { border-left: 6px solid #ffcc00; }
-.card-residencial.zona-zs { border-left: 6px solid #e5007d; }
-.card-residencial.zona-verde { border-left: 6px solid #00713a; }
+/* ABAS LATERAIS (Aumentei para 8px para dar mais destaque) */
+.card-residencial.zona-zo { border-left: 8px solid #f39200 !important; } /* Laranja */
+.card-residencial.zona-zl { border-left: 8px solid #f39200 !important; } /* Laranja */
+.card-residencial.zona-zn { border-left: 8px solid #ffcc00 !important; } /* Amarelo */
+.card-residencial.zona-zs { border-left: 8px solid #e5007d !important; } /* Rosa/Pink */
+.card-residencial.zona-verde { border-left: 8px solid #00713a !important; } /* Verde MRV */
 
-/* Destaque ao clicar */
+/* Texto Interno */
+.nome-card {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #333;
+}
+
+.estoque-status {
+    font-size: 0.7rem;
+    color: #666;
+    font-weight: bold;
+    margin-left: 10px;
+}
+
+/* Quando selecionado */
 .card-residencial.selecionado {
     background-color: #f39200 !important;
+    border-color: #d17a00 !important;
+}
+.card-residencial.selecionado .nome-card,
+.card-residencial.selecionado .estoque-status {
     color: #fff !important;
 }
