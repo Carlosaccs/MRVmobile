@@ -1,54 +1,209 @@
-html v139
+/* ==========================================================================
+   v139 - ARQUIVO CSS CONSOLIDADO
+   ========================================================================== */
 
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>MRV Mobile - v139</title>
-    <link rel="stylesheet" href="mobile.css?v=139">
-</head>
-<body>
+/* 1. FUNDAÇÃO E RESET */
+html, body { 
+    margin: 0; padding: 0; width: 100%; height: 100%; 
+    overflow: hidden; background: #fff; 
+}
+* { box-sizing: border-box; font-family: sans-serif; }
 
-    <div class="mobile-wrapper">
-        
-        <aside class="faixa-verde-vertical">
-            <div class="icon-top" onclick="toggleMenuLateral()">
-                <svg viewBox="35 130 70 55" width="28" height="28">
-                    <path fill="white" d="M 39.911259 134.69049 L 39.911259 137.57403 L 39.911259 140.45706 L 69.950769 140.45706 L 99.990796 140.45706 L 99.990796 137.57403 L 99.990796 134.69049 L 69.950769 134.69049 L 39.911259 134.69049 z M 39.911259 153.33121 L 39.911259 156.14757 L 39.911259 158.96394 L 69.950769 158.96394 L 99.990796 158.96394 L 99.990796 156.14757 L 99.990796 153.33121 L 69.950769 153.33121 L 39.911259 153.33121 z M 39.911259 171.83809 L 39.911259 174.72112 L 39.911259 177.60466 L 69.950769 177.60466 L 99.990796 177.60466 L 99.990796 174.72112 L 99.990796 171.83809 L 69.950769 171.83809 L 39.911259 171.83809 z" />
-                </svg>
-            </div>
-            
-            <div class="titulo-vertical">MRV em SP</div>
-            
-            <div class="icon-bottom" onclick="toggleFullscreen()">
-                <svg viewBox="60 110 90 90" width="30" height="30">
-                    <path id="path-fullscreen" fill="white" d="M 75.757133 114.16926 L 75.757133 124.7898 L 75.757133 135.41086 L 78.412268 135.41086 L 81.067403 135.41086 L 81.067403 127.44493 L 81.067403 119.47953 L 89.032808 119.47953 L 96.99873 119.47953 L 96.99873 116.82439 L 96.99873 114.16926 L 86.377673 114.16926 L 75.757133 114.16926 z M 115.58468 114.16926 L 115.58468 116.82439 L 115.58468 119.47953 L 123.36043 119.47953 L 131.13618 119.47953 L 131.13618 127.44493 L 131.13618 135.41086 L 133.79183 135.41086 L 136.44697 135.41086 L 136.44697 124.7898 L 136.44697 114.16926 L 126.01556 114.16926 L 115.58468 114.16926 z M 75.757133 153.9968 L 75.757133 164.61734 L 75.757133 175.2384 L 86.377673 175.2384 L 96.99873 175.2384 L 96.99873 172.39361 L 96.99873 169.54882 L 89.032808 169.54882 L 81.067403 169.54882 L 81.067403 161.77255 L 81.067403 153.9968 L 78.412268 153.9968 L 75.757133 153.9968 z M 131.13618 153.9968 L 131.13618 161.77255 L 131.13618 169.54882 L 123.36043 169.54882 L 115.58468 169.54882 L 115.58468 172.39361 L 115.58468 175.2384 L 126.01556 175.2384 L 136.44697 175.2384 L 136.44697 164.61734 L 136.44697 153.9968 L 133.79183 153.9968 L 131.13618 153.9968 z" />
-                </svg>
-            </div>
-        </aside>
+.mobile-wrapper { 
+    display: flex; width: 100vw; height: 100%; 
+    position: relative; overflow: hidden; 
+}
 
-        <div id="identificador-cidade"></div>
+/* 2. FAIXA VERDE LATERAL */
+.faixa-verde-vertical {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 60px; 
+    height: 100%;
+    background-color: #00713a; 
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 0; /* Reduzi para dar mais fôlego ao título */
+    z-index: 2000;
+    box-shadow: 2px 0 10px rgba(0,0,0,0.3);
+}
 
-        <main class="area-mapa" id="mapa-container"></main>
-        
-        <div id="menu-lateral-container">
-            <div id="trilho-infinito"></div>
-        </div>
+/* TÍTULO CENTRALIZADO */
+.titulo-vertical {
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    font-weight: bold;
+    font-size: 1.1rem; 
+    letter-spacing: 1px;
+    color: white !important;
+    white-space: nowrap; 
+    flex-grow: 1; /* Ocupa todo o meio da barra */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
 
-        <div id="mapa-minimizado"></div>
+/* ÍCONES BRANCOS E MAIORES */
+.icon-top, .icon-bottom {
+    font-size: 26px; /* Tamanho ideal para o dedo */
+    color: white !important;
+    cursor: pointer;
+    padding: 10px;
+    user-select: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
 
-        <aside class="ficha-tecnica" id="ficha-tecnica">
-            <h3 id="nome-imovel">Selecione</h3>
-            <div id="detalhes-imovel">
-                Toque em um ponto verde para ver os detalhes.
-            </div>
-            <div style="position:absolute; bottom:10px; right:10px; font-size:10px; color:#ccc;">v139</div>
-        </aside>
+/* Efeito de clique nos ícones */
+.icon-top:active, .icon-bottom:active {
+    transform: scale(1.2);
+    opacity: 0.8;
+}
+/* 3. CONTAINER DO MAPA PRINCIPAL */
+#mapa-container {
+    position: absolute;
+    left: 0; 
+    top: 0;
+    width: 100%; 
+    height: 100%;
+    z-index: 10;
+    display: flex; 
+    align-items: center; 
+    justify-content: center;
+    overflow: hidden;
+    touch-action: none;
 
-    </div>
+    /* --- AJUSTE DE SEGURANÇA (OPÇÃO 1) --- */
+    padding-left: 60px;       /* Empurra o mapa para a direita da faixa verde */
+    box-sizing: border-box;   /* Garante que o padding não aumente o tamanho da tela */
+}
 
-    <script src="mapa-SP.js"></script>
-    <script src="mobile.js?v=139"></script>
-</body>
-</html>
+#mapa-container svg { 
+    width: 130% !important; 
+    height: auto;
+    max-height: 98%; 
+    transition: all 0.3s ease; 
+    transform-origin: center top; 
+}
+
+#mapa-container path {
+    transition: fill 0.15s ease, stroke-width 0.2s ease;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent; /* NOVO: Remove o flash azul ao tocar */
+}
+/* 4. MAPA MINIMIZADO (v127) - Posicionado à direita da área do mapa */
+#mapa-minimizado {
+    position: absolute;
+    bottom: 20px;
+    right: 45%; /* Coloca o botão no limite da área do mapa com a ficha técnica */
+    width: 90px;
+    height: 70px;
+    background: white;
+    border: 2px solid #00713a;
+    border-radius: 10px;
+    cursor: pointer;
+    z-index: 2500;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s ease;
+}
+
+#mapa-minimizado:active { transform: scale(0.95); }
+
+/* Classes de cursor para diferenciar os paths */
+path.commrv { cursor: pointer; }
+path.semmrv { cursor: default; }
+
+/* 5. FICHA TÉCNICA (LATERAL DIREITA) */
+.ficha-tecnica {
+    position: absolute; right: 0; top: 0; 
+    width: 44%; height: 100%;
+    background: rgba(60, 60, 60, 0.95);
+    backdrop-filter: blur(10px); color: white;
+    padding: 35px; z-index: 1000; 
+    box-shadow: -10px 0 25px rgba(0,0,0,0.4);
+}
+#nome-imovel { 
+    color: #50c878; margin: 0 0 15px 0; font-size: 1.6rem; 
+    border-bottom: 2px solid #50c878; padding-bottom: 10px; 
+}
+#detalhes-imovel { font-size: 1.2rem; line-height: 1.6; }
+
+/* 6. IDENTIFICADOR DE CIDADE (CENTRO SUPERIOR) - v125 */
+#identificador-cidade {
+    position: absolute;
+    top: 5px; /* Encostado no topo */
+    left: 28%;
+    transform: translateX(-50%);
+    font-size: 1rem; /* Mesmo tamanho da faixa verde */
+    font-weight: bold;
+    color: #333;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    pointer-events: none;
+    text-shadow: 1px 1px 2px rgba(255,255,255,0.8);
+}
+
+/* ==========================================================================
+   7. MENU LATERAL (v139.5) - CORREÇÃO DE INTERAÇÃO E VISIBILIDADE
+   ========================================================================== */
+
+#menu-lateral-container {
+    position: absolute;
+    top: 0;
+    left: -320px; 
+    width: 300px; 
+    height: 100%;
+    background: transparent;
+    z-index: 1500; 
+    transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+    padding: 20px 10px;
+    overflow-y: auto;
+    scrollbar-width: none;
+    
+    /* IMPORTANTE: Desativa cliques e esconde totalmente quando fechado */
+    pointer-events: none; 
+    visibility: hidden; 
+}
+
+#menu-lateral-container.aberto {
+    left: 40px; 
+    /* IMPORTANTE: Reativa cliques e torna visível para o navegador */
+    pointer-events: auto; 
+    visibility: visible;
+}
+
+#trilho-infinito {
+    display: flex;
+    flex-direction: column;
+    gap: 8px; 
+    padding-bottom: 50px;
+}
+
+.card-residencial {
+    background: #ffffff;
+    border: 2px solid #00713a;
+    border-right: 15px solid #00713a;
+    padding: 8px 15px 8px 35px; /* Espaço para o texto sair de baixo da faixa */
+    font-size: 0.82rem;
+    font-weight: bold;
+    color: #333;
+    border-radius: 4px;
+    text-transform: uppercase;
+    box-shadow: 3px 3px 10px rgba(0,0,0,0.2);
+    cursor: pointer;
+    white-space: nowrap;
+    
+    /* Garante que o card receba o clique do dedo */
+    pointer-events: all;
+}
+
+/* Remove a barra cinza chata */
+#menu-lateral-container::-webkit-scrollbar { display: none; }
