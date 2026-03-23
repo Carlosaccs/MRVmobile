@@ -99,18 +99,19 @@ function popularMenuResidenciais() {
         
         // AQUI ESTÁ A CHAVE: Usamos apenas o nomeCurto. 
         // Removido qualquer menção ao item.estoque (Coluna F) para o menu não esticar.
-        card.innerHTML = `<span>${nomeUpper}</span>`;
-        
-        card.onclick = (e) => {
-            e.stopPropagation();
-            const pathOriginal = document.getElementById(item.idPath);
-            if (pathOriginal) {
-                // A Coluna F só aparece AQUI (dentro da ficha técnica), não no menu.
-                exibirDadosNoPainel(item.idPath, item.nomeCurto);
-                pathOriginal.style.fill = "#FF4500";
-                toggleMenuLateral();
-            }
-        };
+       card.innerHTML = `
+          <span>${nomeUpper}</span>
+          <span style="font-size: 0.6rem; color: #888; font-weight: normal;">
+              ${item.estoque !== '-' ? 'RESTAM ' + item.estoque + ' UN.' : '-'}
+          </span>
+      `;
+      
+      card.onclick = (e) => {
+          e.preventDefault();
+          console.log("Clicou em:", item.nomeCurto); // Teste no console
+          exibirDadosNoPainel(item.idPath, item.nomeCurto);
+          toggleMenuLateral(); // Fecha o menu ao selecionar
+      };
         trilho.appendChild(card);
     });
 }
