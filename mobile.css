@@ -1,114 +1,209 @@
 /* ==========================================================================
-   DASHBOARD MRV MOBILE - v171 (ESTRUTURA v139 + LARGURA +10%)
-   ========================================================================== */
+   v139 - ARQUIVO CSS CONSOLIDADO
+   ========================================================================== */
 
 /* 1. FUNDAÇÃO E RESET */
-html, body { 
-    margin: 0; padding: 0; width: 100%; height: 100%; 
-    overflow: hidden; background: #fff; 
+html, body { 
+    margin: 0; padding: 0; width: 100%; height: 100%; 
+    overflow: hidden; background: #fff; 
 }
-* { box-sizing: border-box; font-family: 'Montserrat', sans-serif; }
+* { box-sizing: border-box; font-family: sans-serif; }
 
-/* 2. FAIXA VERDE LATERAL (FIXA) */
+.mobile-wrapper { 
+    display: flex; width: 100vw; height: 100%; 
+    position: relative; overflow: hidden; 
+}
+
+/* 2. FAIXA VERDE LATERAL */
 .faixa-verde-vertical {
-    position: fixed;
-    left: 0; top: 0;
-    width: 60px; height: 100%;
-    background-color: #00713a; 
-    display: flex; flex-direction: column;
-    align-items: center; justify-content: space-between;
-    padding: 10px 0;
-    z-index: 5000; /* Sempre no topo */
-    box-shadow: 2px 0 10px rgba(0,0,0,0.3);
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 60px; 
+    height: 100%;
+    background-color: #00713a; 
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 0; /* Reduzi para dar mais fôlego ao título */
+    z-index: 2000;
+    box-shadow: 2px 0 10px rgba(0,0,0,0.3);
 }
 
+/* TÍTULO CENTRALIZADO */
 .titulo-vertical {
-    writing-mode: vertical-rl; transform: rotate(180deg);
-    font-weight: bold; font-size: 1.1rem; 
-    color: white !important; white-space: nowrap;
-    flex-grow: 1; display: flex; align-items: center; justify-content: center;
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    font-weight: bold;
+    font-size: 1.1rem; 
+    letter-spacing: 1px;
+    color: white !important;
+    white-space: nowrap; 
+    flex-grow: 1; /* Ocupa todo o meio da barra */
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-/* ÍCONES DA FAIXA VERDE (HAMBÚRGUER E FULLSCREEN) */
+/* ÍCONES BRANCOS E MAIORES */
 .icon-top, .icon-bottom {
-    font-size: 26px; color: white !important;
-    cursor: pointer; padding: 15px;
-    z-index: 5001;
-    pointer-events: auto; /* IMPORTANTE: Habilita o clique */
-    transition: transform 0.2s;
+    font-size: 26px; /* Tamanho ideal para o dedo */
+    color: white !important;
+    cursor: pointer;
+    padding: 10px;
+    user-select: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
-.icon-top:active, .icon-bottom:active { transform: scale(1.2); }
 
-/* 3. MENU LATERAL (LARGURA v139 + 10%) */
-/* AJUSTE DO MENU (v172) */
+/* Efeito de clique nos ícones */
+.icon-top:active, .icon-bottom:active {
+    transform: scale(1.2);
+    opacity: 0.8;
+}
+/* 3. CONTAINER DO MAPA PRINCIPAL */
+#mapa-container {
+    position: absolute;
+    left: 0; 
+    top: 0;
+    width: 100%; 
+    height: 100%;
+    z-index: 10;
+    display: flex; 
+    align-items: center; 
+    justify-content: center;
+    overflow: hidden;
+    touch-action: none;
+
+    /* --- AJUSTE DE SEGURANÇA (OPÇÃO 1) --- */
+    padding-left: 60px;       /* Empurra o mapa para a direita da faixa verde */
+    box-sizing: border-box;   /* Garante que o padding não aumente o tamanho da tela */
+}
+
+#mapa-container svg { 
+    width: 130% !important; 
+    height: auto;
+    max-height: 98%; 
+    transition: all 0.3s ease; 
+    transform-origin: center top; 
+}
+
+#mapa-container path {
+    transition: fill 0.15s ease, stroke-width 0.2s ease;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent; /* NOVO: Remove o flash azul ao tocar */
+}
+/* 4. MAPA MINIMIZADO (v127) - Posicionado à direita da área do mapa */
+#mapa-minimizado {
+    position: absolute;
+    bottom: 20px;
+    right: 45%; /* Coloca o botão no limite da área do mapa com a ficha técnica */
+    width: 90px;
+    height: 70px;
+    background: white;
+    border: 2px solid #00713a;
+    border-radius: 10px;
+    cursor: pointer;
+    z-index: 2500;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s ease;
+}
+
+#mapa-minimizado:active { transform: scale(0.95); }
+
+/* Classes de cursor para diferenciar os paths */
+path.commrv { cursor: pointer; }
+path.semmrv { cursor: default; }
+
+/* 5. FICHA TÉCNICA (LATERAL DIREITA) */
+.ficha-tecnica {
+    position: absolute; right: 0; top: 0; 
+    width: 44%; height: 100%;
+    background: rgba(60, 60, 60, 0.95);
+    backdrop-filter: blur(10px); color: white;
+    padding: 35px; z-index: 1000; 
+    box-shadow: -10px 0 25px rgba(0,0,0,0.4);
+}
+#nome-imovel { 
+    color: #50c878; margin: 0 0 15px 0; font-size: 1.6rem; 
+    border-bottom: 2px solid #50c878; padding-bottom: 10px; 
+}
+#detalhes-imovel { font-size: 1.2rem; line-height: 1.6; }
+
+/* 6. IDENTIFICADOR DE CIDADE (CENTRO SUPERIOR) - v125 */
+#identificador-cidade {
+    position: absolute;
+    top: 5px; /* Encostado no topo */
+    left: 28%;
+    transform: translateX(-50%);
+    font-size: 1rem; /* Mesmo tamanho da faixa verde */
+    font-weight: bold;
+    color: #333;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    pointer-events: none;
+    text-shadow: 1px 1px 2px rgba(255,255,255,0.8);
+}
+
+/* ==========================================================================
+   7. MENU LATERAL (v139.5) - CORREÇÃO DE INTERAÇÃO E VISIBILIDADE
+   ========================================================================== */
+
 #menu-lateral-container {
-    position: fixed;
+    position: absolute;
     top: 0;
-    left: -400px; /* Começa fora da tela */
-    width: 320px;
+    left: -320px; 
+    width: 300px; 
     height: 100%;
-    background: white; /* Garante que o fundo não seja transparente se você não quiser */
-    z-index: 3000;
-    transition: 0.4s cubic-bezier(0.25, 1, 0.5, 1);
-    padding: 20px 10px 20px 75px; /* Recuo para não cobrir a faixa verde */
+    background: transparent;
+    z-index: 1500; 
+    transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+    padding: 20px 10px;
     overflow-y: auto;
-    visibility: hidden; /* Escondido para não bloquear cliques */
+    scrollbar-width: none;
+    
+    /* IMPORTANTE: Desativa cliques e esconde totalmente quando fechado */
+    pointer-events: none; 
+    visibility: hidden; 
 }
 
 #menu-lateral-container.aberto {
-    left: 0;
+    left: 40px; 
+    /* IMPORTANTE: Reativa cliques e torna visível para o navegador */
+    pointer-events: auto; 
     visibility: visible;
 }
 
+#trilho-infinito {
+    display: flex;
+    flex-direction: column;
+    gap: 8px; 
+    padding-bottom: 50px;
+}
+
 .card-residencial {
+    background: #ffffff;
     border: 2px solid #00713a;
-    border-right: 12px solid #00713a; /* Borda direita característica */
-    margin-bottom: 10px;
-    padding: 12px;
-    background: #fff;
+    border-right: 15px solid #00713a;
+    padding: 8px 15px 8px 35px; /* Espaço para o texto sair de baixo da faixa */
+    font-size: 0.82rem;
+    font-weight: bold;
+    color: #333;
+    border-radius: 4px;
+    text-transform: uppercase;
+    box-shadow: 3px 3px 10px rgba(0,0,0,0.2);
     cursor: pointer;
-    font-size: 0.8rem;
+    white-space: nowrap;
+    
+    /* Garante que o card receba o clique do dedo */
+    pointer-events: all;
 }
 
-#mapa-container {
-    position: fixed;
-    left: 60px;
-    top: 0;
-    width: calc(100% - 60px);
-    height: 100%;
-    z-index: 10;
-}
-/* 4. MAPA MINIMIZADO (LADO DIREITO - v139) */
-#mapa-minimizado {
-    position: fixed;
-    bottom: 20px;
-    right: 45%; /* Posicionado longe do menu para não sobrepor */
-    width: 100px;
-    height: 80px;
-    background: white;
-    border: 2px solid #00713a;
-    border-radius: 10px;
-    cursor: pointer;
-    z-index: 4000; 
-    overflow: hidden;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-    display: flex; align-items: center; justify-content: center;
-}
-
-/* 5. MAPA PRINCIPAL E FICHA TÉCNICA */
-#mapa-container {
-    position: fixed; left: 0; top: 0;
-    width: 100%; height: 100%;
-    z-index: 10;
-    padding-left: 60px;
-    display: flex; align-items: center; justify-content: center;
-}
-
-.ficha-tecnica {
-    position: fixed; right: 0; top: 0; 
-    width: 44%; height: 100%;
-    background: rgba(60, 60, 60, 0.98);
-    color: white; padding: 35px; z-index: 2000; 
-    box-shadow: -10px 0 25px rgba(0,0,0,0.4);
-    overflow-y: auto;
-}
+/* Remove a barra cinza chata */
+#menu-lateral-container::-webkit-scrollbar { display: none; }
