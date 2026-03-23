@@ -8,15 +8,20 @@
 <body>
 
 <div class="mobile-wrapper">
-    <div class="faixa-verde-vertical">
-        <div class="icon-top" onclick="toggleMenuLateral()">
-            <svg viewBox="0 0 24 24" width="30" height="30" fill="white"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
-        </div>
-        
-        <div class="titulo-vertical">MRV em SP</div>
-        
-        <div id="contador-registros" class="icon-bottom">42</div>
+   <div class="faixa-verde-vertical">
+    <div class="icon-top" onclick="toggleMenuLateral()">
+        <svg viewBox="0 0 24 24" width="32" height="32" fill="white"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
     </div>
+    
+    <div class="titulo-vertical">MRV em SP</div>
+    
+    <div class="controles-zoom">
+        <div class="btn-zoom" onclick="zoomIn()">+</div>
+        <div class="btn-zoom" onclick="zoomOut()">−</div>
+    </div>
+
+    <div id="contador-registros" class="icon-bottom">42</div>
+</div>
 
     <div id="menu-lateral-container">
         <div id="trilho-infinito"></div>
