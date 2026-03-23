@@ -193,7 +193,7 @@ function toggleMenuLateral() {
 
     menu.classList.toggle('aberto');
 
-    // Se abriu, vamos montar a lista de residenciais
+    // IMPORTANTE: Só popula se o menu abrir
     if (menu.classList.contains('aberto')) {
         popularMenuResidenciais();
     }
@@ -203,28 +203,27 @@ function popularMenuResidenciais() {
     const trilho = document.getElementById('trilho-infinito');
     if (!trilho || !window.bancoDados) return;
 
-    // 1. Limpa o menu para não duplicar toda vez que abrir
-    trilho.innerHTML = "";
+    trilho.innerHTML = ""; // Limpa lixo anterior
 
-    // 2. Transforma o bancoDados em uma lista e pega apenas a Coluna D (nomeCurto)
-    const listaIds = Object.keys(window.bancoDados);
-
-    listaIds.forEach(id => {
+    // Pega as chaves do banco de dados (IDs das cidades)
+    Object.keys(window.bancoDados).forEach(id => {
         const info = window.bancoDados[id];
         
-        // Só cria o card se existir um nome na Coluna D
-        if (info.nomeCurto && info.nomeCurto.trim() !== "") {
+        // Verifica se tem dado na Coluna D (nomeCurto)
+        if (info && info.nomeCurto) {
             const card = document.createElement('div');
             card.className = 'card-residencial';
             card.innerText = info.nomeCurto;
-
-            // Ao clicar no nome no menu, ele seleciona a cidade no mapa
+            
+            // Ao clicar no card, fecha o menu e foca no mapa
             card.onclick = () => {
-                const pathMapa = document.getElementById(id);
-                if (pathMapa) pathMapa.click(); // Simula o clique no mapa
-                toggleMenuLateral(); // Fecha o menu
+                const path = document.getElementById(id);
+                if (path) {
+                    path.dispatchEvent(new Event('click')); // Dispara o clique real
+                }
+                toggleMenuLateral();
             };
-
+            
             trilho.appendChild(card);
         }
     });
