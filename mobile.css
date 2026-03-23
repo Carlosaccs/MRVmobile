@@ -1,11 +1,11 @@
 /* ==========================================================================
-   v139 - ARQUIVO CSS CONSOLIDADO
-   ========================================================================== */
+   1. FONTE E BASE (v161)
+   ========================================================================== */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800&display=swap');
 
-/* 1. CORREÇÃO DA FONTE (Global para o Dashboard) */
 body {
-    font-family: 'Montserrat', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-    font-weight: 600; /* Deixa o texto mais encorpado como antes */
+    font-family: 'Montserrat', sans-serif !important;
+    overflow: hidden;
 }
 
 /* 2. FAIXA VERDE (SEMPRE NO TOPO) */
@@ -151,31 +151,36 @@ path.semmrv { cursor: default; }
     text-shadow: 1px 1px 2px rgba(255,255,255,0.8);
 }
 
-/* 7. MENU LATERAL (AJUSTE DE "SAÍDA" E POSIÇÃO) */
+/* ==========================================================================
+   7. MENU LATERAL (AJUSTE DE ENCAIXE E BORDAS)
+   ========================================================================== */
+
 #menu-lateral-container {
     position: fixed;
     top: 0;
-    left: -320px; /* Escondido à esquerda */
-    width: 320px; /* Aumentamos um pouco para compensar o recuo */
+    left: -350px; /* Escondido */
+    width: 320px; 
     height: 100%;
     background: #fdfdfd;
-    z-index: 4000; /* Fica atrás da faixa verde (5000) */
-    transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 4000; /* ATRÁS da faixa verde (que é 5000) */
+    transition: left 0.4s ease-out;
     
-    /* AQUI ESTÁ O SEGREDO: */
-    padding: 20px 10px 20px 75px; /* 75px de recuo para os botões não ficarem sob a faixa verde */
+    /* ENCAIXE PERFEITO: 
+       60px (largura da faixa verde) + 15px (distância para o texto) */
+    padding: 20px 10px 20px 75px; 
     
     display: flex;
     flex-direction: column;
     overflow-y: auto;
     scrollbar-width: none;
+    box-shadow: 5px 0 15px rgba(0,0,0,0.1);
 }
 
 #menu-lateral-container.aberto {
-    left: 0; /* Ele encosta na borda da tela, mas os cards respeitam o padding de 75px */
+    left: 0; /* Encosta na borda esquerda da tela, por baixo da faixa */
 }
 
-/* AJUSTE DOS CARDS (FONTE E DISTÂNCIA) */
+/* ESTILO DOS BOTÕES (CARDS) */
 .card-residencial {
     display: flex;
     justify-content: space-between;
@@ -185,14 +190,31 @@ path.semmrv { cursor: default; }
     padding: 12px 15px;
     border-radius: 4px;
     
-    /* Fonte mais profissional */
+    /* Fonte Bold como solicitado */
     font-size: 0.72rem;
     font-weight: 700; 
-    letter-spacing: 0.3px;
     color: #333;
-    
-    box-shadow: 2px 2px 8px rgba(0,0,0,0.06);
-    border-right: 6px solid #ccc; /* Tarja na direita preservada */
-    cursor: pointer;
     text-transform: uppercase;
+    
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.05);
+    cursor: pointer;
+    
+    /* BORDA PADRÃO NA DIREITA */
+    border-right: 6px solid #ccc; 
+    border-left: none !important;
+}
+
+/* REATIVANDO AS CORES NA DIREITA (v161) */
+.zona-zo { border-right: 6px solid #FF8C00 !important; } 
+.zona-zl { border-right: 6px solid #000080 !important; } 
+.zona-zn { border-right: 6px solid #FFD700 !important; } 
+.zona-zs { border-right: 6px solid #C71585 !important; }
+
+/* ESTILO PARA COMPLEXOS (FUNDO ESCURO) */
+.card-complexo {
+    background: #333 !important;
+    color: white !important;
+    border-right: none !important;
+    justify-content: center;
+    text-align: center;
 }
