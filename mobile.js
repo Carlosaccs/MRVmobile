@@ -75,23 +75,25 @@ function popularMenuResidenciais() {
 
     ordenados.forEach(item => {
         const card = document.createElement('div');
+        const nome = item.nomeCurto.toUpperCase().trim();
         
-        // Identificação da Zona
-        const prefixo = item.nomeCurto.substring(0, 2).toUpperCase();
-        let classeZona = "zona-verde";
-        if (prefixo === "ZO") classeZona = "zona-zo";
-        else if (prefixo === "ZL") classeZona = "zona-zl";
-        else if (prefixo === "ZN") classeZona = "zona-zn";
-        else if (prefixo === "ZS") classeZona = "zona-zs";
+        // Lógica de Detecção de Zona mais inteligente
+        let classeZona = "zona-verde"; // Padrão
+        if (nome.startsWith("ZO")) classeZona = "zona-zo";
+        else if (nome.startsWith("ZL")) classeZona = "zona-zl";
+        else if (nome.startsWith("ZN")) classeZona = "zona-zn";
+        else if (nome.startsWith("ZS")) classeZona = "zona-zs";
 
-        // Identificação de Categoria (Coluna B)
         const classeCategoria = (item.categoria === "COMPLEXO") ? "card-complexo" : "";
 
         card.className = `card-residencial ${classeZona} ${classeCategoria}`;
         
+        // Verifica se o estoque é apenas um traço ou vazio para limpar o visual
+        const exibicaoEstoque = (item.estoque === "-" || item.estoque === "") ? "" : item.estoque.toUpperCase();
+
         card.innerHTML = `
-            <span class="nome-card">${item.nomeCurto.toUpperCase()}</span>
-            <span class="estoque-status">${item.estoque}</span>
+            <span class="nome-card">${nome}</span>
+            <span class="estoque-status">${exibicaoEstoque}</span>
         `;
         
         card.onclick = (e) => {
@@ -109,7 +111,6 @@ function popularMenuResidenciais() {
         trilho.appendChild(card);
     });
 }
-
 // 2. MENU LATERAL (ORDENADO PELA COLUNA C)
 function toggleMenuLateral() {
     const menu = document.getElementById('menu-lateral-container');
