@@ -1,5 +1,5 @@
 /* ==========================================================================
-   v144 - VERSÃO CONSOLIDADA (FIX: 42 REGISTROS & CARREGAMENTO IMEDIATO)
+   v145 - VERSÃO FINAL (ULTRA-ROBUSTA: 42 REGISTROS & SYNC TOTAL)
    ========================================================================== */
 
 const svgNS = "http://www.w3.org/2000/svg";
@@ -14,50 +14,70 @@ const AJUSTES_MAPA = {
 };
 
 const DNA_AMPLIAR = "M 75.757133 114.16926 L 75.757133 124.7898 L 75.757133 135.41086 L 78.412268 135.41086 L 81.067403 135.41086 L 81.067403 127.44493 L 81.067403 119.47953 L 89.032808 119.47953 L 96.99873 119.47953 L 96.99873 116.82439 L 96.99873 114.16926 L 86.377673 114.16926 L 75.757133 114.16926 z M 115.58468 114.16926 L 115.58468 116.82439 L 115.58468 119.47953 L 123.36043 119.47953 L 131.13618 119.47953 L 131.13618 127.44493 L 131.13618 135.41086 L 133.79183 135.41086 L 136.44697 135.41086 L 136.44697 124.7898 L 136.44697 114.16926 L 126.01556 114.16926 L 115.58468 114.16926 z M 75.757133 153.9968 L 75.757133 164.61734 L 75.757133 175.2384 L 86.377673 175.2384 L 96.99873 175.2384 L 96.99873 172.39361 L 96.99873 169.54882 L 89.032808 169.54882 L 81.067403 169.54882 L 81.067403 161.77255 L 81.067403 153.9968 L 78.412268 153.9968 L 75.757133 153.9968 z M 131.13618 153.9968 L 131.13618 161.77255 L 131.13618 169.54882 L 123.36043 169.54882 L 115.58468 169.54882 L 115.58468 172.39361 L 115.58468 172.39361 L 115.58468 175.2384 L 126.01556 175.2384 L 136.44697 175.2384 L 136.44697 164.61734 L 136.44697 153.9968 L 133.79183 153.9968 L 131.13618 153.9968 z";
-const DNA_REDUZIR = "M 78.408134 124.88437 L 78.408134 132.66012 L 78.408134 140.43587 L 70.442729 140.43587 L 62.476807 140.43587 L 62.476807 143.28066 L 62.476807 146.12596 L 73.097864 146.12596 L 83.718404 146.12596 L 83.718404 135.50491 L 83.718404 124.88437 L 81.063269 124.88437 L 78.408134 124.88437 z M 102.30435 124.88437 L 102.30435 135.50491 L 102.30435 146.12596 L 112.92541 146.12596 L 123.54595 146.12596 L 123.54595 143.28066 L 123.54595 140.43587 L 115.58054 140.43587 L 107.61514 140.43587 L 107.61514 132.66012 L 107.61514 124.88437 L 104.96 124.88437 L 102.30435 124.88437 z M 62.476807 164.3326 L 62.476807 167.17739 L 62.476807 170.02218 L 70.442729 170.02218 L 78.408134 170.02218 L 78.408134 177.79793 L 78.408134 185.5742 L 81.063269 185.5742 L 83.718404 185.5742 L 83.718404 174.95315 L 83.718404 164.3326 L 73.097864 164.3326 L 62.476807 164.3326 z M 102.30435 164.3326 L 102.30435 174.95315 L 102.30435 185.5742 L 104.96 185.5742 L 107.61514 185.5742 L 107.61514 177.79793 L 107.61514 170.02218 L 115.58054 170.02218 L 123.54595 170.02218 L 123.54595 167.17739 L 123.54595 164.3326 L 112.92541 164.3326 L 102.30435 164.3326 z";
+const DNA_REDUZIR = "M 78.408134 124.88437 L 78.408134 132.66012 L 78.408134 140.43587 L 70.442729 140.43587 L 62.476807 140.43587 L 62.476807 143.28066 L 62.476807 146.12596 L 73.097864 146.12596 L 83.718404 146.12596 L 83.718404 135.50491 L 83.718404 124.88437 L 81.063269 124.88437 L 78.408134 124.88437 z M 102.30435 124.88437 L 102.30435 135.50491 L 102.30435 146.12596 L 112.92541 146.12596 L 123.54595 146.12596 L 123.54595 143.28066 L 123.54595 140.43587 L 115.58054 140.43587 L 107.61514 107.61514 132.66012 L 107.61514 124.88437 L 104.96 124.88437 L 102.30435 124.88437 z M 62.476807 164.3326 L 62.476807 167.17739 L 62.476807 170.02218 L 70.442729 170.02218 L 78.408134 170.02218 L 78.408134 177.79793 L 78.408134 185.5742 L 81.063269 185.5742 L 83.718404 185.5742 L 83.718404 174.95315 L 83.718404 164.3326 L 73.097864 164.3326 L 62.476807 164.3326 z M 102.30435 164.3326 L 102.30435 174.95315 L 102.30435 185.5742 L 104.96 185.5742 L 107.61514 185.5742 L 107.61514 177.79793 L 107.61514 170.02218 L 115.58054 170.02218 L 123.54595 170.02218 L 123.54595 167.17739 L 123.54595 164.3326 L 112.92541 164.3326 L 102.30435 164.3326 z";
 
-// 1. CARREGAMENTO BLINDADO
+// 1. CARREGAMENTO REFORÇADO
 async function carregarPlanilha() {
+    console.log("🚀 Iniciando fetch da planilha...");
     try {
         const res = await fetch(URL_PLANILHA);
         const csv = await res.text();
-        const linhas = csv.split(/\r?\n/).filter(l => l.trim() !== "");
+        
+        // Remove carateres invisíveis (BOM) e divide linhas
+        const linhas = csv.replace(/^\uFEFF/, "").split(/\r?\n/).filter(l => l.trim() !== "");
+        
         window.bancoDados = {}; 
 
-        linhas.slice(1).forEach(linha => {
-            // Regex robusto para CSV do Google
-            const c = linha.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
-            if (c.length >= 4) {
-                // Remove aspas duplas de todas as formas e espaços extras
-                const id = c[0].replace(/["']/g, '').trim().toLowerCase();
-                const nomeD = c[3]?.replace(/["']/g, '').trim() || "";
+        linhas.slice(1).forEach((linha, index) => {
+            const colunas = linha.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+            
+            if (colunas.length >= 4) {
+                // Limpeza ultra-agressiva de aspas e espaços
+                const idOriginal = colunas[0].replace(/["']/g, '').trim().toLowerCase();
+                const nomeD = colunas[3]?.replace(/["']/g, '').trim() || "";
                 
-                if (id && nomeD) {
-                    window.bancoDados[id] = {
+                if (idOriginal && nomeD) {
+                    window.bancoDados[idOriginal] = {
                         nomeCurto: nomeD,
-                        nomeFull: c[4]?.replace(/["']/g, '').trim() || nomeD,
-                        estoque: c[5]?.replace(/["']/g, '').trim() || "0",
-                        statusObra: c[11]?.replace(/["']/g, '').trim() || "Consulte"
+                        nomeFull: colunas[4]?.replace(/["']/g, '').trim() || nomeD,
+                        estoque: colunas[5]?.replace(/["']/g, '').trim() || "0",
+                        statusObra: colunas[11]?.replace(/["']/g, '').trim() || "Consulte"
                     };
                 }
             }
         });
 
         const total = Object.keys(window.bancoDados).length;
-        console.log("✅ Banco de Dados:", total);
+        console.log(`✅ Banco Carregado: ${total} registros.`);
 
-        // ATUALIZA O CONTADOR NA BARRA VERDE IMEDIATAMENTE
+        // Atualiza contador visual
         const contador = document.getElementById('contador-registros');
         if (contador) {
             contador.innerText = total.toString().padStart(2, '0');
-            contador.style.color = (total >= 42) ? "#ADFF2F" : "#ffff00";
+            if (total >= 42) {
+                contador.style.color = "#ADFF2F"; // Verde Limão se estiver completo
+                contador.style.opacity = "1";
+            }
         }
 
-        atualizarVisualizacao();
-    } catch (e) { console.error("Erro no CSV"); }
+        // Tenta desenhar o mapa. Se o mapa-SP.js ainda não carregou, espera 100ms.
+        tentarDesenhar();
+        
+    } catch (e) {
+        console.error("❌ Erro crítico no CSV:", e);
+    }
 }
 
-// 2. FUNÇÕES DE INTERFACE (CHAMADAS PELO HTML)
+function tentarDesenhar() {
+    if (typeof MAPA_GSP !== 'undefined') {
+        atualizarVisualizacao();
+    } else {
+        console.log("⏳ Aguardando mapa-SP.js...");
+        setTimeout(tentarDesenhar, 100);
+    }
+}
+
+// 2. FUNÇÕES DE INTERFACE (MENU E LISTA)
 function toggleMenuLateral() {
     const menu = document.getElementById('menu-lateral-container');
     if (menu) {
@@ -71,7 +91,10 @@ function popularMenuResidenciais() {
     if (!trilho) return;
     trilho.innerHTML = "";
 
-    Object.keys(window.bancoDados).sort().forEach(id => {
+    // Ordena alfabeticamente para facilitar a vida do Carlos
+    Object.keys(window.bancoDados).sort((a, b) => 
+        window.bancoDados[a].nomeCurto.localeCompare(window.bancoDados[b].nomeCurto)
+    ).forEach(id => {
         const info = window.bancoDados[id];
         const card = document.createElement('div');
         card.className = 'card-residencial';
@@ -83,6 +106,8 @@ function popularMenuResidenciais() {
             if (pathOriginal) {
                 pathOriginal.dispatchEvent(new Event('click'));
                 toggleMenuLateral();
+            } else {
+                console.warn(`Caminho não encontrado no SVG para o ID: ${id}`);
             }
         };
         trilho.appendChild(card);
