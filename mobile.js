@@ -177,3 +177,8 @@ document.addEventListener('click', (e) => {
 });
 
 document.addEventListener('fullscreenchange', atualizarVisualIconeFullscreen);
+
+function toggleMenuLateral() {
+    const menu = document.getElementById('menu-lateral-container');
+    menu.classList.toggle('aberto');
+}
