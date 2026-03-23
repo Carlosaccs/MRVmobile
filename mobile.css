@@ -91,6 +91,15 @@ html, body { 
     cursor: pointer;
     -webkit-tap-highlight-color: transparent; /* NOVO: Remove o flash azul ao tocar */
 }
+#mapa-container {
+    position: absolute;
+    left: 60px;
+    top: 0;
+    width: calc(100% - 60px);
+    height: 100%;
+    z-index: 100; /* Garante que fique atrás do menu e da ficha */
+    background: #fff;
+}
 /* 4. MAPA MINIMIZADO (v127) - Posicionado à direita da área do mapa */
 #mapa-minimizado {
     position: absolute;
