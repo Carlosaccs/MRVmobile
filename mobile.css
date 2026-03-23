@@ -151,3 +151,53 @@ path.semmrv { cursor: default; }
     pointer-events: none;
     text-shadow: 1px 1px 2px rgba(255,255,255,0.8);
 }
+
+/* 7. MENU LATERAL (POPUP DA COLUNA D) - v138 */
+#menu-lateral-container {
+    position: absolute;
+    top: 0;
+    left: -260px; /* Escondido à esquerda da faixa verde */
+    width: 250px;
+    height: 100%;
+    background: transparent; /* Fundo sem cor como você pediu */
+    z-index: 1500; /* Acima do mapa (10), mas abaixo da faixa verde (2000) */
+    transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+    padding: 20px 15px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden; /* Trava as barras de rolagem */
+}
+
+/* Quando o menu ganha a classe .aberto via JS */
+#menu-lateral-container.aberto {
+    left: 60px; /* Brota exatamente ao lado da faixa verde */
+}
+
+/* O "Trilho" para o efeito de rolagem infinita */
+#trilho-infinito {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* As Caixas de Texto Brancas conforme sua descrição */
+.card-residencial {
+    background: #ffffff;
+    border: 2px solid #00713a; /* Contorno verde escuro MRV */
+    border-right: 15px solid #00713a; /* Borda direita mais larga para cores de zona */
+    padding: 12px 15px;
+    font-size: 0.9rem;
+    font-weight: bold;
+    color: #333;
+    border-radius: 4px;
+    text-transform: uppercase;
+    box-shadow: 3px 3px 8px rgba(0,0,0,0.2);
+    cursor: pointer;
+    white-space: nowrap;
+    user-select: none;
+    transition: transform 0.2s ease;
+}
+
+.card-residencial:active {
+    transform: scale(0.96);
+}
