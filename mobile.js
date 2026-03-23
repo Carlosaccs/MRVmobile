@@ -58,48 +58,48 @@ function toggleMenuLateral() {
     }
 }
 
-function popularMenuResidenciais() {
+
+
+
+unction popularMenuResidenciais() {
     const trilho = document.getElementById('trilho-infinito');
-    if (!trilho || !window.bancoDados) {
-        console.error("Dados da planilha não encontrados!");
-        return;
-    }
+    const contador = document.getElementById('contador-registros');
+    if (!trilho || !window.bancoDados) return;
 
-    trilho.innerHTML = ""; // Limpa para evitar duplicatas
+    trilho.innerHTML = ""; 
 
-    // Transformamos o objeto em Array para contar e garantir a ordem
     const ids = Object.keys(window.bancoDados);
-    
-    console.log("Total de IDs encontrados no banco:", ids.length);
+    let totalGerado = 0;
 
     ids.forEach(id => {
         const info = window.bancoDados[id];
         
-        // Se houver qualquer dado na Coluna D (NOME_CURTO), criamos o card
+        // Critério: Tem que ter nome na Coluna D
         if (info && info.nomeCurto && info.nomeCurto.toString().trim() !== "") {
             const card = document.createElement('div');
             card.className = 'card-residencial';
-            
-            // Texto do Card (Coluna D)
             card.innerText = info.nomeCurto.toUpperCase();
 
-            // Lógica de Clique: Fecha menu e "toca" no mapa
             card.onclick = () => {
                 const elementoMapa = document.getElementById(id);
                 if (elementoMapa) {
-                    // Simula o clique para abrir a ficha técnica
                     elementoMapa.dispatchEvent(new Event('click'));
-                    // Fecha o menu lateral
                     toggleMenuLateral();
-                } else {
-                    console.warn("ID do mapa não encontrado para:", id);
                 }
             };
 
             trilho.appendChild(card);
+            totalGerado++;
         }
     });
 
+    // Atualiza o número na faixa verde para conferência
+    if (contador) {
+        contador.innerText = totalGerado.toString().padStart(2, '0');
+        // Se for diferente de 42, ele fica amarelo para te avisar
+        contador.style.color = (totalGerado >= 42) ? "white" : "#ffff00";
+    }
+}
     // Verificação de segurança no console
     console.log("Total de cards gerados no menu:", trilho.children.length);
 }
