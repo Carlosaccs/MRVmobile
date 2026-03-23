@@ -1,98 +1,51 @@
 /* ==========================================================================
-   1. FONTE E BASE (v161)
+   1. RESET E PREVENÇÃO DE SCROLL (v162)
    ========================================================================== */
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800&display=swap');
+* { box-sizing: border-box; }
 
-body {
-    font-family: 'Montserrat', sans-serif !important;
-    overflow: hidden;
+html, body {
+    margin: 0; padding: 0;
+    width: 100vw; height: 100vh;
+    overflow: hidden !important; /* Mata as barras de rolagem da página */
+    font-family: 'Montserrat', sans-serif;
 }
 
-/* 2. FAIXA VERDE (SEMPRE NO TOPO) */
+/* ==========================================================================
+   2. FAIXA VERDE (Sempre visível no topo)
+   ========================================================================== */
 .faixa-verde-vertical {
     position: fixed;
     left: 0; top: 0;
     width: 60px; height: 100%;
     background-color: #00713a !important; 
-    z-index: 5000; /* À frente do menu */
+    z-index: 5000; /* Camada mais alta */
     display: flex;
     flex-direction: column;
     align-items: center;
     padding: 20px 0;
 }
-/* TÍTULO CENTRALIZADO */
-.titulo-vertical {
-    writing-mode: vertical-rl;
-    transform: rotate(180deg);
-    font-weight: bold;
-    font-size: 1.1rem; 
-    letter-spacing: 1px;
-    color: white !important;
-    white-space: nowrap; 
-    flex-grow: 1; /* Ocupa todo o meio da barra */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
 
-/* ÍCONES BRANCOS E MAIORES */
-.icon-top, .icon-bottom {
-    font-size: 26px; /* Tamanho ideal para o dedo */
-    color: white !important;
-    cursor: pointer;
-    padding: 10px;
-    user-select: none;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-/* Efeito de clique nos ícones */
-.icon-top:active, .icon-bottom:active {
-    transform: scale(1.2);
-    opacity: 0.8;
-}
-/* 3. CONTAINER DO MAPA PRINCIPAL */
-#mapa-container {
-    position: absolute;
-    left: 0; 
-    top: 0;
-    width: 100%; 
-    height: 100%;
-    z-index: 10;
-    display: flex; 
-    align-items: center; 
-    justify-content: center;
-    overflow: hidden;
-    touch-action: none;
-
-    /* --- AJUSTE DE SEGURANÇA (OPÇÃO 1) --- */
-    padding-left: 60px;       /* Empurra o mapa para a direita da faixa verde */
-    box-sizing: border-box;   /* Garante que o padding não aumente o tamanho da tela */
-}
-
-#mapa-container svg { 
-    width: 130% !important; 
-    height: auto;
-    max-height: 98%; 
-    transition: all 0.3s ease; 
-    transform-origin: center top; 
-}
-
-#mapa-container path {
-    transition: fill 0.15s ease, stroke-width 0.2s ease;
-    cursor: pointer;
-    -webkit-tap-highlight-color: transparent; /* NOVO: Remove o flash azul ao tocar */
-}
+/* ==========================================================================
+   3. MAPA (Área Central - O Coração do Dashboard)
+   ========================================================================== */
 #mapa-container {
     position: absolute;
-    left: 60px;
+    left: 60px; /* Começa exatamente após a faixa verde */
     top: 0;
-    width: calc(100% - 60px);
-    height: 100%;
-    z-index: 100; /* Garante que fique atrás do menu e da ficha */
-    background: #fff;
+    width: calc(100% - 60px); 
+    height: 100vh;
+    z-index: 100; /* Atrás de todos os menus */
+    background: #ffffff;
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
 }
+
+#mapa-container svg {
+    width: 90%; height: 90%; /* Força o SVG a aparecer */
+}
+
+
 /* 4. MAPA MINIMIZADO (v127) - Posicionado à direita da área do mapa */
 #mapa-minimizado {
     position: absolute;
@@ -152,35 +105,31 @@ path.semmrv { cursor: default; }
 }
 
 /* ==========================================================================
-   7. MENU LATERAL (AJUSTE DE ENCAIXE E BORDAS)
+   7. MENU LATERAL (Efeito de Saída de Trás da Faixa Verde)
    ========================================================================== */
-
 #menu-lateral-container {
     position: fixed;
     top: 0;
-    left: -350px; /* Escondido */
-    width: 320px; 
+    left: -320px; /* Escondido */
+    width: 310px; 
     height: 100%;
     background: #fdfdfd;
-    z-index: 4000; /* ATRÁS da faixa verde (que é 5000) */
+    z-index: 4000; /* Entre o mapa (100) e a faixa verde (5000) */
     transition: left 0.4s ease-out;
     
-    /* ENCAIXE PERFEITO: 
-       60px (largura da faixa verde) + 15px (distância para o texto) */
-    padding: 20px 10px 20px 75px; 
+    /* Encaixe: Começa do zero, mas empurra o conteúdo 60px para não cobrir a faixa */
+    padding: 20px 10px 20px 70px; 
     
-    display: flex;
-    flex-direction: column;
     overflow-y: auto;
     scrollbar-width: none;
-    box-shadow: 5px 0 15px rgba(0,0,0,0.1);
+    box-shadow: 10px 0 20px rgba(0,0,0,0.1);
 }
 
 #menu-lateral-container.aberto {
-    left: 0; /* Encosta na borda esquerda da tela, por baixo da faixa */
+    left: 0; /* Agora ele encosta na borda da tela, mas fica ATRÁS da faixa verde */
 }
 
-/* ESTILO DOS BOTÕES (CARDS) */
+/* Cards com destaque cinza no clique (v162) */
 .card-residencial {
     display: flex;
     justify-content: space-between;
@@ -189,32 +138,14 @@ path.semmrv { cursor: default; }
     margin-bottom: 8px;
     padding: 12px 15px;
     border-radius: 4px;
-    
-    /* Fonte Bold como solicitado */
     font-size: 0.72rem;
-    font-weight: 700; 
-    color: #333;
+    font-weight: 700;
     text-transform: uppercase;
-    
-    box-shadow: 2px 2px 5px rgba(0,0,0,0.05);
+    border-right: 6px solid #ccc;
     cursor: pointer;
-    
-    /* BORDA PADRÃO NA DIREITA */
-    border-right: 6px solid #ccc; 
-    border-left: none !important;
+    transition: background 0.2s;
 }
 
-/* REATIVANDO AS CORES NA DIREITA (v161) */
-.zona-zo { border-right: 6px solid #FF8C00 !important; } 
-.zona-zl { border-right: 6px solid #000080 !important; } 
-.zona-zn { border-right: 6px solid #FFD700 !important; } 
-.zona-zs { border-right: 6px solid #C71585 !important; }
-
-/* ESTILO PARA COMPLEXOS (FUNDO ESCURO) */
-.card-complexo {
-    background: #333 !important;
-    color: white !important;
-    border-right: none !important;
-    justify-content: center;
-    text-align: center;
+.card-residencial:active {
+    background: #e0e0e0; /* O destaque cinza que você mencionou */
 }
