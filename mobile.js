@@ -17,6 +17,7 @@ async function carregarPlanilha() {
         const res = await fetch(URL_PLANILHA);
         const csv = await res.text();
         const linhas = csv.split(/\r?\n/).filter(l => l.trim() !== "");
+        
         window.bancoDados = {}; 
         linhas.slice(1).forEach(linha => {
             const c = linha.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
@@ -25,12 +26,21 @@ async function carregarPlanilha() {
                 window.bancoDados[id] = {
                     nomeCurto: c[3]?.replace(/"/g, '').trim() || "",
                     estoque: c[5]?.replace(/"/g, '').trim() || "0",
-                    statusObra: c[11]?.replace(/"/g, '').trim() || "N/A"
+                    statusObra: c[11]?.replace(/"/g, '').trim() || "Consulte"
                 };
             }
         });
-        atualizarVisualizacao();
-    } catch (e) { console.error("Erro Planilha"); }
+
+        // Só tenta desenhar se os dados do mapa existirem
+        if (typeof MAPA_GSP !== 'undefined') {
+            atualizarVisualizacao();
+            popularMenuResidenciais();
+        } else {
+            console.error("ERRO: MAPA_GSP não definido em mapas_data.js");
+        }
+    } catch (e) { 
+        console.error("ERRO CRÍTICO AO CARREGAR PLANILHA:", e); 
+    }
 }
 
 function toggleMenuLateral() {
