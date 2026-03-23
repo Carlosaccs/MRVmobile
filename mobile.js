@@ -204,53 +204,64 @@ document.addEventListener('fullscreenchange', atualizarVisualIconeFullscreen);
    ========================================================================== */
 
 function popularMenuResidenciais() {
-    const trilho = document.getElementById('trilho-infinito');
-    const contador = document.getElementById('contador-registros');
-    if (!trilho || !window.bancoDados) return;
+    const trilho = document.getElementById('trilho-infinito');
+    const contador = document.getElementById('contador-registros');
+    
+    if (!trilho) return;
+    if (!window.bancoDados || Object.keys(window.bancoDados).length === 0) {
+        console.warn("Banco de dados vazio ou não carregado ainda.");
+        return;
+    }
 
-    trilho.innerHTML = ""; 
+    trilho.innerHTML = ""; 
 
-    const ids = Object.keys(window.bancoDados);
-    let totalGerado = 0;
+    const ids = Object.keys(window.bancoDados);
+    let totalGerado = 0;
 
-    ids.forEach(id => {
-        const info = window.bancoDados[id];
-        
-        // Critério: Tem que ter nome na Coluna D
-        if (info && info.nomeCurto && info.nomeCurto.toString().trim() !== "") {
-            const card = document.createElement('div');
-            card.className = 'card-residencial';
-            card.innerText = info.nomeCurto.toUpperCase();
+    ids.forEach(id => {
+        const info = window.bancoDados[id];
+        
+        // Só cria o card se tiver o nome na Coluna D (nomeCurto)
+        if (info && info.nomeCurto && info.nomeCurto.toString().trim() !== "") {
+            const card = document.createElement('div');
+            card.className = 'card-residencial';
+            card.innerText = info.nomeCurto.toUpperCase();
 
-            card.onclick = () => {
-                const elementoMapa = document.getElementById(id);
-                if (elementoMapa) {
-                    elementoMapa.dispatchEvent(new Event('click'));
-                    toggleMenuLateral();
-                }
-            };
+            card.onclick = (e) => {
+                e.stopPropagation(); // Evita bugs de clique duplo
+                const elementoMapa = document.getElementById(id);
+                if (elementoMapa) {
+                    elementoMapa.dispatchEvent(new Event('click'));
+                    toggleMenuLateral(); // Fecha após selecionar
+                }
+            };
 
-            trilho.appendChild(card);
-            totalGerado++;
-        }
-    });
+            trilho.appendChild(card);
+            totalGerado++;
+        }
+    });
 
-    // Atualiza o número na faixa verde para conferência
-    if (contador) {
-        contador.innerText = totalGerado.toString().padStart(2, '0');
-        // Se for diferente de 42, ele fica amarelo para te avisar
-        contador.style.color = (totalGerado >= 42) ? "white" : "#ffff00";
-    }
+    // Atualiza o contador na faixa verde
+    if (contador) {
+        contador.innerText = totalGerado.toString().padStart(2, '0');
+        contador.style.color = (totalGerado >= 42) ? "white" : "#ffff00";
+    }
 }
 
 // Função Única de Abrir/Fechar o Menu
 function toggleMenuLateral() {
+    console.log("Botão do menu clicado!"); // Isso ajuda a testar no F12
     const menu = document.getElementById('menu-lateral-container');
-    if (!menu) return;
+    
+    if (!menu) {
+        console.error("Erro: Elemento 'menu-lateral-container' não encontrado no HTML!");
+        return;
+    }
 
+    // Alterna a classe 'aberto'
     menu.classList.toggle('aberto');
 
-    // Se abriu, popula. Se fechou, não faz nada.
+    // Se o menu abriu, popula a lista e atualiza o contador
     if (menu.classList.contains('aberto')) {
         popularMenuResidenciais();
     }
