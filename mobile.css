@@ -2,11 +2,10 @@
    v139 - ARQUIVO CSS CONSOLIDADO
    ========================================================================== */
 
-/* 1. RESET PARA ELIMINAR SCROLLS DA PÁGINA */
-html, body { 
-    overflow: hidden !important; 
-    width: 100%; height: 100%; 
-    position: fixed; 
+/* 1. CORREÇÃO DA FONTE (Global para o Dashboard) */
+body {
+    font-family: 'Montserrat', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    font-weight: 600; /* Deixa o texto mais encorpado como antes */
 }
 
 /* 2. FAIXA VERDE (SEMPRE NO TOPO) */
@@ -152,44 +151,48 @@ path.semmrv { cursor: default; }
     text-shadow: 1px 1px 2px rgba(255,255,255,0.8);
 }
 
-/* 7. MENU LATERAL (SAINDO DE TRÁS DA FAIXA) */
+/* 7. MENU LATERAL (AJUSTE DE "SAÍDA" E POSIÇÃO) */
 #menu-lateral-container {
     position: fixed;
     top: 0;
-    left: -320px; 
-    width: 300px;
+    left: -320px; /* Escondido à esquerda */
+    width: 320px; /* Aumentamos um pouco para compensar o recuo */
     height: 100%;
     background: #fdfdfd;
-    z-index: 4000; /* Atrás da faixa verde */
+    z-index: 4000; /* Fica atrás da faixa verde (5000) */
     transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    padding: 20px 10px 20px 70px; /* 70px de recuo para o texto não ficar sob a faixa */
+    
+    /* AQUI ESTÁ O SEGREDO: */
+    padding: 20px 10px 20px 75px; /* 75px de recuo para os botões não ficarem sob a faixa verde */
+    
+    display: flex;
+    flex-direction: column;
     overflow-y: auto;
-    scrollbar-width: none; /* Esconde barra no Firefox */
+    scrollbar-width: none;
 }
-#menu-lateral-container::-webkit-scrollbar { display: none; } /* Esconde no Chrome */
 
 #menu-lateral-container.aberto {
-    left: 0; /* Começa do zero, mas o conteúdo está recuado pelo padding-left */
+    left: 0; /* Ele encosta na borda da tela, mas os cards respeitam o padding de 75px */
 }
 
-/* CARDS COM TARJA NA DIREITA */
+/* AJUSTE DOS CARDS (FONTE E DISTÂNCIA) */
 .card-residencial {
     display: flex;
     justify-content: space-between;
     align-items: center;
     background: white;
     margin-bottom: 8px;
-    padding: 12px;
+    padding: 12px 15px;
     border-radius: 4px;
-    font-size: 0.75rem;
-    font-weight: bold;
-    box-shadow: 2px 2px 8px rgba(0,0,0,0.08);
-    border-right: 6px solid #ccc; /* TARJA NA DIREITA */
-    border-left: none !important;
+    
+    /* Fonte mais profissional */
+    font-size: 0.72rem;
+    font-weight: 700; 
+    letter-spacing: 0.3px;
+    color: #333;
+    
+    box-shadow: 2px 2px 8px rgba(0,0,0,0.06);
+    border-right: 6px solid #ccc; /* Tarja na direita preservada */
+    cursor: pointer;
+    text-transform: uppercase;
 }
-
-/* CORES POR ZONA (TARJA DIREITA) */
-.zona-zo { border-right-color: #FF8C00 !important; } 
-.zona-zl { border-right-color: #000080 !important; } 
-.zona-zn { border-right-color: #FFD700 !important; } 
-.zona-zs { border-right-color: #C71585 !important; }
