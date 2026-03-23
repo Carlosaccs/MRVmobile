@@ -209,5 +209,22 @@ function toggleFullscreen() {
 }
 
 // 5. BOOT
-window.onload = () => carregarPlanilha();
-document.addEventListener('fullscreenchange', atualizarVisualIconeFullscreen);
+// Garante que o ícone mude mesmo se o usuário sair pelo 'Esc' ou botão 'Voltar' do Android
+document.addEventListener('fullscreenchange', () => {
+    const path = document.getElementById('path-fullscreen');
+    const svg = path.closest('svg');
+
+    // Reutilizamos os mesmos caminhos (Paths) que você extraiu do Inkscape
+    const pathAmpliar = "M 75.757133 114.16926 ..."; // (cole o código completo aqui)
+    const pathReduzir = "M 78.408134 124.88437 ..."; // (cole o código completo aqui)
+
+    if (!document.fullscreenElement) {
+        // Voltou ao normal (Esc pressionado)
+        path.setAttribute('d', pathAmpliar);
+        svg.setAttribute('viewBox', '60 110 90 90');
+    } else {
+        // Entrou em tela cheia (por qualquer outro método)
+        path.setAttribute('d', pathReduzir);
+        svg.setAttribute('viewBox', '55 120 80 80');
+    }
+});
