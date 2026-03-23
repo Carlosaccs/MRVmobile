@@ -72,49 +72,38 @@ function toggleMenuLateral() {
 
 function popularMenuResidenciais() {
     const trilho = document.getElementById('trilho-infinito');
-    if (!trilho) return;
     trilho.innerHTML = "";
 
-    // Ordenação pela Coluna C
-    const ordenados = [...window.listaCompleta].sort((a, b) => {
-        if (a.ordem !== b.ordem) return a.ordem - b.ordem;
-        return a.nomeCurto.localeCompare(b.nomeCurto);
-    });
-
-    ordenados.forEach(item => {
+    window.listaCompleta.forEach(item => {
         const card = document.createElement('div');
         const nomeUpper = item.nomeCurto.toUpperCase().trim();
         
-        // Aplica cores por zona (ZO, ZL, ZN, ZS)
+        // Classes de zona
         let classeZona = "zona-verde";
         if (nomeUpper.startsWith("ZO")) classeZona = "zona-zo";
         else if (nomeUpper.startsWith("ZL")) classeZona = "zona-zl";
         else if (nomeUpper.startsWith("ZN")) classeZona = "zona-zn";
         else if (nomeUpper.startsWith("ZS")) classeZona = "zona-zs";
 
-        // Se for "COMPLEXO" na Coluna B, aplica estilo escuro
-        const classeComplexo = (item.categoria === "COMPLEXO") ? "card-complexo" : "";
-
-        card.className = `card-residencial ${classeZona} ${classeComplexo}`;
+        card.className = `card-residencial ${classeZona}`;
         
-        // AQUI ESTÁ A CHAVE: Usamos apenas o nomeCurto. 
-        // Removido qualquer menção ao item.estoque (Coluna F) para o menu não esticar.
-       card.innerHTML = `
-          <span>${nomeUpper}</span>
-          <span style="font-size: 0.6rem; color: #888; font-weight: normal;">
-              ${item.estoque !== '-' ? 'RESTAM ' + item.estoque + ' UN.' : '-'}
-          </span>
-      `;
-      
-      card.onclick = (e) => {
-          e.preventDefault();
-          console.log("Clicou em:", item.nomeCurto); // Teste no console
-          exibirDadosNoPainel(item.idPath, item.nomeCurto);
-          toggleMenuLateral(); // Fecha o menu ao selecionar
-      };
+        // REMOVIDO: Informação de estoque (Coluna F)
+        card.innerHTML = `<span>${nomeUpper}</span>`;
+        
+        // CLIQUE: Apenas atualiza o painel, NÃO fecha o menu
+        card.onclick = (e) => {
+            e.stopPropagation();
+            exibirDadosNoPainel(item.idPath, item.nomeCurto);
+            
+            // Feedback visual de seleção (opcional)
+            document.querySelectorAll('.card-residencial').forEach(c => c.style.background = "white");
+            card.style.background = "#f0f0f0";
+        };
+        
         trilho.appendChild(card);
     });
 }
+
 // 3. EXIBIÇÃO NO PAINEL LATERAL (SUPORTA LISTA)
 function exibirDadosNoPainel(idPath, filtrarNome = null) {
     const listaImoveis = window.bancoDados[idPath];
