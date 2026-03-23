@@ -152,79 +152,93 @@ path.semmrv { cursor: default; }
 }
 
 /* ==========================================================================
-   7. MENU LATERAL (v139.5) - CORREÇÃO DE INTERAÇÃO E VISIBILIDADE
-   ========================================================================== */
+   7. MENU LATERAL (v156) - FIX LARGURA E ESTILO DE ZONAS
+   ========================================================================== */
 
 #menu-lateral-container {
-    position: absolute;
-    top: 0;
-    left: -320px; 
-    width: 300px; 
-    height: 100%;
-    background: transparent;
-    z-index: 1500; 
-    transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
-    padding: 20px 10px;
-    overflow-y: auto;
-    scrollbar-width: none;
-    
-    /* IMPORTANTE: Desativa cliques e esconde totalmente quando fechado */
-    pointer-events: none; 
-    visibility: hidden; 
+    position: absolute;
+    top: 0;
+    left: -320px; 
+    width: 300px; /* Travado em 300px */
+    max-width: 300px;
+    height: 100%;
+    background: transparent;
+    z-index: 1500; 
+    transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+    padding: 20px 10px;
+    overflow-y: auto;
+    overflow-x: hidden; /* IMPEDE O TEXTO DE ESTICAR O MENU */
+    scrollbar-width: none;
+    pointer-events: none; 
+    visibility: hidden; 
 }
 
 #menu-lateral-container.aberto {
-    left: 40px; 
-    /* IMPORTANTE: Reativa cliques e torna visível para o navegador */
-    pointer-events: auto; 
-    visibility: visible;
+    left: 40px; 
+    pointer-events: auto; 
+    visibility: visible;
 }
 
 #trilho-infinito {
-    display: flex;
-    flex-direction: column;
-    gap: 8px; 
-    padding-bottom: 50px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px; 
+    padding-bottom: 50px;
+    width: 100%; /* Garante que o conteúdo respeite os 300px */
 }
 
-/* --- ESTILOS DE ZONAS E COMPLEXOS (v155) --- */
+/* --- ESTILOS DE ZONAS E COMPLEXOS --- */
 
-/* Base do Card com Flex para alinhar nome e estoque */
 .card-residencial {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-right: none !important; /* Removemos a borda grossa da v139 */
-    border-left: 5px solid #00713a; /* Borda fina na esquerda como padrão */
+    background: #ffffff;
+    padding: 8px 12px;
+    font-size: 0.82rem;
+    font-weight: bold;
+    color: #333;
+    border-radius: 4px;
+    text-transform: uppercase;
+    box-shadow: 3px 3px 10px rgba(0,0,0,0.1);
+    cursor: pointer;
+    border-left: 5px solid #00713a; /* Cor padrão */
+    width: 100%; /* Ocupa apenas a largura do container pai (300px) */
+    box-sizing: border-box;
 }
 
-/* Cores das Bordas Laterais por Zona */
+/* Cores das Bordas Laterais por Zona (Referência Imagem) */
 .zona-zo { border-left: 6px solid #FF8C00 !important; } /* Laranja */
 .zona-zl { border-left: 6px solid #000080 !important; } /* Azul Marinho */
 .zona-zn { border-left: 6px solid #FFD700 !important; } /* Amarelo */
-.zona-zs { border-left: 6px solid #C71585 !important; } /* Rosa/Vinho */
+.zona-zs { border-left: 6px solid #C71585 !important; } /* Vinho/Rosa */
 
-/* Visual Especial para COMPLEXOS (Ex: Sete Sóis) */
+/* Visual para COMPLEXOS (Fundo Cinza Escuro) */
 .card-complexo {
     background: #333333 !important;
     color: #FFFFFF !important;
     border-left: none !important;
-    text-align: center;
     justify-content: center;
     padding: 10px !important;
-    margin-top: 10px;
-    border-radius: 4px;
+    margin-top: 5px;
 }
-.card-complexo span { font-size: 0.9rem; letter-spacing: 1px; }
+.card-complexo span { 
+    font-size: 0.9rem; 
+    letter-spacing: 1px;
+    color: #FFFFFF !important;
+}
 
-/* Texto do Estoque à Direita */
+/* Texto do Estoque (Coluna F) - Estilo discreto à direita */
 .estoque-status {
     font-size: 0.65rem;
     color: #666;
     font-weight: normal;
+    margin-left: 10px;
+    white-space: nowrap; /* Impede que o "RESTAM X UN." quebre linha */
 }
 
-/* Destaque para pouco estoque (Ex: Restam 1 ou 2) */
-.card-residencial span[style*="color: red"] {
-    font-weight: bold;
+/* Destaque para pouco estoque (Vermelho) */
+.estoque-alerta {
+    color: #FF0000 !important;
+    font-weight: bold !important;
 }
