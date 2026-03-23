@@ -123,12 +123,18 @@ path.semmrv { cursor: default; }
 
 /* 5. FICHA TÉCNICA (LATERAL DIREITA) */
 .ficha-tecnica {
-    position: absolute; right: 0; top: 0; 
-    width: 44%; height: 100%;
-    background: rgba(60, 60, 60, 0.95);
-    backdrop-filter: blur(10px); color: white;
-    padding: 35px; z-index: 1000; 
-    box-shadow: -10px 0 25px rgba(0,0,0,0.4);
+    position: absolute; 
+    right: 0; 
+    top: 0; 
+    width: 40%; /* Ajustado para não brigar com o menu */
+    height: 100%;
+    background: rgba(60, 60, 60, 0.95) !important; 
+    backdrop-filter: blur(10px); 
+    color: white;
+    padding: 30px; 
+    z-index: 1000; /* Fica acima do mapa */
+    box-shadow: -10px 0 25px rgba(0,0,0,0.4);
+    display: block !important;
 }
 #nome-imovel { 
     color: #50c878; margin: 0 0 15px 0; font-size: 1.6rem; 
