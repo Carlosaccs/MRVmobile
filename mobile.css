@@ -14,23 +14,19 @@ html, body { 
     position: relative; overflow: hidden; 
 }
 
-/* 2. FAIXA VERDE LATERAL */
+/* 2. FAIXA VERDE (FIXA NO TOPO) */
 .faixa-verde-vertical {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 60px; 
-    height: 100%;
-    background-color: #00713a; 
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: space-between;
-    padding: 10px 0; /* Reduzi para dar mais fôlego ao título */
-    z-index: 2000;
-    box-shadow: 2px 0 10px rgba(0,0,0,0.3);
+    position: fixed; /* Troquei absolute por fixed para garantir */
+    left: 0; top: 0;
+    width: 60px; height: 100%;
+    background-color: #00713a !important; 
+    z-index: 5000; /* No topo de tudo */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px 0;
 }
-
 /* TÍTULO CENTRALIZADO */
 .titulo-vertical {
     writing-mode: vertical-rl;
@@ -121,20 +117,16 @@ html, body { 
 path.commrv { cursor: pointer; }
 path.semmrv { cursor: default; }
 
-/* 5. FICHA TÉCNICA (LATERAL DIREITA) */
+/* 5. FICHA TÉCNICA (PAINEL CINZA) */
 .ficha-tecnica {
-    position: absolute; 
-    right: 0; 
-    top: 0; 
-    width: 40%; /* Ajustado para não brigar com o menu */
-    height: 100%;
-    background: rgba(60, 60, 60, 0.95) !important; 
-    backdrop-filter: blur(10px); 
+    position: fixed; 
+    right: 0; top: 0; 
+    width: 35%; height: 100%;
+    background: rgba(50, 50, 50, 0.98) !important; 
     color: white;
-    padding: 30px; 
-    z-index: 1000; /* Fica acima do mapa */
-    box-shadow: -10px 0 25px rgba(0,0,0,0.4);
-    display: block !important;
+    z-index: 1000; 
+    padding: 40px 25px;
+    box-shadow: -5px 0 20px rgba(0,0,0,0.5);
 }
 #nome-imovel { 
     color: #50c878; margin: 0 0 15px 0; font-size: 1.6rem; 
@@ -157,32 +149,56 @@ path.semmrv { cursor: default; }
     text-shadow: 1px 1px 2px rgba(255,255,255,0.8);
 }
 
-/* 7. MENU LATERAL (v157 - FIX DE EMPILHAMENTO) */
+/* 7. MENU LATERAL (ESTILO REFERÊNCIA v158) */
 #menu-lateral-container {
-    position: absolute;
+    position: fixed;
     top: 0;
-    left: -350px; /* Garante que saia totalmente da tela */
+    left: -320px; /* Escondido */
     width: 300px;
     height: 100%;
-    background: white; /* Fundo branco para os cards não ficarem transparentes */
-    z-index: 2000; /* Abaixo da faixa verde (9999), mas acima de tudo */
-    transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+    background: #f4f4f4;
+    z-index: 4000; /* Atrás da faixa verde, na frente do mapa */
+    transition: left 0.4s ease;
     padding: 20px 10px;
     overflow-y: auto;
-    visibility: hidden;
-    pointer-events: none;
-    box-shadow: 5px 0 15px rgba(0,0,0,0.3);
-}
-
-#menu-lateral-container.aberto {
-    left: 60px; /* Abre exatamente após a faixa verde */
-    visibility: visible;
+    visibility: visible; /* Deixamos visível para a transição de left funcionar */
     pointer-events: auto;
 }
 
-#trilho-infinito {
+#menu-lateral-container.aberto {
+    left: 60px; /* Abre logo após a faixa verde */
+}
+
+/* CARDS DO MENU (ESTILO DA IMAGEM DE REFERÊNCIA) */
+.card-residencial {
     display: flex;
-    flex-direction: column;
-    gap: 10px;
-    width: 100%;
+    justify-content: space-between;
+    align-items: center;
+    background: white;
+    margin-bottom: 6px;
+    padding: 10px 12px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: bold;
+    color: #333;
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
+    cursor: pointer;
+    transition: transform 0.1s;
+    border-left: 5px solid #ccc; /* Borda padrão */
+}
+
+.card-residencial:active { transform: scale(0.98); }
+
+/* CORES POR ZONA NA LATERAL ESQUERDA */
+.zona-zo { border-left: 6px solid #FF8C00 !important; } 
+.zona-zl { border-left: 6px solid #000080 !important; } 
+.zona-zn { border-left: 6px solid #FFD700 !important; } 
+.zona-zs { border-left: 6px solid #C71585 !important; } 
+
+/* ESTILO COMPLEXO (FUNDO PRETO) */
+.card-complexo {
+    background: #222 !important;
+    color: white !important;
+    border-left: none !important;
+    justify-content: center;
 }
