@@ -1,5 +1,5 @@
 /* ==========================================================================
-   v167 - JS CONSOLIDADO (LARGURA AJUSTADA)
+   v168 - JS ESTÁVEL COM TROCA DE MAPAS E MENU LARGO
    ========================================================================== */
 
 const svgNS = "http://www.w3.org/2000/svg";
@@ -9,7 +9,12 @@ let mapaAtivo = "GSP";
 window.bancoDados = {}; 
 window.listaCompleta = []; 
 
-// 1. CARREGAMENTO E ORDENAÇÃO
+const AJUSTES_MAPA = {
+    GSP: { marginRight: "35%", marginLeft: "-70px", scale: "1" },
+    INTERIOR: { marginRight: "50%", marginLeft: "-100px", scale: "1.15" }
+};
+
+// 1. CARREGAMENTO
 async function carregarPlanilha() {
     try {
         const res = await fetch(URL_PLANILHA);
@@ -23,17 +28,15 @@ async function carregarPlanilha() {
             const c = linha.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
             if (c.length >= 4) {
                 const idPath = c[0].replace(/["']/g, '').trim().toLowerCase();
-                const ordem = parseInt(c[2]) || 99999;
-                const nomeCurto = c[3]?.replace(/["']/g, '').trim() || "";
-
-                if (idPath && nomeCurto) {
-                    const item = {
-                        idPath: idPath,
-                        ordem: ordem,
-                        nomeCurto: nomeCurto,
-                        estoque: c[5]?.replace(/["']/g, '').trim() || "0",
-                        statusObra: c[11]?.replace(/["']/g, '').trim() || "Consulte"
-                    };
+                const item = {
+                    idPath: idPath,
+                    ordem: parseInt(c[2]) || 99999,
+                    nomeCurto: c[3]?.replace(/["']/g, '').trim() || "",
+                    obs: c[18]?.replace(/["']/g, '').trim() || "",
+                    estoque: c[5]?.replace(/["']/g, '').trim() || "0",
+                    statusObra: c[11]?.replace(/["']/g, '').trim() || "Consulte"
+                };
+                if (idPath && item.nomeCurto) {
                     if (!window.bancoDados[idPath]) window.bancoDados[idPath] = [];
                     window.bancoDados[idPath].push(item);
                     window.listaCompleta.push(item);
@@ -41,22 +44,27 @@ async function carregarPlanilha() {
             }
         });
 
-        const total = window.listaCompleta.length;
-        const contador = document.getElementById('contador-registros');
-        if (contador) {
-            contador.innerText = total.toString().padStart(2, '0');
-            contador.style.color = (total >= 42) ? "#ADFF2F" : "#FFFF00";
-        }
-
+        atualizarContador();
         if (typeof MAPA_GSP !== 'undefined') atualizarVisualizacao();
     } catch (e) { console.error("Erro CSV:", e); }
 }
 
-// 2. MENU E CORES
+function atualizarContador() {
+    const total = window.listaCompleta.length;
+    const contador = document.getElementById('contador-registros');
+    if (contador) {
+        contador.innerText = total.toString().padStart(2, '0');
+        contador.style.color = (total >= 42) ? "#ADFF2F" : "#FFFF00";
+    }
+}
+
+// 2. INTERFACE E MENU
 function toggleMenuLateral() {
     const menu = document.getElementById('menu-lateral-container');
-    if (menu) menu.classList.toggle('aberto');
-    if (menu.classList.contains('aberto')) popularMenuResidenciais();
+    if (menu) {
+        menu.classList.toggle('aberto');
+        if (menu.classList.contains('aberto')) popularMenuResidenciais();
+    }
 }
 
 function popularMenuResidenciais() {
@@ -71,8 +79,7 @@ function popularMenuResidenciais() {
 
     ordenados.forEach(item => {
         const card = document.createElement('div');
-        const nomeUpper = item.nomeCurto.toUpperCase().trim();
-        
+        const nomeUpper = item.nomeCurto.toUpperCase();
         let classeZona = "";
         if (nomeUpper.startsWith("ZO")) classeZona = "zona-zo";
         else if (nomeUpper.startsWith("ZL")) classeZona = "zona-zl";
@@ -81,7 +88,6 @@ function popularMenuResidenciais() {
 
         card.className = `card-residencial ${classeZona}`;
         card.innerHTML = `<span>${nomeUpper}</span>`;
-        
         card.onclick = (e) => {
             e.stopPropagation();
             exibirDadosNoPainel(item.idPath, item.nomeCurto);
@@ -90,26 +96,35 @@ function popularMenuResidenciais() {
     });
 }
 
-// 3. MAPAS E FICHA (Resumo do v165)
 function exibirDadosNoPainel(idPath, filtrarNome = null) {
     const lista = window.bancoDados[idPath];
     if (!lista) return;
     const itens = filtrarNome ? lista.filter(i => i.nomeCurto === filtrarNome) : lista;
     document.getElementById('nome-imovel').innerText = idPath.toUpperCase();
     document.getElementById('detalhes-imovel').innerHTML = itens.map(info => `
-        <div style="margin-bottom: 20px; border-bottom: 1px solid #444; padding-bottom: 10px;">
+        <div style="margin-bottom: 25px;">
+            <p style="color: #FFD700; font-size: 11px; margin-bottom: 5px;">${info.obs}</p>
             <h3 style="color: #ADFF2F; margin: 0;">${info.nomeCurto}</h3>
             <p>Estoque: ${info.estoque} | Status: ${info.statusObra}</p>
         </div>
     `).join("");
 }
 
+// 3. MAPA E TROCA (RESTAURADO)
 function desenharMapa(dados, targetId, ehMinimizado) {
     const container = document.getElementById(targetId);
     if (!container || !dados) return;
     container.innerHTML = "";
     const svg = document.createElementNS(svgNS, "svg");
     svg.setAttribute("viewBox", dados.viewBox);
+
+    if (!ehMinimizado) {
+        const conf = AJUSTES_MAPA[mapaAtivo];
+        svg.style.marginRight = conf.marginRight;
+        svg.style.marginLeft = conf.marginLeft;
+        svg.style.transform = `scale(${conf.scale})`;
+    }
+
     const g = document.createElementNS(svgNS, "g");
     g.setAttribute("transform", dados.transform);
 
@@ -117,10 +132,10 @@ function desenharMapa(dados, targetId, ehMinimizado) {
         const path = document.createElementNS(svgNS, "path");
         const ehMRV = pData.class === "commrv";
         path.setAttribute("d", pData.d);
-        path.setAttribute("class", pData.class || "semmrv");
         path.style.fill = ehMRV ? "#00713a" : "#cccccc";
         path.style.stroke = "#ffffff";
         path.style.strokeWidth = ehMinimizado ? "6" : "1.2";
+
         if (!ehMinimizado && ehMRV) {
             path.onclick = () => {
                 document.getElementById('identificador-cidade').innerText = pData.name || pData.id;
@@ -136,6 +151,11 @@ function desenharMapa(dados, targetId, ehMinimizado) {
 function atualizarVisualizacao() {
     desenharMapa(mapaAtivo === "GSP" ? MAPA_GSP : MAPA_INTERIOR, "mapa-container", false);
     desenharMapa(mapaAtivo === "GSP" ? MAPA_INTERIOR : MAPA_GSP, "mapa-minimizado", true);
+}
+
+function trocarMapas() {
+    mapaAtivo = (mapaAtivo === "GSP") ? "INTERIOR" : "GSP";
+    atualizarVisualizacao();
 }
 
 window.onload = () => carregarPlanilha();
