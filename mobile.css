@@ -157,94 +157,32 @@ path.semmrv { cursor: default; }
     text-shadow: 1px 1px 2px rgba(255,255,255,0.8);
 }
 
-/* ==========================================================================
-   7. MENU LATERAL (v156) - FIX LARGURA E ESTILO DE ZONAS
-   ========================================================================== */
-
+/* 7. MENU LATERAL (v157 - FIX DE EMPILHAMENTO) */
 #menu-lateral-container {
     position: absolute;
     top: 0;
-    left: -320px; 
-    width: 300px; /* Travado em 300px */
-    max-width: 300px;
+    left: -350px; /* Garante que saia totalmente da tela */
+    width: 300px;
     height: 100%;
-    background: transparent;
-    z-index: 1500; 
+    background: white; /* Fundo branco para os cards não ficarem transparentes */
+    z-index: 2000; /* Abaixo da faixa verde (9999), mas acima de tudo */
     transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
     padding: 20px 10px;
     overflow-y: auto;
-    overflow-x: hidden; /* IMPEDE O TEXTO DE ESTICAR O MENU */
-    scrollbar-width: none;
-    pointer-events: none; 
-    visibility: hidden; 
+    visibility: hidden;
+    pointer-events: none;
+    box-shadow: 5px 0 15px rgba(0,0,0,0.3);
 }
 
 #menu-lateral-container.aberto {
-    left: 40px; 
-    pointer-events: auto; 
+    left: 60px; /* Abre exatamente após a faixa verde */
     visibility: visible;
+    pointer-events: auto;
 }
 
 #trilho-infinito {
     display: flex;
     flex-direction: column;
-    gap: 8px; 
-    padding-bottom: 50px;
-    width: 100%; /* Garante que o conteúdo respeite os 300px */
-}
-
-/* --- ESTILOS DE ZONAS E COMPLEXOS --- */
-
-.card-residencial {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: #ffffff;
-    padding: 8px 12px;
-    font-size: 0.82rem;
-    font-weight: bold;
-    color: #333;
-    border-radius: 4px;
-    text-transform: uppercase;
-    box-shadow: 3px 3px 10px rgba(0,0,0,0.1);
-    cursor: pointer;
-    border-left: 5px solid #00713a; /* Cor padrão */
-    width: 100%; /* Ocupa apenas a largura do container pai (300px) */
-    box-sizing: border-box;
-}
-
-/* Cores das Bordas Laterais por Zona (Referência Imagem) */
-.zona-zo { border-left: 6px solid #FF8C00 !important; } /* Laranja */
-.zona-zl { border-left: 6px solid #000080 !important; } /* Azul Marinho */
-.zona-zn { border-left: 6px solid #FFD700 !important; } /* Amarelo */
-.zona-zs { border-left: 6px solid #C71585 !important; } /* Vinho/Rosa */
-
-/* Visual para COMPLEXOS (Fundo Cinza Escuro) */
-.card-complexo {
-    background: #333333 !important;
-    color: #FFFFFF !important;
-    border-left: none !important;
-    justify-content: center;
-    padding: 10px !important;
-    margin-top: 5px;
-}
-.card-complexo span { 
-    font-size: 0.9rem; 
-    letter-spacing: 1px;
-    color: #FFFFFF !important;
-}
-
-/* Texto do Estoque (Coluna F) - Estilo discreto à direita */
-.estoque-status {
-    font-size: 0.65rem;
-    color: #666;
-    font-weight: normal;
-    margin-left: 10px;
-    white-space: nowrap; /* Impede que o "RESTAM X UN." quebre linha */
-}
-
-/* Destaque para pouco estoque (Vermelho) */
-.estoque-alerta {
-    color: #FF0000 !important;
-    font-weight: bold !important;
+    gap: 10px;
+    width: 100%;
 }
