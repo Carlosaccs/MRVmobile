@@ -19,57 +19,80 @@ const AJUSTES_MAPA = {
 const DNA_AMPLIAR = "M 75.757133 114.16926 L 75.757133 124.7898 L 75.757133 135.41086 L 78.412268 135.41086 L 81.067403 135.41086 L 81.067403 127.44493 L 81.067403 119.47953 L 89.032808 119.47953 L 96.99873 119.47953 L 96.99873 116.82439 L 96.99873 114.16926 L 86.377673 114.16926 L 75.757133 114.16926 z M 115.58468 114.16926 L 115.58468 116.82439 L 115.58468 119.47953 L 123.36043 119.47953 L 131.13618 119.47953 L 131.13618 127.44493 L 131.13618 135.41086 L 133.79183 135.41086 L 136.44697 135.41086 L 136.44697 124.7898 L 136.44697 114.16926 L 126.01556 114.16926 L 115.58468 114.16926 z M 75.757133 153.9968 L 75.757133 164.61734 L 75.757133 175.2384 L 86.377673 175.2384 L 96.99873 175.2384 L 96.99873 172.39361 L 96.99873 169.54882 L 89.032808 169.54882 L 81.067403 169.54882 L 81.067403 161.77255 L 81.067403 153.9968 L 78.412268 153.9968 L 75.757133 153.9968 z M 131.13618 153.9968 L 131.13618 161.77255 L 131.13618 169.54882 L 123.36043 169.54882 L 115.58468 169.54882 L 115.58468 172.39361 L 115.58468 172.39361 L 115.58468 175.2384 L 126.01556 175.2384 L 136.44697 175.2384 L 136.44697 164.61734 L 136.44697 153.9968 L 133.79183 153.9968 L 131.13618 153.9968 z";
 const DNA_REDUZIR = "M 78.408134 124.88437 L 78.408134 132.66012 L 78.408134 140.43587 L 70.442729 140.43587 L 62.476807 140.43587 L 62.476807 143.28066 L 62.476807 146.12596 L 73.097864 146.12596 L 83.718404 146.12596 L 83.718404 135.50491 L 83.718404 124.88437 L 81.063269 124.88437 L 78.408134 124.88437 z M 102.30435 124.88437 L 102.30435 135.50491 L 102.30435 146.12596 L 112.92541 146.12596 L 123.54595 146.12596 L 123.54595 143.28066 L 123.54595 140.43587 L 115.58054 140.43587 L 107.61514 140.43587 L 107.61514 132.66012 L 107.61514 124.88437 L 104.96 124.88437 L 102.30435 124.88437 z M 62.476807 164.3326 L 62.476807 167.17739 L 62.476807 170.02218 L 70.442729 170.02218 L 78.408134 170.02218 L 78.408134 177.79793 L 78.408134 185.5742 L 81.063269 185.5742 L 83.718404 185.5742 L 83.718404 174.95315 L 83.718404 164.3326 L 73.097864 164.3326 L 62.476807 164.3326 z M 102.30435 164.3326 L 102.30435 174.95315 L 102.30435 185.5742 L 104.96 185.5742 L 107.61514 185.5742 L 107.61514 177.79793 L 107.61514 170.02218 L 115.58054 170.02218 L 123.54595 170.02218 L 123.54595 167.17739 L 123.54595 164.3326 L 112.92541 164.3326 L 102.30435 164.3326 z";
 
-// 2. CARREGAMENTO DE DADOS (v140.5 - O RETORNO DA v139 CORRIGIDA)
+// 2. CARREGAMENTO DE DADOS (CSV GOOGLE SHEETS)
 async function carregarPlanilha() {
-    console.log("🔄 Tentando resgatar os 42 registros...");
+    console.log("🔄 Buscando registros na planilha...");
     try {
         const res = await fetch(URL_PLANILHA);
         const csv = await res.text();
         const linhas = csv.split(/\r?\n/).filter(l => l.trim() !== "");
         
         window.bancoDados = {}; 
-
-        // Pula o cabeçalho
-        for (let i = 1; i < linhas.length; i++) {
-            // Split simples por vírgula (como na 139)
-            let colunas = linhas[i].split(",");
-            
-            // LIMPEZA: Remove aspas de todos os campos
-            colunas = colunas.map(c => c.replace(/"/g, '').trim());
-
-            if (colunas.length >= 4) {
-                const idOriginal = colunas[0].toLowerCase();
-                const nomeD = colunas[3]; // Coluna D (Nome Curto)
-
-                // Só adiciona se tiver ID e Nome
-                if (idOriginal && nomeD) {
-                    window.bancoDados[idOriginal] = {
-                        nomeCurto: nomeD,
-                        nomeFull: colunas[4] || nomeD,
-                        estoque: colunas[5] || "0",
-                        statusObra: colunas[11] || "Em andamento"
-                    };
-                }
+        linhas.slice(1).forEach(linha => {
+            const c = linha.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+            if (c.length >= 5) {
+                const id = c[0].replace(/"/g, '').trim().toLowerCase();
+                window.bancoDados[id] = {
+                    nomeCurto: c[3]?.replace(/"/g, '').trim() || "",
+                    nomeFull: c[4]?.replace(/"/g, '').trim() || "",
+                    estoque: c[5]?.replace(/"/g, '').trim() || "0",
+                    statusObra: c[11]?.replace(/"/g, '').trim() || "N/A"
+                };
             }
-        }
+        });
         
-        console.log("✅ Total carregado:", Object.keys(window.bancoDados).length);
+        console.log("✅ Banco carregado. Registros:", Object.keys(window.bancoDados).length);
         atualizarVisualizacao();
         popularMenuResidenciais(); 
-    } catch (e) { 
-        console.error("❌ Erro ao ler:", e); 
-    }
+    } catch (e) { console.error("❌ Erro CSV"); }
 }
 
-// 3. LOGICA DO MENU (AJUSTE TOUCH)
+// 3. LOGICA DO MENU LATERAL (v139.5)
 function toggleMenuLateral() {
     const menu = document.getElementById('menu-lateral-container');
     if (!menu) return;
+    
     menu.classList.toggle('aberto');
     if (menu.classList.contains('aberto')) {
         popularMenuResidenciais();
     }
 }
+
+function popularMenuResidenciais() {
+    const trilho = document.getElementById('trilho-infinito');
+    const contador = document.getElementById('contador-registros');
+    if (!trilho) return;
+
+    trilho.innerHTML = "";
+    const ids = Object.keys(window.bancoDados);
+    let totalGerado = 0;
+
+    ids.forEach(id => {
+        const info = window.bancoDados[id];
+        if (info && info.nomeCurto && info.nomeCurto.trim() !== "") {
+            const card = document.createElement('div');
+            card.className = 'card-residencial';
+            card.innerText = info.nomeCurto.toUpperCase();
+            
+            card.onclick = (e) => {
+                e.stopPropagation();
+                const path = document.getElementById(id);
+                if (path) {
+                    path.dispatchEvent(new Event('click'));
+                    toggleMenuLateral();
+                }
+            };
+            trilho.appendChild(card);
+            totalGerado++;
+        }
+    });
+
+    if (contador) {
+        contador.innerText = totalGerado.toString().padStart(2, '0');
+        contador.style.color = (totalGerado >= 42) ? "white" : "#ffff00";
+    }
+}
+
 // 4. DESENHO DOS MAPAS (GSP & INTERIOR)
 function desenharMapa(dados, targetId, ehMinimizado) {
     const container = document.getElementById(targetId);
@@ -172,19 +195,9 @@ function atualizarVisualIconeFullscreen() {
     }
 }
 
-// 7. INICIALIZAÇÃO E EVENTOS
+// 7. INICIALIZAÇÃO DO SISTEMA
 window.onload = () => {
     carregarPlanilha();
-    
-    const btnMenu = document.querySelector('.icon-bottom'); 
-    if (btnMenu) {
-        // mousedown funciona melhor que click em alguns celulares
-        btnMenu.addEventListener('mousedown', (e) => {
-            e.preventDefault();
-            toggleMenuLateral();
-        });
-    }
 };
 
-document.addEventListener('fullscreenchange', atualizarVisualIconeFullscreen);
 document.addEventListener('fullscreenchange', atualizarVisualIconeFullscreen);
