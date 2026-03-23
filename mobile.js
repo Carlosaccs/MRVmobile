@@ -61,7 +61,11 @@ function toggleMenuLateral() {
 
 
 
-unction popularMenuResidenciais() {
+/* ==========================================================================
+   v139.3 - MENU COM CONTADOR DE SEGURANÇA
+   ========================================================================== */
+
+function popularMenuResidenciais() {
     const trilho = document.getElementById('trilho-infinito');
     const contador = document.getElementById('contador-registros');
     if (!trilho || !window.bancoDados) return;
@@ -100,6 +104,9 @@ unction popularMenuResidenciais() {
         contador.style.color = (totalGerado >= 42) ? "white" : "#ffff00";
     }
 }
+
+
+
     // Verificação de segurança no console
     console.log("Total de cards gerados no menu:", trilho.children.length);
 }
