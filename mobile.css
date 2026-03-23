@@ -151,59 +151,47 @@ path.semmrv { cursor: default; }
     text-shadow: 1px 1px 2px rgba(255,255,255,0.8);
 }
 
-/* ==========================================================================
-   7. MENU LATERAL (v139.5) - CORREÇÃO DE INTERAÇÃO E VISIBILIDADE
-   ========================================================================== */
-
+/* 7. MENU LATERAL (v139) */
 #menu-lateral-container {
     position: absolute;
     top: 0;
-    left: -320px; 
-    width: 300px; 
+    left: -280px; 
+    width: 250px;
     height: 100%;
     background: transparent;
-    z-index: 1500; 
-    transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+    z-index: 1500; /* MENOR que a faixa-verde (2000) para passar SOB ela */
+    transition: all 0.4s ease;
     padding: 20px 10px;
-    overflow-y: auto;
-    scrollbar-width: none;
     
-    /* IMPORTANTE: Desativa cliques e esconde totalmente quando fechado */
-    pointer-events: none; 
-    visibility: hidden; 
+    /* REMOVE BARRAS DE ROLAGEM */
+    overflow-y: auto;
+    -ms-overflow-style: none;  /* IE/Edge */
+    scrollbar-width: none;     /* Firefox */
+}
+
+#menu-lateral-container::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
 }
 
 #menu-lateral-container.aberto {
-    left: 40px; 
-    /* IMPORTANTE: Reativa cliques e torna visível para o navegador */
-    pointer-events: auto; 
-    visibility: visible;
+    left: 60px; /* Brota ao lado da faixa verde */
 }
 
 #trilho-infinito {
     display: flex;
     flex-direction: column;
-    gap: 8px; 
-    padding-bottom: 50px;
+    gap: 12px;
 }
 
 .card-residencial {
     background: #ffffff;
     border: 2px solid #00713a;
-    border-right: 15px solid #00713a;
-    padding: 8px 15px 8px 35px; /* Espaço para o texto sair de baixo da faixa */
-    font-size: 0.82rem;
+    border-right: 15px solid #00713a; /* Borda direita larga */
+    padding: 12px;
+    font-size: 0.85rem;
     font-weight: bold;
     color: #333;
     border-radius: 4px;
     text-transform: uppercase;
-    box-shadow: 3px 3px 10px rgba(0,0,0,0.2);
-    cursor: pointer;
-    white-space: nowrap;
-    
-    /* Garante que o card receba o clique do dedo */
-    pointer-events: all;
+    box-shadow: 2px 2px 8px rgba(0,0,0,0.15);
 }
-
-/* Remove a barra cinza chata */
-#menu-lateral-container::-webkit-scrollbar { display: none; }
