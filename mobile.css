@@ -152,7 +152,7 @@ path.semmrv { cursor: default; }
 }
 
 /* ==========================================================================
-   7. MENU LATERAL (v139.5) - CORREÇÃO DE INTERAÇÃO
+   7. MENU LATERAL (v139.5) - CORREÇÃO DE INTERAÇÃO E VISIBILIDADE
    ========================================================================== */
 
 #menu-lateral-container {
@@ -168,17 +168,16 @@ path.semmrv { cursor: default; }
     overflow-y: auto;
     scrollbar-width: none;
     
-    /* IMPORTANTE: Deixa cliques passarem quando fechado */
+    /* IMPORTANTE: Desativa cliques e esconde totalmente quando fechado */
     pointer-events: none; 
     visibility: hidden; 
 }
 
 #menu-lateral-container.aberto {
     left: 40px; 
-    z-index: 3000 !important; /* Maior que os 2000 da faixa */
-    display: block !important;
-    visibility: visible !important;
-    pointer-events: auto !important;
+    /* IMPORTANTE: Reativa cliques e torna visível para o navegador */
+    pointer-events: auto; 
+    visibility: visible;
 }
 
 #trilho-infinito {
@@ -186,15 +185,13 @@ path.semmrv { cursor: default; }
     flex-direction: column;
     gap: 8px; 
     padding-bottom: 50px;
-    /* Garante que o conteúdo interno responda ao toque */
-    pointer-events: auto;
 }
 
 .card-residencial {
     background: #ffffff;
     border: 2px solid #00713a;
     border-right: 15px solid #00713a;
-    padding: 8px 15px 8px 35px; 
+    padding: 8px 15px 8px 35px; /* Espaço para o texto sair de baixo da faixa */
     font-size: 0.82rem;
     font-weight: bold;
     color: #333;
@@ -203,8 +200,10 @@ path.semmrv { cursor: default; }
     box-shadow: 3px 3px 10px rgba(0,0,0,0.2);
     cursor: pointer;
     white-space: nowrap;
-    /* Força o card a ser clicável */
+    
+    /* Garante que o card receba o clique do dedo */
     pointer-events: all;
 }
 
+/* Remove a barra cinza chata */
 #menu-lateral-container::-webkit-scrollbar { display: none; }
