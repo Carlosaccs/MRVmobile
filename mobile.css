@@ -1,51 +1,46 @@
-/* ==========================================================================
-   1. RESET E PREVENÇÃO DE SCROLL (v162)
-   ========================================================================== */
-* { box-sizing: border-box; }
-
-html, body {
-    margin: 0; padding: 0;
-    width: 100vw; height: 100vh;
-    overflow: hidden !important; /* Mata as barras de rolagem da página */
-    font-family: 'Montserrat', sans-serif;
+/* 1. RESET DE TELA */
+html, body { 
+    margin: 0; padding: 0; 
+    width: 100%; height: 100%; 
+    overflow: hidden !important; 
 }
 
-/* ==========================================================================
-   2. FAIXA VERDE (Sempre visível no topo)
-   ========================================================================== */
+/* 2. FAIXA VERDE E TÍTULO (v163) */
 .faixa-verde-vertical {
     position: fixed;
     left: 0; top: 0;
     width: 60px; height: 100%;
     background-color: #00713a !important; 
-    z-index: 5000; /* Camada mais alta */
+    z-index: 5000; /* No topo de tudo */
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: space-between;
     padding: 20px 0;
 }
 
-/* ==========================================================================
-   3. MAPA (Área Central - O Coração do Dashboard)
-   ========================================================================== */
+.titulo-vertical {
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    color: white;
+    font-size: 1.1rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin: 20px 0;
+}
+
+/* 3. MAPA (FORÇAR VISIBILIDADE) */
 #mapa-container {
-    position: absolute;
-    left: 60px; /* Começa exatamente após a faixa verde */
+    position: fixed; /* Troque para fixed */
+    left: 60px; /* Começa colado na faixa verde */
     top: 0;
     width: calc(100% - 60px); 
     height: 100vh;
-    z-index: 100; /* Atrás de todos os menus */
+    z-index: 10; /* Camada base */
     background: #ffffff;
-    display: flex !important;
-    align-items: center;
-    justify-content: center;
+    display: block !important;
 }
-
-#mapa-container svg {
-    width: 90%; height: 90%; /* Força o SVG a aparecer */
-}
-
-
 /* 4. MAPA MINIMIZADO (v127) - Posicionado à direita da área do mapa */
 #mapa-minimizado {
     position: absolute;
@@ -104,48 +99,36 @@ path.semmrv { cursor: default; }
     text-shadow: 1px 1px 2px rgba(255,255,255,0.8);
 }
 
-/* ==========================================================================
-   7. MENU LATERAL (Efeito de Saída de Trás da Faixa Verde)
-   ========================================================================== */
+/* 7. MENU LATERAL (ENCAIXE ATRÁS DA FAIXA) */
 #menu-lateral-container {
     position: fixed;
     top: 0;
-    left: -320px; /* Escondido */
-    width: 310px; 
+    left: -320px; /* Totalmente escondido */
+    width: 320px; 
     height: 100%;
     background: #fdfdfd;
-    z-index: 4000; /* Entre o mapa (100) e a faixa verde (5000) */
-    transition: left 0.4s ease-out;
+    z-index: 4000; /* ATRÁS da faixa verde (5000) */
+    transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     
-    /* Encaixe: Começa do zero, mas empurra o conteúdo 60px para não cobrir a faixa */
-    padding: 20px 10px 20px 70px; 
-    
+    /* Padding de 65px para o texto começar APÓS a faixa verde */
+    padding: 20px 10px 20px 65px; 
     overflow-y: auto;
-    scrollbar-width: none;
-    box-shadow: 10px 0 20px rgba(0,0,0,0.1);
 }
 
 #menu-lateral-container.aberto {
-    left: 0; /* Agora ele encosta na borda da tela, mas fica ATRÁS da faixa verde */
+    left: 0 !important; /* Encosta na borda da tela */
 }
 
-/* Cards com destaque cinza no clique (v162) */
-.card-residencial {
+/* CONTROLES DE ZOOM */
+.controles-zoom {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: white;
-    margin-bottom: 8px;
-    padding: 12px 15px;
-    border-radius: 4px;
-    font-size: 0.72rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    border-right: 6px solid #ccc;
-    cursor: pointer;
-    transition: background 0.2s;
+    flex-direction: column;
+    gap: 15px;
 }
-
-.card-residencial:active {
-    background: #e0e0e0; /* O destaque cinza que você mencionou */
+.btn-zoom {
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+    font-weight: bold;
+    text-align: center;
 }
