@@ -1,5 +1,5 @@
 /* ==========================================================================
-   v141 - VERSÃO FINAL (42 REGISTROS & MOBILE TOUCH)
+   v142 - VERSÃO FINALIZADA PARA O SEU HTML (42 REGISTROS)
    ========================================================================== */
 
 const svgNS = "http://www.w3.org/2000/svg";
@@ -16,7 +16,7 @@ const AJUSTES_MAPA = {
 const DNA_AMPLIAR = "M 75.757133 114.16926 L 75.757133 124.7898 L 75.757133 135.41086 L 78.412268 135.41086 L 81.067403 135.41086 L 81.067403 127.44493 L 81.067403 119.47953 L 89.032808 119.47953 L 96.99873 119.47953 L 96.99873 116.82439 L 96.99873 114.16926 L 86.377673 114.16926 L 75.757133 114.16926 z M 115.58468 114.16926 L 115.58468 116.82439 L 115.58468 119.47953 L 123.36043 119.47953 L 131.13618 119.47953 L 131.13618 127.44493 L 131.13618 135.41086 L 133.79183 135.41086 L 136.44697 135.41086 L 136.44697 124.7898 L 136.44697 114.16926 L 126.01556 114.16926 L 115.58468 114.16926 z M 75.757133 153.9968 L 75.757133 164.61734 L 75.757133 175.2384 L 86.377673 175.2384 L 96.99873 175.2384 L 96.99873 172.39361 L 96.99873 169.54882 L 89.032808 169.54882 L 81.067403 169.54882 L 81.067403 161.77255 L 81.067403 153.9968 L 78.412268 153.9968 L 75.757133 153.9968 z M 131.13618 153.9968 L 131.13618 161.77255 L 131.13618 169.54882 L 123.36043 169.54882 L 115.58468 169.54882 L 115.58468 172.39361 L 115.58468 172.39361 L 115.58468 175.2384 L 126.01556 175.2384 L 136.44697 175.2384 L 136.44697 164.61734 L 136.44697 153.9968 L 133.79183 153.9968 L 131.13618 153.9968 z";
 const DNA_REDUZIR = "M 78.408134 124.88437 L 78.408134 132.66012 L 78.408134 140.43587 L 70.442729 140.43587 L 62.476807 140.43587 L 62.476807 143.28066 L 62.476807 146.12596 L 73.097864 146.12596 L 83.718404 146.12596 L 83.718404 135.50491 L 83.718404 124.88437 L 81.063269 124.88437 L 78.408134 124.88437 z M 102.30435 124.88437 L 102.30435 135.50491 L 102.30435 146.12596 L 112.92541 146.12596 L 123.54595 146.12596 L 123.54595 143.28066 L 123.54595 140.43587 L 115.58054 140.43587 L 107.61514 140.43587 L 107.61514 132.66012 L 107.61514 124.88437 L 104.96 124.88437 L 102.30435 124.88437 z M 62.476807 164.3326 L 62.476807 167.17739 L 62.476807 170.02218 L 70.442729 170.02218 L 78.408134 170.02218 L 78.408134 177.79793 L 78.408134 185.5742 L 81.063269 185.5742 L 83.718404 185.5742 L 83.718404 174.95315 L 83.718404 164.3326 L 73.097864 164.3326 L 62.476807 164.3326 z M 102.30435 164.3326 L 102.30435 174.95315 L 102.30435 185.5742 L 104.96 185.5742 L 107.61514 185.5742 L 107.61514 177.79793 L 107.61514 170.02218 L 115.58054 170.02218 L 123.54595 170.02218 L 123.54595 167.17739 L 123.54595 164.3326 L 112.92541 164.3326 L 102.30435 164.3326 z";
 
-// BLOCO 2 - CARGA CORRIGIDA (PARA 42 REGISTROS)
+// 2. CARREGAMENTO (AJUSTADO PARA A COLUNA D)
 async function carregarPlanilha() {
     try {
         const res = await fetch(URL_PLANILHA);
@@ -25,15 +25,14 @@ async function carregarPlanilha() {
         window.bancoDados = {}; 
 
         linhas.slice(1).forEach(linha => {
-            // Split simplificado para não bugar com os nomes da Coluna D
             const c = linha.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
             if (c.length >= 4) {
                 const id = c[0].replace(/"/g, '').trim().toLowerCase();
-                const nomeCurto = c[3]?.replace(/"/g, '').trim() || "";
-                if (id && nomeCurto) {
+                const nomeD = c[3]?.replace(/"/g, '').trim() || "";
+                if (id && nomeD) {
                     window.bancoDados[id] = {
-                        nomeCurto: nomeCurto,
-                        nomeFull: c[4]?.replace(/"/g, '').trim() || nomeCurto,
+                        nomeCurto: nomeD,
+                        nomeFull: c[4]?.replace(/"/g, '').trim() || nomeD,
                         estoque: c[5]?.replace(/"/g, '').trim() || "0",
                         statusObra: c[11]?.replace(/"/g, '').trim() || "Consulte"
                     };
@@ -42,16 +41,17 @@ async function carregarPlanilha() {
         });
         console.log("✅ Registros carregados:", Object.keys(window.bancoDados).length);
         atualizarVisualizacao();
-    } catch (e) { console.error("Erro CSV"); }
+    } catch (e) { console.error("Erro no CSV"); }
 }
 
-// BLOCO 3 - MENU LATERAL (v141)
+// 3. MENU LATERAL (Acionado pelo icon-top)
 function toggleMenuLateral(event) {
     if (event) { event.preventDefault(); event.stopPropagation(); }
     const menu = document.getElementById('menu-lateral-container');
-    if (!menu) return;
-    menu.classList.toggle('aberto');
-    if (menu.classList.contains('aberto')) popularMenuResidenciais();
+    if (menu) {
+        menu.classList.toggle('aberto');
+        if (menu.classList.contains('aberto')) popularMenuResidenciais();
+    }
 }
 
 function popularMenuResidenciais() {
@@ -59,7 +59,7 @@ function popularMenuResidenciais() {
     const contador = document.getElementById('contador-registros');
     if (!trilho) return;
     trilho.innerHTML = "";
-    let totalGerado = 0;
+    let total = 0;
 
     Object.keys(window.bancoDados).forEach(id => {
         const info = window.bancoDados[id];
@@ -72,16 +72,16 @@ function popularMenuResidenciais() {
             if (path) { path.dispatchEvent(new Event('click')); toggleMenuLateral(); }
         };
         trilho.appendChild(card);
-        totalGerado++;
+        total++;
     });
 
     if (contador) {
-        contador.innerText = totalGerado.toString().padStart(2, '0');
-        contador.style.color = (totalGerado >= 42) ? "white" : "#ffff00";
+        contador.innerText = total.toString().padStart(2, '0');
+        contador.style.color = (total >= 42) ? "#ADFF2F" : "#ffff00";
     }
 }
 
-// BLOCO 4 - DESENHO
+// 4. MAPAS
 function desenharMapa(dados, targetId, ehMinimizado) {
     const container = document.getElementById(targetId);
     if (!container || !dados) return;
@@ -104,11 +104,11 @@ function desenharMapa(dados, targetId, ehMinimizado) {
         path.setAttribute("d", pData.d);
         path.setAttribute("id", (ehMinimizado ? 'mini-' : '') + pData.id);
         path.setAttribute("class", pData.class || "semmrv");
-        const corOriginal = ehMRV ? "#00713a" : "#cccccc";
-        path.style.fill = corOriginal;
+        const corBase = ehMRV ? "#00713a" : "#cccccc";
+        path.style.fill = corBase;
         path.style.stroke = "#ffffff";
         path.style.strokeWidth = ehMinimizado ? "6" : "1.2";
-        path.setAttribute('data-cor-base', corOriginal);
+        path.setAttribute('data-cor-base', corBase);
         if (!ehMinimizado) {
             path.onclick = () => {
                 if (!ehMRV) return;
@@ -140,8 +140,9 @@ function trocarMapas() {
     atualizarVisualizacao();
 }
 
+// 6. FULLSCREEN
 function toggleFullscreen() {
-    if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(e => console.warn(e.message));
+    if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(() => {});
     else if (document.exitFullscreen) document.exitFullscreen();
 }
 
@@ -153,16 +154,17 @@ function atualizarVisualIconeFullscreen() {
     else { path.setAttribute('d', DNA_AMPLIAR); svg.setAttribute('viewBox', '60 110 90 90'); }
 }
 
-// BLOCO 7 - INICIALIZAÇÃO E TOQUE CELULAR
+// 7. INICIALIZAÇÃO (Vínculo direto com o seu HTML)
 window.onload = () => {
     carregarPlanilha();
     
-    // CORREÇÃO PARA O CELULAR: Vincula o clique no ícone de hambúrguer
-    const iconesMenu = document.querySelectorAll('.icon-bottom');
-    iconesMenu.forEach(icon => {
-        // 'pointerdown' funciona instantâneo no touch do celular
-        icon.addEventListener('pointerdown', toggleMenuLateral);
-    });
+    // Vincula o Menu ao ícone de cima (icon-top)
+    const btnMenu = document.querySelector('.icon-top');
+    if (btnMenu) btnMenu.addEventListener('pointerdown', toggleMenuLateral);
+
+    // Vincula o Fullscreen ao ícone de baixo (icon-bottom)
+    const btnFull = document.querySelector('.icon-bottom');
+    if (btnFull) btnFull.addEventListener('pointerdown', toggleFullscreen);
 };
 
 document.addEventListener('fullscreenchange', atualizarVisualIconeFullscreen);
