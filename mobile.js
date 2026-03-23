@@ -62,16 +62,12 @@ async function carregarPlanilha() {
 }
 
 // 3. LOGICA DO MENU (AJUSTE TOUCH)
-function toggleMenuLateral(e) {
-    if (e) {
-        e.preventDefault();
-        e.stopPropagation();
-    }
+function toggleMenuLateral() {
     const menu = document.getElementById('menu-lateral-container');
-    if (menu) {
-        menu.classList.toggle('aberto');
-        console.log("Menu disparado via touch/click");
-        if (menu.classList.contains('aberto')) popularMenuResidenciais();
+    if (!menu) return;
+    menu.classList.toggle('aberto');
+    if (menu.classList.contains('aberto')) {
+        popularMenuResidenciais();
     }
 }
 // 4. DESENHO DOS MAPAS (GSP & INTERIOR)
@@ -180,11 +176,15 @@ function atualizarVisualIconeFullscreen() {
 window.onload = () => {
     carregarPlanilha();
     
-    // Seleciona o ícone de hambúrguer (ajuste o seletor se necessário)
     const btnMenu = document.querySelector('.icon-bottom'); 
     if (btnMenu) {
-        // pointerdown mata o atraso do touch no mobile
-        btnMenu.addEventListener('pointerdown', toggleMenuLateral);
+        // mousedown funciona melhor que click em alguns celulares
+        btnMenu.addEventListener('mousedown', (e) => {
+            e.preventDefault();
+            toggleMenuLateral();
+        });
     }
 };
+
+document.addEventListener('fullscreenchange', atualizarVisualIconeFullscreen);
 document.addEventListener('fullscreenchange', atualizarVisualIconeFullscreen);
