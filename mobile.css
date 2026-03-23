@@ -187,23 +187,37 @@ path.semmrv { cursor: default; }
     padding-bottom: 50px;
 }
 
+/* Card padrão (Residencial) */
 .card-residencial {
-    background: #ffffff;
-    border: 2px solid #00713a;
-    border-right: 15px solid #00713a;
-    padding: 8px 15px 8px 35px; /* Espaço para o texto sair de baixo da faixa */
-    font-size: 0.82rem;
-    font-weight: bold;
-    color: #333;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 15px;
+    margin-bottom: 8px;
+    background: #ffffff; /* Fundo branco para residenciais */
+    border: 1px solid #ddd;
     border-radius: 4px;
-    text-transform: uppercase;
-    box-shadow: 3px 3px 10px rgba(0,0,0,0.2);
+    font-family: sans-serif;
     cursor: pointer;
-    white-space: nowrap;
-    
-    /* Garante que o card receba o clique do dedo */
-    pointer-events: all;
+    transition: all 0.2s;
 }
 
-/* Remove a barra cinza chata */
-#menu-lateral-container::-webkit-scrollbar { display: none; }
+/* Estilo específico para COMPLEXO (Fundo Cinza) */
+.card-residencial.card-complexo {
+    background: #f0f0f0; /* Cinza claro sugerido */
+    border: 1px solid #ccc;
+    font-weight: bold; /* Um pouco mais de destaque no texto */
+}
+
+/* As abas laterais continuam funcionando normalmente */
+.card-residencial.zona-zo { border-left: 6px solid #f39200; }
+.card-residencial.zona-zl { border-left: 6px solid #f39200; }
+.card-residencial.zona-zn { border-left: 6px solid #ffcc00; }
+.card-residencial.zona-zs { border-left: 6px solid #e5007d; }
+.card-residencial.zona-verde { border-left: 6px solid #00713a; }
+
+/* Destaque ao clicar */
+.card-residencial.selecionado {
+    background-color: #f39200 !important;
+    color: #fff !important;
+}
