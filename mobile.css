@@ -40,40 +40,51 @@ html, body {
 .icon-top:active, .icon-bottom:active { transform: scale(1.2); }
 
 /* 3. MENU LATERAL (LARGURA v139 + 10%) */
+/* AJUSTE DO MENU (v172) */
 #menu-lateral-container {
     position: fixed;
     top: 0;
-    left: -400px; /* Escondido à esquerda */
-    width: 330px; /* v139 (300px) + 10% = 330px */
+    left: -350px; /* Escondido */
+    width: 320px;
     height: 100%;
     background: transparent;
-    z-index: 3000; 
-    transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
-    padding: 20px 10px 20px 75px; /* Texto começa após a faixa verde */
+    z-index: 3000;
+    transition: all 0.4s ease;
+    padding: 20px 10px 20px 70px; /* Texto começa logo após a faixa verde */
     overflow-y: auto;
-    scrollbar-width: none;
-    pointer-events: none; 
-    visibility: hidden; 
+    pointer-events: none;
+    visibility: hidden;
 }
 
 #menu-lateral-container.aberto {
-    left: 40px; /* v139: Entra 20px atrás da faixa verde para encaixe perfeito */
-    pointer-events: auto; 
+    left: 0px; /* Encosta no canto da tela, ficando sob a faixa verde */
+    pointer-events: auto;
     visibility: visible;
 }
 
+/* CARDS COM CLIQUE GARANTIDO */
 .card-residencial {
-    background: #ffffff;
+    background: white;
     border: 2px solid #00713a;
-    border-right: 15px solid #00713a; 
-    padding: 12px 15px;
+    border-right: 15px solid #00713a; /* Cor padrão da borda */
+    padding: 12px;
     margin-bottom: 8px;
-    font-size: 0.85rem; font-weight: bold;
-    color: #333; border-radius: 4px;
-    text-transform: uppercase;
-    box-shadow: 3px 3px 10px rgba(0,0,0,0.15);
     cursor: pointer;
-    pointer-events: all;
+    pointer-events: all; /* Essencial para o clique funcionar */
+    display: block;
+}
+
+/* MAPA PRINCIPAL - Garante visibilidade */
+#mapa-container {
+    position: fixed;
+    left: 60px; /* Começa após a faixa verde */
+    top: 0;
+    width: calc(100% - 60px);
+    height: 100%;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 /* 4. MAPA MINIMIZADO (LADO DIREITO - v139) */
