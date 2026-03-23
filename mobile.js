@@ -17,10 +17,7 @@ const AJUSTES_MAPA = {
 const DNA_AMPLIAR = "M 75.757133 114.16926 L 75.757133 124.7898 L 75.757133 135.41086 L 78.412268 135.41086 L 81.067403 135.41086 L 81.067403 127.44493 L 81.067403 119.47953 L 89.032808 119.47953 L 96.99873 119.47953 L 96.99873 116.82439 L 96.99873 114.16926 L 86.377673 114.16926 L 75.757133 114.16926 z M 115.58468 114.16926 L 115.58468 116.82439 L 115.58468 119.47953 L 123.36043 119.47953 L 131.13618 119.47953 L 131.13618 127.44493 L 131.13618 135.41086 L 133.79183 135.41086 L 136.44697 135.41086 L 136.44697 124.7898 L 136.44697 114.16926 L 126.01556 114.16926 L 115.58468 114.16926 z M 75.757133 153.9968 L 75.757133 164.61734 L 75.757133 175.2384 L 86.377673 175.2384 L 96.99873 175.2384 L 96.99873 172.39361 L 96.99873 169.54882 L 89.032808 169.54882 L 81.067403 169.54882 L 81.067403 161.77255 L 81.067403 153.9968 L 78.412268 153.9968 L 75.757133 153.9968 z M 131.13618 153.9968 L 131.13618 161.77255 L 131.13618 169.54882 L 123.36043 169.54882 L 115.58468 169.54882 L 115.58468 172.39361 L 115.58468 172.39361 L 115.58468 175.2384 L 126.01556 175.2384 L 136.44697 175.2384 L 136.44697 164.61734 L 136.44697 153.9968 L 133.79183 153.9968 L 131.13618 153.9968 z";
 const DNA_REDUZIR = "M 78.408134 124.88437 L 78.408134 132.66012 L 78.408134 140.43587 L 70.442729 140.43587 L 62.476807 140.43587 L 62.476807 143.28066 L 62.476807 146.12596 L 73.097864 146.12596 L 83.718404 146.12596 L 83.718404 135.50491 L 83.718404 124.88437 L 81.063269 124.88437 L 78.408134 124.88437 z M 102.30435 124.88437 L 102.30435 135.50491 L 102.30435 146.12596 L 112.92541 146.12596 L 123.54595 146.12596 L 123.54595 143.28066 L 123.54595 140.43587 L 115.58054 140.43587 L 107.61514 132.66012 L 107.61514 124.88437 L 104.96 124.88437 L 102.30435 124.88437 z M 62.476807 164.3326 L 62.476807 167.17739 L 62.476807 170.02218 L 70.442729 170.02218 L 78.408134 170.02218 L 78.408134 177.79793 L 78.408134 185.5742 L 81.063269 185.5742 L 83.718404 185.5742 L 83.718404 174.95315 L 83.718404 164.3326 L 73.097864 164.3326 L 62.476807 164.3326 z M 102.30435 164.3326 L 102.30435 174.95315 L 102.30435 185.5742 L 104.96 185.5742 L 107.61514 185.5742 L 107.61514 177.79793 L 107.61514 170.02218 L 115.58054 170.02218 L 123.54595 170.02218 L 123.54595 167.17739 L 123.54595 164.3326 L 112.92541 164.3326 L 102.30435 164.3326 z";
 
-/* ==========================================================================
-   CARREGAMENTO DOS 42 REGISTROS COM ORDEM (COLUNA C) - (COMPLEXO COM FUNDO CINZA)
-   ========================================================================== */
-
+// 1. CARREGAMENTO DOS 42 REGISTROS COM ORDEM (COLUNA C)
 async function carregarPlanilha() {
     try {
         const res = await fetch(URL_PLANILHA);
@@ -34,17 +31,15 @@ async function carregarPlanilha() {
             const c = linha.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
             if (c.length >= 4) {
                 const idPath = c[0].replace(/["']/g, '').trim().toLowerCase();
-                const categoria = c[1]?.replace(/["']/g, '').trim().toUpperCase() || "RESIDENCIAL"; // Coluna B
-                const ordem = parseInt(c[2]) || 99999;
+                const ordem = parseInt(c[2]) || 99999; // Coluna C
                 const nomeCurto = c[3]?.replace(/["']/g, '').trim() || "";
 
                 if (idPath && nomeCurto) {
                     const item = {
                         idPath: idPath,
-                        categoria: categoria, // Salva se é COMPLEXO ou RESIDENCIAL
                         ordem: ordem,
                         nomeCurto: nomeCurto,
-                        estoque: c[5]?.replace(/["']/g, '').trim() || "-",
+                        estoque: c[5]?.replace(/["']/g, '').trim() || "0",
                         statusObra: c[11]?.replace(/["']/g, '').trim() || "Consulte"
                     };
 
@@ -57,60 +52,15 @@ async function carregarPlanilha() {
 
         const total = window.listaCompleta.length;
         const contador = document.getElementById('contador-registros');
-        if (contador) contador.innerText = total.toString().padStart(2, '0');
+        if (contador) {
+            contador.innerText = total.toString().padStart(2, '0');
+            contador.style.color = (total >= 42) ? "#ADFF2F" : "#FFFF00";
+        }
 
         if (typeof MAPA_GSP !== 'undefined') atualizarVisualizacao();
     } catch (e) { console.error("Erro CSV:", e); }
 }
 
-function popularMenuResidenciais() {
-    const trilho = document.getElementById('trilho-infinito');
-    if (!trilho) return;
-    trilho.innerHTML = "";
-
-    const ordenados = [...window.listaCompleta].sort((a, b) => {
-        if (a.ordem !== b.ordem) return a.ordem - b.ordem;
-        return a.nomeCurto.localeCompare(b.nomeCurto);
-    });
-
-    ordenados.forEach(item => {
-        const card = document.createElement('div');
-        const nome = item.nomeCurto.toUpperCase().trim();
-        
-        // Lógica de Detecção de Zona mais inteligente
-        let classeZona = "zona-verde"; // Padrão
-        if (nome.startsWith("ZO")) classeZona = "zona-zo";
-        else if (nome.startsWith("ZL")) classeZona = "zona-zl";
-        else if (nome.startsWith("ZN")) classeZona = "zona-zn";
-        else if (nome.startsWith("ZS")) classeZona = "zona-zs";
-
-        const classeCategoria = (item.categoria === "COMPLEXO") ? "card-complexo" : "";
-
-        card.className = `card-residencial ${classeZona} ${classeCategoria}`;
-        
-        // Verifica se o estoque é apenas um traço ou vazio para limpar o visual
-        const exibicaoEstoque = (item.estoque === "-" || item.estoque === "") ? "" : item.estoque.toUpperCase();
-
-        card.innerHTML = `
-            <span class="nome-card">${nome}</span>
-            <span class="estoque-status">${exibicaoEstoque}</span>
-        `;
-        
-        card.onclick = (e) => {
-            e.stopPropagation();
-            document.querySelectorAll('.card-residencial').forEach(c => c.classList.remove('selecionado'));
-            card.classList.add('selecionado');
-
-            const pathOriginal = document.getElementById(item.idPath);
-            if (pathOriginal) {
-                exibirDadosNoPainel(item.idPath, item.nomeCurto);
-                pathOriginal.style.fill = "#FF4500";
-                toggleMenuLateral();
-            }
-        };
-        trilho.appendChild(card);
-    });
-}
 // 2. MENU LATERAL (ORDENADO PELA COLUNA C)
 function toggleMenuLateral() {
     const menu = document.getElementById('menu-lateral-container');
