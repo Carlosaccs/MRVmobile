@@ -1,134 +1,99 @@
-/* 1. RESET DE TELA */
+/* ==========================================================================
+   v164 - ESTRUTURA CONSOLIDADA (MAPA + MENU ENCAIXADO)
+   ========================================================================== */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800&display=swap');
+
 html, body { 
-    margin: 0; padding: 0; 
-    width: 100%; height: 100%; 
-    overflow: hidden !important; 
+    margin: 0; padding: 0; width: 100%; height: 100%; 
+    overflow: hidden; background: #fff; 
+    font-family: 'Montserrat', sans-serif !important;
 }
 
-/* 2. FAIXA VERDE E TÍTULO (v163) */
+* { box-sizing: border-box; }
+
+/* FAIXA VERDE LATERAL */
 .faixa-verde-vertical {
-    position: fixed;
+    position: fixed; /* Fixed para não sair do lugar */
     left: 0; top: 0;
     width: 60px; height: 100%;
-    background-color: #00713a !important; 
-    z-index: 5000; /* No topo de tudo */
+    background-color: #00713a; 
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: space-between;
-    padding: 20px 0;
+    padding: 15px 0;
+    z-index: 5000; /* Sempre no topo */
+    box-shadow: 2px 0 10px rgba(0,0,0,0.3);
 }
 
 .titulo-vertical {
     writing-mode: vertical-rl;
     transform: rotate(180deg);
-    color: white;
-    font-size: 1.1rem;
     font-weight: 800;
+    font-size: 1.1rem; 
+    color: white;
     text-transform: uppercase;
     letter-spacing: 1px;
-    margin: 20px 0;
 }
 
-/* 3. MAPA (FORÇAR VISIBILIDADE) */
+/* ÁREA DO MAPA */
 #mapa-container {
-    position: fixed; /* Troque para fixed */
-    left: 60px; /* Começa colado na faixa verde */
-    top: 0;
-    width: calc(100% - 60px); 
-    height: 100vh;
-    z-index: 10; /* Camada base */
-    background: #ffffff;
-    display: block !important;
-}
-/* 4. MAPA MINIMIZADO (v127) - Posicionado à direita da área do mapa */
-#mapa-minimizado {
-    position: absolute;
-    bottom: 20px;
-    right: 45%; /* Coloca o botão no limite da área do mapa com a ficha técnica */
-    width: 90px;
-    height: 70px;
-    background: white;
-    border: 2px solid #00713a;
-    border-radius: 10px;
-    cursor: pointer;
-    z-index: 2500;
-    overflow: hidden;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: transform 0.2s ease;
+    position: fixed;
+    left: 0; top: 0;
+    width: 100%; height: 100%;
+    padding-left: 60px; /* Respeita a faixa verde */
+    z-index: 10;
+    display: flex; align-items: center; justify-content: center;
+    background: #fff;
 }
 
-#mapa-minimizado:active { transform: scale(0.95); }
+#mapa-container svg { width: 100% !important; height: auto; max-height: 95%; }
 
-/* Classes de cursor para diferenciar os paths */
-path.commrv { cursor: pointer; }
-path.semmrv { cursor: default; }
-
-/* 5. FICHA TÉCNICA (PAINEL CINZA) */
-.ficha-tecnica {
-    position: fixed; 
-    right: 0; top: 0; 
-    width: 35%; height: 100%;
-    background: rgba(50, 50, 50, 0.98) !important; 
-    color: white;
-    z-index: 1000; 
-    padding: 40px 25px;
-    box-shadow: -5px 0 20px rgba(0,0,0,0.5);
-}
-#nome-imovel { 
-    color: #50c878; margin: 0 0 15px 0; font-size: 1.6rem; 
-    border-bottom: 2px solid #50c878; padding-bottom: 10px; 
-}
-#detalhes-imovel { font-size: 1.2rem; line-height: 1.6; }
-
-/* 6. IDENTIFICADOR DE CIDADE (CENTRO SUPERIOR) - v125 */
-#identificador-cidade {
-    position: absolute;
-    top: 5px; /* Encostado no topo */
-    left: 28%;
-    transform: translateX(-50%);
-    font-size: 1rem; /* Mesmo tamanho da faixa verde */
-    font-weight: bold;
-    color: #333;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    pointer-events: none;
-    text-shadow: 1px 1px 2px rgba(255,255,255,0.8);
-}
-
-/* 7. MENU LATERAL (ENCAIXE ATRÁS DA FAIXA) */
+/* MENU LATERAL (ENCAIXE PERFEITO) */
 #menu-lateral-container {
     position: fixed;
     top: 0;
-    left: -320px; /* Totalmente escondido */
-    width: 320px; 
-    height: 100%;
+    left: -350px; /* Escondido */
+    width: 320px; height: 100%;
     background: #fdfdfd;
-    z-index: 4000; /* ATRÁS da faixa verde (5000) */
-    transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    
-    /* Padding de 65px para o texto começar APÓS a faixa verde */
-    padding: 20px 10px 20px 65px; 
+    z-index: 4000; /* Entre o mapa e a faixa */
+    transition: left 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+    padding: 20px 10px 20px 75px; /* Texto começa após a faixa verde */
     overflow-y: auto;
+    scrollbar-width: none;
+    box-shadow: 5px 0 15px rgba(0,0,0,0.1);
 }
 
-#menu-lateral-container.aberto {
-    left: 0 !important; /* Encosta na borda da tela */
-}
+#menu-lateral-container.aberto { left: 0; }
 
-/* CONTROLES DE ZOOM */
-.controles-zoom {
+/* CARDS DO MENU */
+.card-residencial {
     display: flex;
-    flex-direction: column;
-    gap: 15px;
+    justify-content: space-between;
+    align-items: center;
+    background: white;
+    margin-bottom: 8px;
+    padding: 12px 15px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #333;
+    text-transform: uppercase;
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.05);
+    border-right: 6px solid #ccc; /* Tarja na direita */
 }
-.btn-zoom {
-    color: white;
-    font-size: 24px;
-    cursor: pointer;
-    font-weight: bold;
-    text-align: center;
+
+/* CORES DAS ZONAS NA DIREITA */
+.zona-zo { border-right: 6px solid #FF8C00 !important; } 
+.zona-zl { border-right: 6px solid #000080 !important; } 
+.zona-zn { border-right: 6px solid #FFD700 !important; } 
+.zona-zs { border-right: 6px solid #C71585 !important; }
+
+/* FICHA TÉCNICA */
+.ficha-tecnica {
+    position: fixed; right: 0; top: 0; 
+    width: 40%; height: 100%;
+    background: rgba(50, 50, 50, 0.98);
+    color: white; padding: 30px; z-index: 2000; 
+    box-shadow: -10px 0 25px rgba(0,0,0,0.4);
 }
