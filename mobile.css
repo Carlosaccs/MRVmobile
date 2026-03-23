@@ -1,99 +1,178 @@
 /* ==========================================================================
-   v164 - ESTRUTURA CONSOLIDADA (MAPA + MENU ENCAIXADO)
+   DASHBOARD MRV MOBILE - v166 (ESTILIZAÇÃO COMPLETA)
    ========================================================================== */
+
+/* 1. CONFIGURAÇÕES GERAIS E FONTE */
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800&display=swap');
 
 html, body { 
-    margin: 0; padding: 0; width: 100%; height: 100%; 
-    overflow: hidden; background: #fff; 
-    font-family: 'Montserrat', sans-serif !important;
+    margin: 0; 
+    padding: 0; 
+    width: 100%; 
+    height: 100%; 
+    overflow: hidden; 
+    background: #fff; 
+    font-family: 'Montserrat', sans-serif !important; /* Estilo padrão do Dashboard */
 }
 
 * { box-sizing: border-box; }
 
-/* FAIXA VERDE LATERAL */
+/* 2. FAIXA VERDE VERTICAL (LATERAL ESQUERDA) */
 .faixa-verde-vertical {
-    position: fixed; /* Fixed para não sair do lugar */
-    left: 0; top: 0;
-    width: 60px; height: 100%;
-    background-color: #00713a; 
-    display: flex;
+    position: fixed; 
+    left: 0; 
+    top: 0;
+    width: 60px; 
+    height: 100%;
+    background-color: #00713a; /* Verde Institucional MRV */
+    display: flex; 
     flex-direction: column;
-    align-items: center;
+    align-items: center; 
     justify-content: space-between;
-    padding: 15px 0;
-    z-index: 5000; /* Sempre no topo */
+    padding: 15px 0; 
+    z-index: 5000; /* Garante que fique acima do menu lateral */
     box-shadow: 2px 0 10px rgba(0,0,0,0.3);
 }
 
+/* 3. CONTADOR DE REGISTROS (TOPO DA FAIXA) */
+#contador-registros {
+    color: white; 
+    font-size: 14px; 
+    font-weight: 800; 
+    margin-bottom: 5px; 
+    text-align: center;
+    width: 100%;
+}
+
+/* 4. TÍTULO VERTICAL */
 .titulo-vertical {
-    writing-mode: vertical-rl;
+    writing-mode: vertical-rl; 
     transform: rotate(180deg);
-    font-weight: 800;
+    font-weight: 800; 
     font-size: 1.1rem; 
     color: white;
-    text-transform: uppercase;
+    text-transform: uppercase; 
     letter-spacing: 1px;
 }
 
-/* ÁREA DO MAPA */
+/* 5. MENU LATERAL (SLIDE-OUT) */
+#menu-lateral-container {
+    position: fixed; 
+    top: 0; 
+    left: -350px; /* Escondido por padrão */
+    width: 320px; 
+    height: 100%;
+    background: #fdfdfd; 
+    z-index: 4000; /* Atrás da faixa verde, à frente do mapa */
+    transition: left 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+    padding: 20px 10px 20px 75px; /* Espaço para não sobrepor a faixa verde */
+    overflow-y: auto; 
+    scrollbar-width: none;
+}
+
+#menu-lateral-container.aberto { 
+    left: 0; /* Desliza para aparecer */
+}
+
+/* 6. CARDS DOS RESIDENCIAIS (MENU) */
+.card-residencial {
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center;
+    background: white; 
+    margin-bottom: 8px; 
+    padding: 12px 15px;
+    border-radius: 4px; 
+    font-size: 0.75rem; 
+    font-weight: 700;
+    color: #333; 
+    text-transform: uppercase;
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.05);
+    border-right: 8px solid #ccc; /* Tarja lateral padrão */
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.card-residencial:active {
+    background: #f0f0f0;
+}
+
+/* 7. CORES DAS TARJAS POR ZONA (DIREITA DO CARD) */
+.zona-zo { border-right-color: #FF8C00 !important; } /* Zona Oeste: Laranja */
+.zona-zl { border-right-color: #000080 !important; } /* Zona Leste: Azul Marinho */
+.zona-zn { border-right-color: #FFD700 !important; } /* Zona Norte: Amarelo/Ouro */
+.zona-zs { border-right-color: #C71585 !important; } /* Zona Sul: Rosa/Vinho */
+
+/* 8. ÁREA DO MAPA PRINCIPAL */
 #mapa-container {
     position: fixed;
-    left: 0; top: 0;
-    width: 100%; height: 100%;
-    padding-left: 60px; /* Respeita a faixa verde */
+    left: 0; 
+    top: 0;
+    width: 100%; 
+    height: 100%;
+    padding-left: 60px; /* Respeita a faixa fixa */
     z-index: 10;
-    display: flex; align-items: center; justify-content: center;
+    display: flex; 
+    align-items: center; 
+    justify-content: center;
     background: #fff;
 }
 
-#mapa-container svg { width: 100% !important; height: auto; max-height: 95%; }
-
-/* MENU LATERAL (ENCAIXE PERFEITO) */
-#menu-lateral-container {
-    position: fixed;
-    top: 0;
-    left: -350px; /* Escondido */
-    width: 320px; height: 100%;
-    background: #fdfdfd;
-    z-index: 4000; /* Entre o mapa e a faixa */
-    transition: left 0.4s cubic-bezier(0.25, 1, 0.5, 1);
-    padding: 20px 10px 20px 75px; /* Texto começa após a faixa verde */
-    overflow-y: auto;
-    scrollbar-width: none;
-    box-shadow: 5px 0 15px rgba(0,0,0,0.1);
+#mapa-container svg { 
+    width: 100% !important; 
+    height: auto; 
+    max-height: 95%; 
 }
 
-#menu-lateral-container.aberto { left: 0; }
+/* 9. MAPA MINIMIZADO (TROCA DE REGIÃO) */
+#mapa-minimizado {
+    position: fixed;
+    bottom: 20px; 
+    left: 80px;
+    width: 120px; 
+    height: 100px;
+    background: rgba(255,255,255,0.9);
+    border: 2px solid #00713a;
+    border-radius: 8px;
+    z-index: 1000;
+    cursor: pointer;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
 
-/* CARDS DO MENU */
-.card-residencial {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: white;
-    margin-bottom: 8px;
-    padding: 12px 15px;
-    border-radius: 4px;
-    font-size: 0.75rem;
-    font-weight: 700;
+/* 10. FICHA TÉCNICA (PAINEL DIREITO) */
+.ficha-tecnica {
+    position: fixed; 
+    right: 0; 
+    top: 0; 
+    width: 44%; 
+    height: 100%;
+    background: rgba(50, 50, 50, 0.98);
+    color: white; 
+    padding: 30px; 
+    z-index: 2000;
+    box-shadow: -10px 0 25px rgba(0,0,0,0.4);
+    overflow-y: auto;
+}
+
+#nome-imovel {
+    color: #ADFF2F; 
+    text-transform: uppercase; 
+    font-size: 1.5rem;
+    border-bottom: 1px solid #666;
+    padding-bottom: 10px;
+}
+
+/* 11. IDENTIFICADOR DE CIDADE (TOPO CENTRAL) */
+#identificador-cidade {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1500;
+    font-weight: 800;
+    font-size: 1.2rem;
     color: #333;
     text-transform: uppercase;
-    box-shadow: 2px 2px 5px rgba(0,0,0,0.05);
-    border-right: 6px solid #ccc; /* Tarja na direita */
-}
-
-/* CORES DAS ZONAS NA DIREITA */
-.zona-zo { border-right: 6px solid #FF8C00 !important; } 
-.zona-zl { border-right: 6px solid #000080 !important; } 
-.zona-zn { border-right: 6px solid #FFD700 !important; } 
-.zona-zs { border-right: 6px solid #C71585 !important; }
-
-/* FICHA TÉCNICA */
-.ficha-tecnica {
-    position: fixed; right: 0; top: 0; 
-    width: 40%; height: 100%;
-    background: rgba(50, 50, 50, 0.98);
-    color: white; padding: 30px; z-index: 2000; 
-    box-shadow: -10px 0 25px rgba(0,0,0,0.4);
+    text-shadow: 1px 1px 2px rgba(255,255,255,0.8);
 }
