@@ -1,7 +1,8 @@
 /* ==========================================================================
    v171 - JS CONSOLIDADO (GSP & INTERIOR + FULLSCREEN FIX)
    ========================================================================== */
-
+console.log("DADOS GSP:", typeof MAPA_GSP); 
+console.log("DADOS INTERIOR:", typeof MAPA_INTERIOR);
 const svgNS = "http://www.w3.org/2000/svg";
 const URL_PLANILHA = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSRKdJctOPQjKAtOZSDHyArD_H8SgKIouelAS1vF1d_-13pu7u_ic6J8nP3r0Ijd56WA-mbUmHjb4Me/pub?output=csv';
 
