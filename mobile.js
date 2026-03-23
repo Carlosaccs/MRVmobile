@@ -83,8 +83,28 @@ function popularMenuResidenciais() {
 
     ordenados.forEach(item => {
         const card = document.createElement('div');
-        card.className = 'card-residencial';
-        card.innerText = item.nomeCurto.toUpperCase();
+        const nomeUpper = item.nomeCurto.toUpperCase().trim();
+        
+        // --- IDENTIFICAÇÃO DA ZONA (CORES) ---
+        let classeZona = "zona-verde"; // Padrão
+        if (nomeUpper.startsWith("ZO")) classeZona = "zona-zo";
+        else if (nomeUpper.startsWith("ZL")) classeZona = "zona-zl";
+        else if (nomeUpper.startsWith("ZN")) classeZona = "zona-zn";
+        else if (nomeUpper.startsWith("ZS")) classeZona = "zona-zs";
+
+        // --- IDENTIFICAÇÃO DE COMPLEXO (ESTILO) ---
+        // Se a Coluna B (item.categoria) for "COMPLEXO", adiciona a classe
+        const classeComplexo = (item.categoria === "COMPLEXO") ? "card-complexo" : "";
+
+        card.className = `card-residencial ${classeZona} ${classeComplexo}`;
+        
+        // Formatação do Estoque (se for "-" ou "0", não exibe o texto)
+        const estoqueTexto = (item.estoque === "-" || item.estoque === "0") ? "" : `RESTAM ${item.estoque} UN.`;
+        if (item.estoque.toUpperCase() === "CONSULTAR") {
+             card.innerHTML = `<span>${nomeUpper}</span><span class="estoque-status" style="color:#FFA500">CONSULTAR</span>`;
+        } else {
+             card.innerHTML = `<span>${nomeUpper}</span><span class="estoque-status">${estoqueTexto}</span>`;
+        }
         
         card.onclick = (e) => {
             e.stopPropagation();
