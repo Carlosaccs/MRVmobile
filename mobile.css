@@ -44,49 +44,40 @@ html, body {
 #menu-lateral-container {
     position: fixed;
     top: 0;
-    left: -350px; /* Escondido */
+    left: -400px; /* Começa fora da tela */
     width: 320px;
     height: 100%;
-    background: transparent;
+    background: white; /* Garante que o fundo não seja transparente se você não quiser */
     z-index: 3000;
-    transition: all 0.4s ease;
-    padding: 20px 10px 20px 70px; /* Texto começa logo após a faixa verde */
+    transition: 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+    padding: 20px 10px 20px 75px; /* Recuo para não cobrir a faixa verde */
     overflow-y: auto;
-    pointer-events: none;
-    visibility: hidden;
+    visibility: hidden; /* Escondido para não bloquear cliques */
 }
 
 #menu-lateral-container.aberto {
-    left: 0px; /* Encosta no canto da tela, ficando sob a faixa verde */
-    pointer-events: auto;
+    left: 0;
     visibility: visible;
 }
 
-/* CARDS COM CLIQUE GARANTIDO */
 .card-residencial {
-    background: white;
     border: 2px solid #00713a;
-    border-right: 15px solid #00713a; /* Cor padrão da borda */
+    border-right: 12px solid #00713a; /* Borda direita característica */
+    margin-bottom: 10px;
     padding: 12px;
-    margin-bottom: 8px;
+    background: #fff;
     cursor: pointer;
-    pointer-events: all; /* Essencial para o clique funcionar */
-    display: block;
+    font-size: 0.8rem;
 }
 
-/* MAPA PRINCIPAL - Garante visibilidade */
 #mapa-container {
     position: fixed;
-    left: 60px; /* Começa após a faixa verde */
+    left: 60px;
     top: 0;
     width: calc(100% - 60px);
     height: 100%;
     z-index: 10;
-    display: flex;
-    align-items: center;
-    justify-content: center;
 }
-
 /* 4. MAPA MINIMIZADO (LADO DIREITO - v139) */
 #mapa-minimizado {
     position: fixed;
