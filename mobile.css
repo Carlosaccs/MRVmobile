@@ -156,16 +156,20 @@ path.semmrv { cursor: default; }
 #menu-lateral-container {
     position: absolute;
     top: 0;
-    left: -260px; /* Escondido à esquerda da faixa verde */
-    width: 250px;
+    left: -280px; /* Escondido mais à esquerda */
+    width: 260px;
     height: 100%;
-    background: transparent; /* Fundo sem cor como você pediu */
-    z-index: 1500; /* Acima do mapa (10), mas abaixo da faixa verde (2000) */
-    transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
-    padding: 20px 15px;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden; /* Trava as barras de rolagem */
+    background: rgba(255, 255, 255, 0.05); /* Quase invisível, mas ajuda no toque */
+    z-index: 2500; /* MAIOR que o mapa-container (10) e ficha-tecnica (1000) */
+    transition: all 0.4s ease-out;
+    padding: 20px 10px;
+    overflow-y: auto; /* Permite rolar se a lista for grande */
+    pointer-events: none; /* Não atrapalha o mapa quando fechado */
+}
+
+#menu-lateral-container.aberto {
+    left: 60px; /* Brota ao lado da faixa verde */
+    pointer-events: auto; /* Ativa cliques quando aberto */
 }
 
 /* Quando o menu ganha a classe .aberto via JS */
