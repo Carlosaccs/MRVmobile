@@ -60,37 +60,48 @@ function toggleMenuLateral() {
 
 function popularMenuResidenciais() {
     const trilho = document.getElementById('trilho-infinito');
-    const contador = document.getElementById('contador-registros');
-    if (!trilho) return;
+    if (!trilho || !window.bancoDados) {
+        console.error("Dados da planilha não encontrados!");
+        return;
+    }
 
-    trilho.innerHTML = "";
+    trilho.innerHTML = ""; // Limpa para evitar duplicatas
+
+    // Transformamos o objeto em Array para contar e garantir a ordem
     const ids = Object.keys(window.bancoDados);
-    let totalGerado = 0;
+    
+    console.log("Total de IDs encontrados no banco:", ids.length);
 
     ids.forEach(id => {
         const info = window.bancoDados[id];
-        if (info && info.nomeCurto && info.nomeCurto.trim() !== "") {
+        
+        // Se houver qualquer dado na Coluna D (NOME_CURTO), criamos o card
+        if (info && info.nomeCurto && info.nomeCurto.toString().trim() !== "") {
             const card = document.createElement('div');
             card.className = 'card-residencial';
-            card.innerText = info.nomeCurto.toUpperCase();
             
-            card.onclick = (e) => {
-                e.stopPropagation();
-                const path = document.getElementById(id);
-                if (path) {
-                    path.dispatchEvent(new Event('click'));
+            // Texto do Card (Coluna D)
+            card.innerText = info.nomeCurto.toUpperCase();
+
+            // Lógica de Clique: Fecha menu e "toca" no mapa
+            card.onclick = () => {
+                const elementoMapa = document.getElementById(id);
+                if (elementoMapa) {
+                    // Simula o clique para abrir a ficha técnica
+                    elementoMapa.dispatchEvent(new Event('click'));
+                    // Fecha o menu lateral
                     toggleMenuLateral();
+                } else {
+                    console.warn("ID do mapa não encontrado para:", id);
                 }
             };
+
             trilho.appendChild(card);
-            totalGerado++;
         }
     });
 
-    if (contador) {
-        contador.innerText = totalGerado.toString().padStart(2, '0');
-        contador.style.color = (totalGerado >= 42) ? "white" : "#ffff00";
-    }
+    // Verificação de segurança no console
+    console.log("Total de cards gerados no menu:", trilho.children.length);
 }
 
 // 4. DESENHO DOS MAPAS (GSP & INTERIOR)
