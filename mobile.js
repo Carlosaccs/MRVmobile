@@ -1,13 +1,13 @@
 /* ==========================================================================
-   v147 - VERSÃO MULTI-REGISTROS (FIX: 42 EMPREENDIMENTOS)
+   v148 - VERSÃO "ORDEM DE VENDAS" (FIX: MULTI-RESIDENCIAIS & COLUNA C)
    ========================================================================== */
 
 const svgNS = "http://www.w3.org/2000/svg";
 const URL_PLANILHA = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSRKdJctOPQjKAtOZSDHyArD_H8SgKIouelAS1vF1d_-13pu7u_ic6J8nP3r0Ijd56WA-mbUmHjb4Me/pub?output=csv';
 
 let mapaAtivo = "GSP";
-window.bancoDados = {}; // Agora será um objeto de Arrays
-window.listaCompleta = []; // Para o Menu de 42 itens
+window.bancoDados = {}; 
+window.listaCompleta = []; 
 
 const AJUSTES_MAPA = {
     GSP: { marginRight: "35%", marginLeft: "-70px", scale: "1" },
@@ -17,7 +17,7 @@ const AJUSTES_MAPA = {
 const DNA_AMPLIAR = "M 75.757133 114.16926 L 75.757133 124.7898 L 75.757133 135.41086 L 78.412268 135.41086 L 81.067403 135.41086 L 81.067403 127.44493 L 81.067403 119.47953 L 89.032808 119.47953 L 96.99873 119.47953 L 96.99873 116.82439 L 96.99873 114.16926 L 86.377673 114.16926 L 75.757133 114.16926 z M 115.58468 114.16926 L 115.58468 116.82439 L 115.58468 119.47953 L 123.36043 119.47953 L 131.13618 119.47953 L 131.13618 127.44493 L 131.13618 135.41086 L 133.79183 135.41086 L 136.44697 135.41086 L 136.44697 124.7898 L 136.44697 114.16926 L 126.01556 114.16926 L 115.58468 114.16926 z M 75.757133 153.9968 L 75.757133 164.61734 L 75.757133 175.2384 L 86.377673 175.2384 L 96.99873 175.2384 L 96.99873 172.39361 L 96.99873 169.54882 L 89.032808 169.54882 L 81.067403 169.54882 L 81.067403 161.77255 L 81.067403 153.9968 L 78.412268 153.9968 L 75.757133 153.9968 z M 131.13618 153.9968 L 131.13618 161.77255 L 131.13618 169.54882 L 123.36043 169.54882 L 115.58468 169.54882 L 115.58468 172.39361 L 115.58468 172.39361 L 115.58468 175.2384 L 126.01556 175.2384 L 136.44697 175.2384 L 136.44697 164.61734 L 136.44697 153.9968 L 133.79183 153.9968 L 131.13618 153.9968 z";
 const DNA_REDUZIR = "M 78.408134 124.88437 L 78.408134 132.66012 L 78.408134 140.43587 L 70.442729 140.43587 L 62.476807 140.43587 L 62.476807 143.28066 L 62.476807 146.12596 L 73.097864 146.12596 L 83.718404 146.12596 L 83.718404 135.50491 L 83.718404 124.88437 L 81.063269 124.88437 L 78.408134 124.88437 z M 102.30435 124.88437 L 102.30435 135.50491 L 102.30435 146.12596 L 112.92541 146.12596 L 123.54595 146.12596 L 123.54595 143.28066 L 123.54595 140.43587 L 115.58054 140.43587 L 107.61514 132.66012 L 107.61514 124.88437 L 104.96 124.88437 L 102.30435 124.88437 z M 62.476807 164.3326 L 62.476807 167.17739 L 62.476807 170.02218 L 70.442729 170.02218 L 78.408134 170.02218 L 78.408134 177.79793 L 78.408134 185.5742 L 81.063269 185.5742 L 83.718404 185.5742 L 83.718404 174.95315 L 83.718404 164.3326 L 73.097864 164.3326 L 62.476807 164.3326 z M 102.30435 164.3326 L 102.30435 174.95315 L 102.30435 185.5742 L 104.96 185.5742 L 107.61514 185.5742 L 107.61514 177.79793 L 107.61514 170.02218 L 115.58054 170.02218 L 123.54595 170.02218 L 123.54595 167.17739 L 123.54595 164.3326 L 112.92541 164.3326 L 102.30435 164.3326 z";
 
-// 1. CARREGAMENTO DOS 42 REGISTROS
+// 1. CARREGAMENTO DOS 42 REGISTROS COM ORDEM (COLUNA C)
 async function carregarPlanilha() {
     try {
         const res = await fetch(URL_PLANILHA);
@@ -31,29 +31,26 @@ async function carregarPlanilha() {
             const c = linha.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
             if (c.length >= 4) {
                 const idPath = c[0].replace(/["']/g, '').trim().toLowerCase();
+                const ordem = parseInt(c[2]) || 99999; // Coluna C
                 const nomeCurto = c[3]?.replace(/["']/g, '').trim() || "";
 
                 if (idPath && nomeCurto) {
                     const item = {
                         idPath: idPath,
+                        ordem: ordem,
                         nomeCurto: nomeCurto,
                         estoque: c[5]?.replace(/["']/g, '').trim() || "0",
                         statusObra: c[11]?.replace(/["']/g, '').trim() || "Consulte"
                     };
 
-                    // Agrupa no banco para o clique no mapa
                     if (!window.bancoDados[idPath]) window.bancoDados[idPath] = [];
                     window.bancoDados[idPath].push(item);
-
-                    // Adiciona na lista flat para o menu lateral
                     window.listaCompleta.push(item);
                 }
             }
         });
 
         const total = window.listaCompleta.length;
-        console.log(`✅ Total de registros: ${total}`);
-
         const contador = document.getElementById('contador-registros');
         if (contador) {
             contador.innerText = total.toString().padStart(2, '0');
@@ -64,7 +61,7 @@ async function carregarPlanilha() {
     } catch (e) { console.error("Erro CSV:", e); }
 }
 
-// 2. MENU LATERAL (42 CARDS)
+// 2. MENU LATERAL (ORDENADO PELA COLUNA C)
 function toggleMenuLateral() {
     const menu = document.getElementById('menu-lateral-container');
     if (menu) {
@@ -78,10 +75,11 @@ function popularMenuResidenciais() {
     if (!trilho) return;
     trilho.innerHTML = "";
 
-    // Ordena os 42 nomes alfabeticamente
-    const ordenados = [...window.listaCompleta].sort((a, b) => 
-        a.nomeCurto.localeCompare(b.nomeCurto)
-    );
+    // Ordenação Master: Primeiro pela Coluna C (Ordem), depois por nome
+    const ordenados = [...window.listaCompleta].sort((a, b) => {
+        if (a.ordem !== b.ordem) return a.ordem - b.ordem;
+        return a.nomeCurto.localeCompare(b.nomeCurto);
+    });
 
     ordenados.forEach(item => {
         const card = document.createElement('div');
@@ -90,10 +88,8 @@ function popularMenuResidenciais() {
         
         card.onclick = (e) => {
             e.stopPropagation();
-            // Simula clique no mapa usando o ID_PATH
             const pathOriginal = document.getElementById(item.idPath);
             if (pathOriginal) {
-                // Forçamos a exibição apenas deste item específico no painel
                 exibirDadosNoPainel(item.idPath, item.nomeCurto);
                 pathOriginal.style.fill = "#FF4500";
                 toggleMenuLateral();
@@ -103,7 +99,7 @@ function popularMenuResidenciais() {
     });
 }
 
-// 3. LOGICA DO PAINEL LATERAL
+// 3. EXIBIÇÃO NO PAINEL LATERAL (SUPORTA LISTA)
 function exibirDadosNoPainel(idPath, filtrarNome = null) {
     const listaImoveis = window.bancoDados[idPath];
     const tituloPainel = document.getElementById('nome-imovel');
@@ -111,17 +107,17 @@ function exibirDadosNoPainel(idPath, filtrarNome = null) {
 
     if (!listaImoveis) return;
 
-    // Se clicar no mapa, mostra todos do bairro. Se clicar no menu, mostra só o escolhido.
-    const imoveisParaExibir = filtrarNome 
+    // Se clicar no mapa, exibe todos do bairro. Se clicar no menu, foca no escolhido.
+    const itens = filtrarNome 
         ? listaImoveis.filter(i => i.nomeCurto === filtrarNome)
         : listaImoveis;
 
     tituloPainel.innerText = idPath.toUpperCase();
-    detalhesPainel.innerHTML = imoveisParaExibir.map(info => `
-        <div style="margin-bottom: 20px; border-bottom: 1px solid #555; padding-bottom: 10px;">
-            <h3 style="color: #50c878; margin: 5px 0;">${info.nomeCurto}</h3>
-            <p><strong>Estoque:</strong> ${info.estoque}</p>
-            <p><strong>Status:</strong> ${info.statusObra}</p>
+    detalhesPainel.innerHTML = itens.map(info => `
+        <div style="margin-bottom: 25px; border-bottom: 2px solid #444; padding-bottom: 15px;">
+            <h3 style="color: #ADFF2F; margin: 0 0 10px 0; font-size: 1.2rem;">${info.nomeCurto}</h3>
+            <p style="margin: 5px 0;"><strong>Estoque:</strong> ${info.estoque}</p>
+            <p style="margin: 5px 0;"><strong>Status:</strong> ${info.statusObra}</p>
         </div>
     `).join("");
 }
@@ -148,7 +144,6 @@ function desenharMapa(dados, targetId, ehMinimizado) {
     dados.paths.forEach(pData => {
         const path = document.createElementNS(svgNS, "path");
         const idLimpo = pData.id.toLowerCase();
-        const temDados = window.bancoDados[idLimpo];
         const ehMRV = pData.class === "commrv";
 
         path.setAttribute("d", pData.d);
@@ -194,8 +189,8 @@ function trocarMapas() {
 function toggleFullscreen() {
     if (!document.fullscreenElement) {
         document.documentElement.requestFullscreen().catch(() => {});
-    } else {
-        if (document.exitFullscreen) document.exitFullscreen();
+    } else if (document.exitFullscreen) {
+        document.exitFullscreen();
     }
 }
 
