@@ -75,7 +75,7 @@ function popularMenuResidenciais() {
     if (!trilho) return;
     trilho.innerHTML = "";
 
-    // Ordenação Master: Primeiro pela Coluna C (Ordem), depois por nome
+    // Ordenação pela Coluna C
     const ordenados = [...window.listaCompleta].sort((a, b) => {
         if (a.ordem !== b.ordem) return a.ordem - b.ordem;
         return a.nomeCurto.localeCompare(b.nomeCurto);
@@ -85,31 +85,27 @@ function popularMenuResidenciais() {
         const card = document.createElement('div');
         const nomeUpper = item.nomeCurto.toUpperCase().trim();
         
-        // --- IDENTIFICAÇÃO DA ZONA (CORES) ---
-        let classeZona = "zona-verde"; // Padrão
+        // Aplica cores por zona (ZO, ZL, ZN, ZS)
+        let classeZona = "zona-verde";
         if (nomeUpper.startsWith("ZO")) classeZona = "zona-zo";
         else if (nomeUpper.startsWith("ZL")) classeZona = "zona-zl";
         else if (nomeUpper.startsWith("ZN")) classeZona = "zona-zn";
         else if (nomeUpper.startsWith("ZS")) classeZona = "zona-zs";
 
-        // --- IDENTIFICAÇÃO DE COMPLEXO (ESTILO) ---
-        // Se a Coluna B (item.categoria) for "COMPLEXO", adiciona a classe
+        // Se for "COMPLEXO" na Coluna B, aplica estilo escuro
         const classeComplexo = (item.categoria === "COMPLEXO") ? "card-complexo" : "";
 
         card.className = `card-residencial ${classeZona} ${classeComplexo}`;
         
-        // Formatação do Estoque (se for "-" ou "0", não exibe o texto)
-        const estoqueTexto = (item.estoque === "-" || item.estoque === "0") ? "" : `RESTAM ${item.estoque} UN.`;
-        if (item.estoque.toUpperCase() === "CONSULTAR") {
-             card.innerHTML = `<span>${nomeUpper}</span><span class="estoque-status" style="color:#FFA500">CONSULTAR</span>`;
-        } else {
-             card.innerHTML = `<span>${nomeUpper}</span><span class="estoque-status">${estoqueTexto}</span>`;
-        }
+        // AQUI ESTÁ A CHAVE: Usamos apenas o nomeCurto. 
+        // Removido qualquer menção ao item.estoque (Coluna F) para o menu não esticar.
+        card.innerHTML = `<span>${nomeUpper}</span>`;
         
         card.onclick = (e) => {
             e.stopPropagation();
             const pathOriginal = document.getElementById(item.idPath);
             if (pathOriginal) {
+                // A Coluna F só aparece AQUI (dentro da ficha técnica), não no menu.
                 exibirDadosNoPainel(item.idPath, item.nomeCurto);
                 pathOriginal.style.fill = "#FF4500";
                 toggleMenuLateral();
@@ -118,7 +114,6 @@ function popularMenuResidenciais() {
         trilho.appendChild(card);
     });
 }
-
 // 3. EXIBIÇÃO NO PAINEL LATERAL (SUPORTA LISTA)
 function exibirDadosNoPainel(idPath, filtrarNome = null) {
     const listaImoveis = window.bancoDados[idPath];
