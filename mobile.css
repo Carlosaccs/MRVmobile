@@ -73,49 +73,71 @@ html, body {
     opacity: 0.8;
 }
 
-/* 3. MENU LATERAL DESLIZANTE (DRAWER) */
+/* ==========================================================================
+   3. MENU LATERAL COM BOTÕES (ZONA-READY)
+   ========================================================================== */
 #menu-lateral {
-    position: absolute;
+    position: fixed; /* Fixed garante que ele cubra a tela toda ao deslizar */
     left: 0;
     top: 0;
-    width: 280px; 
+    width: 310px; 
     height: 100%;
-    background-color: rgba(0, 113, 58, 0.98); /* Verde MRV denso */
-    z-index: 3500; /* Atrás da faixa verde, mas acima do mapa */
-    padding: 60px 20px 20px 80px; /* Recuo para não esconder sob a faixa */
+    /* Fundo levemente escurecido com desfoque para destacar os botões brancos */
+    background: rgba(0, 0, 0, 0.15); 
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 3000; 
+    padding: 20px 0; /* Tiramos o padding fixo para os botões terem margens próprias */
     transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 5px 0 20px rgba(0,0,0,0.4);
-    color: white;
+    box-shadow: 5px 0 20px rgba(0,0,0,0.2);
 }
 
-/* Classes de Estado do Menu */
+/* Classes de Estado */
 .menu-oculto { transform: translateX(-100%); }
 .menu-aberto { transform: translateX(0); }
 
 .menu-header {
+    margin-left: 85px; /* Recuo para não ficar sob a faixa verde */
     font-weight: bold;
-    font-size: 1.4rem;
-    border-bottom: 2px solid rgba(255,255,255,0.2);
-    margin-bottom: 25px;
-    padding-bottom: 10px;
-    color: #50c878;
+    font-size: 1.2rem;
+    color: #00713a; /* Verde MRV no título */
+    margin-bottom: 20px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
 }
 
 .menu-lista {
     list-style: none;
     padding: 0;
     margin: 0;
+    overflow-y: auto; /* Permite rolar se a lista de prédios for grande */
+    height: calc(100% - 60px);
 }
 
-.menu-lista li {
-    padding: 18px 0;
-    font-size: 1.1rem;
-    border-bottom: 1px solid rgba(255,255,255,0.1);
+/* O BOTÃO BRANCO COM BORDA LARGA (CIRÚRGICO) */
+.menu-item-mrv {
+    background: #ffffff;
+    border: 1.5px solid #00713a;
+    /* Borda da direita larga para futuras cores de zona */
+    border-right: 20px solid #00713a; 
+    
+    margin: 10px 15px 10px 85px; /* 85px de distância da esquerda (leitura limpa) */
+    padding: 14px 12px;
+    border-radius: 4px 15px 15px 4px; /* Arredondado só na direita */
+    
+    color: #00713a;
+    font-weight: bold;
+    font-size: 0.85rem;
     cursor: pointer;
-    transition: color 0.2s;
+    display: block;
+    box-shadow: 4px 4px 8px rgba(0,0,0,0.1);
+    transition: transform 0.1s, background 0.2s;
 }
 
-.menu-lista li:active { color: #50c878; }
+.menu-item-mrv:active {
+    transform: scale(0.96);
+    background: #f1f1f1;
+}
 
 /* 4. CONTAINER DO MAPA PRINCIPAL */
 #mapa-container {
