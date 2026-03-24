@@ -175,22 +175,23 @@ CSS
 
 /* 7. MENU LATERAL (v138 - AJUSTE FINAL DE LEITURA E CLIQUE) */
 #container-menu {
-    position: absolute; 
-    left: -320px; 
+    position: fixed; /* Troquei para fixed para garantir que ignore o resto */
+    left: -320px;
     top: 0;
-    width: 300px; 
-    height: 100%;
-    background: #ffffff; 
-    z-index: 5000 !important; 
-    transition: left 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    width: 280px;
+    height: 100vh;
+    background: white;
+    z-index: 99999 !important; /* Valor bem alto */
+    transition: left 0.3s ease;
+    padding: 20px 20px 20px 80px; /* Espaço para a faixa verde */
+    box-shadow: 5px 0 15px rgba(0,0,0,0.3);
     overflow-y: auto;
-    /* O SEGREDO: padding-left maior que a largura da faixa verde (60px) */
-    padding: 20px 15px 20px 75px; 
-    box-shadow: 10px 0 20px rgba(0,0,0,0.4);
+    pointer-events: auto; /* Garante que aceite toques */
 }
 
 #container-menu.ativo {
     left: 0;
+}
 }
 
 .item-menu {
