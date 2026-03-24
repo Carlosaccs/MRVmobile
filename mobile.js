@@ -52,12 +52,15 @@ function toggleMenuLateral() {
     const menu = document.getElementById('menu-lateral-container');
     if (!menu) return;
     
+    // O console.log abaixo é seu melhor amigo. 
+    // Se você clicar e não aparecer "MENU FOI ACIONADO" no F12, o erro é no HTML.
+    console.log("MENU FOI ACIONADO"); 
     menu.classList.toggle('aberto');
+
     if (menu.classList.contains('aberto')) {
         popularMenuResidenciais();
     }
 }
-
 function popularMenuResidenciais() {
     const trilho = document.getElementById('trilho-infinito');
     const contador = document.getElementById('contador-registros');
