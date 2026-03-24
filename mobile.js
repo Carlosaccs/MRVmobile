@@ -9,9 +9,18 @@ const URL_PLANILHA = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSRKdJctOP
 let mapaAtivo = "GSP";
 window.bancoDados = {}; 
 
-const AJUSTES_MAPA = {
-    GSP: { marginRight: "35%", marginLeft: "-70px", scale: "1" },
-    INTERIOR: { marginRight: "50%", marginLeft: "-100px", scale: "1.15" }
+const MAPA_GSP = {
+    viewBox: "0 0 1000 800", // Exemplo
+    transform: "translate(0,0)",
+    paths: [
+        { id: "sao-paulo", class: "commrv", d: "M10 10 L20 20..." },
+        // ... todos os seus paths aqui
+    ]
+};
+
+const MAPA_INTERIOR = {
+    viewBox: "0 0 1000 800",
+    paths: [ /* ... */ ]
 };
 
 // DNA DOS ÍCONES (FULLSCREEN)
