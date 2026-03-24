@@ -195,9 +195,67 @@ function atualizarVisualIconeFullscreen() {
     }
 }
 
-// 7. INICIALIZAÇÃO DO SISTEMA
-window.onload = () => {
-    carregarPlanilha();
-};
+/* ==========================================================================
+   7. MENU LATERAL (v139) - AJUSTE DE CAMADAS E SCROLL
+   ========================================================================== */
 
-document.addEventListener('fullscreenchange', atualizarVisualIconeFullscreen);
+#menu-lateral-container {
+    position: absolute;
+    top: 0;
+    left: -280px; /* Escondido atrás do limite da tela */
+    width: 250px;
+    height: 100%;
+    background: transparent;
+    
+    /* PILHA DE CAMADAS: Abaixo da faixa (2000), acima do mapa (10) */
+    z-index: 1500; 
+    
+    transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+    padding: 20px 10px;
+    
+    /* REMOVE BARRAS DE ROLAGEM VISÍVEIS */
+    overflow-y: auto;
+    -ms-overflow-style: none;  /* IE/Edge */
+    scrollbar-width: none;     /* Firefox */
+    
+    /* Garante que toques não vazem para o mapa quando fechado */
+    pointer-events: none;
+}
+
+/* Esconde barra no Chrome, Safari e Opera */
+#menu-lateral-container::-webkit-scrollbar {
+    display: none;
+}
+
+#menu-lateral-container.aberto {
+    left: 60px; /* Brota exatamente onde a faixa verde termina */
+    pointer-events: auto;
+}
+
+#trilho-infinito {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding-bottom: 50px; /* Espaço para o último item não colar no fundo */
+}
+
+/* O "Card" branco que você desenhou */
+.card-residencial {
+    background: #ffffff;
+    border: 2px solid #00713a; /* Verde MRV */
+    border-right: 15px solid #00713a; /* Borda larga para futuras cores de zona */
+    padding: 12px 15px;
+    font-size: 0.85rem;
+    font-weight: bold;
+    color: #333;
+    border-radius: 4px;
+    text-transform: uppercase;
+    box-shadow: 3px 3px 10px rgba(0,0,0,0.2);
+    cursor: pointer;
+    transition: transform 0.1s ease;
+}
+
+.card-residencial:active {
+    transform: scale(0.96);
+    background-color: #f9f9f9;
+}
