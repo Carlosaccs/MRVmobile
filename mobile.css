@@ -180,51 +180,40 @@ CSS
 
 
 
-/* 7. MENU LATERAL (v138 - CIRURGIA DO MENU) */
+/* 7. MENU LATERAL (v138 - AJUSTE DE POSICIONAMENTO) */
 #container-menu {
     position: absolute;
-    left: -280px; /* Começa escondido totalmente à esquerda */
+    left: -280px; /* Escondido */
     top: 0;
-    width: 280px; 
+    width: 250px; 
     height: 100%;
-    background: rgba(255, 255, 255, 0.1); /* Fundo da caixa transparente como solicitado */
-    z-index: 1500; /* Fica entre o mapa (1000) e a faixa verde (2000) */
-    transition: left 0.4s ease-in-out;
+    background: rgba(255, 255, 255, 0.1); 
+    z-index: 1500; 
+    transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     overflow-y: auto;
-    padding-left: 70px; /* Espaço de segurança para não sumir sob a faixa verde */
+    padding-left: 80px; /* Aumentamos para 80px para afastar da faixa verde */
     padding-top: 20px;
     padding-right: 15px;
-    pointer-events: none; /* Desativado por padrão para não atrapalhar o mapa */
+    pointer-events: none;
 }
 
-/* Quando o menu ganha a classe .ativo, ele desliza para a direita */
 #container-menu.ativo {
-    left: 0; 
-    pointer-events: auto; /* Reativa os cliques nos botões */
+    left: 0px; /* Agora ele desliza corretamente */
+    pointer-events: auto;
 }
 
 .item-menu {
     background: white;
-    border: 1px solid #00713a; /* Contorno verde escuro */
+    border: 1px solid #00713a;
     margin-bottom: 12px;
-    padding: 12px;
+    padding: 10px;
     border-radius: 4px;
     cursor: pointer;
-    font-size: 0.85rem;
+    font-size: 0.75rem; /* Diminuímos um pouco para caber melhor no mobile */
     font-weight: bold;
     color: #333;
     display: block;
     box-shadow: 2px 2px 8px rgba(0,0,0,0.1);
-    border-right: 12px solid #ccc; /* Borda grossa na direita para as zonas */
-    transition: transform 0.2s ease;
+    border-right: 10px solid #ccc; 
+    text-align: left;
 }
-
-.item-menu:active {
-    transform: scale(0.98);
-}
-
-/* Cores das Zonas na borda direita (identificadas pelo prefixo no JS) */
-.borda-zo { border-right-color: #f39c12; } /* Oeste: Laranja */
-.borda-zl { border-right-color: #e74c3c; } /* Leste: Vermelho */
-.borda-zn { border-right-color: #3498db; } /* Norte: Azul */
-.borda-zs { border-right-color: #9b59b6; } /* Sul: Roxo */
