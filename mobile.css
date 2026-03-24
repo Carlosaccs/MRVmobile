@@ -173,21 +173,20 @@ CSS
 
 
 
-/* 7. MENU LATERAL (v138 - FIXO E SOBREPOSTO) */
-/* Bloco 7 - MENU SOBRE TUDO */
+/* 7. MENU LATERAL (v138 - AJUSTE FINAL DE LEITURA E CLIQUE) */
 #container-menu {
-    position: absolute; /* Mudança para absolute */
+    position: absolute; 
     left: -320px; 
     top: 0;
-    width: 280px; 
+    width: 300px; 
     height: 100%;
     background: #ffffff; 
-    z-index: 9999 !important; /* Força o menu na frente de tudo */
-    transition: left 0.4s ease-in-out;
+    z-index: 5000 !important; 
+    transition: left 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     overflow-y: auto;
-    padding-left: 75px; 
-    padding-top: 20px;
-    box-shadow: 10px 0 20px rgba(0,0,0,0.5);
+    /* O SEGREDO: padding-left maior que a largura da faixa verde (60px) */
+    padding: 20px 15px 20px 75px; 
+    box-shadow: 10px 0 20px rgba(0,0,0,0.4);
 }
 
 #container-menu.ativo {
@@ -197,7 +196,7 @@ CSS
 .item-menu {
     background: #f9f9f9;
     border: 1px solid #00713a;
-    margin-bottom: 8px;
+    margin-bottom: 10px;
     padding: 12px 10px;
     border-radius: 6px;
     cursor: pointer;
@@ -205,7 +204,18 @@ CSS
     font-weight: bold;
     color: #222;
     display: block;
-    border-right: 12px solid #ccc;
     text-align: left;
     box-shadow: 2px 2px 5px rgba(0,0,0,0.05);
+    border-right: 12px solid #ccc; /* Cor padrão cinza */
+    transition: transform 0.1s;
 }
+
+.item-menu:active {
+    transform: scale(0.98);
+}
+
+/* CORES POR ZONA (Para o seu JS aplicar) */
+.borda-zo { border-right-color: #ff8c00 !important; } /* Laranja */
+.borda-zl { border-right-color: #ff1493 !important; } /* Rosa/DeepPink */
+.borda-zn { border-right-color: #1e90ff !important; } /* Azul */
+.borda-zs { border-right-color: #ff4500 !important; } /* Laranja Avermelhado */
