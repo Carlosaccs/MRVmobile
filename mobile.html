@@ -27,12 +27,11 @@
         </aside>
 
         <nav id="menu-lateral" class="menu-oculto">
-            <div class="menu-header">MENU MRV</div>
+            <div class="menu-header">OPÇÕES</div>
             <ul class="menu-lista">
-                <li>Lançamentos</li>
-                <li>Prontos para Morar</li>
-                <li>Minha Casa Minha Vida</li>
-                <li>Falar com Consultor</li>
+                <li onclick="toggleFullscreen()">Expandir Tela</li>
+                <li>Filtrar por Disponibilidade</li>
+                <li>Baixar Tabela PDF</li>
                 <li onclick="toggleMenu()" style="color: #ff4500; margin-top: 30px; font-weight: bold;">✕ FECHAR</li>
             </ul>
         </nav>
@@ -43,16 +42,19 @@
 
         <div id="identificador-cidade"></div>
 
-        <div id="mapa-minimizado">
+        <div id="mapa-minimizado" title="Clique para trocar o mapa">
             </div>
 
         <section class="ficha-tecnica">
-            <h2 id="nome-imovel">Selecione</h2>
+            <h2 id="nome-imovel">SELECIONE</h2>
             <div id="detalhes-imovel">
-                <p>Toque em um ponto verde para ver os detalhes da MRV nesta região.</p>
+                <p>Toque em uma cidade para ver os detalhes da planilha.</p>
             </div>
         </section>
 
     </div>
 
-    <script src="mapa-SP
+    <script src="mapa-SP.js"></script> 
+    <script src="mobile.js"></script>
+</body>
+</html>
