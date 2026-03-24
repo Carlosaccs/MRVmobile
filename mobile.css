@@ -180,42 +180,35 @@ CSS
 
 
 
-/* 7. MENU LATERAL (v138 - AJUSTE FINAL DE CAMADAS) */
+/* 7. MENU LATERAL (v138 - SOBREPOSIÇÃO FORÇADA) */
 #container-menu {
-    position: absolute;
-    left: -280px; /* Escondido à esquerda */
+    position: fixed; /* Mudamos para fixed para ele ignorar o resto do layout */
+    left: -280px; 
     top: 0;
     width: 280px; 
-    height: 100%;
-    /* Fundo quase sólido para o mapa não aparecer através do menu */
-    background: rgba(255, 255, 255, 0.98); 
-    /* z-index: MAIOR que o mapa (1000) e MENOR que a faixa verde (2000) */
-    z-index: 1500; 
+    height: 100vh; /* Ocupa a altura total da tela */
+    background: #ffffff; /* Fundo branco sólido para cobrir o mapa totalmente */
+    z-index: 9999 !important; /* Valor altíssimo para garantir que fique SOBRE o mapa */
     transition: left 0.4s ease-in-out;
     overflow-y: auto;
-    padding-left: 75px; /* Espaço para não ser coberto pela faixa verde */
+    padding-left: 75px; 
     padding-top: 20px;
     padding-right: 15px;
-    pointer-events: none; /* Não atrapalha o mapa quando está fechado */
+    box-shadow: 5px 0 15px rgba(0,0,0,0.5);
+    pointer-events: none;
 }
 
 #container-menu.ativo {
     left: 0; 
-    pointer-events: auto; /* Permite clicar nos botões quando aberto */
-    box-shadow: 5px 0 15px rgba(0,0,0,0.3);
+    pointer-events: auto;
 }
 
-.item-menu {
-    background: white;
-    border: 1px solid #00713a;
-    margin-bottom: 10px;
-    padding: 10px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 11px;
-    font-weight: bold;
-    color: #333;
-    display: block;
-    border-right: 10px solid #ccc; /* Borda grossa para as cores das zonas */
-    text-align: left;
+/* Garante que a faixa verde fique AINDA MAIS acima que o menu se necessário */
+.faixa-verde-vertical {
+    z-index: 10000 !important;
+}
+
+/* Garante que o mapa fique lá embaixo */
+#mapa-container, .area-mapa {
+    z-index: 1 !important;
 }
