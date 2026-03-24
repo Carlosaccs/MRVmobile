@@ -180,35 +180,41 @@ CSS
 
 
 
-/* 7. MENU LATERAL (v138 - SOBREPOSIÇÃO FORÇADA) */
+/* 7. MENU LATERAL (v138 - FIXO E SOBREPOSTO) */
 #container-menu {
-    position: fixed; /* Mudamos para fixed para ele ignorar o resto do layout */
-    left: -280px; 
+    position: fixed; /* Fixa na tela, independente do wrapper */
+    left: -320px; /* Esconde totalmente (incluindo sombra) */
     top: 0;
     width: 280px; 
-    height: 100vh; /* Ocupa a altura total da tela */
-    background: #ffffff; /* Fundo branco sólido para cobrir o mapa totalmente */
-    z-index: 9999 !important; /* Valor altíssimo para garantir que fique SOBRE o mapa */
-    transition: left 0.4s ease-in-out;
+    height: 100vh;
+    background: #ffffff; /* Fundo sólido para cobrir o mapa */
+    z-index: 5000 !important; /* Valor muito alto para vencer o SVG */
+    transition: left 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Efeito elástico */
     overflow-y: auto;
-    padding-left: 75px; 
+    padding-left: 80px; /* Espaço para a faixa verde */
     padding-top: 20px;
     padding-right: 15px;
-    box-shadow: 5px 0 15px rgba(0,0,0,0.5);
-    pointer-events: none;
+    box-shadow: 10px 0 20px rgba(0,0,0,0.4);
+    pointer-events: none; /* Bloqueia cliques no mapa enquanto fechado */
 }
 
 #container-menu.ativo {
     left: 0; 
-    pointer-events: auto;
+    pointer-events: auto; /* Permite clicar nos residenciais quando aberto */
 }
 
-/* Garante que a faixa verde fique AINDA MAIS acima que o menu se necessário */
-.faixa-verde-vertical {
-    z-index: 10000 !important;
-}
-
-/* Garante que o mapa fique lá embaixo */
-#mapa-container, .area-mapa {
-    z-index: 1 !important;
+.item-menu {
+    background: #f9f9f9;
+    border: 1px solid #00713a;
+    margin-bottom: 8px;
+    padding: 12px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 11px;
+    font-weight: bold;
+    color: #222;
+    display: block;
+    border-right: 12px solid #ccc;
+    text-align: left;
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.05);
 }
