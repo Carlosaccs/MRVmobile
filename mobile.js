@@ -196,3 +196,15 @@ function toggleMenu() {
         menu.classList.add('menu-oculto');
     }
 }
+
+// Funções para o novo Menu
+function filtrarDisponibilidade() {
+    console.log("Filtrando imóveis...");
+    // Aqui entra sua lógica de filtro no futuro
+    toggleMenu(); // Fecha o menu após clicar
+}
+
+function baixarTabela() {
+    window.open(URL_PLANILHA, '_blank');
+    toggleMenu();
+}
