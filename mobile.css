@@ -1,305 +1,193 @@
 /* ==========================================================================
-
-   v136 - ARQUIVO CSS CONSOLIDADO
-
+   v140 - CSS INTEGRAL: MENU SOBREPOSTO + AJUSTES DE CAMADA
    ========================================================================== */
 
-
-
-/* 1. FUNDAÇÃO E RESET */
-
-html, body {
-
-    margin: 0; padding: 0; width: 100%; height: 100%;
-
-    overflow: hidden; background: #fff;
-
+/* 1. Reset e Base */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
 }
 
-* { box-sizing: border-box; font-family: sans-serif; }
-
-
+body, html {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background-color: #ffffff;
+}
 
 .mobile-wrapper {
-
-    display: flex; width: 100vw; height: 100%;
-
-    position: relative; overflow: hidden;
-
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: row;
 }
 
-
-
-/* 2. FAIXA VERDE LATERAL */
-
-/* 2. FAIXA VERDE LATERAL - v136 FINAL */
-
-.faixa-verde-vertical {
-
+/* 2. Faixa Verde Lateral (A mais alta na hierarquia) */
+.sidebar-verde {
     position: absolute;
-
     left: 0;
-
     top: 0;
-
     width: 60px;
-
     height: 100%;
-
     background-color: #00713a;
-
     display: flex;
-
     flex-direction: column;
-
-    align-items: center;
-
     justify-content: space-between;
-
-    padding: 10px 0; /* Reduzi para dar mais fôlego ao título */
-
-    z-index: 2000;
-
+    align-items: center;
+    padding: 15px 0;
+    z-index: 2000; /* Garante que fique acima de tudo */
     box-shadow: 2px 0 10px rgba(0,0,0,0.3);
-
 }
 
-
-
-/* TÍTULO CENTRALIZADO */
-
-.titulo-vertical {
-
+.logo-mrv-vertical {
+    color: white;
     writing-mode: vertical-rl;
-
     transform: rotate(180deg);
-
     font-weight: bold;
-
-    font-size: 1.1rem;
-
-    letter-spacing: 1px;
-
-    color: white !important;
-
-    white-space: nowrap;
-
-    flex-grow: 1; /* Ocupa todo o meio da barra */
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: center;
-
+    font-size: 1.2rem;
+    letter-spacing: 2px;
 }
 
-
-
-/* ÍCONES BRANCOS E MAIORES */
-
-.icon-top, .icon-bottom {
-
-    font-size: 26px; /* Tamanho ideal para o dedo */
-
-    color: white !important;
-
+.icon-bottom {
     cursor: pointer;
-
-    padding: 10px;
-
-    user-select: none;
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: center;
-
+    transition: transform 0.2s;
 }
 
-
-
-/* Efeito de clique nos ícones */
-
-.icon-top:active, .icon-bottom:active {
-
-    transform: scale(1.2);
-
-    opacity: 0.8;
-
+.icon-bottom:active {
+    transform: scale(0.9);
 }
 
-/* 3. CONTAINER DO MAPA PRINCIPAL */
+/* 3. Área Principal do Mapa */
+.map-section {
+    position: relative;
+    flex: 1;
+    height: 100%;
+    background: #fff;
+    z-index: 10; /* Base */
+    overflow: hidden;
+}
 
 #mapa-container {
-
-    position: absolute;
-
-    left: 0;
-
-    top: 0;
-
     width: 100%;
-
     height: 100%;
-
-    z-index: 10;
-
     display: flex;
-
-    align-items: center;
-
     justify-content: center;
-
-    overflow: hidden;
-
-    touch-action: none;
-
-
-
-    /* --- AJUSTE DE SEGURANÇA (OPÇÃO 1) --- */
-
-    padding-left: 60px;       /* Empurra o mapa para a direita da faixa verde */
-
-    box-sizing: border-box;   /* Garante que o padding não aumente o tamanho da tela */
-
+    align-items: center;
 }
 
-
-
-#mapa-container svg {
-
-    width: 130% !important;
-
-    height: auto;
-
-    max-height: 98%;
-
-    transition: all 0.3s ease;
-
-    transform-origin: center top;
-
-}
-
-
-
-#mapa-container path {
-
-    transition: fill 0.15s ease, stroke-width 0.2s ease;
-
-    cursor: pointer;
-
-    -webkit-tap-highlight-color: transparent; /* NOVO: Remove o flash azul ao tocar */
-
-}
-
-/* 4. MAPA MINIMIZADO (v127) - Posicionado à direita da área do mapa */
-
-#mapa-minimizado {
-
+/* 4. MENU DE RESIDENCIAIS (O Desafio) */
+#container-menu {
     position: absolute;
+    left: 0;
+    top: 0;
+    width: 320px; /* Largura suficiente para os cards */
+    height: 100%;
+    background: transparent; /* Caixa principal transparente conforme pedido */
+    z-index: 1500; /* Entre o mapa (10) e a faixa verde (2000) */
+    transform: translateX(-100%); /* Começa escondido à esquerda */
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    padding: 20px 10px 20px 10px;
+    overflow-y: auto;
+    pointer-events: none; /* Não clica no menu se estiver fechado */
+}
 
-    bottom: 20px;
+#container-menu.aberto {
+    transform: translateX(0);
+    pointer-events: auto;
+}
 
-    right: 45%; /* Coloca o botão no limite da área do mapa com a ficha técnica */
-
-    width: 90px;
-
-    height: 70px;
-
+/* Estilização dos itens (Botões brancos) */
+.item-menu {
     background: white;
-
-    border: 2px solid #00713a;
-
-    border-radius: 10px;
-
+    color: #333;
+    border: 1px solid #00713a;
+    margin-bottom: 10px;
+    padding: 15px 15px 15px 70px; /* 70px de recuo para o texto não ficar sob a faixa de 60px */
+    border-radius: 0 10px 10px 0;
+    font-weight: 600;
+    font-size: 0.85rem;
     cursor: pointer;
-
-    z-index: 2500;
-
+    box-shadow: 3px 3px 6px rgba(0,0,0,0.15);
+    white-space: nowrap;
     overflow: hidden;
-
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: center;
-
-    transition: transform 0.2s ease;
-
+    text-overflow: ellipsis;
+    transition: background 0.2s, transform 0.1s;
+    display: block;
+    width: 100%;
 }
 
-
-
-#mapa-minimizado:active { transform: scale(0.95); }
-
-
-
-/* Classes de cursor para diferenciar os paths */
-
-path.commrv { cursor: pointer; }
-
-path.semmrv { cursor: default; }
-
-
-
-/* 5. FICHA TÉCNICA (LATERAL DIREITA) */
-
-.ficha-tecnica {
-
-    position: absolute; right: 0; top: 0;
-
-    width: 44%; height: 100%;
-
-    background: rgba(60, 60, 60, 0.95);
-
-    backdrop-filter: blur(10px); color: white;
-
-    padding: 35px; z-index: 1000;
-
-    box-shadow: -10px 0 25px rgba(0,0,0,0.4);
-
+.item-menu:active {
+    background: #f9f9f9;
+    transform: scale(0.98);
 }
 
-#nome-imovel {
-
-    color: #50c878; margin: 0 0 15px 0; font-size: 1.6rem;
-
-    border-bottom: 2px solid #50c878; padding-bottom: 10px;
-
+/* 5. Painel de Informações (Direita) */
+.info-panel {
+    width: 350px;
+    height: 100%;
+    background-color: #444;
+    color: white;
+    padding: 25px;
+    z-index: 100;
+    box-shadow: -5px 0 15px rgba(0,0,0,0.2);
 }
 
-#detalhes-imovel { font-size: 1.2rem; line-height: 1.6; }
+.info-panel h2 {
+    color: #4caf50;
+    border-bottom: 2px solid #4caf50;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
 
-
-
-/* 6. IDENTIFICADOR DE CIDADE (CENTRO SUPERIOR) - v125 */
+/* 6. Mini Mapa e Identificadores */
+.mini-map-box {
+    position: absolute;
+    bottom: 20px;
+    left: 80px;
+    width: 80px;
+    height: 80px;
+    background: white;
+    border: 2px solid #00713a;
+    border-radius: 8px;
+    cursor: pointer;
+    z-index: 500;
+}
 
 #identificador-cidade {
-
     position: absolute;
-
-    top: 5px; /* Encostado no topo */
-
-    left: 28%;
-
+    top: 20px;
+    left: 50%;
     transform: translateX(-50%);
-
-    font-size: 1rem; /* Mesmo tamanho da faixa verde */
-
     font-weight: bold;
-
+    font-size: 1.1rem;
     color: #333;
-
+    background: rgba(255,255,255,0.8);
+    padding: 5px 15px;
+    border-radius: 20px;
+    z-index: 500;
     text-transform: uppercase;
+}
 
-    letter-spacing: 2px;
+/* 7. Fullscreen Icon */
+.fullscreen-toggle {
+    position: absolute;
+    top: 15px;
+    left: 75px;
+    cursor: pointer;
+    z-index: 2100;
+    background: #00713a;
+    border-radius: 4px;
+    padding: 5px;
+}
 
-    pointer-events: none;
-
-    text-shadow: 1px 1px 2px rgba(255,255,255,0.8);
-
+/* Scrollbar do Menu */
+#container-menu::-webkit-scrollbar {
+    width: 4px;
+}
+#container-menu::-webkit-scrollbar-thumb {
+    background: #00713a;
+    border-radius: 10px;
 }
