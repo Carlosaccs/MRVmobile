@@ -20,44 +20,73 @@ const DNA_AMPLIAR = "M 75.757133 114.16926 L 75.757133 124.7898 L 75.757133 135.
 const DNA_REDUZIR = "M 78.408134 124.88437 L 78.408134 132.66012 L 78.408134 140.43587 L 70.442729 140.43587 L 62.476807 140.43587 L 62.476807 143.28066 L 62.476807 146.12596 L 73.097864 146.12596 L 83.718404 146.12596 L 83.718404 135.50491 L 83.718404 124.88437 L 81.063269 124.88437 L 78.408134 124.88437 z M 102.30435 124.88437 L 102.30435 135.50491 L 102.30435 146.12596 L 112.92541 146.12596 L 123.54595 146.12596 L 123.54595 143.28066 L 123.54595 140.43587 L 115.58054 140.43587 L 107.61514 140.43587 L 107.61514 132.66012 L 107.61514 124.88437 L 104.96 124.88437 L 102.30435 124.88437 z M 62.476807 164.3326 L 62.476807 167.17739 L 62.476807 170.02218 L 70.442729 170.02218 L 78.408134 170.02218 L 78.408134 177.79793 L 78.408134 185.5742 L 81.063269 185.5742 L 83.718404 185.5742 L 83.718404 174.95315 L 83.718404 164.3326 L 73.097864 164.3326 L 62.476807 164.3326 z M 102.30435 164.3326 L 102.30435 174.95315 L 102.30435 185.5742 L 104.96 185.5742 L 107.61514 185.5742 L 107.61514 177.79793 L 107.61514 170.02218 L 115.58054 170.02218 L 123.54595 170.02218 L 123.54595 167.17739 L 123.54595 164.3326 L 112.92541 164.3326 L 102.30435 164.3326 z";
 
 // 2. Carregamento de Dados da Planilha (Apenas a associação)
+// Nova variável global para a lista ordenada
+window.listaResidenciais = [];
+
 async function carregarPlanilha() {
     try {
         const res = await fetch(URL_PLANILHA);
         const csv = await res.text();
+        const linhas = csv.split('\n').slice(1); // Pula o cabeçalho
         
-        // Divide as linhas e remove o cabeçalho
-        const linhas = csv.split('\n').slice(1);
-        window.bancoDados = {};
+        window.listaResidenciais = []; // Limpa a lista
 
         linhas.forEach(linha => {
-            // Regex para lidar com vírgulas dentro de aspas (comum em nomes de empreendimentos)
-            const colunas = linha.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
-            
-            if (colunas.length >= 5) {
-                // ID (Coluna A) limpo: minúsculo e sem espaços
-                const idOriginal = colunas[0].replace(/"/g, '').trim().toLowerCase();
-                
-                // Normalização para remover acentos (ex: ribeirão -> ribeirao)
-                const idLimpo = idOriginal.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-                
-                window.bancoDados[idLimpo] = {
-                    nomeCurto: colunas[3]?.replace(/"/g, '').trim(),
-                    nomeFull: colunas[4]?.replace(/"/g, '').trim(),
-                    estoque: colunas[5]?.replace(/"/g, '').trim(),
-                    statusObra: colunas[11]?.replace(/"/g, '').trim(),
-                    observacoes: colunas[18]?.replace(/"/g, '').trim() // Coluna S
+            const c = linha.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+            if (c.length >= 5) {
+                const item = {
+                    idPath: c[0].replace(/"/g, '').trim().toLowerCase(),
+                    categoria: c[1]?.replace(/"/g, '').trim(),
+                    ordem: parseInt(c[2]) || 999,
+                    nomeCurto: c[3]?.replace(/"/g, '').trim(),
+                    nomeFull: c[4]?.replace(/"/g, '').trim()
                 };
+                window.listaResidenciais.push(item);
             }
         });
-        console.log("Planilha associada com sucesso!");
-    } catch (e) { 
-        console.error("Erro na conexão com a planilha:", e); 
-    }
-    
-    // Chama a função que já existe no seu código para desenhar os mapas com os novos dados
-    atualizarVisualizacao();
+
+        // Ordenação Cirúrgica pela Coluna C
+        window.listaResidenciais.sort((a, b) => a.ordem - b.ordem);
+
+        construirMenuDOM();
+    } catch (e) { console.error("Erro na planilha:", e); }
 }
 
+function construirMenuDOM() {
+    const listaDiv = document.getElementById('lista-residenciais');
+    if (!listaDiv) return;
+    listaDiv.innerHTML = "";
+
+    window.listaResidenciais.forEach(res => {
+        const btn = document.createElement('div');
+        btn.className = 'item-menu';
+        btn.innerText = res.nomeCurto;
+
+        // Identifica a Zona pelo prefixo (ZO, ZL, ZN, ZS) para colorir a borda
+        const prefixo = res.nomeCurto.substring(0, 2).toUpperCase();
+        if (prefixo === "ZO") btn.classList.add('borda-zo');
+        else if (prefixo === "ZL") btn.classList.add('borda-zl');
+        else if (prefixo === "ZN") btn.classList.add('borda-zn');
+        else if (prefixo === "ZS") btn.classList.add('borda-zs');
+
+        btn.onclick = () => {
+            // Aqui simularemos o clique no mapa pelo ID
+            const path = document.getElementById(res.idPath);
+            if (path) path.dispatchEvent(new Event('click'));
+            
+            // Opcional: fechar menu ao clicar (se desejar)
+            // document.getElementById('container-menu').classList.remove('ativo');
+        };
+
+        listaDiv.appendChild(btn);
+    });
+}
+
+// Função para abrir/fechar o menu (vincular ao ícone de hambúrguer na barra verde)
+function toggleMenu() {
+    const menu = document.getElementById('container-menu');
+    menu.classList.toggle('ativo');
+}
 // 3. Função de Desenho do Mapa
 function desenharMapa(dados, targetId, ehMinimizado) {
     const container = document.getElementById(targetId);
