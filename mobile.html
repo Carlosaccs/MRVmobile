@@ -1,85 +1,97 @@
 <!DOCTYPE html>
+
 <html lang="pt-br">
+
 <head>
+
     <meta charset="UTF-8">
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Dashboard MRV SP</title>
-    <style>
-        /* RESET E FUNDAÇÃO */
-        html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #fff; font-family: sans-serif; }
-        .mobile-wrapper { display: flex; width: 100vw; height: 100%; position: relative; overflow: hidden; }
 
-        /* FAIXA VERDE LATERAL */
-        .faixa-verde-vertical { 
-            position: absolute; left: 0; top: 0; width: 60px; height: 100%; 
-            background: #00713a; z-index: 2000; display: flex; 
-            flex-direction: column; align-items: center; justify-content: space-between; 
-            padding: 10px 0; color: white; box-shadow: 2px 0 10px rgba(0,0,0,0.3); 
-        }
-        .titulo-vertical { 
-            writing-mode: vertical-rl; transform: rotate(180deg); 
-            font-weight: bold; font-size: 1.1rem; flex-grow: 1; 
-            display: flex; align-items: center; justify-content: center; 
-            letter-spacing: 2px;
-        }
+    <title>MRV Mobile - v137</title>
 
-        /* MAPA E CONTEÚDO */
-        #mapa-container { 
-            position: absolute; left: 0; top: 0; width: 100%; height: 100%; 
-            z-index: 10; display: flex; align-items: center; justify-content: center; 
-            padding-left: 60px; box-sizing: border-box; background: #eee; 
-        }
-        
-        /* BOTÃO DE TROCA (REPOSICIONADO PARA NÃO SOBREPOR A FICHA) */
-        #mapa-minimizado { 
-            position: absolute; bottom: 20px; left: 100px; /* Movido para a esquerda */
-            width: 80px; height: 60px; background: white; 
-            border: 2px solid #00713a; border-radius: 8px; z-index: 2500; 
-            display: flex; align-items: center; justify-content: center; 
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3); cursor: pointer; 
-        }
+    <link rel="stylesheet" href="mobile.css?v=137">
 
-        /* FICHA TÉCNICA */
-        .ficha-tecnica { 
-            position: absolute; right: 0; top: 0; width: 44%; height: 100%; 
-            background: rgba(35, 35, 35, 0.96); backdrop-filter: blur(8px); 
-            color: white; padding: 30px; z-index: 1000; 
-            box-shadow: -8px 0 20px rgba(0,0,0,0.5); 
-        }
-        #nome-imovel { color: #50c878; border-bottom: 2px solid #00713a; padding-bottom: 10px; margin-top: 0; }
-        
-        .icon-btn { cursor: pointer; padding: 15px; transition: transform 0.2s; }
-        .icon-btn:active { transform: scale(1.2); }
-    </style>
 </head>
+
 <body>
 
+
+
     <div class="mobile-wrapper">
+
         <aside class="faixa-verde-vertical">
-            <div class="icon-btn" onclick="toggleMenuLateral()">☰</div>
-            <div class="titulo-vertical">MRV EM SP <span id="contador-registros" style="margin-top:10px; color:#ffff00;">00</span></div>
-            <div class="icon-btn" onclick="toggleFullscreen()">
-                <svg width="25" height="25" viewBox="60 110 90 90">
-                    <path id="path-fullscreen" fill="white" d="M 75.757133 114.16926 L 75.757133 124.7898 L 75.757133 135.41086 L 78.412268 135.41086 L 81.067403 135.41086 L 81.067403 127.44493 L 81.067403 119.47953 L 89.032808 119.47953 L 96.99873 119.47953 L 96.99873 116.82439 L 96.99873 114.16926 L 86.377673 114.16926 L 75.757133 114.16926 z M 115.58468 114.16926 L 115.58468 116.82439 L 115.58468 119.47953 L 123.36043 119.47953 L 131.13618 119.47953 L 131.13618 127.44493 L 131.13618 135.41086 L 133.79183 135.41086 L 136.44697 135.41086 L 136.44697 124.7898 L 136.44697 114.16926 L 126.01556 114.16926 L 115.58468 114.16926 z M 75.757133 153.9968 L 75.757133 164.61734 L 75.757133 175.2384 L 86.377673 175.2384 L 96.99873 175.2384 L 96.99873 172.39361 L 96.99873 169.54882 L 89.032808 169.54882 L 81.067403 169.54882 L 81.067403 161.77255 L 81.067403 153.9968 L 78.412268 153.9968 L 75.757133 153.9968 z M 131.13618 153.9968 L 131.13618 161.77255 L 131.13618 169.54882 L 123.36043 169.54882 L 115.58468 169.54882 L 115.58468 172.39361 L 115.58468 172.39361 L 115.58468 175.2384 L 126.01556 175.2384 L 136.44697 175.2384 L 136.44697 164.61734 L 136.44697 153.9968 L 133.79183 153.9968 L 131.13618 153.9968 z"></path>
+
+            <div class="icon-top" onclick="toggleFullscreen()">
+
+                <svg viewBox="60 110 90 90" width="28" height="28">
+
+                    <path id="path-fullscreen" fill="white"
+
+                          d="M 75.757133 114.16926 L 75.757133 124.7898 L 75.757133 135.41086 L 78.412268 135.41086 L 81.067403 135.41086 L 81.067403 127.44493 L 81.067403 119.47953 L 89.032808 119.47953 L 96.99873 119.47953 L 96.99873 116.82439 L 96.99873 114.16926 L 86.377673 114.16926 L 75.757133 114.16926 z M 115.58468 114.16926 L 115.58468 116.82439 L 115.58468 119.47953 L 123.36043 119.47953 L 131.13618 119.47953 L 131.13618 127.44493 L 131.13618 135.41086 L 133.79183 135.41086 L 136.44697 135.41086 L 136.44697 124.7898 L 136.44697 114.16926 L 126.01556 114.16926 L 115.58468 114.16926 z M 75.757133 153.9968 L 75.757133 164.61734 L 75.757133 175.2384 L 86.377673 175.2384 L 96.99873 175.2384 L 96.99873 172.39361 L 96.99873 169.54882 L 89.032808 169.54882 L 81.067403 169.54882 L 81.067403 161.77255 L 81.067403 153.9968 L 78.412268 153.9968 L 75.757133 153.9968 z M 131.13618 153.9968 L 131.13618 161.77255 L 131.13618 169.54882 L 123.36043 169.54882 L 115.58468 169.54882 L 115.58468 172.39361 L 115.58468 175.2384 L 126.01556 175.2384 L 136.44697 175.2384 L 136.44697 164.61734 L 136.44697 153.9968 L 133.79183 153.9968 L 131.13618 153.9968 z" />
+
                 </svg>
+
             </div>
+
+           
+
+            <div class="titulo-vertical">MRV em SP</div>
+
+           
+
+            <div class="icon-bottom">
+
+                <svg viewBox="35 130 70 55" width="28" height="28">
+
+                    <path fill="white"
+
+                          d="M 39.911259 134.69049 L 39.911259 137.57403 L 39.911259 140.45706 L 69.950769 140.45706 L 99.990796 140.45706 L 99.990796 137.57403 L 99.990796 134.69049 L 69.950769 134.69049 L 39.911259 134.69049 z M 39.911259 153.33121 L 39.911259 156.14757 L 39.911259 158.96394 L 69.950769 158.96394 L 99.990796 158.96394 L 99.990796 156.14757 L 99.990796 153.33121 L 69.950769 153.33121 L 39.911259 153.33121 z M 39.911259 171.83809 L 39.911259 174.72112 L 39.911259 177.60466 L 69.950769 177.60466 L 99.990796 177.60466 L 99.990796 174.72112 L 99.990796 171.83809 L 69.950769 171.83809 L 39.911259 171.83809 z" />
+
+                </svg>
+
+            </div>
+
         </aside>
 
-        <main id="mapa-container">
-            <p style="color:#666;">Carregando mapas...</p>
-        </main>
 
-        <div id="mapa-minimizado" onclick="trocarMapas()">
-            <span style="font-size:10px; color:#00713a; font-weight:bold;">TROCAR</span>
-        </div>
 
-        <section class="ficha-tecnica">
-            <h2 id="nome-imovel">Selecione um Imóvel</h2>
-            <div id="detalhes-imovel">Toque em uma cidade no mapa para ver detalhes.</div>
-        </section>
+        <div id="identificador-cidade"></div>
+
+
+
+        <main class="area-mapa" id="mapa-container"></main>
+
+
+
+        <div id="mapa-minimizado"></div>
+
+
+
+        <aside class="ficha-tecnica" id="ficha-tecnica">
+
+            <h3 id="nome-imovel">Selecione</h3>
+
+            <div id="detalhes-imovel">
+
+                Toque em um ponto verde para ver os detalhes.
+
+            </div>
+
+           
+
+            <div style="position:absolute; bottom:10px; right:10px; font-size:10px; color:#666;">v136</div>
+
+        </aside>
+
     </div>
 
-    <script src="mapas_dados.js"></script>
-    <script src="script.js"></script>
+
+
+    <script src="mapa-SP.js"></script>
+
+    <script src="mobile.js?v=136"></script>
+
 </body>
+
 </html>
