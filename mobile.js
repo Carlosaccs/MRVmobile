@@ -2,111 +2,42 @@
    v137 - INTEGRAL: MAPA + TELA CHEIA + ÍCONES INKSCAPE
    ========================================================================== */
 
-// 1. Configurações Iniciais e Dados
-const svgNS = "http://www.w3.org/2000/svg";
-const URL_PLANILHA = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSRKdJctOPQjKAtOZSDHyArD_H8SgKIouelAS1vF1d_-13pu7u_ic6J8nP3r0Ijd56WA-mbUmHjb4Me/pub?output=csv';
-const DNA_MENU = "M 39.911259 134.69049 L 39.911259 137.57403 L 39.911259 140.45706 L 69.950769 140.45706 L 99.990796 140.45706 L 99.990796 137.57403 L 99.990796 134.69049 L 69.950769 134.69049 L 39.911259 134.69049 z M 39.911259 153.33121 L 39.911259 156.14757 L 39.911259 158.96394 L 69.950769 158.96394 L 99.990796 158.96394 L 99.990796 156.14757 L 99.990796 153.33121 L 69.950769 153.33121 L 39.911259 153.33121 z M 39.911259 171.83809 L 39.911259 174.72112 L 39.911259 174.72112 L 39.911259 177.60466 L 69.950769 177.60466 L 99.990796 177.60466 L 99.990796 174.72112 L 99.990796 171.83809 L 69.950769 171.83809 L 39.911259 171.83809 z";
-
-let mapaAtivo = "GSP";
-let cidadeSelecionada = ""; 
-window.bancoDados = {}; 
-
-const AJUSTES_MAPA = {
-    GSP: { marginRight: "35%", marginLeft: "-70px", scale: "1" },
-    INTERIOR: { marginRight: "50%", marginLeft: "-100px", scale: "1.15" }
-};
-
-// DNA DOS ÍCONES (Caminhos extraídos do seu Inkscape)
-const DNA_AMPLIAR = "M 75.757133 114.16926 L 75.757133 124.7898 L 75.757133 135.41086 L 78.412268 135.41086 L 81.067403 135.41086 L 81.067403 127.44493 L 81.067403 119.47953 L 89.032808 119.47953 L 96.99873 119.47953 L 96.99873 116.82439 L 96.99873 114.16926 L 86.377673 114.16926 L 75.757133 114.16926 z M 115.58468 114.16926 L 115.58468 116.82439 L 115.58468 119.47953 L 123.36043 119.47953 L 131.13618 119.47953 L 131.13618 127.44493 L 131.13618 135.41086 L 133.79183 135.41086 L 136.44697 135.41086 L 136.44697 124.7898 L 136.44697 114.16926 L 126.01556 114.16926 L 115.58468 114.16926 z M 75.757133 153.9968 L 75.757133 164.61734 L 75.757133 175.2384 L 86.377673 175.2384 L 96.99873 175.2384 L 96.99873 172.39361 L 96.99873 169.54882 L 89.032808 169.54882 L 81.067403 169.54882 L 81.067403 161.77255 L 81.067403 153.9968 L 78.412268 153.9968 L 75.757133 153.9968 z M 131.13618 153.9968 L 131.13618 161.77255 L 131.13618 169.54882 L 123.36043 169.54882 L 115.58468 169.54882 L 115.58468 172.39361 L 115.58468 175.2384 L 126.01556 175.2384 L 136.44697 175.2384 L 136.44697 164.61734 L 136.44697 153.9968 L 133.79183 153.9968 L 131.13618 153.9968 z";
-const DNA_REDUZIR = "M 78.408134 124.88437 L 78.408134 132.66012 L 78.408134 140.43587 L 70.442729 140.43587 L 62.476807 140.43587 L 62.476807 143.28066 L 62.476807 146.12596 L 73.097864 146.12596 L 83.718404 146.12596 L 83.718404 135.50491 L 83.718404 124.88437 L 81.063269 124.88437 L 78.408134 124.88437 z M 102.30435 124.88437 L 102.30435 135.50491 L 102.30435 146.12596 L 112.92541 146.12596 L 123.54595 146.12596 L 123.54595 143.28066 L 123.54595 140.43587 L 115.58054 140.43587 L 107.61514 140.43587 L 107.61514 132.66012 L 107.61514 124.88437 L 104.96 124.88437 L 102.30435 124.88437 z M 62.476807 164.3326 L 62.476807 167.17739 L 62.476807 170.02218 L 70.442729 170.02218 L 78.408134 170.02218 L 78.408134 177.79793 L 78.408134 185.5742 L 81.063269 185.5742 L 83.718404 185.5742 L 83.718404 174.95315 L 83.718404 164.3326 L 73.097864 164.3326 L 62.476807 164.3326 z M 102.30435 164.3326 L 102.30435 174.95315 L 102.30435 185.5742 L 104.96 185.5742 L 107.61514 185.5742 L 107.61514 177.79793 L 107.61514 170.02218 L 115.58054 170.02218 L 123.54595 170.02218 L 123.54595 167.17739 L 123.54595 164.3326 L 112.92541 164.3326 L 102.30435 164.3326 z";
-
-// 2. Carregamento de Dados da Planilha (Apenas a associação)
-// Nova variável global para a lista ordenada
-window.listaResidenciais = [];
-
-async function carregarPlanilha() {
-    try {
-        const res = await fetch(URL_PLANILHA);
-        const csv = await res.text();
-        // Remove linhas vazias e trata quebras de linha de diferentes sistemas
-        const linhas = csv.split(/\r?\n/).filter(linha => linha.trim() !== "");
-        const dadosPuros = linhas.slice(1); // Remove o cabeçalho
-        
-        window.listaResidenciais = [];
-        window.bancoDados = {}; // Para o hover do mapa
-
-        dadosPuros.forEach(linha => {
-            const c = linha.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
-            if (c.length >= 5 && c[0].trim() !== "") {
-                const idOriginal = c[0].replace(/"/g, '').trim().toLowerCase();
-                const idLimpo = idOriginal.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-                
-                const item = {
-                    idPath: idLimpo,
-                    categoria: c[1]?.replace(/"/g, '').trim(),
-                    ordem: parseInt(c[2]) || 999,
-                    nomeCurto: c[3]?.replace(/"/g, '').trim(),
-                    nomeFull: c[4]?.replace(/"/g, '').trim(),
-                    estoque: c[5]?.replace(/"/g, '').trim(),
-                    statusObra: c[11]?.replace(/"/g, '').trim(),
-                    observacoes: c[18]?.replace(/"/g, '').trim()
-                };
-
-                window.listaResidenciais.push(item);
-                
-                // Salva no banco de dados para o mapa (usa o primeiro que encontrar para o hover)
-                if (!window.bancoDados[idLimpo]) {
-                    window.bancoDados[idLimpo] = item;
-                }
-            }
-        });
-
-        window.listaResidenciais.sort((a, b) => a.ordem - b.ordem);
-        
-        // CONSTRUIR O MENU E SÓ ENTÃO DESENHAR O MAPA
-        construirMenuDOM();
-        atualizarVisualizacao(); // Isso garante que o mapa apareça maximizado logo no início
-
-    } catch (e) { 
-        console.error("Erro ao carregar:", e);
-        atualizarVisualizacao(); // Garante o mapa mesmo se a planilha falhar
+// 1. FUNÇÃO SIMPLES PARA ABRIR/FECHAR
+function toggleMenu() {
+    const menu = document.getElementById('container-menu');
+    if (menu) {
+        menu.classList.toggle('ativo');
+        console.log("Status do menu:", menu.classList.contains('ativo') ? "Aberto" : "Fechado");
     }
 }
 
+// 2. CONSTRUÇÃO LIMPA DO MENU
 function construirMenuDOM() {
     const listaDiv = document.getElementById('lista-residenciais');
-    if (!listaDiv) return;
-    listaDiv.innerHTML = "";
+    if (!listaDiv || !window.listaResidenciais) return;
+    
+    listaDiv.innerHTML = ""; // Limpa antes de criar
 
     window.listaResidenciais.forEach(res => {
         const btn = document.createElement('div');
         btn.className = 'item-menu';
         btn.innerText = res.nomeCurto;
 
+        // Clique no item do menu
         btn.onclick = (e) => {
-            e.stopPropagation(); // IMPEDE QUE O MAPA "ROUBE" O CLIQUE
-            const path = document.getElementById(res.idPath);
-            if (path) path.dispatchEvent(new Event('click'));
+            e.stopPropagation(); // Evita conflito com o mapa ao fundo
             
-            toggleMenu(); // Fecha o menu após escolher
+            // Tenta achar o prédio no mapa e clica nele
+            const path = document.getElementById(res.idPath);
+            if (path) {
+                path.dispatchEvent(new Event('click'));
+            }
+            
+            toggleMenu(); // Fecha o menu após selecionar
         };
 
         listaDiv.appendChild(btn);
     });
-}
-
-
-// Função para abrir/fechar o menu (vincular ao ícone de hambúrguer na barra verde)
-function toggleMenu() {
-    // Busca o menu que agora está no final do <body>
-    const menu = document.getElementById('container-menu');
-    
-    if (menu) {
-        menu.classList.toggle('ativo');
-        console.log("Menu acionado!"); // Verifique se isso aparece no console F12
-    } else {
-        console.error("Erro: #container-menu não encontrado no HTML");
-    }
 }
 // 3. Função de Desenho do Mapa
 function desenharMapa(dados, targetId, ehMinimizado) {
