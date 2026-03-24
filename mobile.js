@@ -103,9 +103,15 @@ function construirMenuDOM() {
 
 // Função para abrir/fechar o menu (vincular ao ícone de hambúrguer na barra verde)
 function toggleMenu() {
+    // Busca o menu que agora está no final do <body>
     const menu = document.getElementById('container-menu');
-    // Alterna a classe. Se tiver 'ativo', o menu aparece. Se não, some.
-    menu.classList.toggle('ativo');
+    
+    if (menu) {
+        menu.classList.toggle('ativo');
+        console.log("Menu acionado!"); // Verifique se isso aparece no console F12
+    } else {
+        console.error("Erro: #container-menu não encontrado no HTML");
+    }
 }
 // 3. Função de Desenho do Mapa
 function desenharMapa(dados, targetId, ehMinimizado) {
