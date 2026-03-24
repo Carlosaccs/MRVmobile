@@ -1,123 +1,112 @@
 /* ==========================================================================
-   v140 - MENU DINÂMICO COMPLETO (TODOS OS REGISTROS)
+   BLOCO 1: VARIÁVEIS GLOBAIS E CONFIGURAÇÕES
    ========================================================================== */
-
 const svgNS = "http://www.w3.org/2000/svg";
 const URL_PLANILHA = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSRKdJctOPQjKAtOZSDHyArD_H8SgKIouelAS1vF1d_-13pu7u_ic6J8nP3r0Ijd56WA-mbUmHjb4Me/pub?output=csv';
 
 let mapaAtivo = "GSP";
-let cidadeSelecionada = ""; 
-window.bancoDados = {}; 
-window.listaResidenciais = []; // Nova lista para armazenar TODOS os registros
+window.bancoDados = {}; // Objeto para busca rápida por ID
+window.listaResidenciais = []; // Lista completa para o menu
 
-const AJUSTES_MAPA = {
-    GSP: { marginRight: "35%", marginLeft: "-70px", scale: "1" },
-    INTERIOR: { marginRight: "50%", marginLeft: "-100px", scale: "1.15" }
-};
-
-const DNA_AMPLIAR = "M 75.757133 114.16926 L 75.757133 124.7898 L 75.757133 135.41086 L 78.412268 135.41086 L 81.067403 135.41086 L 81.067403 127.44493 L 81.067403 119.47953 L 89.032808 119.47953 L 96.99873 119.47953 L 96.99873 116.82439 L 96.99873 114.16926 L 86.377673 114.16926 L 75.757133 114.16926 z M 115.58468 114.16926 L 115.58468 116.82439 L 115.58468 119.47953 L 123.36043 119.47953 L 131.13618 119.47953 L 131.13618 127.44493 L 131.13618 135.41086 L 133.79183 135.41086 L 136.44697 135.41086 L 136.44697 124.7898 L 136.44697 114.16926 L 126.01556 114.16926 L 115.58468 114.16926 z M 75.757133 153.9968 L 75.757133 164.61734 L 75.757133 175.2384 L 86.377673 175.2384 L 96.99873 175.2384 L 96.99873 172.39361 L 96.99873 169.54882 L 89.032808 169.54882 L 81.067403 169.54882 L 81.067403 161.77255 L 81.067403 153.9968 L 78.412268 153.9968 L 75.757133 153.9968 z M 131.13618 153.9968 L 131.13618 161.77255 L 131.13618 169.54882 L 123.36043 169.54882 L 115.58468 169.54882 L 115.58468 172.39361 L 115.58468 175.2384 L 126.01556 175.2384 L 136.44697 175.2384 L 136.44697 164.61734 L 136.44697 153.9968 L 133.79183 153.9968 L 131.13618 153.9968 z";
-const DNA_REDUZIR = "M 78.408134 124.88437 L 78.408134 132.66012 L 78.408134 140.43587 L 70.442729 140.43587 L 62.476807 140.43587 L 62.476807 143.28066 L 62.476807 146.12596 L 73.097864 146.12596 L 83.718404 146.12596 L 83.718404 135.50491 L 83.718404 124.88437 L 81.063269 124.88437 L 78.408134 124.88437 z M 102.30435 124.88437 L 102.30435 135.50491 L 102.30435 146.12596 L 112.92541 146.12596 L 123.54595 146.12596 L 123.54595 143.28066 L 123.54595 140.43587 L 115.58054 140.43587 L 107.61514 140.43587 L 107.61514 132.66012 L 107.61514 124.88437 L 104.96 124.88437 L 102.30435 124.88437 z M 62.476807 164.3326 L 62.476807 167.17739 L 62.476807 170.02218 L 70.442729 170.02218 L 78.408134 170.02218 L 78.408134 177.79793 L 78.408134 185.5742 L 81.063269 185.5742 L 83.718404 185.5742 L 83.718404 174.95315 L 83.718404 164.3326 L 73.097864 164.3326 L 62.476807 164.3326 z M 102.30435 164.3326 L 102.30435 174.95315 L 102.30435 185.5742 L 104.96 185.5742 L 107.61514 185.5742 L 107.61514 177.79793 L 107.61514 170.02218 L 115.58054 170.02218 L 123.54595 170.02218 L 123.54595 167.17739 L 123.54595 164.3326 L 112.92541 164.3326 L 102.30435 164.3326 z";
-
-// 1. CARREGAMENTO DE DADOS
+/* ==========================================================================
+   BLOCO 2: CONEXÃO COM GOOGLE SHEETS E TRATAMENTO DE DADOS
+   ========================================================================== */
 async function carregarPlanilha() {
     try {
         const res = await fetch(URL_PLANILHA);
         const csv = await res.text();
         const linhas = csv.split(/\r?\n/).filter(l => l.trim() !== "");
         
-        window.bancoDados = {}; 
+        window.bancoDados = {};
         window.listaResidenciais = [];
 
         for (let i = 1; i < linhas.length; i++) {
+            // Regex para evitar quebra em vírgulas dentro de aspas
             const c = linhas[i].split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+            
             if (c.length >= 5) {
                 const registro = {
                     idPath: c[0]?.replace(/"/g, '').trim().toLowerCase(),
-                    categoria: c[1]?.replace(/"/g, '').trim().toUpperCase(),
+                    categoria: c[1]?.replace(/"/g, '').trim(),
                     ordem: parseInt(c[2]) || 999,
                     nomeMenu: c[3]?.replace(/"/g, '').trim(),
                     nomeFull: c[4]?.replace(/"/g, '').trim(),
-                    estoque: c[5]?.replace(/"/g, '').trim(),
-                    status: c[11]?.replace(/"/g, '').trim()
+                    estoque: c[5]?.replace(/"/g, '').trim() || "Consulte",
+                    status: c[11]?.replace(/"/g, '').trim() || "Em obra"
                 };
 
-                // Armazena na lista global para o Menu (preserva duplicatas de ID)
                 window.listaResidenciais.push(registro);
-
-                // Armazena no Banco de Dados para busca rápida via clique no Mapa
+                
+                // Mapeia o ID para o clique no mapa (armazena o primeiro encontrado)
                 if (!window.bancoDados[registro.idPath]) {
                     window.bancoDados[registro.idPath] = registro;
                 }
             }
         }
         
-        // Ordena a lista pela coluna C (ordem)
+        // Ordena por prioridade (Coluna C)
         window.listaResidenciais.sort((a, b) => a.ordem - b.ordem);
         
-        console.log("Total carregado:", window.listaResidenciais.length);
         gerarMenuResidenciais();
-    } catch (e) { console.error("Erro planilha:", e); }
-    atualizarVisualizacao();
+        atualizarVisualizacao();
+    } catch (e) { 
+        console.error("Erro no carregamento da planilha:", e); 
+    }
 }
 
-// 2. GERAÇÃO DO MENU (Sobre o mapa, sob a faixa verde)
+/* ==========================================================================
+   BLOCO 3: CONSTRUÇÃO DO MENU DINÂMICO
+   ========================================================================== */
 function gerarMenuResidenciais() {
     const container = document.getElementById('container-menu');
-    if (!container) {
-        // Cria o container do menu se não existir no HTML
-        const novoMenu = document.createElement('div');
-        novoMenu.id = 'container-menu';
-        document.querySelector('.mobile-wrapper').appendChild(novoMenu);
-        gerarMenuResidenciais();
-        return;
-    }
+    if (!container) return;
 
     container.innerHTML = "";
     window.listaResidenciais.forEach(reg => {
-        const btn = document.createElement('div');
-        btn.className = 'item-menu';
-        btn.innerText = reg.nomeMenu;
+        const item = document.createElement('div');
+        item.className = 'item-menu';
+        item.innerText = reg.nomeMenu;
         
-        btn.onclick = () => {
+        item.onclick = () => {
             selecionarImovel(reg.idPath, reg);
-            toggleMenu(); // Fecha ao selecionar
+            toggleMenu(); // Fecha o menu após selecionar
         };
         
-        container.appendChild(btn);
+        container.appendChild(item);
     });
 }
 
-// 3. SELEÇÃO DE IMÓVEL (Unificada para Mapa e Menu)
-function selecionarImovel(idPath, dadosManuais = null) {
-    const info = dadosManuais || window.bancoDados[idPath];
+/* ==========================================================================
+   BLOCO 4: LÓGICA DE SELEÇÃO E INTERAÇÃO (MAPA + MENU)
+   ========================================================================== */
+function selecionarImovel(id, dados = null) {
+    // Se clicou no mapa, busca no banco. Se veio do menu, usa os dados diretos.
+    const info = dados || window.bancoDados[id];
     if (!info) return;
 
-    // Reset visual dos caminhos no mapa
+    // 1. Reset visual do mapa
     document.querySelectorAll('#mapa-container path').forEach(p => {
-        p.setAttribute('data-selecionado', 'false');
         p.style.fill = p.getAttribute('data-cor-base');
     });
 
-    // Destaca o path no mapa
-    const path = document.getElementById(idPath) || document.getElementById(idPath.toUpperCase());
+    // 2. Destaca o path selecionado
+    const path = document.getElementById(id);
     if (path) {
-        path.setAttribute('data-selecionado', 'true');
         path.style.fill = "#FF4500";
+        document.getElementById('identificador-cidade').innerText = info.nomeMenu;
     }
 
-    // Atualiza Ficha Técnica
+    // 3. Atualiza Ficha Técnica
     document.getElementById('nome-imovel').innerText = info.nomeMenu || info.nomeFull;
     document.getElementById('detalhes-imovel').innerHTML = `
-        <p><strong>Estoque:</strong> ${info.estoque || 'Consulte'}</p>
-        <p><strong>Status:</strong> ${info.status || 'Em obra'}</p>
+        <p style="margin: 10px 0;"><strong>Estoque:</strong> ${info.estoque}</p>
+        <p style="margin: 10px 0;"><strong>Status:</strong> ${info.status}</p>
     `;
-
-    // Atualiza Identificador de Cidade
-    const display = document.getElementById('identificador-cidade');
-    if(display) display.innerText = info.nomeMenu;
 }
 
-// 4. DESENHO DO MAPA
+/* ==========================================================================
+   BLOCO 5: DESENHO E ALTERNÂNCIA DOS MAPAS (SVG)
+   ========================================================================== */
 function desenharMapa(dados, targetId, ehMinimizado) {
     const container = document.getElementById(targetId);
     if (!container || !dados) return;
@@ -126,13 +115,6 @@ function desenharMapa(dados, targetId, ehMinimizado) {
     const svg = document.createElementNS(svgNS, "svg");
     svg.setAttribute("viewBox", dados.viewBox);
     
-    if (!ehMinimizado) {
-        const conf = AJUSTES_MAPA[mapaAtivo];
-        svg.style.marginRight = conf.marginRight;
-        svg.style.marginLeft = conf.marginLeft;
-        svg.style.transform = `scale(${conf.scale})`;
-    }
-
     const g = document.createElementNS(svgNS, "g");
     g.setAttribute("transform", dados.transform);
 
@@ -144,11 +126,11 @@ function desenharMapa(dados, targetId, ehMinimizado) {
         path.setAttribute("d", pData.d);
         path.setAttribute("id", (ehMinimizado ? 'mini-' : '') + pData.id);
         
-        const corOriginal = ehMRV ? "#00713a" : "#cccccc";
-        path.style.fill = corOriginal;
+        const corBase = ehMRV ? "#00713a" : "#cccccc";
+        path.style.fill = corBase;
         path.style.stroke = "#ffffff";
         path.style.strokeWidth = ehMinimizado ? "6" : "1.2";
-        path.setAttribute('data-cor-base', corOriginal);
+        path.setAttribute('data-cor-base', corBase);
 
         if (!ehMinimizado && ehMRV) {
             path.onclick = () => selecionarImovel(idLimpo);
@@ -159,7 +141,6 @@ function desenharMapa(dados, targetId, ehMinimizado) {
     container.appendChild(svg);
 }
 
-// 5. CONTROLES E EVENTOS
 function atualizarVisualizacao() {
     if (typeof MAPA_GSP !== 'undefined' && typeof MAPA_INTERIOR !== 'undefined') {
         desenharMapa(mapaAtivo === "GSP" ? MAPA_GSP : MAPA_INTERIOR, "mapa-container", false);
@@ -167,33 +148,23 @@ function atualizarVisualizacao() {
     }
 }
 
-function trocarMapas() {
-    mapaAtivo = (mapaAtivo === "GSP") ? "INTERIOR" : "GSP";
-    atualizarVisualizacao();
-}
-
+/* ==========================================================================
+   BLOCO 6: FUNÇÕES DE CONTROLE (MENU/FULLSCREEN/LOAD)
+   ========================================================================== */
 function toggleMenu() {
     const menu = document.getElementById('container-menu');
     if(menu) menu.classList.toggle('aberto');
 }
 
-function toggleFullscreen() {
-    if (!document.fullscreenElement) {
-        document.documentElement.requestFullscreen().catch(err => console.warn(err.message));
-    } else {
-        if (document.exitFullscreen) document.exitFullscreen();
-    }
-}
-
-function atualizarVisualIconeFullscreen() {
-    const path = document.getElementById('path-fullscreen');
-    if (!path) return;
-    path.setAttribute('d', document.fullscreenElement ? DNA_REDUZIR : DNA_AMPLIAR);
+function trocarMapas() {
+    mapaAtivo = (mapaAtivo === "GSP") ? "INTERIOR" : "GSP";
+    atualizarVisualizacao();
 }
 
 window.onload = carregarPlanilha;
+
+// Listener para o ícone de hambúrguer na faixa verde
 document.addEventListener('click', (e) => {
-    if (e.target.closest('#mapa-minimizado')) trocarMapas();
     if (e.target.closest('.icon-bottom')) toggleMenu();
+    if (e.target.closest('#mapa-minimizado')) trocarMapas();
 });
-document.addEventListener('fullscreenchange', atualizarVisualIconeFullscreen);
