@@ -180,40 +180,40 @@ CSS
 
 
 
-/* 7. MENU LATERAL (v138 - AJUSTE DE POSICIONAMENTO) */
+/* 7. MENU LATERAL (v138 - AJUSTE FINAL DE CAMADAS) */
 #container-menu {
     position: absolute;
-    left: -280px; /* Escondido */
+    left: -280px; /* Posição Fechado */
     top: 0;
-    width: 250px; 
+    width: 280px; 
     height: 100%;
-    background: rgba(255, 255, 255, 0.1); 
-    z-index: 1500; 
-    transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    background: rgba(255, 255, 255, 0.9); /* Um pouco mais opaco para ler melhor */
+    z-index: 1800; /* MAIOR que o mapa (1000) e MENOR que a faixa verde (2000) */
+    transition: left 0.4s ease-in-out;
     overflow-y: auto;
-    padding-left: 80px; /* Aumentamos para 80px para afastar da faixa verde */
-    padding-top: 20px;
+    padding-left: 75px; /* Afasta o texto da faixa verde */
+    padding-top: 60px; /* Abre espaço para o ícone de fullscreen não cobrir o primeiro item */
     padding-right: 15px;
     pointer-events: none;
 }
 
 #container-menu.ativo {
-    left: 0px; /* Agora ele desliza corretamente */
+    left: 0; /* Posição Aberto */
     pointer-events: auto;
+    box-shadow: 5px 0 15px rgba(0,0,0,0.3);
 }
 
 .item-menu {
     background: white;
     border: 1px solid #00713a;
-    margin-bottom: 12px;
+    margin-bottom: 10px;
     padding: 10px;
     border-radius: 4px;
     cursor: pointer;
-    font-size: 0.75rem; /* Diminuímos um pouco para caber melhor no mobile */
+    font-size: 11px;
     font-weight: bold;
     color: #333;
     display: block;
-    box-shadow: 2px 2px 8px rgba(0,0,0,0.1);
-    border-right: 10px solid #ccc; 
-    text-align: left;
+    border-right: 8px solid #ccc;
+    text-transform: uppercase;
 }
