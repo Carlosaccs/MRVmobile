@@ -81,26 +81,19 @@ function construirMenuDOM() {
         btn.className = 'item-menu';
         btn.innerText = res.nomeCurto;
 
-        // Identifica a Zona pelo prefixo (ZO, ZL, ZN, ZS) para colorir a borda
-        const prefixo = res.nomeCurto.substring(0, 2).toUpperCase();
-        if (prefixo === "ZO") btn.classList.add('borda-zo');
-        else if (prefixo === "ZL") btn.classList.add('borda-zl');
-        else if (prefixo === "ZN") btn.classList.add('borda-zn');
-        else if (prefixo === "ZS") btn.classList.add('borda-zs');
+        // ... lógica das cores das zonas (mantenha a sua) ...
 
         btn.onclick = () => {
-            // Aqui simularemos o clique no mapa pelo ID
             const path = document.getElementById(res.idPath);
             if (path) path.dispatchEvent(new Event('click'));
             
-            // Opcional: fechar menu ao clicar (se desejar)
-            // document.getElementById('container-menu').classList.remove('ativo');
+            // FECHA O MENU AUTOMATICAMENTE AO SELECIONAR
+            toggleMenu(); 
         };
 
         listaDiv.appendChild(btn);
     });
 }
-
 // Função para abrir/fechar o menu (vincular ao ícone de hambúrguer na barra verde)
 function toggleMenu() {
     // Busca o menu que agora está no final do <body>
