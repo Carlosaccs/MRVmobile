@@ -2,41 +2,48 @@
    v137 - INTEGRAL: MAPA + TELA CHEIA + ÍCONES INKSCAPE
    ========================================================================== */
 
-// 1. FUNÇÃO SIMPLES PARA ABRIR/FECHAR
+// 1. FUNÇÃO PARA ABRIR E FECHAR (O CORAÇÃO DO MENU)
 function toggleMenu() {
     const menu = document.getElementById('container-menu');
     if (menu) {
         menu.classList.toggle('ativo');
-        console.log("Status do menu:", menu.classList.contains('ativo') ? "Aberto" : "Fechado");
+        console.log("Menu disparado! Classe atual:", menu.className);
+    } else {
+        console.error("Erro: O elemento #container-menu não foi encontrado!");
     }
 }
 
-// 2. CONSTRUÇÃO LIMPA DO MENU
+// 2. CONSTRUÇÃO DA LISTA (SIMPLIFICADA)
 function construirMenuDOM() {
     const listaDiv = document.getElementById('lista-residenciais');
-    if (!listaDiv || !window.listaResidenciais) return;
-    
-    listaDiv.innerHTML = ""; // Limpa antes de criar
+    if (!listaDiv) return;
+
+    listaDiv.innerHTML = ""; // Limpa a lista atual
+
+    // Verifica se os dados da planilha existem
+    if (!window.listaResidenciais || window.listaResidenciais.length === 0) {
+        listaDiv.innerHTML = "<p style='padding:20px'>Carregando dados...</p>";
+        return;
+    }
 
     window.listaResidenciais.forEach(res => {
-        const btn = document.createElement('div');
-        btn.className = 'item-menu';
-        btn.innerText = res.nomeCurto;
+        const item = document.createElement('div');
+        item.className = 'item-menu';
+        item.innerText = res.nomeCurto;
 
-        // Clique no item do menu
-        btn.onclick = (e) => {
-            e.stopPropagation(); // Evita conflito com o mapa ao fundo
+        item.onclick = (e) => {
+            e.stopPropagation(); // Impede o clique de atravessar para o mapa
             
-            // Tenta achar o prédio no mapa e clica nele
-            const path = document.getElementById(res.idPath);
-            if (path) {
-                path.dispatchEvent(new Event('click'));
+            // Simula o clique no path do mapa
+            const pathAlvo = document.getElementById(res.idPath);
+            if (pathAlvo) {
+                pathAlvo.dispatchEvent(new Event('click'));
             }
             
-            toggleMenu(); // Fecha o menu após selecionar
+            toggleMenu(); // Fecha o menu
         };
 
-        listaDiv.appendChild(btn);
+        listaDiv.appendChild(item);
     });
 }
 // 3. Função de Desenho do Mapa
