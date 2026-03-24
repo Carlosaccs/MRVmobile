@@ -151,7 +151,7 @@ html, body {
 #mapa-minimizado {
     position: absolute;
     bottom: 20px;
-    left: 80px; /* Posicionado após a faixa verde */
+    left: 80px; /* Garante que fique após a faixa verde de 60px */
     width: 100px;
     height: 80px;
     background: white;
