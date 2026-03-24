@@ -71,6 +71,7 @@ async function carregarPlanilha() {
         atualizarVisualizacao(); // Garante o mapa mesmo se a planilha falhar
     }
 }
+
 function construirMenuDOM() {
     const listaDiv = document.getElementById('lista-residenciais');
     if (!listaDiv) return;
@@ -81,19 +82,19 @@ function construirMenuDOM() {
         btn.className = 'item-menu';
         btn.innerText = res.nomeCurto;
 
-        // ... lógica das cores das zonas (mantenha a sua) ...
-
-        btn.onclick = () => {
+        btn.onclick = (e) => {
+            e.stopPropagation(); // IMPEDE QUE O MAPA "ROUBE" O CLIQUE
             const path = document.getElementById(res.idPath);
             if (path) path.dispatchEvent(new Event('click'));
             
-            // FECHA O MENU AUTOMATICAMENTE AO SELECIONAR
-            toggleMenu(); 
+            toggleMenu(); // Fecha o menu após escolher
         };
 
         listaDiv.appendChild(btn);
     });
 }
+
+
 // Função para abrir/fechar o menu (vincular ao ícone de hambúrguer na barra verde)
 function toggleMenu() {
     // Busca o menu que agora está no final do <body>
