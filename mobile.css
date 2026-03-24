@@ -180,27 +180,27 @@ CSS
 
 
 
-/* 7. MENU LATERAL (v138 - AJUSTE FINAL DE CAMADAS) */
+/* 7. MENU LATERAL (v138 - AJUSTE DE CAMADAS E POSIÇÃO) */
 #container-menu {
     position: absolute;
-    left: -280px; /* Posição Fechado */
+    left: -280px; /* Escondido à esquerda */
     top: 0;
     width: 280px; 
     height: 100%;
-    background: rgba(255, 255, 255, 0.9); /* Um pouco mais opaco para ler melhor */
-    z-index: 1800; /* MAIOR que o mapa (1000) e MENOR que a faixa verde (2000) */
-    transition: left 0.4s ease-in-out;
+    background: rgba(255, 255, 255, 0.95); /* Fundo quase opaco para não vazar o mapa atrás */
+    z-index: 1900; /* MAIOR que o mapa (1000) e MENOR que a faixa verde (2000) */
+    transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     overflow-y: auto;
-    padding-left: 75px; /* Afasta o texto da faixa verde */
-    padding-top: 60px; /* Abre espaço para o ícone de fullscreen não cobrir o primeiro item */
+    padding-left: 75px; /* Espaço para a faixa verde não cobrir o texto */
+    padding-top: 20px;
     padding-right: 15px;
-    pointer-events: none;
+    pointer-events: none; /* Não bloqueia o mapa quando fechado */
+    box-shadow: 5px 0 15px rgba(0,0,0,0.2);
 }
 
 #container-menu.ativo {
-    left: 0; /* Posição Aberto */
-    pointer-events: auto;
-    box-shadow: 5px 0 15px rgba(0,0,0,0.3);
+    left: 0; 
+    pointer-events: auto; /* Permite clicar nos botões quando aberto */
 }
 
 .item-menu {
@@ -214,6 +214,6 @@ CSS
     font-weight: bold;
     color: #333;
     display: block;
-    border-right: 8px solid #ccc;
-    text-transform: uppercase;
+    border-right: 10px solid #ccc; /* Borda grossa para as cores das zonas */
+    text-align: left;
 }
