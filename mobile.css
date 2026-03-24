@@ -180,27 +180,29 @@ CSS
 
 
 
-/* 7. MENU LATERAL (v138 - AJUSTE DE CAMADAS E POSIÇÃO) */
+/* 7. MENU LATERAL (v138 - AJUSTE FINAL DE CAMADAS) */
 #container-menu {
     position: absolute;
     left: -280px; /* Escondido à esquerda */
     top: 0;
     width: 280px; 
     height: 100%;
-    background: rgba(255, 255, 255, 0.95); /* Fundo quase opaco para não vazar o mapa atrás */
-    z-index: 1900; /* MAIOR que o mapa (1000) e MENOR que a faixa verde (2000) */
-    transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    /* Fundo quase sólido para o mapa não aparecer através do menu */
+    background: rgba(255, 255, 255, 0.98); 
+    /* z-index: MAIOR que o mapa (1000) e MENOR que a faixa verde (2000) */
+    z-index: 1500; 
+    transition: left 0.4s ease-in-out;
     overflow-y: auto;
-    padding-left: 75px; /* Espaço para a faixa verde não cobrir o texto */
+    padding-left: 75px; /* Espaço para não ser coberto pela faixa verde */
     padding-top: 20px;
     padding-right: 15px;
-    pointer-events: none; /* Não bloqueia o mapa quando fechado */
-    box-shadow: 5px 0 15px rgba(0,0,0,0.2);
+    pointer-events: none; /* Não atrapalha o mapa quando está fechado */
 }
 
 #container-menu.ativo {
     left: 0; 
     pointer-events: auto; /* Permite clicar nos botões quando aberto */
+    box-shadow: 5px 0 15px rgba(0,0,0,0.3);
 }
 
 .item-menu {
