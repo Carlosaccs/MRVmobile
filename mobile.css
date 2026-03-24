@@ -14,6 +14,9 @@ html, body {
     position: relative; overflow: hidden; 
 }
 
+
+
+
 /* 2. FAIXA VERDE LATERAL */
 .faixa-verde-vertical {
     position: absolute;
@@ -63,6 +66,10 @@ html, body {
     transform: scale(1.2);
     opacity: 0.8;
 }
+
+
+
+
 /* 3. CONTAINER DO MAPA PRINCIPAL */
 #mapa-container {
     position: absolute;
@@ -95,6 +102,10 @@ html, body {
     cursor: pointer;
     -webkit-tap-highlight-color: transparent; /* NOVO: Remove o flash azul ao tocar */
 }
+
+
+
+
 /* 4. MAPA MINIMIZADO (v127) - Posicionado à direita da área do mapa */
 #mapa-minimizado {
     position: absolute;
@@ -121,6 +132,9 @@ html, body {
 path.commrv { cursor: pointer; }
 path.semmrv { cursor: default; }
 
+
+
+
 /* 5. FICHA TÉCNICA (LATERAL DIREITA) */
 .ficha-tecnica {
     position: absolute; right: 0; top: 0; 
@@ -136,6 +150,10 @@ path.semmrv { cursor: default; }
 }
 #detalhes-imovel { font-size: 1.2rem; line-height: 1.6; }
 
+
+
+
+
 /* 6. IDENTIFICADOR DE CIDADE (CENTRO SUPERIOR) - v125 */
 #identificador-cidade {
     position: absolute;
@@ -150,3 +168,63 @@ path.semmrv { cursor: default; }
     pointer-events: none;
     text-shadow: 1px 1px 2px rgba(255,255,255,0.8);
 }
+
+
+Com certeza, Carlos. Como o seu arquivo mobile.css está organizado em blocos numerados (atualmente indo até o 6. IDENTIFICADOR DE CIDADE), o ideal é criarmos o Bloco 7 logo abaixo dele.
+
+Aqui está o código completo para você copiar e colar no final do seu arquivo mobile.css:
+
+mobile.css (Adição do Bloco 7)
+CSS
+
+
+
+
+/* 7. MENU LATERAL (v138 - CIRURGIA DO MENU) */
+#container-menu {
+    position: absolute;
+    left: -280px; /* Começa escondido totalmente à esquerda */
+    top: 0;
+    width: 280px; 
+    height: 100%;
+    background: rgba(255, 255, 255, 0.1); /* Fundo da caixa transparente como solicitado */
+    z-index: 1500; /* Fica entre o mapa (1000) e a faixa verde (2000) */
+    transition: left 0.4s ease-in-out;
+    overflow-y: auto;
+    padding-left: 70px; /* Espaço de segurança para não sumir sob a faixa verde */
+    padding-top: 20px;
+    padding-right: 15px;
+    pointer-events: none; /* Desativado por padrão para não atrapalhar o mapa */
+}
+
+/* Quando o menu ganha a classe .ativo, ele desliza para a direita */
+#container-menu.ativo {
+    left: 0; 
+    pointer-events: auto; /* Reativa os cliques nos botões */
+}
+
+.item-menu {
+    background: white;
+    border: 1px solid #00713a; /* Contorno verde escuro */
+    margin-bottom: 12px;
+    padding: 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: bold;
+    color: #333;
+    display: block;
+    box-shadow: 2px 2px 8px rgba(0,0,0,0.1);
+    border-right: 12px solid #ccc; /* Borda grossa na direita para as zonas */
+    transition: transform 0.2s ease;
+}
+
+.item-menu:active {
+    transform: scale(0.98);
+}
+
+/* Cores das Zonas na borda direita (identificadas pelo prefixo no JS) */
+.borda-zo { border-right-color: #f39c12; } /* Oeste: Laranja */
+.borda-zl { border-right-color: #e74c3c; } /* Leste: Vermelho */
+.borda-zn { border-right-color: #3498db; } /* Norte: Azul */
+.borda-zs { border-right-color: #9b59b6; } /* Sul: Roxo */
