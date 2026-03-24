@@ -1,5 +1,5 @@
 /* ==========================================================================
-   v136 - ARQUIVO CSS CONSOLIDADO
+   v138 - ARQUIVO CSS CONSOLIDADO
    ========================================================================== */
 
 /* 1. FUNDAÇÃO E RESET */
@@ -49,22 +49,26 @@ html, body {
     justify-content: center;
 }
 
-/* ÍCONES BRANCOS E MAIORES */
+
+/* AJUSTE DOS ÍCONES NA FAIXA VERDE (v138) */
 .icon-top, .icon-bottom {
-    font-size: 26px; /* Tamanho ideal para o dedo */
-    color: white !important;
-    cursor: pointer;
-    padding: 10px;
-    user-select: none;
     display: flex;
     align-items: center;
     justify-content: center;
+    width: 100%;
+    height: 60px; /* Área de toque aumentada */
+    cursor: pointer;
+    transition: background 0.3s;
 }
 
-/* Efeito de clique nos ícones */
 .icon-top:active, .icon-bottom:active {
-    transform: scale(1.2);
-    opacity: 0.8;
+    background: rgba(255, 255, 255, 0.2); /* Feedback visual ao tocar */
+}
+
+.icon-top svg, .icon-bottom svg {
+    fill: #ffffff !important; /* Força a cor branca nos ícones */
+    width: 32px;
+    height: 32px;
 }
 
 
