@@ -27,31 +27,50 @@ async function carregarPlanilha() {
     try {
         const res = await fetch(URL_PLANILHA);
         const csv = await res.text();
-        const linhas = csv.split('\n').slice(1); // Pula o cabeçalho
+        // Remove linhas vazias e trata quebras de linha de diferentes sistemas
+        const linhas = csv.split(/\r?\n/).filter(linha => linha.trim() !== "");
+        const dadosPuros = linhas.slice(1); // Remove o cabeçalho
         
-        window.listaResidenciais = []; // Limpa a lista
+        window.listaResidenciais = [];
+        window.bancoDados = {}; // Para o hover do mapa
 
-        linhas.forEach(linha => {
+        dadosPuros.forEach(linha => {
             const c = linha.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
-            if (c.length >= 5) {
+            if (c.length >= 5 && c[0].trim() !== "") {
+                const idOriginal = c[0].replace(/"/g, '').trim().toLowerCase();
+                const idLimpo = idOriginal.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+                
                 const item = {
-                    idPath: c[0].replace(/"/g, '').trim().toLowerCase(),
+                    idPath: idLimpo,
                     categoria: c[1]?.replace(/"/g, '').trim(),
                     ordem: parseInt(c[2]) || 999,
                     nomeCurto: c[3]?.replace(/"/g, '').trim(),
-                    nomeFull: c[4]?.replace(/"/g, '').trim()
+                    nomeFull: c[4]?.replace(/"/g, '').trim(),
+                    estoque: c[5]?.replace(/"/g, '').trim(),
+                    statusObra: c[11]?.replace(/"/g, '').trim(),
+                    observacoes: c[18]?.replace(/"/g, '').trim()
                 };
+
                 window.listaResidenciais.push(item);
+                
+                // Salva no banco de dados para o mapa (usa o primeiro que encontrar para o hover)
+                if (!window.bancoDados[idLimpo]) {
+                    window.bancoDados[idLimpo] = item;
+                }
             }
         });
 
-        // Ordenação Cirúrgica pela Coluna C
         window.listaResidenciais.sort((a, b) => a.ordem - b.ordem);
-
+        
+        // CONSTRUIR O MENU E SÓ ENTÃO DESENHAR O MAPA
         construirMenuDOM();
-    } catch (e) { console.error("Erro na planilha:", e); }
-}
+        atualizarVisualizacao(); // Isso garante que o mapa apareça maximizado logo no início
 
+    } catch (e) { 
+        console.error("Erro ao carregar:", e);
+        atualizarVisualizacao(); // Garante o mapa mesmo se a planilha falhar
+    }
+}
 function construirMenuDOM() {
     const listaDiv = document.getElementById('lista-residenciais');
     if (!listaDiv) return;
