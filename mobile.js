@@ -7,7 +7,6 @@ const svgNS = "http://www.w3.org/2000/svg";
 const URL_PLANILHA = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSRKdJctOPQjKAtOZSDHyArD_H8SgKIouelAS1vF1d_-13pu7u_ic6J8nP3r0Ijd56WA-mbUmHjb4Me/pub?output=csv';
 
 let mapaAtivo = "GSP";
-let cidadeSelecionada = ""; 
 window.bancoDados = {}; 
 
 const AJUSTES_MAPA = {
@@ -44,18 +43,15 @@ async function carregarPlanilha() {
         console.log("✅ Banco carregado. Registros:", Object.keys(window.bancoDados).length);
         atualizarVisualizacao();
         popularMenuResidenciais(); 
-    } catch (e) { console.error("❌ Erro CSV"); }
+    } catch (e) { console.error("❌ Erro ao processar CSV:", e); }
 }
 
-// 3. LOGICA DO MENU LATERAL (v139.5)
+// 3. LÓGICA DO MENU LATERAL
 function toggleMenuLateral() {
     const menu = document.getElementById('menu-lateral-container');
     if (!menu) return;
     
     menu.classList.toggle('aberto');
-    if (menu.classList.contains('aberto')) {
-        popularMenuResidenciais();
-    }
 }
 
 function popularMenuResidenciais() {
@@ -89,11 +85,11 @@ function popularMenuResidenciais() {
 
     if (contador) {
         contador.innerText = totalGerado.toString().padStart(2, '0');
-        contador.style.color = (totalGerado >= 42) ? "white" : "#ffff00";
+        contador.style.color = (totalGerado >= 40) ? "white" : "#ffff00";
     }
 }
 
-// 4. DESENHO DOS MAPAS (GSP & INTERIOR)
+// 4. DESENHO DOS MAPAS
 function desenharMapa(dados, targetId, ehMinimizado) {
     const container = document.getElementById(targetId);
     if (!container || !dados) return;
@@ -110,7 +106,7 @@ function desenharMapa(dados, targetId, ehMinimizado) {
     }
 
     const g = document.createElementNS(svgNS, "g");
-    g.setAttribute("transform", dados.transform);
+    g.setAttribute("transform", dados.transform || "");
 
     dados.paths.forEach(pData => {
         const path = document.createElementNS(svgNS, "path");
@@ -136,10 +132,12 @@ function desenharMapa(dados, targetId, ehMinimizado) {
             path.onclick = () => {
                 if (!ehMRV) return;
                 
+                // Reset de cores
                 document.querySelectorAll('#mapa-container path').forEach(p => {
                     p.style.fill = p.getAttribute('data-cor-base');
                 });
                 
+                // Destaque do selecionado
                 path.style.fill = corLaranja;
                 document.getElementById('identificador-cidade').innerText = pData.name || pData.id;
 
@@ -158,11 +156,13 @@ function desenharMapa(dados, targetId, ehMinimizado) {
     container.appendChild(svg);
 }
 
-// 5. TROCA DE MAPAS E ATUALIZAÇÃO
+// 5. TROCA DE MAPAS
 function atualizarVisualizacao() {
     if (typeof MAPA_GSP !== 'undefined' && typeof MAPA_INTERIOR !== 'undefined') {
         desenharMapa(mapaAtivo === "GSP" ? MAPA_GSP : MAPA_INTERIOR, "mapa-container", false);
         desenharMapa(mapaAtivo === "GSP" ? MAPA_INTERIOR : MAPA_GSP, "mapa-minimizado", true);
+    } else {
+        console.warn("⚠️ Mapas não definidos. Verifique se os arquivos de dados foram carregados.");
     }
 }
 
@@ -172,7 +172,7 @@ function trocarMapas() {
     atualizarVisualizacao();
 }
 
-// 6. CONTROLE DE TELA CHEIA (FULLSCREEN)
+// 6. CONTROLE DE FULLSCREEN
 function toggleFullscreen() {
     if (!document.fullscreenElement) {
         document.documentElement.requestFullscreen().catch(err => console.warn(err.message));
@@ -195,7 +195,7 @@ function atualizarVisualIconeFullscreen() {
     }
 }
 
-// 7. INICIALIZAÇÃO DO SISTEMA
+// 7. INICIALIZAÇÃO
 window.onload = () => {
     carregarPlanilha();
 };
