@@ -150,24 +150,28 @@ html, body {
 /* 5. BOTÃO DE TROCA (MAPA MINIMIZADO) */
 #mapa-minimizado {
     position: absolute;
-    bottom: 20px;
-    left: 80px; /* Garante que fique após a faixa verde de 60px */
-    width: 100px;
-    height: 80px;
+    bottom: 25px;
+    /* A mágica está aqui: 44% é a largura da sua ficha técnica + 15px de respiro */
+    right: calc(44% + 15px); 
+    width: 90px;
+    height: 70px;
     background: white;
     border: 2px solid #00713a;
-    border-radius: 12px;
+    border-radius: 10px;
     cursor: pointer;
     z-index: 2000;
     overflow: hidden;
-    box-shadow: 0 6px 15px rgba(0,0,0,0.3);
+    box-shadow: -5px 5px 15px rgba(0,0,0,0.3);
     display: flex;
     align-items: center;
     justify-content: center;
     transition: transform 0.2s ease;
 }
 
-#mapa-minimizado:active { transform: scale(0.9); }
+#mapa-minimizado:active {
+    transform: scale(0.9);
+}
+
 #mapa-minimizado svg { width: 90%; height: 90%; }
 
 /* 6. FICHA TÉCNICA (LATERAL DIREITA) */
