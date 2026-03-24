@@ -233,23 +233,32 @@ function atualizarVisualIconeFullscreen() {
     }
 }
 
-// 6. Inicialização e Eventos Globais
-window.onload = carregarPlanilha;
+// 6. Inicialização e Eventos Globais (v138 - Ajustada)
+window.onload = () => {
+    // 1. Força a primeira visualização do mapa (Grande SP) imediatamente
+    atualizarVisualizacao(); 
+    
+    // 2. Carrega os dados da planilha para colorir os caminhos e montar o menu
+    carregarPlanilha();
+};
 
 document.addEventListener('click', (e) => {
-    if (e.target.closest('#mapa-minimizado')) trocarMapas();
+    // Se clicar no mapa pequeno, troca as posições
+    if (e.target.closest('#mapa-minimizado')) {
+        trocarMapas();
+    }
 });
 
 document.addEventListener('fullscreenchange', atualizarVisualIconeFullscreen);
 
-
-
-
-// 7. FUNÇÃO DE CONTROLE DO MENU (CIRURGIA v138)
+// 7. FUNÇÃO DE CONTROLE DO MENU (CIRURGIA v138 - Ajuste de Click)
 function toggleMenu() {
     const menu = document.getElementById('container-menu');
     if (!menu) return;
 
-    // Alterna a classe 'ativo' para disparar o slide do CSS
+    // Alterna a classe 'ativo' para o CSS deslizar o menu
     menu.classList.toggle('ativo');
+    
+    // Log para você conferir no console do navegador (F12) se o comando está chegando
+    console.log("Menu alternado. Classe atual:", menu.className);
 }
