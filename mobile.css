@@ -152,56 +152,58 @@ path.semmrv { cursor: default; }
 }
 
 /* ==========================================================================
-   7. MENU LATERAL (v139.1) - AJUSTE DE POSICIONAMENTO E COMPACTAÇÃO
-   ========================================================================== */
+   7. MENU LATERAL (v139.5) - CORREÇÃO DE INTERAÇÃO
+   ========================================================================== */
 
 #menu-lateral-container {
-    position: absolute;
-    top: 0;
-    left: -320px; /* Escondido mais atrás */
-    width: 300px; /* Aumentado para acomodar o deslocamento do texto */
-    height: 100%;
-    background: transparent;
-    z-index: 1500; 
-    transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
-    padding: 20px 10px;
-    overflow-y: auto;
-    scrollbar-width: none;
-    pointer-events: none;
+    position: absolute;
+    top: 0;
+    left: -320px; 
+    width: 300px; 
+    height: 100%;
+    background: transparent;
+    z-index: 1500; 
+    transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+    padding: 20px 10px;
+    overflow-y: auto;
+    scrollbar-width: none;
+    
+    /* IMPORTANTE: Deixa cliques passarem quando fechado */
+    pointer-events: none; 
+    visibility: hidden; 
 }
 
 #menu-lateral-container.aberto {
-    /* O menu agora começa 20px ANTES de terminar a faixa verde (60px) 
-       para garantir que ele saia de "dentro" dela */
-    left: 40px; 
-    pointer-events: auto;
+    left: 40px; 
+    /* IMPORTANTE: Reativa cliques e visibilidade quando aberto */
+    pointer-events: auto; 
+    visibility: visible;
 }
 
 #trilho-infinito {
-    display: flex;
-    flex-direction: column;
-    gap: 8px; /* Reduzido em 25% a distância entre itens */
-    padding-bottom: 50px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px; 
+    padding-bottom: 50px;
+    /* Garante que o conteúdo interno responda ao toque */
+    pointer-events: auto;
 }
 
 .card-residencial {
-    background: #ffffff;
-    border: 2px solid #00713a;
-    border-right: 15px solid #00713a;
-    
-    /* AJUSTES DE ALTURA E DISTÂNCIA INTERNA */
-    padding: 8px 15px 8px 35px; /* 35px na esquerda para o texto não sumir sob a faixa */
-    height: auto; /* Deixa a altura ser definida pelo novo padding menor */
-    
-    font-size: 0.82rem;
-    font-weight: bold;
-    color: #333;
-    border-radius: 4px;
-    text-transform: uppercase;
-    box-shadow: 3px 3px 10px rgba(0,0,0,0.2);
-    cursor: pointer;
-    white-space: nowrap;
+    background: #ffffff;
+    border: 2px solid #00713a;
+    border-right: 15px solid #00713a;
+    padding: 8px 15px 8px 35px; 
+    font-size: 0.82rem;
+    font-weight: bold;
+    color: #333;
+    border-radius: 4px;
+    text-transform: uppercase;
+    box-shadow: 3px 3px 10px rgba(0,0,0,0.2);
+    cursor: pointer;
+    white-space: nowrap;
+    /* Força o card a ser clicável */
+    pointer-events: all;
 }
 
-/* Esconder barra de rolagem */
 #menu-lateral-container::-webkit-scrollbar { display: none; }
