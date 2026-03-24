@@ -184,3 +184,15 @@ document.addEventListener('fullscreenchange', atualizarIconeFullscreen);
 document.addEventListener('click', (e) => {
     if (e.target.closest('#mapa-minimizado')) trocarMapas();
 });
+
+
+function toggleMenu() {
+    const menu = document.getElementById('menu-lateral');
+    if (menu.classList.contains('menu-oculto')) {
+        menu.classList.remove('menu-oculto');
+        menu.classList.add('menu-aberto');
+    } else {
+        menu.classList.remove('menu-aberto');
+        menu.classList.add('menu-oculto');
+    }
+}
