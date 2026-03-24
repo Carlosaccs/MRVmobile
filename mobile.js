@@ -222,3 +222,15 @@ document.addEventListener('click', (e) => {
 });
 
 document.addEventListener('fullscreenchange', atualizarVisualIconeFullscreen);
+
+
+
+
+// 7. FUNÇÃO DE CONTROLE DO MENU (CIRURGIA v138)
+function toggleMenu() {
+    const menu = document.getElementById('container-menu');
+    if (!menu) return;
+
+    // Alterna a classe 'ativo' para disparar o slide do CSS
+    menu.classList.toggle('ativo');
+}
