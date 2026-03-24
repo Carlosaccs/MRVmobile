@@ -174,26 +174,24 @@ CSS
 
 
 /* 7. MENU LATERAL (v138 - FIXO E SOBREPOSTO) */
+/* Bloco 7 - MENU SOBRE TUDO */
 #container-menu {
-    position: fixed; /* Fixa na tela, independente do wrapper */
-    left: -320px; /* Esconde totalmente (incluindo sombra) */
+    position: absolute; /* Mudança para absolute */
+    left: -320px; 
     top: 0;
     width: 280px; 
-    height: 100vh;
-    background: #ffffff; /* Fundo sólido para cobrir o mapa */
-    z-index: 5000 !important; /* Valor muito alto para vencer o SVG */
-    transition: left 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Efeito elástico */
+    height: 100%;
+    background: #ffffff; 
+    z-index: 9999 !important; /* Força o menu na frente de tudo */
+    transition: left 0.4s ease-in-out;
     overflow-y: auto;
-    padding-left: 80px; /* Espaço para a faixa verde */
+    padding-left: 75px; 
     padding-top: 20px;
-    padding-right: 15px;
-    box-shadow: 10px 0 20px rgba(0,0,0,0.4);
-    pointer-events: none; /* Bloqueia cliques no mapa enquanto fechado */
+    box-shadow: 10px 0 20px rgba(0,0,0,0.5);
 }
 
 #container-menu.ativo {
-    left: 0; 
-    pointer-events: auto; /* Permite clicar nos residenciais quando aberto */
+    left: 0;
 }
 
 .item-menu {
