@@ -192,3 +192,41 @@ document.addEventListener('fullscreenchange', atualizarIconeFullscreen);
 document.addEventListener('click', (e) => {
     if (e.target.closest('#mapa-minimizado')) trocarMapas();
 });
+
+
+// FUNÇÃO PARA CRIAR OS BOTÕES BRANCOS NO MENU
+function gerarMenuResidenciais() {
+    const lista = document.getElementById('lista-residenciais');
+    if (!lista) return;
+
+    lista.innerHTML = ""; // Limpa qualquer texto antigo
+
+    // Pegamos todos os residenciais que vieram da sua planilha
+    Object.keys(window.bancoDados).forEach(id => {
+        const info = window.bancoDados[id];
+        
+        // Criamos o item da lista (li)
+        const li = document.createElement('li');
+        li.className = 'menu-item-mrv'; // Aplica o estilo do CSS que fizemos
+        li.innerText = info.nomeExibicao.toUpperCase();
+        
+        // No futuro, aqui mudaremos a cor da borda baseado na zona
+        li.style.borderRightColor = "#00713a"; 
+
+        // AÇÃO AO CLICAR NO BOTÃO DO MENU
+        li.onclick = () => {
+            // Procuramos o ID no mapa que está na tela
+            const pathNoMapa = document.getElementById(id);
+            
+            if (pathNoMapa) {
+                pathNoMapa.dispatchEvent(new Event('click')); // Simula o toque no mapa
+                toggleMenu(); // Fecha o menu para mostrar o resultado
+            } else {
+                // Caso o corretor clique em algo que só tem no outro mapa
+                alert("Este residencial está no outro mapa. Troque a visualização na caixinha abaixo!");
+            }
+        };
+
+        lista.appendChild(li);
+    });
+}
