@@ -1,35 +1,22 @@
 /* ==========================================================================
-   v140 - CSS INTEGRAL: MENU SOBREPOSTO + AJUSTES DE CAMADA
+   BLOCO 1: RESET E CONFIGURAÇÕES DE BASE
    ========================================================================== */
-
-/* 1. Reset e Base */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-}
-
-body, html {
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-    background-color: #ffffff;
-}
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+body, html { width: 100%; height: 100%; overflow: hidden; background-color: #ffffff; }
 
 .mobile-wrapper {
     position: relative;
     width: 100vw;
     height: 100vh;
     display: flex;
-    flex-direction: row;
 }
 
-/* 2. Faixa Verde Lateral (A mais alta na hierarquia) */
+/* ==========================================================================
+   BLOCO 2: FAIXA VERDE LATERAL (Z-INDEX 3000)
+   ========================================================================== */
 .sidebar-verde {
     position: absolute;
-    left: 0;
-    top: 0;
+    left: 0; top: 0;
     width: 60px;
     height: 100%;
     background-color: #00713a;
@@ -37,9 +24,9 @@ body, html {
     flex-direction: column;
     justify-content: space-between;
     align-items: center;
-    padding: 15px 0;
-    z-index: 2000; /* Garante que fique acima de tudo */
-    box-shadow: 2px 0 10px rgba(0,0,0,0.3);
+    padding: 20px 0;
+    z-index: 3000; /* Sempre no topo de tudo */
+    box-shadow: 2px 0 10px rgba(0,0,0,0.2);
 }
 
 .logo-mrv-vertical {
@@ -47,51 +34,25 @@ body, html {
     writing-mode: vertical-rl;
     transform: rotate(180deg);
     font-weight: bold;
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     letter-spacing: 2px;
 }
 
-.icon-bottom {
-    cursor: pointer;
-    transition: transform 0.2s;
-}
-
-.icon-bottom:active {
-    transform: scale(0.9);
-}
-
-/* 3. Área Principal do Mapa */
-.map-section {
-    position: relative;
-    flex: 1;
-    height: 100%;
-    background: #fff;
-    z-index: 10; /* Base */
-    overflow: hidden;
-}
-
-#mapa-container {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-/* 4. MENU DE RESIDENCIAIS (O Desafio) */
+/* ==========================================================================
+   BLOCO 3: MENU DE RESIDENCIAIS (Z-INDEX 2000)
+   ========================================================================== */
 #container-menu {
     position: absolute;
-    left: 0;
-    top: 0;
-    width: 320px; /* Largura suficiente para os cards */
+    left: 0; top: 0;
+    width: 320px;
     height: 100%;
-    background: transparent; /* Caixa principal transparente conforme pedido */
-    z-index: 1500; /* Entre o mapa (10) e a faixa verde (2000) */
-    transform: translateX(-100%); /* Começa escondido à esquerda */
+    background: transparent; /* Caixa transparente para ver o mapa */
+    z-index: 2000; /* Entre a faixa verde e o mapa */
+    transform: translateX(-100%);
     transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    padding: 20px 10px 20px 10px;
+    padding: 20px 10px;
     overflow-y: auto;
-    pointer-events: none; /* Não clica no menu se estiver fechado */
+    pointer-events: none;
 }
 
 #container-menu.aberto {
@@ -99,34 +60,33 @@ body, html {
     pointer-events: auto;
 }
 
-/* Estilização dos itens (Botões brancos) */
 .item-menu {
     background: white;
     color: #333;
-    border: 1px solid #00713a;
-    margin-bottom: 10px;
-    padding: 15px 15px 15px 70px; /* 70px de recuo para o texto não ficar sob a faixa de 60px */
+    border: 1.5px solid #00713a;
+    margin-bottom: 8px;
+    padding: 15px 15px 15px 70px; /* Recuo para o texto aparecer à direita da faixa */
     border-radius: 0 10px 10px 0;
     font-weight: 600;
     font-size: 0.85rem;
     cursor: pointer;
-    box-shadow: 3px 3px 6px rgba(0,0,0,0.15);
+    box-shadow: 3px 3px 6px rgba(0,0,0,0.1);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    transition: background 0.2s, transform 0.1s;
-    display: block;
-    width: 100%;
+    transition: background 0.2s;
 }
 
-.item-menu:active {
-    background: #f9f9f9;
-    transform: scale(0.98);
-}
+.item-menu:active { background: #f0f0f0; }
 
-/* 5. Painel de Informações (Direita) */
+/* ==========================================================================
+   BLOCO 4: SEÇÃO DO MAPA E INFO PANEL (Z-INDEX 10-100)
+   ========================================================================== */
+.map-section { flex: 1; position: relative; z-index: 10; background: #fff; }
+#mapa-container { width: 100%; height: 100%; }
+
 .info-panel {
-    width: 350px;
+    width: 380px;
     height: 100%;
     background-color: #444;
     color: white;
@@ -135,59 +95,14 @@ body, html {
     box-shadow: -5px 0 15px rgba(0,0,0,0.2);
 }
 
-.info-panel h2 {
-    color: #4caf50;
-    border-bottom: 2px solid #4caf50;
-    padding-bottom: 10px;
-    margin-bottom: 20px;
-}
-
-/* 6. Mini Mapa e Identificadores */
-.mini-map-box {
-    position: absolute;
-    bottom: 20px;
-    left: 80px;
-    width: 80px;
-    height: 80px;
-    background: white;
-    border: 2px solid #00713a;
-    border-radius: 8px;
-    cursor: pointer;
-    z-index: 500;
-}
-
 #identificador-cidade {
     position: absolute;
-    top: 20px;
-    left: 50%;
+    top: 20px; left: 50%;
     transform: translateX(-50%);
-    font-weight: bold;
-    font-size: 1.1rem;
-    color: #333;
-    background: rgba(255,255,255,0.8);
-    padding: 5px 15px;
+    background: rgba(255,255,255,0.9);
+    padding: 6px 20px;
     border-radius: 20px;
+    font-weight: bold;
+    color: #333;
     z-index: 500;
-    text-transform: uppercase;
-}
-
-/* 7. Fullscreen Icon */
-.fullscreen-toggle {
-    position: absolute;
-    top: 15px;
-    left: 75px;
-    cursor: pointer;
-    z-index: 2100;
-    background: #00713a;
-    border-radius: 4px;
-    padding: 5px;
-}
-
-/* Scrollbar do Menu */
-#container-menu::-webkit-scrollbar {
-    width: 4px;
-}
-#container-menu::-webkit-scrollbar-thumb {
-    background: #00713a;
-    border-radius: 10px;
 }
