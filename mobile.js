@@ -178,4 +178,3 @@ document.addEventListener('click', (e) => {
 
 document.addEventListener('fullscreenchange', atualizarVisualIconeFullscreen);
 
-Na proxima mensagem eu envio o print da tela formada pelos códigos acima e te digo o nosso desafio
