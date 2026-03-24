@@ -9,15 +9,8 @@
 <body>
 
     <div class="mobile-wrapper">
-
-            <div id="menu-lateral-container">
-                <div id="trilho-infinito"></div>
-            </div>
-
         
         <aside class="faixa-verde-vertical">
-            <div id="contador-registros" style="color: white; font-size: 10px; font-weight: bold; margin-bottom: 5px; opacity: 0.8; text-align: center; width: 100%;">00</div>
-
             <div class="icon-top" onclick="toggleMenuLateral()">
                 <svg viewBox="35 130 70 55" width="28" height="28">
                     <path fill="white" d="M 39.911259 134.69049 L 39.911259 137.57403 L 39.911259 140.45706 L 69.950769 140.45706 L 99.990796 140.45706 L 99.990796 137.57403 L 99.990796 134.69049 L 69.950769 134.69049 L 39.911259 134.69049 z M 39.911259 153.33121 L 39.911259 156.14757 L 39.911259 158.96394 L 69.950769 158.96394 L 99.990796 158.96394 L 99.990796 156.14757 L 99.990796 153.33121 L 69.950769 153.33121 L 39.911259 153.33121 z M 39.911259 171.83809 L 39.911259 174.72112 L 39.911259 177.60466 L 69.950769 177.60466 L 99.990796 177.60466 L 99.990796 174.72112 L 99.990796 171.83809 L 69.950769 171.83809 L 39.911259 171.83809 z" />
@@ -37,16 +30,18 @@
 
         <main class="area-mapa" id="mapa-container"></main>
         
+        <div id="menu-lateral-container">
+            <div id="trilho-infinito"></div>
+        </div>
 
-
-        <div id="mapa-minimizado" onclick="trocarMapas()"></div>
+        <div id="mapa-minimizado"></div>
 
         <aside class="ficha-tecnica" id="ficha-tecnica">
             <h3 id="nome-imovel">Selecione</h3>
             <div id="detalhes-imovel">
                 Toque em um ponto verde para ver os detalhes.
             </div>
-            <div style="position:absolute; bottom:10px; right:10px; font-size:10px; color:#ccc;">v139.4</div>
+            <div style="position:absolute; bottom:10px; right:10px; font-size:10px; color:#ccc;">v139</div>
         </aside>
 
     </div>
