@@ -78,24 +78,17 @@ html, body {
    ========================================================================== */
 #menu-lateral {
     position: fixed;
-    /* Começa exatamente após a faixa verde de 80px */
     left: 80px; 
     top: 0;
-    /* Ocupa o restante da largura, mas com um limite elegante */
     width: calc(100% - 80px);
-    max-width: 300px; 
+    max-width: 330px; /* Aumentado de 300px para 330px */
     height: 100%;
-    
-    /* Fundo totalmente transparente, só com o desfoque (Blur) */
     background: transparent; 
     backdrop-filter: blur(15px);
     -webkit-backdrop-filter: blur(15px);
-    
     z-index: 3000; 
     padding: 10px 0; 
     transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    
-    /* Importante: impede que o menu invisível bloqueie o mapa */
     pointer-events: none; 
 }
 
@@ -135,10 +128,11 @@ html, body {
 .menu-item-mrv {
     background: #ffffff;
     border: 1px solid #d1d1d1;
-    border-right: 18px solid #00713a; /* Borda padrão verde */
+    border-right: 18px solid #00713a; 
     
-    /* Margens ajustadas para ficar colado na faixa verde com respiro */
-    margin: 10px 15px; 
+    /* Ajustado: margem esquerda menor (5px) para o botão "crescer" para a esquerda */
+    margin: 10px 15px 10px 5px;  
+    
     padding: 14px 12px;
     border-radius: 4px 12px 12px 4px;
     
