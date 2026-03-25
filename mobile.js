@@ -268,3 +268,63 @@ document.addEventListener('fullscreenchange', atualizarIconeFullscreen);
 document.addEventListener('click', (e) => {
     if (e.target.closest('#mapa-minimizado')) trocarMapas();
 });
+
+
+
+/* ==========================================================================
+   BLOCO 8: LÓGICA DA VITRINE (LISTA DE IMÓVEIS POR REGIÃO)
+   ========================================================================== */
+
+// Esta função limpa a ficha e monta a lista de botões dos prédios daquela cidade
+function montarListaCidadeVitrine(nomeRegiao, idPath) {
+    const elNome = document.getElementById('nome-imovel');
+    const elDetalhes = document.getElementById('detalhes-imovel');
+
+    if (!elNome || !elDetalhes) return;
+
+    // 1. Atualiza o Título Principal da Vitrine
+    elNome.innerText = `MRV EM ${nomeRegiao.toUpperCase()}`;
+
+    // 2. Filtra no seu Array (window.dadosGerais) todos os imóveis dessa cidade
+    const imoveisDaRegiao = window.dadosGerais.filter(d => d.id === idPath.toLowerCase());
+
+    if (imoveisDaRegiao.length === 0) {
+        elDetalhes.innerHTML = `<p style="padding:20px; color:#999;">Nenhum residencial cadastrado para esta região.</p>`;
+        return;
+    }
+
+    // 3. Cria a lista de botões (btRes)
+    let htmlBotoes = `<div class="vitrine-lista-botoes">`;
+    
+    imoveisDaRegiao.forEach(imovel => {
+        // Define a cor da borda lateral com base na Zona (ZL, ZS, etc)
+        let corBorda = "#00713a";
+        if (imovel.nomeCurto.includes("ZO")) corBorda = "#ff8c00";
+        else if (imovel.nomeCurto.includes("ZL")) corBorda = "#e31c19";
+        else if (imovel.nomeCurto.includes("ZN")) corBorda = "#0054a6";
+        else if (imovel.nomeCurto.includes("ZS")) corBorda = "#d1147e";
+
+        htmlBotoes += `
+            <button class="btRes" 
+                    style="border-right: 15px solid ${corBorda};"
+                    onclick="abrirFichaImovel('${imovel.nomeCurto}')">
+                ${imovel.nomeCurto.toUpperCase()}
+            </button>`;
+    });
+
+    htmlBotoes += `</div>`;
+    elDetalhes.innerHTML = htmlBotoes;
+}
+
+// Função de apoio que será usada no próximo passo para mostrar preços/detalhes
+function abrirFichaImovel(nomeImovel) {
+    console.log("Solicitado detalhes de: " + nomeImovel);
+    // Aqui entrará a lógica de carregar a tabela de preços e endereço
+}
+
+/* AJUSTE DE INTEGRAÇÃO: 
+   Para que isso funcione, adicione esta linha NO FINAL da sua função 
+   clicarNoMapa (lá no Bloco 4) do seu código original:
+   
+   montarListaCidadeVitrine(nomeParaTopo, pathElement.id);
+*/
