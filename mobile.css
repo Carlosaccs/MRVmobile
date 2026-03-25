@@ -74,45 +74,33 @@ html, body {
 }
 
 /* ==========================================================================
-   3. MENU LATERAL - DESIGN FINAL MOBILE (LIMPO + TRANSPARENTE)
+   3. MENU LATERAL - AJUSTE DE DISTÂNCIA E ALINHAMENTO DE TEXTO
    ========================================================================== */
 #menu-lateral {
     position: fixed;
-    /* Começa exatamente após a faixa verde de 80px */
-    left: 80px; 
+    /* APROXIMAÇÃO: Reduzi de 80px para 15px de distância da faixa verde */
+    /* Isso deixa o menu 'colado' mas com um respiro elegante */
+    left: 15px; 
     top: 0;
-    /* Ocupa o restante da largura, mas com um limite elegante */
-    width: calc(100% - 80px);
+    width: calc(100% - 15px);
     max-width: 300px; 
     height: 100%;
-    
-    /* Fundo totalmente transparente, só com o desfoque (Blur) */
     background: transparent; 
     backdrop-filter: blur(15px);
     -webkit-backdrop-filter: blur(15px);
-    
     z-index: 3000; 
     padding: 10px 0; 
     transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    
-    /* Importante: impede que o menu invisível bloqueie o mapa */
     pointer-events: none; 
 }
 
-/* Quando aberto, ele volta para a posição e aceita toques */
 #menu-lateral.menu-aberto {
     transform: translateX(0);
     pointer-events: auto;
 }
 
-/* Quando oculto, ele sai totalmente da tela para a esquerda */
 #menu-lateral.menu-oculto {
     transform: translateX(-120%); 
-}
-
-/* Esconde o cabeçalho conforme pedido */
-.menu-header {
-    display: none; 
 }
 
 .menu-lista {
@@ -121,38 +109,43 @@ html, body {
     margin: 0;
     height: 100vh;
     overflow-y: auto;
-    
-    /* Esconde a barra de rolagem visualmente mas mantém o movimento */
     scrollbar-width: none; 
-    -ms-overflow-style: none; 
 }
 
 .menu-lista::-webkit-scrollbar {
     display: none; 
 }
 
-/* BOTÃO PADRÃO (Residencial) */
+/* BOTÃO COM TEXTO DESLOCADO PARA A ESQUERDA */
 .menu-item-mrv {
     background: #ffffff;
     border: 1px solid #d1d1d1;
-    border-right: 18px solid #00713a; /* Borda padrão verde */
+    border-right: 18px solid #00713a;
     
-    /* Margens ajustadas para ficar colado na faixa verde com respiro */
-    margin: 10px 15px; 
-    padding: 14px 12px;
+    /* Margem lateral menor para aproximar da faixa */
+    margin: 10px 10px; 
+    
+    /* AJUSTE DE TEXTO: Padding esquerdo reduzido para o texto "correr" para a esquerda */
+    /* Usei 8px para dar o efeito de deslocamento que você pediu */
+    padding: 14px 8px 14px 12px; 
+    
     border-radius: 4px 12px 12px 4px;
-    
     color: #333;
     font-weight: 600;
-    font-size: 0.85rem;
+    font-size: 0.82rem;
     display: block;
     box-shadow: 4px 4px 10px rgba(0,0,0,0.1);
     cursor: pointer;
-    transition: transform 0.1s;
+    
+    /* Garante que o texto não bata na borda direita verde */
+    text-align: left;
 }
 
 .menu-item-mrv:active {
     transform: scale(0.96);
+}
+
+
 }/* 4. CONTAINER DO MAPA PRINCIPAL */
 #mapa-container {
     position: absolute;
