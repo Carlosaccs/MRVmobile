@@ -277,11 +277,14 @@ document.addEventListener('click', (e) => {
 function montarListaCidadeVitrine(nomeRegiao, idPath) {
     const elNome = document.getElementById('nome-imovel');
     const elDetalhes = document.getElementById('detalhes-imovel');
-
     if (!elNome || !elDetalhes) return;
 
-    // 1. Atualiza o Título Principal da Vitrine
+    const buscaId = idPath.toLowerCase().trim();
+    const imoveisDaRegiao = window.dadosGerais.filter(d => d.id === buscaId);
+
+    // CORREÇÃO DO TÍTULO: Agora exibe "MRV EM PIRITUBA - Z. OESTE"
     elNome.innerText = `MRV EM ${nomeRegiao.toUpperCase()}`;
+}
 
     // 2. Filtra no seu Array (window.dadosGerais) todos os imóveis dessa cidade
     const imoveisDaRegiao = window.dadosGerais.filter(d => d.id === idPath.toLowerCase());
