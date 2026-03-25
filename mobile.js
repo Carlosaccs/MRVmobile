@@ -1,5 +1,5 @@
 /* ==========================================================================
-   v140.0 - JS CONSOLIDADO (LÓGICA DE ARRAY)
+   v140.0 - JS CONSOLIDADO (LÓGICA DE ARRAY E VITRINE)
    ========================================================================== */
 
 /* ==========================================================================
@@ -92,8 +92,9 @@ function gerarMenuResidenciais() {
         lista.appendChild(li);
     });
 }
+
 /* ==========================================================================
-   BLOCO 4: DESENHO E LÓGICA DO MAPA SVG (CORRIGIDO)
+   BLOCO 4: DESENHO E LÓGICA DO MAPA SVG
    ========================================================================== */
 function desenharMapa(dados, targetId, ehMinimizado) {
     const container = document.getElementById(targetId);
@@ -117,7 +118,6 @@ function desenharMapa(dados, targetId, ehMinimizado) {
         const path = document.createElementNS(svgNS, "path");
         const idLimpo = pData.id.toLowerCase();
         
-        // Verifica se existe algum residencial para esta região no nosso Array
         const temResidencial = window.dadosGerais.some(d => d.id === idLimpo);
         const ehMRV = pData.class === "commrv" || temResidencial;
 
@@ -154,8 +154,6 @@ function desenharMapa(dados, targetId, ehMinimizado) {
                     return;
                 }
                 if (!ehMRV) return;
-                
-                // Busca o primeiro residencial desta região para exibir na ficha
                 const infoPrimeiro = window.dadosGerais.find(d => d.id === idLimpo);
                 clicarNoMapa(path, infoPrimeiro, pData);
             };
@@ -167,11 +165,11 @@ function desenharMapa(dados, targetId, ehMinimizado) {
 }
 
 /* ==========================================================================
-   FUNÇÃO DE APOIO: TRATA O CLIQUE (MAPA OU MENU)
+   FUNÇÃO DE APOIO: TRATA O CLIQUE (MAPA OU MENU) - VERSÃO VITRINE
    ========================================================================== */
 function clicarNoMapa(pathElement, info, pDataRaw = null) {
     const corLaranja = "#FF4500";
-    const idRegiao = pathElement.id.toLowerCase();
+    const idRegiao = pathElement.id.replace('mini-', '').toLowerCase();
     
     // 1. Destaque no mapa
     document.querySelectorAll('#mapa-container path').forEach(p => {
@@ -181,56 +179,56 @@ function clicarNoMapa(pathElement, info, pDataRaw = null) {
     pathElement.setAttribute('data-selecionado', 'true');
     pathElement.style.fill = corLaranja;
     
-    // 2. Nome da Cidade para o Título
+    // 2. Nome da Cidade
     const nomeDaCidade = pDataRaw ? pDataRaw.name : pathElement.getAttribute('data-name');
     cidadeClicadaAtiva = { name: nomeDaCidade || "" }; 
     atualizarTextoTopo(cidadeClicadaAtiva.name);
 
-    // 3. Atualiza o Título Branco e Solto
+    // 3. Título Superior da Ficha Técnica
     const elTituloFicha = document.getElementById('titulo-regiao-ficha');
     if (elTituloFicha) {
         elTituloFicha.innerText = `MRV EM ${cidadeClicadaAtiva.name.toUpperCase()}`;
         elTituloFicha.style.display = "block";
     }
 
-    // 4. LÓGICA DA VITRINE: Buscar todos os residenciais desta região
+    // 4. LÓGICA DE VITRINE (FILTRO DE REGISTROS)
     const todosDestaRegiao = window.dadosGerais.filter(d => d.id === idRegiao);
-    const containerBotoes = document.getElementById('lista-botoes-regiao');
-    containerBotoes.innerHTML = ""; // Limpa lista anterior
+    const containerBotoes = document.getElementById('container-vitrine-botoes');
+    if(containerBotoes) containerBotoes.innerHTML = ""; 
 
-    if (todosDestaRegiao.length > 1) {
-        // Se houver mais de um, o primeiro será o "exibido" e os outros viram botões
-        const exibidoAgora = info || todosDestaRegiao[0];
-        const outros = todosDestaRegiao.filter(item => item.nomeCurto !== exibidoAgora.nomeCurto);
+    const registroDestaque = info || todosDestaRegiao[0];
 
-        outros.forEach(res => {
-            const btn = document.createElement('div');
-            btn.className = 'menu-item-mrv'; // Usa o estilo de botão que você já tem
-            btn.style.margin = "0 0 10px 0";
-            btn.style.padding = "10px";
-            btn.innerText = res.nomeCurto.toUpperCase();
-            btn.onclick = () => clicarNoMapa(pathElement, res, pDataRaw);
-            containerBotoes.appendChild(btn);
+    if (todosDestaRegiao.length > 1 && containerBotoes) {
+        todosDestaRegiao.forEach(item => {
+            if (item.nomeCurto !== registroDestaque.nomeCurto) {
+                const btn = document.createElement('div');
+                btn.className = 'menu-item-mrv';
+                btn.style.margin = "0 0 8px 0";
+                btn.style.padding = "8px";
+                btn.style.fontSize = "0.85rem";
+                btn.innerText = item.nomeCurto.toUpperCase();
+                btn.onclick = () => clicarNoMapa(pathElement, item, pDataRaw);
+                containerBotoes.appendChild(btn);
+            }
         });
+    }
 
-        exibirDadosResidencial(exibidoAgora);
-    } else if (todosDestaRegiao.length === 1) {
-        exibirDadosResidencial(todosDestaRegiao[0]);
+    if (registroDestaque) {
+        exibirDadosResidencial(registroDestaque);
     }
 }
 
-// Função auxiliar para preencher os textos abaixo dos botões
 function exibirDadosResidencial(info) {
     const elNome = document.getElementById('nome-imovel');
     const elDetalhes = document.getElementById('detalhes-imovel');
-    elNome.innerText = info.nomeCurto.toUpperCase();
-    elDetalhes.innerHTML = `
-        <p style="margin-top:10px;"><strong>CATEGORIA:</strong> ${info.categoria}</p>
-        <p style="color:#50c878; font-weight:bold;">📍 Localidade: ${cidadeClicadaAtiva.name.toUpperCase()}</p>
-    `;
+    if(elNome) elNome.innerText = info.nomeCurto.toUpperCase();
+    if(elDetalhes) {
+        elDetalhes.innerHTML = `
+            <p style="margin-top:10px;"><strong>CATEGORIA:</strong> ${info.categoria}</p>
+            <p style="color:#50c878; font-weight:bold;">📍 Localidade: ${cidadeClicadaAtiva ? cidadeClicadaAtiva.name.toUpperCase() : ""}</p>
+        `;
+    }
 }
-
-
 
 /* ==========================================================================
    BLOCO 5: TROCA DE MAPAS E VISUALIZAÇÃO
@@ -255,8 +253,6 @@ function trocarMapas() {
 function atualizarTextoTopo(nome) {
     const indicador = document.getElementById('identificador-cidade');
     if (!indicador) return;
-
-    // Prioriza o nome geográfico passado ou o da cidade ativa
     const textoExibir = nome || (cidadeClicadaAtiva ? cidadeClicadaAtiva.name : "");
     indicador.innerText = textoExibir.toUpperCase();
 }
@@ -284,8 +280,10 @@ function atualizarIconeFullscreen() {
 
 function toggleMenu() {
     const menu = document.getElementById('menu-lateral');
-    menu.classList.toggle('menu-oculto');
-    menu.classList.toggle('menu-aberto');
+    if(menu) {
+        menu.classList.toggle('menu-oculto');
+        menu.classList.toggle('menu-aberto');
+    }
 }
 
 /* ==========================================================================
@@ -297,4 +295,3 @@ document.addEventListener('fullscreenchange', atualizarIconeFullscreen);
 document.addEventListener('click', (e) => {
     if (e.target.closest('#mapa-minimizado')) trocarMapas();
 });
-
