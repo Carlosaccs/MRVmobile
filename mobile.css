@@ -74,22 +74,19 @@ html, body {
 }
 
 /* ==========================================================================
-   3. MENU LATERAL - AJUSTE DE DISTÂNCIA E ALINHAMENTO DE TEXTO
+   3. MENU LATERAL - POSICIONAMENTO CIRÚRGICO
    ========================================================================== */
 #menu-lateral {
     position: fixed;
-    /* APROXIMAÇÃO: Reduzi de 80px para 15px de distância da faixa verde */
-    /* Isso deixa o menu 'colado' mas com um respiro elegante */
-    left: 15px; 
+    left: 0; /* Começa do zero para o fundo blur cobrir tudo se necessário */
     top: 0;
-    width: calc(100% - 15px);
-    max-width: 300px; 
+    width: 310px; 
     height: 100%;
     background: transparent; 
     backdrop-filter: blur(15px);
     -webkit-backdrop-filter: blur(15px);
     z-index: 3000; 
-    padding: 10px 0; 
+    padding: 0; 
     transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     pointer-events: none; 
 }
@@ -100,34 +97,36 @@ html, body {
 }
 
 #menu-lateral.menu-oculto {
-    transform: translateX(-120%); 
+    transform: translateX(-100%); 
+}
+
+/* Garante que o título "RESIDENCIAIS" suma de vez */
+.menu-header {
+    display: none !important; 
 }
 
 .menu-lista {
     list-style: none;
-    padding: 0;
+    padding: 15px 0; /* Espaço no topo da lista */
     margin: 0;
     height: 100vh;
     overflow-y: auto;
     scrollbar-width: none; 
 }
 
-.menu-lista::-webkit-scrollbar {
-    display: none; 
-}
-
-/* BOTÃO COM TEXTO DESLOCADO PARA A ESQUERDA */
+/* ==========================================================================
+   DESIGN DOS BOTÕES (ENCOSTADOS NA FAIXA MAS COM TEXTO LIVRE)
+   ========================================================================== */
 .menu-item-mrv {
     background: #ffffff;
     border: 1px solid #d1d1d1;
     border-right: 18px solid #00713a;
     
-    /* Margem lateral menor para aproximar da faixa */
-    margin: 10px 10px; 
+    /* MARGEM ESQUERDA: 80px da faixa verde + 5px de recuo para não colar no ícone */
+    margin: 10px 10px 10px 85px; 
     
-    /* AJUSTE DE TEXTO: Padding esquerdo reduzido para o texto "correr" para a esquerda */
-    /* Usei 8px para dar o efeito de deslocamento que você pediu */
-    padding: 14px 8px 14px 12px; 
+    /* PADDING: Garante que o início do texto fique longe da borda esquerda do botão */
+    padding: 14px 10px 14px 15px; 
     
     border-radius: 4px 12px 12px 4px;
     color: #333;
@@ -136,17 +135,13 @@ html, body {
     display: block;
     box-shadow: 4px 4px 10px rgba(0,0,0,0.1);
     cursor: pointer;
-    
-    /* Garante que o texto não bata na borda direita verde */
     text-align: left;
+    white-space: nowrap; /* Impede o texto de quebrar linha */
+    overflow: hidden;
+    text-overflow: ellipsis; /* Se o nome for gigante, ele põe "..." */
 }
 
-.menu-item-mrv:active {
-    transform: scale(0.96);
-}
-
-
-}/* 4. CONTAINER DO MAPA PRINCIPAL */
+}/* 4. CONTAINER  DO MAPA PRINCIPAL */
 #mapa-container {
     position: absolute;
     top: 50%;
