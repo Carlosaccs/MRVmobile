@@ -17,34 +17,36 @@ const DNA_AMPLIAR = "M 75.757133 114.16926 L 75.757133 124.7898 L 75.757133 135.
 const DNA_REDUZIR = "M 78.408134 124.88437 L 78.408134 132.66012 L 78.408134 140.43587 L 70.442729 140.43587 L 62.476807 140.43587 L 62.476807 143.28066 L 62.476807 146.12596 L 73.097864 146.12596 L 83.718404 146.12596 L 83.718404 135.50491 L 83.718404 124.88437 L 81.063269 124.88437 L 78.408134 124.88437 z M 102.30435 124.88437 L 102.30435 135.50491 L 102.30435 146.12596 L 112.92541 146.12596 L 123.54595 146.12596 L 123.54595 143.28066 L 123.54595 140.43587 L 115.58054 140.43587 L 107.61514 140.43587 L 107.61514 132.66012 L 107.61514 124.88437 L 104.96 124.88437 L 102.30435 124.88437 z M 62.476807 164.3326 L 62.476807 167.17739 L 62.476807 170.02218 L 70.442729 170.02218 L 78.408134 170.02218 L 78.408134 177.79793 L 78.408134 185.5742 L 81.063269 185.5742 L 83.718404 185.5742 L 83.718404 174.95315 L 83.718404 164.3326 L 73.097864 164.3326 L 62.476807 164.3326 z M 102.30435 164.3326 L 102.30435 174.95315 L 102.30435 185.5742 L 104.96 185.5742 L 107.61514 185.5742 L 107.61514 177.79793 L 107.61514 170.02218 L 115.58054 170.02218 L 123.54595 170.02218 L 123.54595 167.17739 L 123.54595 164.3326 L 112.92541 164.3326 L 102.30435 164.3326 z";
 
 /* ==========================================================================
-   BLOCO 2: CONEXÃO COM PLANILHA (Ajustado para novas colunas)
+   BLOCO 2: CARREGAMENTO DOS DADOS (SUPORTE A IDS DUPLICADOS)
    ========================================================================== */
 async function carregarPlanilha() {
     try {
         const res = await fetch(URL_PLANILHA);
         const csv = await res.text();
         const linhas = csv.split(/\r?\n/).filter(l => l.trim() !== "");
-        window.bancoDados = {};
         
-        linhas.slice(1).forEach(linha => {
+        // Agora usamos um ARRAY para permitir IDs repetidos
+        window.dadosGerais = []; 
+        
+        linhas.slice(1).forEach((linha) => {
             const c = linha.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
             if (c.length >= 4) {
-                const id = c[0].replace(/"/g, '').trim().toLowerCase();
-                window.bancoDados[id] = {
-                    categoria: c[1]?.replace(/"/g, '').trim() || "RESIDENCIAL", // Coluna B
-                    ordem: parseInt(c[2]) || 9999,                             // Coluna C
-                    nomeExibicao: c[3]?.replace(/"/g, '').trim() || "Sem Nome", // Coluna D
-                    nomeFull: c[4]?.replace(/"/g, '').trim() || ""              // Coluna E
-                };
+                const limpar = (t) => t ? t.replace(/"/g, '').trim() : "";
+                
+                window.dadosGerais.push({
+                    id: limpar(c[0]).toLowerCase(),
+                    categoria: limpar(c[1]).toUpperCase(),
+                    ordem: parseInt(limpar(c[2])) || 9999,
+                    nomeCurto: limpar(c[3]) || "Sem Nome"
+                });
             }
         });
-        console.log("✅ Dados carregados com sucesso!");
-    } catch (e) { console.warn("⚠️ Erro Planilha"); }
-    
-    atualizarVisualizacao();
-    gerarMenuResidenciais(); 
+        
+        console.log("✅ Total de itens carregados:", window.dadosGerais.length);
+        atualizarVisualizacao();
+        gerarMenuResidenciais(); 
+    } catch (e) { console.error("Erro na planilha:", e); }
 }
-
 /* ==========================================================================
    BLOCO 3: GERAÇÃO DO MENU (CORRIGIDO PARA CARREGAR TODOS)
    ========================================================================== */
