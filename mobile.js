@@ -172,38 +172,41 @@ function desenharMapa(dados, targetId, ehMinimizado) {
 function clicarNoMapa(pathElement, info, pDataRaw = null) {
     const corLaranja = "#FF4500";
     
-    // 1. Limpa destaques anteriores
+    // 1. Destaque visual no mapa
     document.querySelectorAll('#mapa-container path').forEach(p => {
         p.setAttribute('data-selecionado', 'false');
         p.style.fill = p.getAttribute('data-cor-base');
     });
-
-    // 2. Destaca a nova região
     pathElement.setAttribute('data-selecionado', 'true');
     pathElement.style.fill = corLaranja;
     
-    // AJUSTE AQUI: Pegamos o nome geográfico REAL (Ex: PIRITUBA)
+    // 2. Captura o nome geográfico do campo 'name'
     const nomeDaCidade = pDataRaw ? pDataRaw.name : pathElement.getAttribute('data-name');
+    cidadeClicadaAtiva = { name: nomeDaCidade || "" }; 
     
-    // 3. Atualiza o estado global e o topo com o nome da CIDADE
-    cidadeClicadaAtiva = { name: nomeDaCidade || "Região Selecionada" }; 
+    // 3. Atualiza o indicador flutuante do topo do mapa
     atualizarTextoTopo(cidadeClicadaAtiva.name);
 
-    // 4. Atualiza a Ficha Técnica lateral
+    // 4. ATUALIZAÇÃO DO TÍTULO NA COLUNA DIREITA
+    const elTituloFicha = document.getElementById('titulo-regiao-ficha');
+    if (elTituloFicha) {
+        elTituloFicha.innerText = `MRV EM ${cidadeClicadaAtiva.name.toUpperCase()}`;
+        elTituloFicha.style.display = "block"; // Faz o título aparecer no primeiro clique
+    }
+
+    // 5. Atualiza o conteúdo da Ficha (Nome do Prédio e Detalhes)
     const elNome = document.getElementById('nome-imovel');
     const elDetalhes = document.getElementById('detalhes-imovel');
 
     if (info) {
-        // Na ficha técnica, mantemos o nome do residencial (Ex: SETE SOIS)
         elNome.innerText = info.nomeCurto.toUpperCase();
         elDetalhes.innerHTML = `
             <p style="margin-top:10px;"><strong>CATEGORIA:</strong> ${info.categoria}</p>
-            <p style="color:#00713a; font-weight:bold;">📍 Região: ${cidadeClicadaAtiva.name.toUpperCase()}</p>
+            <p style="color:#50c878; font-weight:bold;">📍 Localidade: ${cidadeClicadaAtiva.name.toUpperCase()}</p>
         `;
     } else {
-        // Se clicar em área cinza, mostra o nome da cidade na ficha também
-        elNome.innerText = cidadeClicadaAtiva.name.toUpperCase();
-        elDetalhes.innerHTML = "<p>Selecione um residencial no menu para ver detalhes específicos.</p>";
+        elNome.innerText = "SELECIONE";
+        elDetalhes.innerHTML = `<p>Toque em um residencial no menu ou cidade no mapa.</p>`;
     }
 }
 /* ==========================================================================
