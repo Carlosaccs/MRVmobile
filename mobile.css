@@ -1,262 +1,47 @@
 /* ==========================================================================
-   v137.1 - CSS CONSOLIDADO (DASHBOARD MRV MOBILE)
+   ESTILO DOS BOTÕES DO MENU (EXPANSÃO PARA A ESQUERDA)
    ========================================================================== */
-
-/* 1. FUNDAÇÃO E RESET */
-html, body {
-    margin: 0; 
-    padding: 0; 
-    width: 100%; 
-    height: 100%;
-    overflow: hidden; 
-    background: #fff;
-}
-
-* { 
-    box-sizing: border-box; 
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-}
-
-.mobile-wrapper {
-    display: flex; 
-    width: 100vw; 
-    height: 100%;
-    position: relative; 
-    overflow: hidden;
-}
-
-/* 2. FAIXA VERDE LATERAL (FIXA) */
-.faixa-verde-vertical {
-    position: absolute;
-    left: 0; 
-    top: 0;
-    width: 60px;
-    height: 100%;
-    background-color: #00713a;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: space-between;
-    padding: 15px 0;
-    z-index: 4000; /* Sempre no topo de tudo */
-    box-shadow: 2px 0 10px rgba(0,0,0,0.3);
-}
-
-.titulo-vertical {
-    writing-mode: vertical-rl;
-    transform: rotate(180deg);
-    font-weight: bold;
-    font-size: 1.1rem;
-    letter-spacing: 2px;
-    color: white !important;
-    white-space: nowrap;
-    flex-grow: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.icon-top, .icon-bottom {
-    font-size: 26px;
-    color: white !important;
-    cursor: pointer;
-    padding: 10px;
-    user-select: none;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: transform 0.2s ease;
-}
-
-.icon-top:active, .icon-bottom:active {
-    transform: scale(1.2);
-    opacity: 0.8;
-}
-
-/* ==========================================================================
-   3. MENU LATERAL - DESIGN FINAL MOBILE (LIMPO + TRANSPARENTE)
-   ========================================================================== */
-#menu-lateral {
-    position: fixed;
-    /* Começa exatamente após a faixa verde de 80px */
-    left: 80px; 
-    top: 0;
-    /* Ocupa o restante da largura, mas com um limite elegante */
-    width: calc(100% - 80px);
-    max-width: 300px; 
-    height: 100%;
-    
-    /* Fundo totalmente transparente, só com o desfoque (Blur) */
-    background: transparent; 
-    backdrop-filter: blur(15px);
-    -webkit-backdrop-filter: blur(15px);
-    
-    z-index: 3000; 
-    padding: 10px 0; 
-    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    
-    /* Importante: impede que o menu invisível bloqueie o mapa */
-    pointer-events: none; 
-}
-
-/* Quando aberto, ele volta para a posição e aceita toques */
-#menu-lateral.menu-aberto {
-    transform: translateX(0);
-    pointer-events: auto;
-}
-
-/* Quando oculto, ele sai totalmente da tela para a esquerda */
-#menu-lateral.menu-oculto {
-    transform: translateX(-120%); 
-}
-
-/* Esconde o cabeçalho conforme pedido */
-.menu-header {
-    display: none; 
-}
-
-.menu-lista {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    height: 100vh;
-    overflow-y: auto;
-    
-    /* Esconde a barra de rolagem visualmente mas mantém o movimento */
-    scrollbar-width: none; 
-    -ms-overflow-style: none; 
-}
-
-.menu-lista::-webkit-scrollbar {
-    display: none; 
-}
-
-/* BOTÃO PADRÃO (Residencial) */
 .menu-item-mrv {
-    background: #ffffff;
-    border: 1px solid #d1d1d1;
-    border-right: 18px solid #00713a; /* Borda padrão verde */
-    
-    /* Margens ajustadas para ficar colado na faixa verde com respiro */
-    margin: 10px 15px; 
-    padding: 14px 12px;
-    border-radius: 4px 12px 12px 4px;
-    
-    color: #333;
-    font-weight: 600;
-    font-size: 0.85rem;
     display: block;
-    box-shadow: 4px 4px 10px rgba(0,0,0,0.1);
+    padding: 12px 15px;
+    margin-bottom: 10px;
+    background: #ffffff;
+    
+    /* Bordas arredondadas apenas no lado direito para o efeito de "aba" */
+    border-radius: 0 5px 5px 0; 
+    
     cursor: pointer;
-    transition: transform 0.1s;
-}
-
-.menu-item-mrv:active {
-    transform: scale(0.96);
-}/* 4. CONTAINER DO MAPA PRINCIPAL */
-#mapa-container {
-    position: absolute;
-    left: 0; 
-    top: 0;
-    width: 100%; 
-    height: 100%;
-    z-index: 10;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-    touch-action: none;
-    padding-left: 60px; /* Compensação da faixa verde */
-}
-
-#mapa-container svg {
-    width: 130% !important;
-    height: auto;
-    max-height: 98%;
-    transition: all 0.3s ease;
-    transform-origin: center center;
-}
-
-#mapa-container path {
-    transition: fill 0.2s ease, stroke-width 0.2s ease;
-    cursor: pointer;
-    -webkit-tap-highlight-color: transparent;
-}
-
-/* 5. BOTÃO DE TROCA (MAPA MINIMIZADO) */
-#mapa-minimizado {
-    position: absolute;
-    bottom: 25px;
-    /* A mágica está aqui: 44% é a largura da sua ficha técnica + 15px de respiro */
-    right: calc(44% + 15px); 
-    width: 90px;
-    height: 70px;
-    background: white;
-    border: 2px solid #00713a;
-    border-radius: 10px;
-    cursor: pointer;
-    z-index: 2000;
-    overflow: hidden;
-    box-shadow: -5px 5px 15px rgba(0,0,0,0.3);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: transform 0.2s ease;
-}
-
-#mapa-minimizado:active {
-    transform: scale(0.9);
-}
-
-#mapa-minimizado svg { width: 90%; height: 90%; }
-
-/* 6. FICHA TÉCNICA (LATERAL DIREITA) */
-.ficha-tecnica {
-    position: absolute; 
-    right: 0; 
-    top: 0;
-    width: 44%; 
-    height: 100%;
-    background: rgba(35, 35, 35, 0.95); /* Estilo Escuro/Industrial */
-    backdrop-filter: blur(10px); 
-    color: white;
-    padding: 40px; 
-    z-index: 1000;
-    box-shadow: -10px 0 30px rgba(0,0,0,0.5);
-    border-left: 1px solid rgba(255,255,255,0.1);
-}
-
-#nome-imovel {
-    color: #50c878; 
-    margin: 0 0 20px 0; 
-    font-size: 1.8rem;
-    border-bottom: 3px solid #00713a; 
-    padding-bottom: 15px;
-    text-transform: uppercase;
-}
-
-#detalhes-imovel { 
-    font-size: 1.3rem; 
-    line-height: 1.8; 
-    color: #efefef; 
-}
-
-#detalhes-imovel strong { color: #50c878; }
-
-/* 7. IDENTIFICADOR DE CIDADE (TOPO) */
-#identificador-cidade {
-    position: absolute;
-    top: 10px;
-    left: 28%;
-    transform: translateX(-50%);
-    font-size: 1.1rem;
     font-weight: bold;
-    color: #00713a;
-    text-transform: uppercase;
-    letter-spacing: 3px;
-    pointer-events: none;
-    z-index: 1500;
-    background: rgba(255,255,255,0.7);
-    padding: 5px 15px;
-    border-radius: 20px;
+    font-size: 13px;
+    text-align: left;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+    
+    /* EXPANSÃO PARA A ESQUERDA */
+    width: 115%;           /* Aumenta a largura total para transbordar */
+    margin-left: -20%;     /* Puxa o botão para fora do limite do menu na esquerda */
+    padding-left: 25%;     /* Empurra o texto de volta para a área visível */
+    
+    /* DETALHES VISUAIS */
+    border: none;
+    border-right: 10px solid #00713a; /* Borda colorida na direita */
+    box-shadow: 4px 2px 8px rgba(0,0,0,0.15);
+    color: #333;
+    position: relative;
+}
+
+/* EFEITO AO PASSAR O MOUSE */
+.menu-item-mrv:hover {
+    margin-left: -15%;     /* O botão "entra" um pouco mais na tela */
+    background: #f0f0f0;
+    color: #000;
+}
+
+/* ESTILO PARA QUANDO O BOTÃO FOR UM "COMPLEXO" (Preto) */
+/* Se você estiver aplicando o estilo de complexo via JS, 
+   estas propriedades vão garantir que o layout se mantenha */
+.menu-item-mrv[style*="background: rgb(35, 35, 35)"],
+.menu-item-mrv.complexo-style {
+    color: #ffffff !important;
+    border-right-color: #50c878 !important; /* Verde mais claro para destacar no preto */
 }
