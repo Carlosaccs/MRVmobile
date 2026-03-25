@@ -46,7 +46,7 @@ async function carregarPlanilha() {
 }
 
 /* ==========================================================================
-   BLOCO 3: GERAÇÃO DO MENU COM TROCA AUTOMÁTICA DE MAPA
+   BLOCO 3: GERAÇÃO DO MENU (CORRIGIDO PARA CARREGAR TODOS)
    ========================================================================== */
 function gerarMenuResidenciais() {
     const lista = document.getElementById('lista-residenciais');
@@ -54,26 +54,37 @@ function gerarMenuResidenciais() {
 
     lista.innerHTML = ""; 
 
-    const itensOrdenados = Object.keys(window.bancoDados).map(id => {
+    // 1. Converte o banco de dados em Array com segurança
+    const itensParaMenu = Object.keys(window.bancoDados).map(id => {
         return { id, ...window.bancoDados[id] };
-    }).sort((a, b) => a.ordem - b.ordem);
+    });
 
-    itensOrdenados.forEach(info => {
+    // 2. Ordenação Robusta: Se não tiver número na Coluna C, vai para o fim da lista
+    itensParaMenu.sort((a, b) => {
+        const ordemA = isNaN(a.ordem) ? 9999 : a.ordem;
+        const ordemB = isNaN(b.ordem) ? 9999 : b.ordem;
+        return ordemA - ordemB;
+    });
+
+    // 3. Renderização de todos os itens
+    itensParaMenu.forEach(info => {
         const li = document.createElement('li');
         li.className = 'menu-item-mrv'; 
-        li.innerText = info.nomeExibicao.toUpperCase();
         
-        // Cores das zonas (ZO, ZL, ZN, ZS)
-        const nomeParaBusca = info.nomeExibicao.toUpperCase();
+        // Garante que o nome apareça mesmo se o campo estiver estranho
+        const nomeTexto = (info.nomeExibicao || "Sem Nome").toUpperCase();
+        li.innerText = nomeTexto;
+        
+        // Lógica de Cores por Zona
         let corBorda = "#00713a";
-        if (nomeParaBusca.includes("ZO")) corBorda = "#ff8c00";
-        if (nomeParaBusca.includes("ZL")) corBorda = "#e31c19";
-        if (nomeParaBusca.includes("ZN")) corBorda = "#0054a6";
-        if (nomeParaBusca.includes("ZS")) corBorda = "#d1147e";
+        if (nomeTexto.includes("ZO")) corBorda = "#ff8c00";
+        if (nomeTexto.includes("ZL")) corBorda = "#e31c19";
+        if (nomeTexto.includes("ZN")) corBorda = "#0054a6";
+        if (nomeTexto.includes("ZS")) corBorda = "#d1147e";
         li.style.borderRightColor = corBorda;
 
-        // Estilo Complexo
-        if (info.categoria.toUpperCase() === "COMPLEXO") {
+        // Estilo Complexo (Coluna B)
+        if (info.categoria && info.categoria.toUpperCase() === "COMPLEXO") {
             li.style.background = "#232323";
             li.style.color = "#ffffff";
             li.style.borderLeft = "3px solid #50c878";
@@ -82,24 +93,25 @@ function gerarMenuResidenciais() {
         li.onclick = () => {
             let pathNoMapa = document.getElementById(info.id);
 
-            // SE NÃO ACHOU NO MAPA ATUAL, TROCA O MAPA
             if (!pathNoMapa) {
-                trocarMapas(); // Função que já existe no seu Bloco 5
+                // Se não está no mapa atual, troca
+                trocarMapas(); 
                 
-                // Espera um milésimo de segundo para o novo mapa carregar no DOM
+                // Aguarda o novo mapa carregar no DOM
                 setTimeout(() => {
-                    pathNoMapa = document.getElementById(info.id);
-                    if (pathNoMapa) {
-                        pathNoMapa.dispatchEvent(new Event('click'));
+                    const novoPath = document.getElementById(info.id);
+                    if (novoPath) {
+                        novoPath.dispatchEvent(new Event('click'));
                     }
-                }, 50); 
+                }, 100); // Aumentei para 100ms para garantir em celulares mais lentos
             } else {
-                // SE JÁ ESTÁ NO MAPA CERTO, SÓ CLICA
                 pathNoMapa.dispatchEvent(new Event('click'));
             }
         };
         lista.appendChild(li);
     });
+
+    console.log(`✅ Menu gerado com ${itensParaMenu.length} itens.`);
 }
 /* ==========================================================================
    BLOCO 4: DESENHO E LÓGICA DO MAPA SVG
