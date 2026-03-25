@@ -181,27 +181,24 @@ function clicarNoMapa(pathElement, info, pDataRaw = null) {
     pathElement.setAttribute('data-selecionado', 'true');
     pathElement.style.fill = corLaranja;
     
-    // 3. Define qual nome exibir no topo
-    const nomeParaTopo = info ? info.nomeCurto : (pDataRaw ? (pDataRaw.name || pDataRaw.id) : "");
-    cidadeClicadaAtiva = { name: nomeParaTopo }; 
-    atualizarTextoTopo(nomeParaTopo);
-
-    // 4. Atualiza a Ficha Técnica lateral
-    const elNome = document.getElementById('nome-imovel');
-    const elDetalhes = document.getElementById('detalhes-imovel');
-
-    if (info) {
-        elNome.innerText = info.nomeCurto.toUpperCase();
-        elDetalhes.innerHTML = `
-            <p style="margin-top:10px;"><strong>CATEGORIA:</strong> ${info.categoria}</p>
-            <p style="color:#00713a; font-weight:bold;">📍 Região: ${pathElement.id.toUpperCase()}</p>
-        `;
+    // 3. PRIORIDADE: Nome da Região do SVG (ex: Pirituba - Z. Oeste)
+    // Se pDataRaw existir (clique no mapa), usamos o nome dele. 
+    // Se não (clique no menu), tentamos achar o nome no mapa pelo ID.
+    let nomeDaRegiao = "";
+    if (pDataRaw && pDataRaw.name) {
+        nomeDaRegiao = pDataRaw.name;
     } else {
-        elNome.innerText = nomeParaTopo.toUpperCase();
-        elDetalhes.innerHTML = "<p>Selecione um residencial no menu para ver detalhes específicos.</p>";
+        const pathMapa = document.getElementById(pathElement.id.replace('mini-', ''));
+        nomeDaRegiao = pathMapa ? (pathMapa.getAttribute('name') || pathElement.id) : pathElement.id;
     }
-   montarListaCidadeVitrine(nomeParaTopo, pathElement.id.replace('mini-', ''));
+
+    cidadeClicadaAtiva = { name: nomeDaRegiao }; 
+    atualizarTextoTopo(nomeDaRegiao); // Atualiza o texto acima do mapa
+
+    // 4. Atualiza a Vitrine na direita com o nome da Região
+    montarListaCidadeVitrine(nomeDaRegiao, pathElement.id.replace('mini-', ''));
 }
+
 
 /* ==========================================================================
    BLOCO 5: TROCA DE MAPAS E VISUALIZAÇÃO
