@@ -200,6 +200,7 @@ function clicarNoMapa(pathElement, info, pDataRaw = null) {
         elNome.innerText = nomeParaTopo.toUpperCase();
         elDetalhes.innerHTML = "<p>Selecione um residencial no menu para ver detalhes específicos.</p>";
     }
+   montarListaCidadeVitrine(nomeParaTopo, pathElement.id.replace('mini-', ''));
 }
 
 /* ==========================================================================
