@@ -93,76 +93,39 @@ function gerarMenuResidenciais() {
     });
 }
 /* ==========================================================================
-   BLOCO 4: DESENHO E LÓGICA DO MAPA SVG (CORRIGIDO)
+   BLOCO 4: DESENHO E LÓGICA DO MAPA SVG (v141 CORRIGIDA)
    ========================================================================== */
-function desenharMapa(dados, targetId, ehMinimizado) {
-    const container = document.getElementById(targetId);
-    if (!container || !dados) return;
+function clicarNoMapa(pathElement, info, pDataRaw = null) {
+    if (!pathElement) return; // Segurança contra clique fantasma
 
-    container.innerHTML = "";
-    const svg = document.createElementNS(svgNS, "svg");
-    svg.setAttribute("viewBox", dados.viewBox);
+    const corLaranja = "#FF4500";
     
-    if (!ehMinimizado) {
-        const conf = AJUSTES_MAPA[mapaAtivo];
-        svg.style.marginRight = conf.marginRight;
-        svg.style.marginLeft = conf.marginLeft;
-        svg.style.transform = `scale(${conf.scale})`;
+    // 1. Limpa destaques anteriores
+    document.querySelectorAll('#mapa-container path').forEach(p => {
+        p.setAttribute('data-selecionado', 'false');
+        p.style.fill = p.getAttribute('data-cor-base');
+    });
+
+    // 2. Destaca a nova região
+    pathElement.setAttribute('data-selecionado', 'true');
+    pathElement.style.fill = corLaranja;
+    
+    // 3. PRIORIDADE: Nome da Região (Usa o atributo 'name' do SVG)
+    let nomeDaRegiao = "";
+    if (pDataRaw && pDataRaw.name) {
+        nomeDaRegiao = pDataRaw.name;
+    } else {
+        // Tenta buscar o nome direto no elemento se clicado pelo menu
+        nomeDaRegiao = pathElement.getAttribute('name') || pathElement.id.replace('mini-', '').toUpperCase();
     }
 
-    const g = document.createElementNS(svgNS, "g");
-    if(dados.transform) g.setAttribute("transform", dados.transform);
+    cidadeClicadaAtiva = { name: nomeDaRegiao }; 
+    atualizarTextoTopo(nomeDaRegiao);
 
-    dados.paths.forEach(pData => {
-        const path = document.createElementNS(svgNS, "path");
-        const idLimpo = pData.id.toLowerCase();
-        
-        // Verifica se existe algum residencial para esta região no nosso Array
-        const temResidencial = window.dadosGerais.some(d => d.id === idLimpo);
-        const ehMRV = pData.class === "commrv" || temResidencial;
-
-        path.setAttribute("d", pData.d);
-        path.setAttribute("id", (ehMinimizado ? 'mini-' : '') + pData.id);
-        
-        const corVerde = "#00713a", corCinza = "#cccccc", corLaranja = "#FF4500", corFoco = "#777777";
-        const corBase = ehMRV ? corVerde : corCinza;
-        
-        path.style.fill = corBase;
-        path.style.stroke = "#ffffff";
-        path.style.strokeWidth = ehMinimizado ? "6" : "1.2";
-        path.setAttribute('data-cor-base', corBase);
-
-        if (!ehMinimizado) {
-            path.onmouseover = () => {
-                atualizarTextoTopo(pData.name || pData.id);
-                if (path.getAttribute('data-selecionado') !== 'true') {
-                    path.style.fill = ehMRV ? corLaranja : corFoco;
-                }
-            };
-            
-            path.onmouseout = () => {
-                atualizarTextoTopo(null);
-                if (path.getAttribute('data-selecionado') !== 'true') {
-                    path.style.fill = corBase;
-                }
-            };
-
-            path.onclick = () => {
-                if (pData.id === "grandesaopaulo") {
-                    trocarMapas();
-                    return;
-                }
-                if (!ehMRV) return;
-                
-                // Busca o primeiro residencial desta região para exibir na ficha
-                const infoPrimeiro = window.dadosGerais.find(d => d.id === idLimpo);
-                clicarNoMapa(path, infoPrimeiro, pData);
-            };
-        }
-        g.appendChild(path);
-    });
-    svg.appendChild(g);
-    container.appendChild(svg);
+    // 4. CHAMA A VITRINE (Certifique-se que o Bloco 8 está abaixo deste)
+    if (typeof montarListaCidadeVitrine === "function") {
+        montarListaCidadeVitrine(nomeDaRegiao, pathElement.id.replace('mini-', ''));
+    }
 }
 
 /* ==========================================================================
