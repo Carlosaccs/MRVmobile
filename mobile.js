@@ -121,6 +121,7 @@ function desenharMapa(dados, targetId, ehMinimizado) {
         const temResidencial = window.dadosGerais.some(d => d.id === idLimpo);
         const ehMRV = pData.class === "commrv" || temResidencial;
 
+        path.setAttribute('data-name', pData.name || pData.id);
         path.setAttribute("d", pData.d);
         path.setAttribute("id", (ehMinimizado ? 'mini-' : '') + pData.id);
         
@@ -181,27 +182,30 @@ function clicarNoMapa(pathElement, info, pDataRaw = null) {
     pathElement.setAttribute('data-selecionado', 'true');
     pathElement.style.fill = corLaranja;
     
-    // 3. Define qual nome exibir no topo
-    const nomeParaTopo = info ? info.nomeCurto : (pDataRaw ? (pDataRaw.name || pDataRaw.id) : "");
-    cidadeClicadaAtiva = { name: nomeParaTopo }; 
-    atualizarTextoTopo(nomeParaTopo);
+    // AJUSTE AQUI: Pegamos o nome geográfico REAL (Ex: PIRITUBA)
+    const nomeDaCidade = pDataRaw ? pDataRaw.name : pathElement.getAttribute('data-name');
+    
+    // 3. Atualiza o estado global e o topo com o nome da CIDADE
+    cidadeClicadaAtiva = { name: nomeDaCidade || "Região Selecionada" }; 
+    atualizarTextoTopo(cidadeClicadaAtiva.name);
 
     // 4. Atualiza a Ficha Técnica lateral
     const elNome = document.getElementById('nome-imovel');
     const elDetalhes = document.getElementById('detalhes-imovel');
 
     if (info) {
+        // Na ficha técnica, mantemos o nome do residencial (Ex: SETE SOIS)
         elNome.innerText = info.nomeCurto.toUpperCase();
         elDetalhes.innerHTML = `
             <p style="margin-top:10px;"><strong>CATEGORIA:</strong> ${info.categoria}</p>
-            <p style="color:#00713a; font-weight:bold;">📍 Região: ${pathElement.id.toUpperCase()}</p>
+            <p style="color:#00713a; font-weight:bold;">📍 Região: ${cidadeClicadaAtiva.name.toUpperCase()}</p>
         `;
     } else {
-        elNome.innerText = nomeParaTopo.toUpperCase();
+        // Se clicar em área cinza, mostra o nome da cidade na ficha também
+        elNome.innerText = cidadeClicadaAtiva.name.toUpperCase();
         elDetalhes.innerHTML = "<p>Selecione um residencial no menu para ver detalhes específicos.</p>";
     }
 }
-
 /* ==========================================================================
    BLOCO 5: TROCA DE MAPAS E VISUALIZAÇÃO
    ========================================================================== */
@@ -225,11 +229,10 @@ function trocarMapas() {
 function atualizarTextoTopo(nome) {
     const indicador = document.getElementById('identificador-cidade');
     if (!indicador) return;
-    if (nome) {
-        indicador.innerText = nome.toUpperCase();
-    } else {
-        indicador.innerText = cidadeClicadaAtiva ? cidadeClicadaAtiva.name.toUpperCase() : "";
-    }
+
+    // Prioriza o nome geográfico passado ou o da cidade ativa
+    const textoExibir = nome || (cidadeClicadaAtiva ? cidadeClicadaAtiva.name : "");
+    indicador.innerText = textoExibir.toUpperCase();
 }
 
 function toggleFullscreen() {
