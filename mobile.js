@@ -17,7 +17,7 @@ const DNA_AMPLIAR = "M 75.757133 114.16926 L 75.757133 124.7898 L 75.757133 135.
 const DNA_REDUZIR = "M 78.408134 124.88437 L 78.408134 132.66012 L 78.408134 140.43587 L 70.442729 140.43587 L 62.476807 140.43587 L 62.476807 143.28066 L 62.476807 146.12596 L 73.097864 146.12596 L 83.718404 146.12596 L 83.718404 135.50491 L 83.718404 124.88437 L 81.063269 124.88437 L 78.408134 124.88437 z M 102.30435 124.88437 L 102.30435 135.50491 L 102.30435 146.12596 L 112.92541 146.12596 L 123.54595 146.12596 L 123.54595 143.28066 L 123.54595 140.43587 L 115.58054 140.43587 L 107.61514 140.43587 L 107.61514 132.66012 L 107.61514 124.88437 L 104.96 124.88437 L 102.30435 124.88437 z M 62.476807 164.3326 L 62.476807 167.17739 L 62.476807 170.02218 L 70.442729 170.02218 L 78.408134 170.02218 L 78.408134 177.79793 L 78.408134 185.5742 L 81.063269 185.5742 L 83.718404 185.5742 L 83.718404 174.95315 L 83.718404 164.3326 L 73.097864 164.3326 L 62.476807 164.3326 z M 102.30435 164.3326 L 102.30435 174.95315 L 102.30435 185.5742 L 104.96 185.5742 L 107.61514 185.5742 L 107.61514 177.79793 L 107.61514 170.02218 L 115.58054 170.02218 L 123.54595 170.02218 L 123.54595 167.17739 L 123.54595 164.3326 L 112.92541 164.3326 L 102.30435 164.3326 z";
 
 /* ==========================================================================
-   BLOCO 2: CARREGAMENTO DOS DADOS (SUPORTE A IDS DUPLICADOS)
+   BLOCO 2: CARREGAMENTO DOS DADOS (ARRAY)
    ========================================================================== */
 async function carregarPlanilha() {
     try {
@@ -25,14 +25,12 @@ async function carregarPlanilha() {
         const csv = await res.text();
         const linhas = csv.split(/\r?\n/).filter(l => l.trim() !== "");
         
-        // Agora usamos um ARRAY para permitir IDs repetidos
         window.dadosGerais = []; 
         
         linhas.slice(1).forEach((linha) => {
             const c = linha.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
             if (c.length >= 4) {
                 const limpar = (t) => t ? t.replace(/"/g, '').trim() : "";
-                
                 window.dadosGerais.push({
                     id: limpar(c[0]).toLowerCase(),
                     categoria: limpar(c[1]).toUpperCase(),
@@ -42,78 +40,53 @@ async function carregarPlanilha() {
             }
         });
         
-        console.log("✅ Total de itens carregados:", window.dadosGerais.length);
         atualizarVisualizacao();
         gerarMenuResidenciais(); 
     } catch (e) { console.error("Erro na planilha:", e); }
 }
+
 /* ==========================================================================
-   BLOCO 3: GERAÇÃO DO MENU (CORRIGIDO PARA CARREGAR TODOS)
+   BLOCO 3: GERAÇÃO DO MENU
    ========================================================================== */
 function gerarMenuResidenciais() {
     const lista = document.getElementById('lista-residenciais');
     if (!lista) return;
-
     lista.innerHTML = ""; 
 
-    // 1. Converte o banco de dados em Array com segurança
-    const itensParaMenu = Object.keys(window.bancoDados).map(id => {
-        return { id, ...window.bancoDados[id] };
-    });
+    const itensOrdenados = [...window.dadosGerais].sort((a, b) => a.ordem - b.ordem);
 
-    // 2. Ordenação Robusta: Se não tiver número na Coluna C, vai para o fim da lista
-    itensParaMenu.sort((a, b) => {
-        const ordemA = isNaN(a.ordem) ? 9999 : a.ordem;
-        const ordemB = isNaN(b.ordem) ? 9999 : b.ordem;
-        return ordemA - ordemB;
-    });
-
-    // 3. Renderização de todos os itens
-    itensParaMenu.forEach(info => {
+    itensOrdenados.forEach(info => {
         const li = document.createElement('li');
         li.className = 'menu-item-mrv'; 
+        li.innerText = info.nomeCurto.toUpperCase();
         
-        // Garante que o nome apareça mesmo se o campo estiver estranho
-        const nomeTexto = (info.nomeExibicao || "Sem Nome").toUpperCase();
-        li.innerText = nomeTexto;
-        
-        // Lógica de Cores por Zona
+        // Cores Zonas
         let corBorda = "#00713a";
-        if (nomeTexto.includes("ZO")) corBorda = "#ff8c00";
-        if (nomeTexto.includes("ZL")) corBorda = "#e31c19";
-        if (nomeTexto.includes("ZN")) corBorda = "#0054a6";
-        if (nomeTexto.includes("ZS")) corBorda = "#d1147e";
+        if (li.innerText.includes("ZO")) corBorda = "#ff8c00";
+        else if (li.innerText.includes("ZL")) corBorda = "#e31c19";
+        else if (li.innerText.includes("ZN")) corBorda = "#0054a6";
+        else if (li.innerText.includes("ZS")) corBorda = "#d1147e";
         li.style.borderRightColor = corBorda;
 
-        // Estilo Complexo (Coluna B)
-        if (info.categoria && info.categoria.toUpperCase() === "COMPLEXO") {
+        if (info.categoria === "COMPLEXO") {
             li.style.background = "#232323";
             li.style.color = "#ffffff";
-            li.style.borderLeft = "3px solid #50c878";
         }
 
         li.onclick = () => {
             let pathNoMapa = document.getElementById(info.id);
-
             if (!pathNoMapa) {
-                // Se não está no mapa atual, troca
-                trocarMapas(); 
-                
-                // Aguarda o novo mapa carregar no DOM
+                trocarMapas();
                 setTimeout(() => {
                     const novoPath = document.getElementById(info.id);
-                    if (novoPath) {
-                        novoPath.dispatchEvent(new Event('click'));
-                    }
-                }, 100); // Aumentei para 100ms para garantir em celulares mais lentos
+                    if (novoPath) clicarNoMapa(novoPath, info);
+                }, 200);
             } else {
-                pathNoMapa.dispatchEvent(new Event('click'));
+                clicarNoMapa(pathNoMapa, info);
             }
         };
         lista.appendChild(li);
     });
-
-    console.log(`✅ Menu gerado com ${itensParaMenu.length} itens.`);
 }
 /* ==========================================================================
    BLOCO 4: DESENHO E LÓGICA DO MAPA SVG
