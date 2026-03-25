@@ -88,8 +88,9 @@ function gerarMenuResidenciais() {
         lista.appendChild(li);
     });
 }
+
 /* ==========================================================================
-   BLOCO 4: DESENHO E LÓGICA DO MAPA SVG
+   BLOCO 4: DESENHO E LÓGICA DO MAPA SVG (CORRIGIDO)
    ========================================================================== */
 function desenharMapa(dados, targetId, ehMinimizado) {
     const container = document.getElementById(targetId);
@@ -112,8 +113,10 @@ function desenharMapa(dados, targetId, ehMinimizado) {
     dados.paths.forEach(pData => {
         const path = document.createElementNS(svgNS, "path");
         const idLimpo = pData.id.toLowerCase();
-        const info = window.bancoDados[idLimpo];
-        const ehMRV = pData.class === "commrv";
+        
+        // Verifica se existe algum residencial para esta região no nosso Array
+        const temResidencial = window.dadosGerais.some(d => d.id === idLimpo);
+        const ehMRV = pData.class === "commrv" || temResidencial;
 
         path.setAttribute("d", pData.d);
         path.setAttribute("id", (ehMinimizado ? 'mini-' : '') + pData.id);
@@ -146,35 +149,54 @@ function desenharMapa(dados, targetId, ehMinimizado) {
                     trocarMapas();
                     return;
                 }
-
                 if (!ehMRV) return;
-
-                document.querySelectorAll('#mapa-container path').forEach(p => {
-                    p.setAttribute('data-selecionado', 'false');
-                    p.style.fill = p.getAttribute('data-cor-base');
-                });
-
-                cidadeClicadaAtiva = pData;
-                path.setAttribute('data-selecionado', 'true');
-                path.style.fill = corLaranja;
-                atualizarTextoTopo(pData.name || pData.id);
-
-                if (info) {
-                    document.getElementById('nome-imovel').innerText = info.nomeExibicao.toUpperCase();
-                    document.getElementById('detalhes-imovel').innerHTML = `
-                        <p><strong>Estoque:</strong> ${info.estoque}</p>
-                        <p><strong>Status:</strong> ${info.status}</p>
-                    `;
-                } else {
-                    document.getElementById('nome-imovel').innerText = (pData.name || pData.id).toUpperCase();
-                    document.getElementById('detalhes-imovel').innerHTML = "<p>Sem dados vinculados.</p>";
-                }
+                
+                // Busca o primeiro residencial desta região para exibir na ficha
+                const infoPrimeiro = window.dadosGerais.find(d => d.id === idLimpo);
+                clicarNoMapa(path, infoPrimeiro, pData);
             };
         }
         g.appendChild(path);
     });
     svg.appendChild(g);
     container.appendChild(svg);
+}
+
+/* ==========================================================================
+   FUNÇÃO DE APOIO: TRATA O CLIQUE (MAPA OU MENU)
+   ========================================================================== */
+function clicarNoMapa(pathElement, info, pDataRaw = null) {
+    const corLaranja = "#FF4500";
+    
+    // 1. Limpa destaques anteriores
+    document.querySelectorAll('#mapa-container path').forEach(p => {
+        p.setAttribute('data-selecionado', 'false');
+        p.style.fill = p.getAttribute('data-cor-base');
+    });
+
+    // 2. Destaca a nova região
+    pathElement.setAttribute('data-selecionado', 'true');
+    pathElement.style.fill = corLaranja;
+    
+    // 3. Define qual nome exibir no topo
+    const nomeParaTopo = info ? info.nomeCurto : (pDataRaw ? (pDataRaw.name || pDataRaw.id) : "");
+    cidadeClicadaAtiva = { name: nomeParaTopo }; 
+    atualizarTextoTopo(nomeParaTopo);
+
+    // 4. Atualiza a Ficha Técnica lateral
+    const elNome = document.getElementById('nome-imovel');
+    const elDetalhes = document.getElementById('detalhes-imovel');
+
+    if (info) {
+        elNome.innerText = info.nomeCurto.toUpperCase();
+        elDetalhes.innerHTML = `
+            <p style="margin-top:10px;"><strong>CATEGORIA:</strong> ${info.categoria}</p>
+            <p style="color:#00713a; font-weight:bold;">📍 Região: ${pathElement.id.toUpperCase()}</p>
+        `;
+    } else {
+        elNome.innerText = nomeParaTopo.toUpperCase();
+        elDetalhes.innerHTML = "<p>Selecione um residencial no menu para ver detalhes específicos.</p>";
+    }
 }
 
 /* ==========================================================================
