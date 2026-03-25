@@ -258,3 +258,15 @@ html, body {
     padding: 5px 15px;
     border-radius: 20px;
 }
+
+/* 8. BOTÕES DA VITRINE */
+
+/* Redução cirúrgica para os botões da vitrine (coluna direita) */
+#container-vitrine-botoes .menu-item-mrv {
+    min-height: auto !important;   /* Força a redução da altura */
+    padding: 6px 10px !important;  /* Diminui o respiro interno em ~35% */
+    font-size: 0.8rem !important;  /* Fonte 15% menor (ajuste se o seu padrão for outro) */
+    margin-bottom: 5px !important; /* Distância entre botões cortada pela metade */
+    line-height: 1.1;              /* Texto mais compacto */
+    justify-content: center;       /* Centraliza o texto no botão menor */
+}
