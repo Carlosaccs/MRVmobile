@@ -78,7 +78,7 @@ html, body {
    ========================================================================== */
 #menu-lateral {
     position: fixed;
-    left: 80px; 
+    left: 55px; 
     top: 0;
     width: calc(100% - 80px);
     max-width: 330px; /* Aumentado de 300px para 330px */
