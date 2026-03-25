@@ -88,7 +88,6 @@ function gerarMenuResidenciais() {
         lista.appendChild(li);
     });
 }
-
 /* ==========================================================================
    BLOCO 4: DESENHO E LÓGICA DO MAPA SVG (CORRIGIDO)
    ========================================================================== */
