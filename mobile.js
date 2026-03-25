@@ -219,16 +219,8 @@ function atualizarIconeFullscreen() {
 
 function toggleMenu() {
     const menu = document.getElementById('menu-lateral');
-    if (!menu) return;
-
-    // Inverte as classes de estado
-    if (menu.classList.contains('menu-oculto')) {
-        menu.classList.remove('menu-oculto');
-        menu.classList.add('menu-aberto');
-    } else {
-        menu.classList.remove('menu-aberto');
-        menu.classList.add('menu-oculto');
-    }
+    menu.classList.toggle('menu-oculto');
+    menu.classList.toggle('menu-aberto');
 }
 
 /* ==========================================================================
