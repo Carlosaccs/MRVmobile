@@ -64,7 +64,6 @@ function gerarMenuResidenciais() {
         li.className = 'menu-item-mrv'; 
         li.innerText = info.nomeCurto.toUpperCase();
         
-        // Cores Zonas
         let corBorda = "#00713a";
         if (li.innerText.includes("ZO")) corBorda = "#ff8c00";
         else if (li.innerText.includes("ZL")) corBorda = "#e31c19";
@@ -171,7 +170,7 @@ function clicarNoMapa(pathElement, info, pDataRaw = null) {
     const corLaranja = "#FF4500";
     const idRegiao = pathElement.id.replace('mini-', '').toLowerCase();
     
-    // 1. Destaque no mapa
+    // 1. Destaque Visual no Mapa
     document.querySelectorAll('#mapa-container path').forEach(p => {
         p.setAttribute('data-selecionado', 'false');
         p.style.fill = p.getAttribute('data-cor-base');
@@ -179,7 +178,7 @@ function clicarNoMapa(pathElement, info, pDataRaw = null) {
     pathElement.setAttribute('data-selecionado', 'true');
     pathElement.style.fill = corLaranja;
     
-    // 2. Nome da Cidade
+    // 2. Identificação da Região
     const nomeDaCidade = pDataRaw ? pDataRaw.name : pathElement.getAttribute('data-name');
     cidadeClicadaAtiva = { name: nomeDaCidade || "" }; 
     atualizarTextoTopo(cidadeClicadaAtiva.name);
@@ -191,28 +190,38 @@ function clicarNoMapa(pathElement, info, pDataRaw = null) {
         elTituloFicha.style.display = "block";
     }
 
-    // 4. LÓGICA DE VITRINE (FILTRO DE REGISTROS)
+    // 4. Lógica de Vitrine (Filtrar todos os empreendimentos dessa região)
     const todosDestaRegiao = window.dadosGerais.filter(d => d.id === idRegiao);
     const containerBotoes = document.getElementById('container-vitrine-botoes');
     if(containerBotoes) containerBotoes.innerHTML = ""; 
 
+    // Registro em destaque é o que foi clicado ou o primeiro da lista
     const registroDestaque = info || todosDestaRegiao[0];
 
+    // Se houver mais de um residencial, cria os botões compactos para os demais
     if (todosDestaRegiao.length > 1 && containerBotoes) {
         todosDestaRegiao.forEach(item => {
             if (item.nomeCurto !== registroDestaque.nomeCurto) {
                 const btn = document.createElement('div');
                 btn.className = 'menu-item-mrv';
-                btn.style.margin = "0 0 8px 0";
-                btn.style.padding = "8px";
-                btn.style.fontSize = "0.85rem";
-                btn.innerText = item.nomeCurto.toUpperCase();
+                const nomeUpper = item.nomeCurto.toUpperCase();
+                btn.innerText = nomeUpper;
+                
+                // Cores de Borda por Zona para os botões da vitrine
+                let corBorda = "#00713a";
+                if (nomeUpper.includes("ZO")) corBorda = "#ff8c00";
+                else if (nomeUpper.includes("ZL")) corBorda = "#e31c19";
+                else if (nomeUpper.includes("ZN")) corBorda = "#0054a6";
+                else if (nomeUpper.includes("ZS")) corBorda = "#d1147e";
+                btn.style.borderRightColor = corBorda;
+
                 btn.onclick = () => clicarNoMapa(pathElement, item, pDataRaw);
                 containerBotoes.appendChild(btn);
             }
         });
     }
 
+    // Exibe os dados do registro em destaque
     if (registroDestaque) {
         exibirDadosResidencial(registroDestaque);
     }
