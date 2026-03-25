@@ -74,23 +74,43 @@ html, body {
 }
 
 /* ==========================================================================
-   3. MENU LATERAL LIMPO (SEM TÍTULO E SEM BARRA)
+   3. MENU LATERAL - DESIGN FINAL MOBILE (LIMPO + TRANSPARENTE)
    ========================================================================== */
 #menu-lateral {
     position: fixed;
-    left: 0;
+    /* Começa exatamente após a faixa verde de 80px */
+    left: 80px; 
     top: 0;
-    width: 310px; 
+    /* Ocupa o restante da largura, mas com um limite elegante */
+    width: calc(100% - 80px);
+    max-width: 300px; 
     height: 100%;
-    background: rgba(0, 0, 0, 0.1); /* Quase invisível para destacar os botões */
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    
+    /* Fundo totalmente transparente, só com o desfoque (Blur) */
+    background: transparent; 
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    
     z-index: 3000; 
-    padding: 10px 0; /* Espaço pequeno no topo */
+    padding: 10px 0; 
     transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    
+    /* Importante: impede que o menu invisível bloqueie o mapa */
+    pointer-events: none; 
 }
 
-/* Esconde o cabeçalho "RESIDENCIAIS" conforme pedido */
+/* Quando aberto, ele volta para a posição e aceita toques */
+#menu-lateral.menu-aberto {
+    transform: translateX(0);
+    pointer-events: auto;
+}
+
+/* Quando oculto, ele sai totalmente da tela para a esquerda */
+#menu-lateral.menu-oculto {
+    transform: translateX(-120%); 
+}
+
+/* Esconde o cabeçalho conforme pedido */
 .menu-header {
     display: none; 
 }
@@ -99,16 +119,16 @@ html, body {
     list-style: none;
     padding: 0;
     margin: 0;
-    height: 100%;
-    overflow-y: scroll; /* Mantém a rolagem ativa */
+    height: 100vh;
+    overflow-y: auto;
     
-    /* TRUQUE: Esconde a barra de rolagem visualmente */
-    scrollbar-width: none; /* Firefox */
-    -ms-overflow-style: none; /* IE/Edge */
+    /* Esconde a barra de rolagem visualmente mas mantém o movimento */
+    scrollbar-width: none; 
+    -ms-overflow-style: none; 
 }
 
 .menu-lista::-webkit-scrollbar {
-    display: none; /* Chrome, Safari e Opera */
+    display: none; 
 }
 
 /* BOTÃO PADRÃO (Residencial) */
@@ -116,17 +136,24 @@ html, body {
     background: #ffffff;
     border: 1px solid #d1d1d1;
     border-right: 18px solid #00713a; /* Borda padrão verde */
-    margin: 8px 15px 8px 85px; 
-    padding: 12px;
+    
+    /* Margens ajustadas para ficar colado na faixa verde com respiro */
+    margin: 10px 15px; 
+    padding: 14px 12px;
     border-radius: 4px 12px 12px 4px;
+    
     color: #333;
     font-weight: 600;
-    font-size: 0.8rem;
+    font-size: 0.85rem;
     display: block;
-    box-shadow: 2px 2px 5px rgba(0,0,0,0.05);
+    box-shadow: 4px 4px 10px rgba(0,0,0,0.1);
     cursor: pointer;
+    transition: transform 0.1s;
 }
-/* 4. CONTAINER DO MAPA PRINCIPAL */
+
+.menu-item-mrv:active {
+    transform: scale(0.96);
+}/* 4. CONTAINER DO MAPA PRINCIPAL */
 #mapa-container {
     position: absolute;
     left: 0; 
