@@ -1,12 +1,11 @@
 /* ==========================================================================
-   v137.2 - MOBILE: HOVER DINÂMICO + GATILHO GRANDE SÃO PAULO
+   BLOCO 1: CONFIGURAÇÕES, URLs E ESTADOS GLOBAIS
    ========================================================================== */
-
 const svgNS = "http://www.w3.org/2000/svg";
 const URL_PLANILHA = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSRKdJctOPQjKAtOZSDHyArD_H8SgKIouelAS1vF1d_-13pu7u_ic6J8nP3r0Ijd56WA-mbUmHjb4Me/pub?output=csv';
 
 let mapaAtivo = "GSP";
-let cidadeClicadaAtiva = null; // Guarda o objeto da cidade selecionada
+let cidadeClicadaAtiva = null; 
 window.bancoDados = {};
 
 const AJUSTES_MAPA = {
@@ -14,22 +13,12 @@ const AJUSTES_MAPA = {
     INTERIOR: { marginRight: "50%", marginLeft: "-100px", scale: "1.15" }
 };
 
-const DNA_AMPLIAR = "M 75.757133 114.16926 L 75.757133 124.7898 L 75.757133 135.41086 L 78.412268 135.41086 L 81.067403 135.41086 L 81.067403 127.44493 L 81.067403 119.47953 L 89.032808 119.47953 L 96.99873 119.47953 L 96.99873 116.82439 L 96.99873 114.16926 L 86.377673 114.16926 L 75.757133 114.16926 z M 115.58468 114.16926 L 115.58468 116.82439 L 115.58468 119.47953 L 123.36043 119.47953 L 131.13618 119.47953 L 131.13618 127.44493 L 131.13618 135.41086 L 133.79183 135.41086 L 136.44697 135.41086 L 136.44697 124.7898 L 136.44697 114.16926 L 126.01556 114.16926 L 115.58468 114.16926 z M 75.757133 153.9968 L 75.757133 164.61734 L 75.757133 175.2384 L 86.377673 175.2384 L 96.99873 175.2384 L 96.99873 172.39361 L 96.99873 169.54882 L 89.032808 169.54882 L 81.067403 169.54882 L 81.067403 161.77255 L 81.067403 153.9968 L 78.412268 153.9968 L 75.757133 153.9968 z M 131.13618 153.9968 L 131.13618 161.77255 L 131.13618 169.54882 L 123.36043 169.54882 L 115.58468 169.54882 L 115.58468 172.39361 L 115.58468 175.2384 L 126.01556 175.2384 L 136.44697 175.2384 L 136.44697 164.61734 L 136.44697 153.9968 L 133.79183 153.9968 L 131.13618 153.9968 z";
+const DNA_AMPLIAR = "M 75.757133 114.16926 L 75.757133 124.7898 L 75.757133 135.41086 L 78.412268 135.41086 L 81.067403 135.41086 L 81.067403 127.44493 L 81.067403 119.47953 L 89.032808 119.47953 L 96.99873 119.47953 L 96.99873 116.82439 L 96.99873 114.16926 L 86.377673 114.16926 L 75.757133 114.16926 z M 115.58468 114.16926 L 115.58468 116.82439 L 115.58468 119.47953 L 123.36043 119.47953 L 131.13618 119.47953 L 131.13618 127.44493 L 131.13618 135.41086 L 133.79183 135.41086 L 136.44697 136.44697 L 136.44697 124.7898 L 136.44697 114.16926 L 126.01556 114.16926 L 115.58468 114.16926 z M 75.757133 153.9968 L 75.757133 164.61734 L 75.757133 175.2384 L 86.377673 175.2384 L 96.99873 175.2384 L 96.99873 172.39361 L 96.99873 169.54882 L 89.032808 169.54882 L 81.067403 169.54882 L 81.067403 161.77255 L 81.067403 153.9968 L 78.412268 153.9968 L 75.757133 153.9968 z M 131.13618 153.9968 L 131.13618 161.77255 L 131.13618 169.54882 L 123.36043 169.54882 L 115.58468 169.54882 L 115.58468 172.39361 L 115.58468 175.2384 L 126.01556 175.2384 L 136.44697 175.2384 L 136.44697 164.61734 L 136.44697 153.9968 L 133.79183 153.9968 L 131.13618 153.9968 z";
 const DNA_REDUZIR = "M 78.408134 124.88437 L 78.408134 132.66012 L 78.408134 140.43587 L 70.442729 140.43587 L 62.476807 140.43587 L 62.476807 143.28066 L 62.476807 146.12596 L 73.097864 146.12596 L 83.718404 146.12596 L 83.718404 135.50491 L 83.718404 124.88437 L 81.063269 124.88437 L 78.408134 124.88437 z M 102.30435 124.88437 L 102.30435 135.50491 L 102.30435 146.12596 L 112.92541 146.12596 L 123.54595 146.12596 L 123.54595 143.28066 L 123.54595 140.43587 L 115.58054 140.43587 L 107.61514 140.43587 L 107.61514 132.66012 L 107.61514 124.88437 L 104.96 124.88437 L 102.30435 124.88437 z M 62.476807 164.3326 L 62.476807 167.17739 L 62.476807 170.02218 L 70.442729 170.02218 L 78.408134 170.02218 L 78.408134 177.79793 L 78.408134 185.5742 L 81.063269 185.5742 L 83.718404 185.5742 L 83.718404 174.95315 L 83.718404 164.3326 L 73.097864 164.3326 L 62.476807 164.3326 z M 102.30435 164.3326 L 102.30435 174.95315 L 102.30435 185.5742 L 104.96 185.5742 L 107.61514 185.5742 L 107.61514 177.79793 L 107.61514 170.02218 L 115.58054 170.02218 L 123.54595 170.02218 L 123.54595 167.17739 L 123.54595 164.3326 L 112.92541 164.3326 L 102.30435 164.3326 z";
 
-// --- NOVAS FUNÇÕES DE TEXTO (HOVER) ---
-function atualizarTextoTopo(nome) {
-    const indicador = document.getElementById('identificador-cidade');
-    if (!indicador) return;
-    
-    // Se passar nome, exibe. Se for null, volta para a cidade clicada ou limpa.
-    if (nome) {
-        indicador.innerText = nome.toUpperCase();
-    } else {
-        indicador.innerText = cidadeClicadaAtiva ? cidadeClicadaAtiva.name.toUpperCase() : "";
-    }
-}
-
+/* ==========================================================================
+   BLOCO 2: CONEXÃO COM PLANILHA E INICIALIZAÇÃO
+   ========================================================================== */
 async function carregarPlanilha() {
     try {
         const res = await fetch(URL_PLANILHA);
@@ -50,9 +39,48 @@ async function carregarPlanilha() {
         });
         console.log("✅ Planilha conectada!");
     } catch (e) { console.warn("⚠️ Erro Planilha"); }
+    
+    // Atualiza o mapa visualmente
     atualizarVisualizacao();
+    // GATILHO: Cria os botões do menu assim que os dados chegam!
+    gerarMenuResidenciais(); 
 }
 
+/* ==========================================================================
+   BLOCO 3: GERAÇÃO DO MENU DE RESIDENCIAIS (DINÂMICO)
+   ========================================================================== */
+function gerarMenuResidenciais() {
+    const lista = document.getElementById('lista-residenciais');
+    if (!lista) return;
+
+    lista.innerHTML = ""; 
+
+    Object.keys(window.bancoDados).forEach(id => {
+        const info = window.bancoDados[id];
+        
+        const li = document.createElement('li');
+        li.className = 'menu-item-mrv'; 
+        li.innerText = info.nomeExibicao.toUpperCase();
+        
+        // Estética da borda direita (cor padrão MRV)
+        li.style.borderRightColor = "#00713a"; 
+
+        li.onclick = () => {
+            const pathNoMapa = document.getElementById(id);
+            if (pathNoMapa) {
+                pathNoMapa.dispatchEvent(new Event('click'));
+                toggleMenu(); 
+            } else {
+                alert("Residencial não encontrado neste mapa atual.");
+            }
+        };
+        lista.appendChild(li);
+    });
+}
+
+/* ==========================================================================
+   BLOCO 4: DESENHO E LÓGICA DO MAPA SVG
+   ========================================================================== */
 function desenharMapa(dados, targetId, ehMinimizado) {
     const container = document.getElementById(targetId);
     if (!container || !dados) return;
@@ -89,7 +117,6 @@ function desenharMapa(dados, targetId, ehMinimizado) {
         path.setAttribute('data-cor-base', corBase);
 
         if (!ehMinimizado) {
-            // --- GESTÃO DE HOVER (Dedo passando no celular ou mouse) ---
             path.onmouseover = () => {
                 atualizarTextoTopo(pData.name || pData.id);
                 if (path.getAttribute('data-selecionado') !== 'true') {
@@ -104,9 +131,7 @@ function desenharMapa(dados, targetId, ehMinimizado) {
                 }
             };
 
-            // --- GESTÃO DE CLIQUE ---
             path.onclick = () => {
-                // CIRURGIA: Gatilho para Grande SP no mapa do Interior/Estado
                 if (pData.id === "grandesaopaulo") {
                     trocarMapas();
                     return;
@@ -114,19 +139,16 @@ function desenharMapa(dados, targetId, ehMinimizado) {
 
                 if (!ehMRV) return;
 
-                // Limpa seleções anteriores
                 document.querySelectorAll('#mapa-container path').forEach(p => {
                     p.setAttribute('data-selecionado', 'false');
                     p.style.fill = p.getAttribute('data-cor-base');
                 });
 
-                // Marca como ativa
                 cidadeClicadaAtiva = pData;
                 path.setAttribute('data-selecionado', 'true');
                 path.style.fill = corLaranja;
                 atualizarTextoTopo(pData.name || pData.id);
 
-                // Ficha Técnica
                 if (info) {
                     document.getElementById('nome-imovel').innerText = info.nomeExibicao.toUpperCase();
                     document.getElementById('detalhes-imovel').innerHTML = `
@@ -145,6 +167,9 @@ function desenharMapa(dados, targetId, ehMinimizado) {
     container.appendChild(svg);
 }
 
+/* ==========================================================================
+   BLOCO 5: TROCA DE MAPAS E VISUALIZAÇÃO
+   ========================================================================== */
 function atualizarVisualizacao() {
     if (typeof MAPA_GSP !== 'undefined' && typeof MAPA_INTERIOR !== 'undefined') {
         desenharMapa(mapaAtivo === "GSP" ? MAPA_GSP : MAPA_INTERIOR, "mapa-container", false);
@@ -154,9 +179,22 @@ function atualizarVisualizacao() {
 
 function trocarMapas() {
     mapaAtivo = (mapaAtivo === "GSP") ? "INTERIOR" : "GSP";
-    cidadeClicadaAtiva = null; // Reseta seleção ao trocar de mapa
+    cidadeClicadaAtiva = null; 
     atualizarTextoTopo(null);
     atualizarVisualizacao();
+}
+
+/* ==========================================================================
+   BLOCO 6: UTILITÁRIOS (FULLSCREEN, TEXTO TOPO, MENU)
+   ========================================================================== */
+function atualizarTextoTopo(nome) {
+    const indicador = document.getElementById('identificador-cidade');
+    if (!indicador) return;
+    if (nome) {
+        indicador.innerText = nome.toUpperCase();
+    } else {
+        indicador.innerText = cidadeClicadaAtiva ? cidadeClicadaAtiva.name.toUpperCase() : "";
+    }
 }
 
 function toggleFullscreen() {
@@ -186,47 +224,12 @@ function toggleMenu() {
     menu.classList.toggle('menu-aberto');
 }
 
+/* ==========================================================================
+   BLOCO 7: EVENTOS DE CARREGAMENTO E CLIQUE EXTERNO
+   ========================================================================== */
 window.onload = carregarPlanilha;
 document.addEventListener('fullscreenchange', atualizarIconeFullscreen);
 
 document.addEventListener('click', (e) => {
     if (e.target.closest('#mapa-minimizado')) trocarMapas();
 });
-
-
-// FUNÇÃO PARA CRIAR OS BOTÕES BRANCOS NO MENU
-function gerarMenuResidenciais() {
-    const lista = document.getElementById('lista-residenciais');
-    if (!lista) return;
-
-    lista.innerHTML = ""; // Limpa qualquer texto antigo
-
-    // Pegamos todos os residenciais que vieram da sua planilha
-    Object.keys(window.bancoDados).forEach(id => {
-        const info = window.bancoDados[id];
-        
-        // Criamos o item da lista (li)
-        const li = document.createElement('li');
-        li.className = 'menu-item-mrv'; // Aplica o estilo do CSS que fizemos
-        li.innerText = info.nomeExibicao.toUpperCase();
-        
-        // No futuro, aqui mudaremos a cor da borda baseado na zona
-        li.style.borderRightColor = "#00713a"; 
-
-        // AÇÃO AO CLICAR NO BOTÃO DO MENU
-        li.onclick = () => {
-            // Procuramos o ID no mapa que está na tela
-            const pathNoMapa = document.getElementById(id);
-            
-            if (pathNoMapa) {
-                pathNoMapa.dispatchEvent(new Event('click')); // Simula o toque no mapa
-                toggleMenu(); // Fecha o menu para mostrar o resultado
-            } else {
-                // Caso o corretor clique em algo que só tem no outro mapa
-                alert("Este residencial está no outro mapa. Troque a visualização na caixinha abaixo!");
-            }
-        };
-
-        lista.appendChild(li);
-    });
-}
