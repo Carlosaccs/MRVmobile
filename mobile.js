@@ -46,7 +46,7 @@ async function carregarPlanilha() {
 }
 
 /* ==========================================================================
-   BLOCO 3: GERAÇÃO DO MENU DE RESIDENCIAIS (DINÂMICO)
+   BLOCO 3: GERAÇÃO DO MENU COM TROCA AUTOMÁTICA DE MAPA
    ========================================================================== */
 function gerarMenuResidenciais() {
     const lista = document.getElementById('lista-residenciais');
@@ -54,29 +54,53 @@ function gerarMenuResidenciais() {
 
     lista.innerHTML = ""; 
 
-    Object.keys(window.bancoDados).forEach(id => {
-        const info = window.bancoDados[id];
-        
+    const itensOrdenados = Object.keys(window.bancoDados).map(id => {
+        return { id, ...window.bancoDados[id] };
+    }).sort((a, b) => a.ordem - b.ordem);
+
+    itensOrdenados.forEach(info => {
         const li = document.createElement('li');
         li.className = 'menu-item-mrv'; 
         li.innerText = info.nomeExibicao.toUpperCase();
         
-        // Estética da borda direita (cor padrão MRV)
-        li.style.borderRightColor = "#00713a"; 
+        // Cores das zonas (ZO, ZL, ZN, ZS)
+        const nomeParaBusca = info.nomeExibicao.toUpperCase();
+        let corBorda = "#00713a";
+        if (nomeParaBusca.includes("ZO")) corBorda = "#ff8c00";
+        if (nomeParaBusca.includes("ZL")) corBorda = "#e31c19";
+        if (nomeParaBusca.includes("ZN")) corBorda = "#0054a6";
+        if (nomeParaBusca.includes("ZS")) corBorda = "#d1147e";
+        li.style.borderRightColor = corBorda;
+
+        // Estilo Complexo
+        if (info.categoria.toUpperCase() === "COMPLEXO") {
+            li.style.background = "#232323";
+            li.style.color = "#ffffff";
+            li.style.borderLeft = "3px solid #50c878";
+        }
 
         li.onclick = () => {
-            const pathNoMapa = document.getElementById(id);
-            if (pathNoMapa) {
-                pathNoMapa.dispatchEvent(new Event('click'));
-                toggleMenu(); 
+            let pathNoMapa = document.getElementById(info.id);
+
+            // SE NÃO ACHOU NO MAPA ATUAL, TROCA O MAPA
+            if (!pathNoMapa) {
+                trocarMapas(); // Função que já existe no seu Bloco 5
+                
+                // Espera um milésimo de segundo para o novo mapa carregar no DOM
+                setTimeout(() => {
+                    pathNoMapa = document.getElementById(info.id);
+                    if (pathNoMapa) {
+                        pathNoMapa.dispatchEvent(new Event('click'));
+                    }
+                }, 50); 
             } else {
-                alert("Residencial não encontrado neste mapa atual.");
+                // SE JÁ ESTÁ NO MAPA CERTO, SÓ CLICA
+                pathNoMapa.dispatchEvent(new Event('click'));
             }
         };
         lista.appendChild(li);
     });
 }
-
 /* ==========================================================================
    BLOCO 4: DESENHO E LÓGICA DO MAPA SVG
    ========================================================================== */
