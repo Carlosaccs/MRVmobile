@@ -172,6 +172,12 @@ function abrirFichaImovel(nomeImovel) {
 
 // Inicialização
 window.onload = carregarPlanilha;
-document.addEventListener('click', (e) => {
-    if (e.target.closest('#mapa-minimizado')) trocarMapas();
+document.addEventListener('DOMContentLoaded', () => {
+    carregarPlanilha();
+    
+    // Listener para o mapa minimizado
+    const minimizado = document.getElementById('mapa-minimizado');
+    if (minimizado) {
+        minimizado.onclick = trocarMapas;
+    }
 });
