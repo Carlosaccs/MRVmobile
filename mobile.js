@@ -171,8 +171,9 @@ function desenharMapa(dados, targetId, ehMinimizado) {
    ========================================================================== */
 function clicarNoMapa(pathElement, info, pDataRaw = null) {
     const corLaranja = "#FF4500";
+    const idRegiao = pathElement.id.toLowerCase();
     
-    // 1. Destaque visual no mapa
+    // 1. Destaque no mapa
     document.querySelectorAll('#mapa-container path').forEach(p => {
         p.setAttribute('data-selecionado', 'false');
         p.style.fill = p.getAttribute('data-cor-base');
@@ -180,35 +181,57 @@ function clicarNoMapa(pathElement, info, pDataRaw = null) {
     pathElement.setAttribute('data-selecionado', 'true');
     pathElement.style.fill = corLaranja;
     
-    // 2. Captura o nome geográfico do campo 'name'
+    // 2. Nome da Cidade para o Título
     const nomeDaCidade = pDataRaw ? pDataRaw.name : pathElement.getAttribute('data-name');
     cidadeClicadaAtiva = { name: nomeDaCidade || "" }; 
-    
-    // 3. Atualiza o indicador flutuante do topo do mapa
     atualizarTextoTopo(cidadeClicadaAtiva.name);
 
-    // 4. ATUALIZAÇÃO DO TÍTULO NA COLUNA DIREITA
+    // 3. Atualiza o Título Branco e Solto
     const elTituloFicha = document.getElementById('titulo-regiao-ficha');
     if (elTituloFicha) {
         elTituloFicha.innerText = `MRV EM ${cidadeClicadaAtiva.name.toUpperCase()}`;
-        elTituloFicha.style.display = "block"; // Faz o título aparecer no primeiro clique
+        elTituloFicha.style.display = "block";
     }
 
-    // 5. Atualiza o conteúdo da Ficha (Nome do Prédio e Detalhes)
-    const elNome = document.getElementById('nome-imovel');
-    const elDetalhes = document.getElementById('detalhes-imovel');
+    // 4. LÓGICA DA VITRINE: Buscar todos os residenciais desta região
+    const todosDestaRegiao = window.dadosGerais.filter(d => d.id === idRegiao);
+    const containerBotoes = document.getElementById('lista-botoes-regiao');
+    containerBotoes.innerHTML = ""; // Limpa lista anterior
 
-    if (info) {
-        elNome.innerText = info.nomeCurto.toUpperCase();
-        elDetalhes.innerHTML = `
-            <p style="margin-top:10px;"><strong>CATEGORIA:</strong> ${info.categoria}</p>
-            <p style="color:#50c878; font-weight:bold;">📍 Localidade: ${cidadeClicadaAtiva.name.toUpperCase()}</p>
-        `;
-    } else {
-        elNome.innerText = "SELECIONE";
-        elDetalhes.innerHTML = `<p>Toque em um residencial no menu ou cidade no mapa.</p>`;
+    if (todosDestaRegiao.length > 1) {
+        // Se houver mais de um, o primeiro será o "exibido" e os outros viram botões
+        const exibidoAgora = info || todosDestaRegiao[0];
+        const outros = todosDestaRegiao.filter(item => item.nomeCurto !== exibidoAgora.nomeCurto);
+
+        outros.forEach(res => {
+            const btn = document.createElement('div');
+            btn.className = 'menu-item-mrv'; // Usa o estilo de botão que você já tem
+            btn.style.margin = "0 0 10px 0";
+            btn.style.padding = "10px";
+            btn.innerText = res.nomeCurto.toUpperCase();
+            btn.onclick = () => clicarNoMapa(pathElement, res, pDataRaw);
+            containerBotoes.appendChild(btn);
+        });
+
+        exibirDadosResidencial(exibidoAgora);
+    } else if (todosDestaRegiao.length === 1) {
+        exibirDadosResidencial(todosDestaRegiao[0]);
     }
 }
+
+// Função auxiliar para preencher os textos abaixo dos botões
+function exibirDadosResidencial(info) {
+    const elNome = document.getElementById('nome-imovel');
+    const elDetalhes = document.getElementById('detalhes-imovel');
+    elNome.innerText = info.nomeCurto.toUpperCase();
+    elDetalhes.innerHTML = `
+        <p style="margin-top:10px;"><strong>CATEGORIA:</strong> ${info.categoria}</p>
+        <p style="color:#50c878; font-weight:bold;">📍 Localidade: ${cidadeClicadaAtiva.name.toUpperCase()}</p>
+    `;
+}
+
+
+
 /* ==========================================================================
    BLOCO 5: TROCA DE MAPAS E VISUALIZAÇÃO
    ========================================================================== */
