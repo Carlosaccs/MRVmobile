@@ -145,12 +145,22 @@ html, body {
     display: flex; align-items: center; justify-content: center;
 }
 
-/* 6. FICHA TÉCNICA (DIREITA) */
+/* ==========================================================================
+   6. FICHA TÉCNICA (DIREITA) - v140.10
+   Foco: Padronização de Fonte e Botões Estilo Desktop
+   ========================================================================== */
+
+:root {
+    --ft-font-size: 0.85rem; /* Tamanho padrão baseado nos botões principais */
+}
+
 .ficha-tecnica {
     position: absolute; 
-    right: 0; top: 0;
-    width: 44%; height: 100%;
-    background: rgba(30, 30, 30, 0.96);
+    right: 0; 
+    top: 0;
+    width: 44%; 
+    height: 100%;
+    background: rgba(30, 30, 30, 0.96); 
     backdrop-filter: blur(12px); 
     color: white;
     padding: 15px 12px 40px 12px; 
@@ -160,12 +170,72 @@ html, body {
     overflow-y: auto;
 }
 
-/* VITRINE COMPACTA DENTRO DA FICHA */
+/* Padronização de todas as fontes da ficha */
+#nome-imovel, 
+.endereco-texto, 
+#texto-descricao,
+#texto-descricao *,
+.btn-acao {
+    font-size: var(--ft-font-size) !important;
+    line-height: 1.4;
+}
+
+#nome-imovel {
+    color: #50c878; 
+    margin: 10px 0 5px 0;
+    font-weight: 700;
+    text-transform: uppercase;
+    border-bottom: 2px solid #00713a; /* Linha verde do print */
+    padding-bottom: 8px;
+}
+
+/* Container de Endereço e Botões MAPS/LINK */
+.container-acoes {
+    display: flex;
+    flex-direction: column; /* Empilha endereço e depois botões */
+    gap: 8px;
+    margin: 12px 0;
+}
+
+.endereco-texto {
+    color: #ddd;
+    display: block;
+}
+
+/* Botões MAPS e LINK - Estilo idêntico ao Desktop */
+.btn-acao {
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-weight: 800;
+    text-decoration: none;
+    text-transform: uppercase;
+    color: white;
+    border: none;
+    cursor: pointer;
+    display: inline-block;
+    text-align: center;
+}
+
+.btn-maps { background-color: #4285F4; } /* Azul Google */
+.btn-link { background-color: #444444; } /* Cinza escuro */
+
+/* Texto Descritivo (Coluna M) */
+#texto-descricao {
+    color: #efefef; 
+    margin-top: 15px;
+    text-align: justify;
+}
+
+#texto-descricao strong {
+    color: #50c878;
+}
+
+/* VITRINE (LISTA DE BOTÕES SUPERIOR) */
 #container-vitrine-botoes {
     display: flex;
     flex-direction: column;
     gap: 3px; 
-    margin-bottom: 15px;
+    margin-bottom: 10px;
 }
 
 #container-vitrine-botoes .menu-item-mrv {
@@ -175,43 +245,22 @@ html, body {
     font-size: 0.72rem !important; 
     line-height: 1.1;
     border-radius: 2px 6px 6px 2px;
-    border-right-width: 12px; /* Reduzimos a borda na vitrine para ganhar espaço horizontal */
 }
 
-/* Estilo Complexo na Vitrine (ajuste de contraste) */
-#container-vitrine-botoes .estilo-complexo {
-    border-right-color: rgba(255,255,255,0.3) !important;
-}
-
-#nome-imovel {
-    color: #50c878; 
-    margin: 15px 0 5px 0;
-    font-size: 1.3rem; 
-    border-bottom: 2px solid #00713a; 
-    padding-bottom: 8px;
-    text-transform: uppercase;
-}
-
-#detalhes-imovel { 
-    font-size: 1.1rem; 
-    line-height: 1.6; 
-    color: #efefef; 
-}
-
-#detalhes-imovel strong { color: #50c878; }
-
-/* 7. INDICADOR CIDADE (TOPO) */
+/* 7. INDICADOR CIDADE (TOPO) - Ajustado para o Layout */
 #identificador-cidade {
     position: absolute;
     top: 10px;
-    left: 30%;
+    left: 28%; /* Levemente para a esquerda para não bater na ficha */
     transform: translateX(-50%);
-    font-size: 1rem;
+    font-size: 0.9rem;
     font-weight: bold;
     color: #00713a;
     z-index: 1500;
-    background: rgba(255,255,255,0.85);
-    padding: 4px 12px;
+    background: rgba(255,255,255,0.9);
+    padding: 5px 15px;
     border-radius: 20px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    text-transform: uppercase;
+    white-space: nowrap;
 }
