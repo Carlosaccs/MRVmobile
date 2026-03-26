@@ -132,13 +132,14 @@ function clicarNoMapa(pathElement, info, pDataRaw = null) {
     if (registroDestaque) exibirDadosResidencial(registroDestaque);
 }
 
-// --- BLOCO 4: FICHA TÉCNICA (LAYOUT DESKTOP NO MOBILE) ---
+// --- BLOCO 4: FICHA TÉCNICA (LAYOUT DESKTOP NO MOBILE - v140.10) ---
 function exibirDadosResidencial(info) {
     const elNome = document.getElementById('nome-imovel');
     const elDetalhes = document.getElementById('detalhes-imovel');
     
     if(elNome) elNome.innerText = info.nomeCurto.toUpperCase();
     
+    // Pegando dados da planilha
     const endereco = info.endereco || "Endereço não cadastrado";
     const linkMaps = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(endereco)}`;
     const linkBook = info.link || "#";
@@ -150,17 +151,13 @@ function exibirDadosResidencial(info) {
             
             <div class="container-acoes">
                 <span class="endereco-texto">📍 ${endereco}</span>
-                <div style="display: flex; gap: 4px; align-items: flex-start;">
+                <div style="display: flex; gap: 6px; align-items: flex-start;">
                     <a href="${linkMaps}" target="_blank" class="btn-acao btn-maps">MAPS</a>
                     <button onclick="copyToClipboard('${linkBook}')" class="btn-acao btn-link">LINK</button>
                 </div>
             </div>
-
-            <p style="margin-top:10px; font-size: 0.75rem;">
-                <strong style="color:#50c878;">CATEGORIA:</strong> ${info.categoria}
-            </p>
             
-            <div id="texto-descricao" style="font-size: 0.85rem; color: #efefef; margin-top:15px; line-height:1.5; text-align: justify;">
+            <div id="texto-descricao">
                 ${textoLongo}
             </div>
         `;
