@@ -1,5 +1,5 @@
 /* ==========================================================================
-   v140.5 - CORREÇÃO DEFINITIVA: MENU (TOPO) / FULLSCREEN (BAIXO)
+   v140.7 - DASHBOARD MOBILE: FOCO EM COMPLEXOS E LISTA COMPACTA
    ========================================================================== */
 
 const svgNS = "http://www.w3.org/2000/svg";
@@ -18,14 +18,18 @@ const AJUSTES_MAPA = {
     INTERIOR: { marginRight: "50%", marginLeft: "-100px", scale: "1.15" }
 };
 
-/* --- Funções de Controle (ESSENCIAIS) --- */
+/* --- Funções de Controle --- */
 
 function toggleMenu() {
-    console.log("Tentando abrir menu..."); // Para teste no console
     const menu = document.getElementById('menu-lateral');
     if(menu) {
-        menu.classList.toggle('menu-oculto');
-        menu.classList.toggle('menu-aberto');
+        if (menu.classList.contains('menu-oculto')) {
+            menu.classList.remove('menu-oculto');
+            menu.classList.add('menu-aberto');
+        } else {
+            menu.classList.remove('menu-aberto');
+            menu.classList.add('menu-oculto');
+        }
     }
 }
 
@@ -50,7 +54,7 @@ function atualizarIconeFullscreen() {
     }
 }
 
-/* --- Lógica de Mapa e Planilha (Mantidas) --- */
+/* --- Lógica de Mapa e Planilha --- */
 
 async function carregarPlanilha() {
     try {
@@ -124,21 +128,35 @@ function clicarNoMapa(pathElement, info, pDataRaw = null) {
     const nomeDaCidade = pDataRaw ? pDataRaw.name : pathElement.getAttribute('data-name');
     cidadeClicadaAtiva = { name: nomeDaCidade || "" }; 
     atualizarTextoTopo(cidadeClicadaAtiva.name);
-    const elTituloFicha = document.getElementById('titulo-regiao-ficha');
-    if (elTituloFicha) { elTituloFicha.innerText = `MRV EM ${cidadeClicadaAtiva.name.toUpperCase()}`; elTituloFicha.style.display = "block"; }
+    
     const todosDestaRegiao = window.dadosGerais.filter(d => d.id === idRegiao);
     const containerBotoes = document.getElementById('container-vitrine-botoes');
     if(containerBotoes) containerBotoes.innerHTML = ""; 
+    
     const registroDestaque = info || todosDestaRegiao[0];
+    
     if (todosDestaRegiao.length > 1 && containerBotoes) {
         todosDestaRegiao.forEach(item => {
             if (item.nomeCurto !== registroDestaque.nomeCurto) {
                 const btn = document.createElement('div');
                 btn.className = 'menu-item-mrv';
                 btn.innerText = item.nomeCurto.toUpperCase();
+                
                 let corBorda = "#00713a";
-                if (btn.innerText.includes("ZO")) corBorda = "#ff8c00"; else if (btn.innerText.includes("ZL")) corBorda = "#e31c19"; else if (btn.innerText.includes("ZN")) corBorda = "#0054a6"; else if (btn.innerText.includes("ZS")) corBorda = "#d1147e";
+                if (btn.innerText.includes("ZO")) corBorda = "#ff8c00"; 
+                else if (btn.innerText.includes("ZL")) corBorda = "#e31c19"; 
+                else if (btn.innerText.includes("ZN")) corBorda = "#0054a6"; 
+                else if (btn.innerText.includes("ZS")) corBorda = "#d1147e";
+                
                 btn.style.borderRightColor = corBorda;
+
+                // LÓGICA DE COMPLEXO: Fundo colorido e texto branco
+                if (item.categoria === "COMPLEXO") {
+                    btn.style.backgroundColor = corBorda;
+                    btn.style.color = "#ffffff";
+                    btn.classList.add('estilo-complexo');
+                }
+
                 btn.onclick = () => clicarNoMapa(pathElement, item, pDataRaw);
                 containerBotoes.appendChild(btn);
             }
@@ -162,15 +180,26 @@ function gerarMenuResidenciais() {
         const li = document.createElement('li');
         li.className = 'menu-item-mrv'; 
         li.innerText = info.nomeCurto.toUpperCase();
+        
         let corBorda = "#00713a";
-        if (li.innerText.includes("ZO")) corBorda = "#ff8c00"; else if (li.innerText.includes("ZL")) corBorda = "#e31c19"; else if (li.innerText.includes("ZN")) corBorda = "#0054a6"; else if (li.innerText.includes("ZS")) corBorda = "#d1147e";
+        if (li.innerText.includes("ZO")) corBorda = "#ff8c00"; 
+        else if (li.innerText.includes("ZL")) corBorda = "#e31c19"; 
+        else if (li.innerText.includes("ZN")) corBorda = "#0054a6"; 
+        else if (li.innerText.includes("ZS")) corBorda = "#d1147e";
+        
         li.style.borderRightColor = corBorda;
-        if (info.categoria === "COMPLEXO") { li.style.background = "#232323"; li.style.color = "#ffffff"; }
+        
+        if (info.categoria === "COMPLEXO") { 
+            li.style.backgroundColor = corBorda; 
+            li.style.color = "#ffffff"; 
+            li.classList.add('estilo-complexo');
+        }
+
         li.onclick = () => {
             let p = document.getElementById(info.id);
             if (!p) { trocarMapas(); setTimeout(() => { let np = document.getElementById(info.id); if (np) clicarNoMapa(np, info); }, 200); }
             else clicarNoMapa(p, info);
-            toggleMenu(); // Fecha o menu após selecionar
+            toggleMenu(); 
         };
         lista.appendChild(li);
     });
@@ -203,35 +232,11 @@ document.addEventListener('fullscreenchange', atualizarIconeFullscreen);
 document.addEventListener('webkitfullscreenchange', atualizarIconeFullscreen);
 
 document.addEventListener('click', (e) => {
-    // Busca se o clique foi no botão de menu ou em qualquer coisa dentro dele
     const clicouNoMenu = e.target.closest('#btn-menu');
     const clicouNoFull = e.target.closest('#btn-fullscreen');
     const clicouNoMini = e.target.closest('#mapa-minimizado');
 
-    if (clicouNoMenu) {
-        console.log("Menu clicado!"); // Verifique se isso aparece no console (F12)
-        toggleMenu();
-    }
-
-    if (clicouNoFull) {
-        toggleFullscreen();
-    }
-
-    if (clicouNoMini) {
-        trocarMapas();
-    }
+    if (clicouNoMenu) toggleMenu();
+    if (clicouNoFull) toggleFullscreen();
+    if (clicouNoMini) trocarMapas();
 });
-
-// Garanta que a função toggleMenu exista e seja esta:
-function toggleMenu() {
-    const menu = document.getElementById('menu-lateral');
-    if (!menu) return;
-
-    if (menu.classList.contains('menu-oculto')) {
-        menu.classList.remove('menu-oculto');
-        menu.classList.add('menu-aberto');
-    } else {
-        menu.classList.remove('menu-aberto');
-        menu.classList.add('menu-oculto');
-    }
-}
