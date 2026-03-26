@@ -270,13 +270,24 @@ html, body {
 }
 
 /* ==========================================================================
-   BLOCO 8: ESPECIALIZAÇÃO DA VITRINE (COLUNA DIREITA)
+   BLOCO 8: VITRINE COMPACTA (COLUNA DIREITA)
    ========================================================================== */
+#container-vitrine-botoes {
+    display: flex;
+    flex-direction: column;
+    gap: 2px; /* Espaço quase zero entre os botões */
+    margin-bottom: 10px;
+}
+
 #container-vitrine-botoes .menu-item-mrv {
-    min-height: auto !important;   /* Reduz altura em ~35% */
-    padding: 5px 10px !important;  /* Ajuste do respiro interno */
-    font-size: 0.82rem !important; /* Fonte 15% menor */
-    margin-bottom: 5px !important; /* Distância entre botões pela metade */
-    line-height: 1.1;
-    justify-content: center;
+    min-height: auto !important; 
+    /* Reduzimos o respiro interno ao mínimo (4px em cima/baixo) */
+    padding: 4px 10px 4px 15px !important; 
+    
+    /* Reduzimos a margem externa para quase nada */
+    margin: 1px 5px !important; 
+    
+    font-size: 0.75rem !important; /* Fonte levemente menor para ajudar no encaixe */
+    line-height: 1;
+    border-radius: 2px 8px 8px 2px; /* Bordas mais sutis para o modo compacto */
 }
