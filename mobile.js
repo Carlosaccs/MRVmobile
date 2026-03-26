@@ -1,5 +1,5 @@
 /* ==========================================================================
-   v140.0 - JS CONSOLIDADO (CORREÇÃO DE CARREGAMENTO E ESTOQUE)
+   v140.1 - RETORNO AO ESTÁVEL + ACRÉSCIMO DA COLUNA N (REGIONAL)
    ========================================================================== */
 
 const svgNS = "http://www.w3.org/2000/svg";
@@ -14,53 +14,49 @@ const AJUSTES_MAPA = {
     INTERIOR: { marginRight: "50%", marginLeft: "-100px", scale: "1.15" }
 };
 
-const DNA_AMPLIAR = "M 75.757133 114.16926 L 75.757133 124.7898 L 75.757133 135.41086 L 78.412268 135.41086 L 81.067403 135.41086 L 81.067403 127.44493 L 81.067403 119.47953 L 89.032808 119.47953 L 96.99873 119.47953 L 96.99873 116.82439 L 96.99873 114.16926 L 86.377673 114.16926 L 75.757133 114.16926 z M 115.58468 114.16926 L 115.58468 116.82439 L 115.58468 119.47953 L 123.36043 119.47953 L 131.13618 119.47953 L 131.13618 127.44493 L 131.13618 135.41086 L 133.79183 135.41086 L 136.44697 114.16926 L 126.01556 114.16926 L 115.58468 114.16926 z M 75.757133 153.9968 L 75.757133 164.61734 L 75.757133 175.2384 L 86.377673 175.2384 L 96.99873 175.2384 L 96.99873 172.39361 L 96.99873 169.54882 L 89.032808 169.54882 L 81.067403 169.54882 L 81.067403 161.77255 L 81.067403 153.9968 L 78.412268 153.9968 L 75.757133 153.9968 z M 131.13618 153.9968 L 131.13618 161.77255 L 131.13618 169.54882 L 123.36043 169.54882 L 115.58468 169.54882 L 115.58468 172.39361 L 115.58468 175.2384 L 126.01556 175.2384 L 136.44697 175.2384 L 136.44697 164.61734 L 136.44697 153.9968 L 133.79183 153.9968 L 131.13618 153.9968 z";
-const DNA_REDUZIR = "M 78.408134 124.88437 L 78.408134 132.66012 L 78.408134 140.43587 L 70.442729 140.43587 L 62.476807 140.43587 L 62.476807 143.28066 L 62.476807 146.12596 L 73.097864 146.12596 L 83.718404 146.12596 L 83.718404 135.50491 L 83.718404 124.88437 L 81.063269 124.88437 L 78.408134 124.88437 z M 102.30435 124.88437 L 102.30435 135.50491 L 102.30435 146.12596 L 112.92541 146.12596 L 123.54595 146.12596 L 123.54595 143.28066 L 123.54595 140.43587 L 115.58054 140.43587 L 107.61514 140.43587 L 107.61514 132.66012 L 107.61514 124.88437 L 104.96 124.88437 L 102.30435 124.88437 z M 62.476807 164.3326 L 62.476807 167.17739 L 62.476807 170.02218 L 70.442729 170.02218 L 78.408134 170.02218 L 78.408134 177.79793 L 78.408134 185.5742 L 81.063269 185.5742 L 83.718404 185.5742 L 83.718404 174.95315 L 83.718404 164.3326 L 73.097864 164.3326 L 62.476807 164.3326 z M 102.30435 164.3326 L 102.30435 174.95315 L 102.30435 185.5742 L 104.96 185.5742 L 107.61514 185.5742 L 107.61514 177.79793 L 107.61514 170.02218 L 115.58054 170.02218 L 123.54595 170.02218 L 123.54595 167.17739 L 123.54595 164.3326 L 112.92541 164.3326 L 102.30435 164.3326 z";
-
 /* ==========================================================================
-   CARREGAMENTO E FORMATAÇÃO
+   CARREGAMENTO DOS DADOS (FOCO NA COLUNA N)
    ========================================================================== */
 async function carregarPlanilha() {
     try {
         const res = await fetch(URL_PLANILHA);
         const csv = await res.text();
         const linhas = csv.split(/\r?\n/).filter(l => l.trim() !== "");
+        
         window.dadosGerais = []; 
         
         linhas.slice(1).forEach((linha) => {
             const c = linha.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
             if (c.length >= 4) {
                 const limpar = (t) => t ? t.replace(/"/g, '').trim() : "";
+                
+                // Pegamos a Coluna N (índice 13)
+                const reg = limpar(c[13]); 
+                const nomeBase = limpar(c[3]) || "Sem Nome";
+                
                 window.dadosGerais.push({
                     id: limpar(c[0]).toLowerCase(),
                     categoria: limpar(c[1]).toUpperCase(),
                     ordem: parseInt(limpar(c[2])) || 9999,
-                    nomeCurto: limpar(c[3]) || "Sem Nome",
-                    estoque: limpar(c[5]),  // Coluna F
-                    regional: limpar(c[13]) // Coluna N
+                    // Aqui acrescentamos o traço e a regional no nomeCurto
+                    nomeCurto: reg ? `${nomeBase} - ${reg}` : nomeBase,
+                    regional: reg
                 });
             }
         });
+        
         atualizarVisualizacao();
         gerarMenuResidenciais(); 
     } catch (e) { console.error("Erro na planilha:", e); }
 }
 
-function formatarEstoque(valor) {
-    if (!valor || valor.trim() === "") return "";
-    if (valor === "-") return '<span style="color: #666;">CONSULTAR</span>';
-    const num = parseInt(valor);
-    if (num === 0) return '<span style="color: #999; text-decoration: line-through;">VENDIDO</span>';
-    if (num < 6) return `<span style="color: #e31c19; font-weight: bold;">RESTAM ${num} UN.</span>`;
-    return `<span style="color: #666;">RESTAM ${num} UN.</span>`;
-}
-
 /* ==========================================================================
-   DESENHO DO MAPA (RECUPERADO)
+   DESENHO DO MAPA (ESTRUTURA ORIGINAL)
    ========================================================================== */
 function desenharMapa(dados, targetId, ehMinimizado) {
     const container = document.getElementById(targetId);
     if (!container || !dados) return;
+
     container.innerHTML = "";
     const svg = document.createElementNS(svgNS, "svg");
     svg.setAttribute("viewBox", dados.viewBox);
@@ -78,6 +74,7 @@ function desenharMapa(dados, targetId, ehMinimizado) {
     dados.paths.forEach(pData => {
         const path = document.createElementNS(svgNS, "path");
         const idLimpo = pData.id.toLowerCase();
+        
         const temResidencial = window.dadosGerais.some(d => d.id === idLimpo);
         const ehMRV = pData.class === "commrv" || temResidencial;
 
@@ -87,6 +84,7 @@ function desenharMapa(dados, targetId, ehMinimizado) {
         
         const corVerde = "#00713a", corCinza = "#cccccc", corLaranja = "#FF4500", corFoco = "#777777";
         const corBase = ehMRV ? corVerde : corCinza;
+        
         path.style.fill = corBase;
         path.style.stroke = "#ffffff";
         path.style.strokeWidth = ehMinimizado ? "6" : "1.2";
@@ -95,13 +93,172 @@ function desenharMapa(dados, targetId, ehMinimizado) {
         if (!ehMinimizado) {
             path.onmouseover = () => {
                 atualizarTextoTopo(pData.name || pData.id);
-                if (path.getAttribute('data-selecionado') !== 'true') path.style.fill = ehMRV ? corLaranja : corFoco;
+                if (path.getAttribute('data-selecionado') !== 'true') {
+                    path.style.fill = ehMRV ? corLaranja : corFoco;
+                }
             };
+            
             path.onmouseout = () => {
                 atualizarTextoTopo(null);
-                if (path.getAttribute('data-selecionado') !== 'true') path.style.fill = corBase;
+                if (path.getAttribute('data-selecionado') !== 'true') {
+                    path.style.fill = corBase;
+                }
             };
+
             path.onclick = () => {
-                if (pData.id === "grandesaopaulo") { trocarMapas(); return; }
+                if (pData.id === "grandesaopaulo") {
+                    trocarMapas();
+                    return;
+                }
                 if (!ehMRV) return;
-                const infoPrimeiro
+                const infoPrimeiro = window.dadosGerais.find(d => d.id === idLimpo);
+                clicarNoMapa(path, infoPrimeiro, pData);
+            };
+        }
+        g.appendChild(path);
+    });
+    svg.appendChild(g);
+    container.appendChild(svg);
+}
+
+/* ==========================================================================
+   LÓGICA DE CLIQUE E INTERAÇÃO
+   ========================================================================== */
+function clicarNoMapa(pathElement, info, pDataRaw = null) {
+    const idRegiao = pathElement.id.replace('mini-', '').toLowerCase();
+    
+    document.querySelectorAll('#mapa-container path').forEach(p => {
+        p.setAttribute('data-selecionado', 'false');
+        p.style.fill = p.getAttribute('data-cor-base');
+    });
+    pathElement.setAttribute('data-selecionado', 'true');
+    pathElement.style.fill = "#FF4500";
+    
+    const nomeDaCidade = pDataRaw ? pDataRaw.name : pathElement.getAttribute('data-name');
+    cidadeClicadaAtiva = { name: nomeDaCidade || "" }; 
+    atualizarTextoTopo(cidadeClicadaAtiva.name);
+
+    const elTituloFicha = document.getElementById('titulo-regiao-ficha');
+    if (elTituloFicha) {
+        elTituloFicha.innerText = `MRV EM ${cidadeClicadaAtiva.name.toUpperCase()}`;
+        elTituloFicha.style.display = "block";
+    }
+
+    const todosDestaRegiao = window.dadosGerais.filter(d => d.id === idRegiao);
+    const containerBotoes = document.getElementById('container-vitrine-botoes');
+    if(containerBotoes) containerBotoes.innerHTML = ""; 
+
+    const registroDestaque = info || todosDestaRegiao[0];
+
+    if (todosDestaRegiao.length > 1 && containerBotoes) {
+        todosDestaRegiao.forEach(item => {
+            if (item.nomeCurto !== registroDestaque.nomeCurto) {
+                const btn = document.createElement('div');
+                btn.className = 'menu-item-mrv';
+                btn.innerText = item.nomeCurto.toUpperCase();
+                
+                let corBorda = "#00713a";
+                if (btn.innerText.includes("ZO")) corBorda = "#ff8c00";
+                else if (btn.innerText.includes("ZL")) corBorda = "#e31c19";
+                else if (btn.innerText.includes("ZN")) corBorda = "#0054a6";
+                else if (btn.innerText.includes("ZS")) corBorda = "#d1147e";
+                btn.style.borderRightColor = corBorda;
+
+                btn.onclick = () => clicarNoMapa(pathElement, item, pDataRaw);
+                containerBotoes.appendChild(btn);
+            }
+        });
+    }
+
+    if (registroDestaque) exibirDadosResidencial(registroDestaque);
+}
+
+function exibirDadosResidencial(info) {
+    const elNome = document.getElementById('nome-imovel');
+    const elDetalhes = document.getElementById('detalhes-imovel');
+    if(elNome) elNome.innerText = info.nomeCurto.toUpperCase();
+    if(elDetalhes) {
+        elDetalhes.innerHTML = `
+            <p style="margin-top:10px;"><strong>CATEGORIA:</strong> ${info.categoria}</p>
+            <p style="color:#50c878; font-weight:bold;">📍 Localidade: ${cidadeClicadaAtiva ? cidadeClicadaAtiva.name.toUpperCase() : ""}</p>
+        `;
+    }
+}
+
+/* ==========================================================================
+   FUNÇÕES DE APOIO (TROCA DE MAPA, FULLSCREEN, ETC)
+   ========================================================================== */
+function gerarMenuResidenciais() {
+    const lista = document.getElementById('lista-residenciais');
+    if (!lista) return;
+    lista.innerHTML = ""; 
+
+    const itensOrdenados = [...window.dadosGerais].sort((a, b) => a.ordem - b.ordem);
+
+    itensOrdenados.forEach(info => {
+        const li = document.createElement('li');
+        li.className = 'menu-item-mrv'; 
+        li.innerText = info.nomeCurto.toUpperCase();
+        
+        let corBorda = "#00713a";
+        if (li.innerText.includes("ZO")) corBorda = "#ff8c00";
+        else if (li.innerText.includes("ZL")) corBorda = "#e31c19";
+        else if (li.innerText.includes("ZN")) corBorda = "#0054a6";
+        else if (li.innerText.includes("ZS")) corBorda = "#d1147e";
+        li.style.borderRightColor = corBorda;
+
+        if (info.categoria === "COMPLEXO") {
+            li.style.background = "#232323";
+            li.style.color = "#ffffff";
+        }
+
+        li.onclick = () => {
+            let p = document.getElementById(info.id);
+            if (!p) {
+                trocarMapas();
+                setTimeout(() => {
+                    let np = document.getElementById(info.id);
+                    if (np) clicarNoMapa(np, info);
+                }, 200);
+            } else {
+                clicarNoMapa(p, info);
+            }
+        };
+        lista.appendChild(li);
+    });
+}
+
+function atualizarVisualizacao() {
+    if (typeof MAPA_GSP !== 'undefined' && typeof MAPA_INTERIOR !== 'undefined') {
+        desenharMapa(mapaAtivo === "GSP" ? MAPA_GSP : MAPA_INTERIOR, "mapa-container", false);
+        desenharMapa(mapaAtivo === "GSP" ? MAPA_INTERIOR : MAPA_GSP, "mapa-minimizado", true);
+    }
+}
+
+function trocarMapas() {
+    mapaAtivo = (mapaAtivo === "GSP") ? "INTERIOR" : "GSP";
+    cidadeClicadaAtiva = null; 
+    atualizarTextoTopo(null);
+    atualizarVisualizacao();
+}
+
+function atualizarTextoTopo(nome) {
+    const indicador = document.getElementById('identificador-cidade');
+    if (!indicador) return;
+    const textoExibir = nome || (cidadeClicadaAtiva ? cidadeClicadaAtiva.name : "");
+    indicador.innerText = textoExibir.toUpperCase();
+}
+
+function toggleMenu() {
+    const menu = document.getElementById('menu-lateral');
+    if(menu) {
+        menu.classList.toggle('menu-oculto');
+        menu.classList.toggle('menu-aberto');
+    }
+}
+
+// Inicialização
+window.onload = carregarPlanilha;
+document.addEventListener('click', (e) => {
+    if (e.target.closest('#mapa-minimizado')) trocarMapas();
+});
