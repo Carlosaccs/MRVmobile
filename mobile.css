@@ -208,28 +208,38 @@ html, body {
 
 #mapa-minimizado svg { width: 90%; height: 90%; }
 
-/* 6. FICHA TÉCNICA (LATERAL DIREITA) */
+/* 6. FICHA TÉCNICA (Ajustada para subir os botões) */
 .ficha-tecnica {
     position: absolute; 
     right: 0; 
     top: 0;
     width: 44%; 
     height: 100%;
-    background: rgba(35, 35, 35, 0.95); /* Estilo Escuro/Industrial */
+    background: rgba(35, 35, 35, 0.95);
     backdrop-filter: blur(10px); 
     color: white;
-    padding: 40px; 
+    /* Reduzi o padding do topo de 40px para 15px */
+    padding: 15px 20px 40px 20px; 
     z-index: 1000;
     box-shadow: -10px 0 30px rgba(0,0,0,0.5);
     border-left: 1px solid rgba(255,255,255,0.1);
+    overflow-y: auto; /* Permite rolar a ficha se houver MUITOS botões */
+}
+
+/* Garante que o container de botões não tenha margem superior desnecessária */
+#container-vitrine-botoes {
+    margin-top: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 5px; /* Espaço uniforme entre os botões */
 }
 
 #nome-imovel {
     color: #50c878; 
-    margin: 0 0 20px 0; 
-    font-size: 1.8rem;
-    border-bottom: 3px solid #00713a; 
-    padding-bottom: 15px;
+    margin: 15px 0 10px 0; /* Ajustado para não colar nos botões acima */
+    font-size: 1.5rem; /* Leve redução para caber melhor no mobile */
+    border-bottom: 2px solid #00713a; 
+    padding-bottom: 10px;
     text-transform: uppercase;
 }
 
