@@ -168,8 +168,34 @@ function clicarNoMapa(pathElement, info, pDataRaw = null) {
 function exibirDadosResidencial(info) {
     const elNome = document.getElementById('nome-imovel');
     const elDetalhes = document.getElementById('detalhes-imovel');
+    
     if(elNome) elNome.innerText = info.nomeCurto.toUpperCase();
-    if(elDetalhes) elDetalhes.innerHTML = `<p style="margin-top:10px;"><strong>CATEGORIA:</strong> ${info.categoria}</p><p style="color:#50c878; font-weight:bold;">📍 Localidade: ${cidadeClicadaAtiva ? cidadeClicadaAtiva.name.toUpperCase() : ""}</p>`;
+    
+    // Pegando dados da planilha (ajuste as colunas se necessário)
+    const endereco = info.endereco || "Endereço não cadastrado";
+    const linkMaps = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(endereco)}`;
+    const linkBook = info.link || "#";
+
+    if(elDetalhes) {
+        elDetalhes.innerHTML = `
+            <div class="divisor-verde"></div>
+            
+            <div class="container-acoes">
+                <span class="endereco-texto">📍 ${endereco}</span>
+                <div style="display: flex; gap: 4px;">
+                    <a href="${linkMaps}" target="_blank" class="btn-acao btn-maps">MAPS</a>
+                    <button onclick="copyToClipboard('${linkBook}')" class="btn-acao btn-link">LINK</button>
+                </div>
+            </div>
+
+            <p style="margin-top:10px; font-size: 0.75rem;">
+                <strong style="color:#50c878;">CATEGORIA:</strong> ${info.categoria}
+            </p>
+            
+            <div id="texto-descricao" style="font-size: 0.75rem; color: #efefef; margin-top:10px; line-height:1.4;">
+                </div>
+        `;
+    }
 }
 
 function gerarMenuResidenciais() {
@@ -240,3 +266,10 @@ document.addEventListener('click', (e) => {
     if (clicouNoFull) toggleFullscreen();
     if (clicouNoMini) trocarMapas();
 });
+
+function copyToClipboard(text) {
+    if(text === "#") return alert("Link não disponível");
+    navigator.clipboard.writeText(text).then(() => {
+        alert("Link do Book copiado com sucesso!");
+    });
+}
