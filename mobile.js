@@ -1,7 +1,8 @@
 /* ==========================================================================
-   v140.7 - DASHBOARD MOBILE: FOCO EM COMPLEXOS E LISTA COMPACTA
+   v140.9 - DASHBOARD MOBILE: FOCO EM COMPLEXOS E FICHA TÉCNICA DETALHADA
    ========================================================================== */
 
+// --- BLOCO 1: CONFIGURAÇÕES E CONSTANTES ---
 const svgNS = "http://www.w3.org/2000/svg";
 const URL_PLANILHA = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSRKdJctOPQjKAtOZSDHyArD_H8SgKIouelAS1vF1d_-13pu7u_ic6J8nP3r0Ijd56WA-mbUmHjb4Me/pub?output=csv';
 
@@ -9,7 +10,7 @@ let mapaAtivo = "GSP";
 let cidadeClicadaAtiva = null; 
 window.dadosGerais = [];
 
-// Paths dos ícones para o botão de tela cheia
+// Ícones do botão Fullscreen
 const DNA_AMPLIAR = "M 75.757133 114.16926 L 75.757133 124.7898 L 75.757133 135.41086 L 78.412268 135.41086 L 81.067403 135.41086 L 81.067403 127.44493 L 81.067403 119.47953 L 89.032808 119.47953 L 96.99873 119.47953 L 96.99873 116.82439 L 96.99873 114.16926 L 86.377673 114.16926 L 75.757133 114.16926 z M 115.58468 114.16926 L 115.58468 116.82439 L 115.58468 119.47953 L 123.36043 119.47953 L 131.13618 119.47953 L 131.13618 127.44493 L 131.13618 135.41086 L 133.79183 135.41086 L 136.44697 114.16926 L 126.01556 114.16926 L 115.58468 114.16926 z M 75.757133 153.9968 L 75.757133 164.61734 L 75.757133 175.2384 L 86.377673 175.2384 L 96.99873 175.2384 L 96.99873 172.39361 L 96.99873 169.54882 L 89.032808 169.54882 L 81.067403 169.54882 L 81.067403 161.77255 L 81.067403 153.9968 L 78.412268 153.9968 L 75.757133 153.9968 z M 131.13618 153.9968 L 131.13618 161.77255 L 131.13618 169.54882 L 123.36043 169.54882 L 115.58468 169.54882 L 115.58468 172.39361 L 115.58468 175.2384 L 126.01556 175.2384 L 136.44697 175.2384 L 136.44697 164.61734 L 136.44697 153.9968 L 133.79183 153.9968 L 131.13618 153.9968 z";
 const DNA_REDUZIR = "M 78.408134 124.88437 L 78.408134 132.66012 L 78.408134 140.43587 L 70.442729 140.43587 L 62.476807 140.43587 L 62.476807 143.28066 L 62.476807 146.12596 L 73.097864 146.12596 L 83.718404 146.12596 L 83.718404 135.50491 L 83.718404 124.88437 L 81.063269 124.88437 L 78.408134 124.88437 z M 102.30435 124.88437 L 102.30435 135.50491 L 102.30435 146.12596 L 112.92541 146.12596 L 123.54595 146.12596 L 123.54595 143.28066 L 123.54595 140.43587 L 115.58054 140.43587 L 107.61514 140.43587 L 107.61514 132.66012 L 107.61514 124.88437 L 104.96 124.88437 L 102.30435 124.88437 z M 62.476807 164.3326 L 62.476807 167.17739 L 62.476807 170.02218 L 70.442729 170.02218 L 78.408134 170.02218 L 78.408134 177.79793 L 78.408134 185.5742 L 81.063269 185.5742 L 83.718404 185.5742 L 83.718404 174.95315 L 83.718404 164.3326 L 73.097864 164.3326 L 62.476807 164.3326 z M 102.30435 164.3326 L 102.30435 174.95315 L 102.30435 185.5742 L 104.96 185.5742 L 107.61514 185.5742 L 107.61514 177.79793 L 107.61514 170.02218 L 115.58054 170.02218 L 123.54595 170.02218 L 123.54595 167.17739 L 123.54595 164.3326 L 112.92541 164.3326 L 102.30435 164.3326 z";
 
@@ -18,44 +19,7 @@ const AJUSTES_MAPA = {
     INTERIOR: { marginRight: "50%", marginLeft: "-100px", scale: "1.15" }
 };
 
-/* --- Funções de Controle --- */
-
-function toggleMenu() {
-    const menu = document.getElementById('menu-lateral');
-    if(menu) {
-        if (menu.classList.contains('menu-oculto')) {
-            menu.classList.remove('menu-oculto');
-            menu.classList.add('menu-aberto');
-        } else {
-            menu.classList.remove('menu-aberto');
-            menu.classList.add('menu-oculto');
-        }
-    }
-}
-
-function toggleFullscreen() {
-    if (!document.fullscreenElement) {
-        document.documentElement.requestFullscreen().catch(err => console.warn(err));
-    } else {
-        if (document.exitFullscreen) document.exitFullscreen();
-    }
-}
-
-function atualizarIconeFullscreen() {
-    const p = document.getElementById('path-fullscreen');
-    const svg = document.getElementById('svg-fullscreen');
-    if (!p || !svg) return;
-    if (document.fullscreenElement) {
-        p.setAttribute('d', DNA_REDUZIR);
-        svg.setAttribute('viewBox', '55 120 80 80');
-    } else {
-        p.setAttribute('d', DNA_AMPLIAR);
-        svg.setAttribute('viewBox', '60 110 90 90');
-    }
-}
-
-/* --- Lógica de Mapa e Planilha --- */
-
+// --- BLOCO 2: CARREGAMENTO DA PLANILHA (Mapeamento G e M) ---
 async function carregarPlanilha() {
     try {
         const res = await fetch(URL_PLANILHA);
@@ -72,6 +36,9 @@ async function carregarPlanilha() {
                     categoria: limpar(c[1]).toUpperCase(),
                     ordem: parseInt(limpar(c[2])) || 9999,
                     nomeCurto: reg ? `${limpar(c[3]) || "Sem Nome"} - ${reg}` : limpar(c[3]) || "Sem Nome",
+                    endereco: limpar(c[6]),    // Coluna G (índice 6)
+                    link: limpar(c[11]),      // Coluna L (Book)
+                    descricao: limpar(c[12]), // Coluna M (Texto longo)
                     regional: reg
                 });
             }
@@ -81,6 +48,7 @@ async function carregarPlanilha() {
     } catch (e) { console.error("Erro na planilha:", e); }
 }
 
+// --- BLOCO 3: LÓGICA DE DESENHO E CLIQUES NO MAPA ---
 function desenharMapa(dados, targetId, ehMinimizado) {
     const container = document.getElementById(targetId);
     if (!container || !dados) return;
@@ -150,7 +118,6 @@ function clicarNoMapa(pathElement, info, pDataRaw = null) {
                 
                 btn.style.borderRightColor = corBorda;
 
-                // LÓGICA DE COMPLEXO: Fundo colorido e texto branco
                 if (item.categoria === "COMPLEXO") {
                     btn.style.backgroundColor = corBorda;
                     btn.style.color = "#ffffff";
@@ -165,16 +132,17 @@ function clicarNoMapa(pathElement, info, pDataRaw = null) {
     if (registroDestaque) exibirDadosResidencial(registroDestaque);
 }
 
+// --- BLOCO 4: FICHA TÉCNICA (LAYOUT DESKTOP NO MOBILE) ---
 function exibirDadosResidencial(info) {
     const elNome = document.getElementById('nome-imovel');
     const elDetalhes = document.getElementById('detalhes-imovel');
     
     if(elNome) elNome.innerText = info.nomeCurto.toUpperCase();
     
-    // Pegando dados da planilha (ajuste as colunas se necessário)
     const endereco = info.endereco || "Endereço não cadastrado";
     const linkMaps = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(endereco)}`;
     const linkBook = info.link || "#";
+    const textoLongo = info.descricao || "";
 
     if(elDetalhes) {
         elDetalhes.innerHTML = `
@@ -182,7 +150,7 @@ function exibirDadosResidencial(info) {
             
             <div class="container-acoes">
                 <span class="endereco-texto">📍 ${endereco}</span>
-                <div style="display: flex; gap: 4px;">
+                <div style="display: flex; gap: 4px; align-items: flex-start;">
                     <a href="${linkMaps}" target="_blank" class="btn-acao btn-maps">MAPS</a>
                     <button onclick="copyToClipboard('${linkBook}')" class="btn-acao btn-link">LINK</button>
                 </div>
@@ -192,12 +160,14 @@ function exibirDadosResidencial(info) {
                 <strong style="color:#50c878;">CATEGORIA:</strong> ${info.categoria}
             </p>
             
-            <div id="texto-descricao" style="font-size: 0.75rem; color: #efefef; margin-top:10px; line-height:1.4;">
-                </div>
+            <div id="texto-descricao" style="font-size: 0.85rem; color: #efefef; margin-top:15px; line-height:1.5; text-align: justify;">
+                ${textoLongo}
+            </div>
         `;
     }
 }
 
+// --- BLOCO 5: MENU LATERAL E NAVEGAÇÃO ---
 function gerarMenuResidenciais() {
     const lista = document.getElementById('lista-residenciais');
     if (!lista) return;
@@ -248,12 +218,54 @@ function trocarMapas() {
 function atualizarTextoTopo(nome) {
     const indicador = document.getElementById('identificador-cidade');
     if (!indicador) return;
-    indicador.innerText = (nome || (cidadeClicadaAtiva ? cidadeClicadaAtiva.name : "")).toUpperCase();
+    indicador.innerText = (nome || (cidadeClicadaAtiva ? cityClicadaAtiva.name : "")).toUpperCase();
 }
 
-/* --- Listeners e Eventos --- */
+// --- BLOCO 6: UTILITÁRIOS E UI ---
+function toggleMenu() {
+    const menu = document.getElementById('menu-lateral');
+    if(menu) {
+        if (menu.classList.contains('menu-oculto')) {
+            menu.classList.remove('menu-oculto');
+            menu.classList.add('menu-aberto');
+        } else {
+            menu.classList.remove('menu-aberto');
+            menu.classList.add('menu-oculto');
+        }
+    }
+}
 
+function toggleFullscreen() {
+    if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(err => console.warn(err));
+    } else {
+        if (document.exitFullscreen) document.exitFullscreen();
+    }
+}
+
+function atualizarIconeFullscreen() {
+    const p = document.getElementById('path-fullscreen');
+    const svg = document.getElementById('svg-fullscreen');
+    if (!p || !svg) return;
+    if (document.fullscreenElement) {
+        p.setAttribute('d', DNA_REDUZIR);
+        svg.setAttribute('viewBox', '55 120 80 80');
+    } else {
+        p.setAttribute('d', DNA_AMPLIAR);
+        svg.setAttribute('viewBox', '60 110 90 90');
+    }
+}
+
+function copyToClipboard(text) {
+    if(!text || text === "#") return alert("Link não disponível");
+    navigator.clipboard.writeText(text).then(() => {
+        alert("Link do Book copiado!");
+    }).catch(err => console.error('Erro ao copiar:', err));
+}
+
+// --- BLOCO 7: LISTENERS E INICIALIZAÇÃO ---
 window.onload = carregarPlanilha;
+
 document.addEventListener('fullscreenchange', atualizarIconeFullscreen);
 document.addEventListener('webkitfullscreenchange', atualizarIconeFullscreen);
 
@@ -266,10 +278,3 @@ document.addEventListener('click', (e) => {
     if (clicouNoFull) toggleFullscreen();
     if (clicouNoMini) trocarMapas();
 });
-
-function copyToClipboard(text) {
-    if(text === "#") return alert("Link não disponível");
-    navigator.clipboard.writeText(text).then(() => {
-        alert("Link do Book copiado com sucesso!");
-    });
-}
