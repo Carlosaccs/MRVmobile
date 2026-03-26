@@ -1,5 +1,6 @@
 /* ==========================================================================
-   v140 - CSS CONSOLIDADO (DASHBOARD MRV MOBILE)
+   v140.8 - CSS CONSOLIDADO (DASHBOARD MRV MOBILE)
+   Foco: Compactação Extrema e Estilo de Complexos
    ========================================================================== */
 
 /* 1. FUNDAÇÃO E RESET */
@@ -28,8 +29,7 @@ html, body {
 /* 2. FAIXA VERDE LATERAL (FIXA) */
 .faixa-verde-vertical {
     position: absolute;
-    left: 0; 
-    top: 0;
+    left: 0; top: 0;
     width: 60px;
     height: 100%;
     background-color: #00713a;
@@ -38,7 +38,7 @@ html, body {
     align-items: center;
     justify-content: space-between;
     padding: 15px 0;
-    z-index: 4000; /* Sempre no topo de tudo */
+    z-index: 4000;
     box-shadow: 2px 0 10px rgba(0,0,0,0.3);
 }
 
@@ -56,87 +56,42 @@ html, body {
     justify-content: center;
 }
 
-.icon-top, .icon-bottom {
-    font-size: 26px;
-    color: white !important;
-    cursor: pointer;
-    padding: 10px;
-    user-select: none;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: transform 0.2s ease;
-}
-
-.icon-top:active, .icon-bottom:active {
-    transform: scale(1.2);
-    opacity: 0.8;
-}
-
-/* ==========================================================================
-   3. MENU LATERAL - DESIGN FINAL MOBILE (LIMPO + TRANSPARENTE)
-   ========================================================================== */
+/* 3. MENU LATERAL (ESQUERDA) */
 #menu-lateral {
     position: fixed;
     left: 55px; 
     top: 0;
     width: calc(100% - 80px);
-    max-width: 330px; /* Aumentado de 300px para 330px */
+    max-width: 330px;
     height: 100%;
     background: transparent; 
     backdrop-filter: blur(15px);
     -webkit-backdrop-filter: blur(15px);
     z-index: 3000; 
-    padding: 10px 0; 
     transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     pointer-events: none; 
 }
 
-/* Quando aberto, ele volta para a posição e aceita toques */
-#menu-lateral.menu-aberto {
-    transform: translateX(0);
-    pointer-events: auto;
-}
-
-/* Quando oculto, ele sai totalmente da tela para a esquerda */
-#menu-lateral.menu-oculto {
-    transform: translateX(-120%); 
-}
-
-/* Esconde o cabeçalho conforme pedido */
-.menu-header {
-    display: none; 
-}
+#menu-lateral.menu-aberto { transform: translateX(0); pointer-events: auto; }
+#menu-lateral.menu-oculto { transform: translateX(-120%); }
 
 .menu-lista {
     list-style: none;
-    padding: 0;
+    padding: 10px 0;
     margin: 0;
     height: 100vh;
     overflow-y: auto;
-    
-    /* Esconde a barra de rolagem visualmente mas mantém o movimento */
     scrollbar-width: none; 
-    -ms-overflow-style: none; 
 }
+.menu-lista::-webkit-scrollbar { display: none; }
 
-.menu-lista::-webkit-scrollbar {
-    display: none; 
-}
-
-
-/* BOTÃO PADRÃO (Residencial) */
+/* 4. ESTILO DOS BOTÕES (BASE) */
 .menu-item-mrv {
     background: #ffffff;
     border: 1px solid #d1d1d1;
     border-right: 18px solid #00713a; 
-    
-    /* Mantemos a margem que ajustamos anteriormente */
-    margin: 10px 10px 10px 5px;  
-    
-    /* ALTERAÇÃO AQUI: Aumentamos o respiro interno na esquerda para 30px */
-    padding: 14px 12px 14px 30px; 
-    
+    margin: 8px 10px 8px 5px;  
+    padding: 12px 12px 12px 25px; 
     border-radius: 2px 12px 12px 2px;
     color: #333;
     font-weight: 600;
@@ -144,150 +99,119 @@ html, body {
     display: block;
     box-shadow: 4px 4px 10px rgba(0,0,0,0.1);
     cursor: pointer;
-    transition: transform 0.1s;
+    transition: all 0.2s ease;
+    text-transform: uppercase;
 }
-.menu-item-mrv:active {
-    transform: scale(0.96);
 
+/* ESTILO ESPECIAL: COMPLEXO */
+.estilo-complexo {
+    border-right-width: 4px !important; /* Borda mais fina pois o fundo já tem cor */
+    font-weight: 800 !important;
+    letter-spacing: 0.5px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2) !important;
+}
 
-   
-}/* 4. CONTAINER DO MAPA PRINCIPAL */
+.menu-item-mrv:active { transform: scale(0.96); }
+
+/* 5. MAPA E INTERAÇÃO */
 #mapa-container {
     position: absolute;
-    left: 0; 
-    top: 0;
-    width: 100%; 
-    height: 100%;
+    left: 0; top: 0;
+    width: 100%; height: 100%;
     z-index: 10;
     display: flex;
     align-items: center;
     justify-content: center;
-    overflow: hidden;
+    padding-left: 60px;
     touch-action: none;
-    padding-left: 60px; /* Compensação da faixa verde */
 }
 
 #mapa-container svg {
-    width: 130% !important;
+    width: 135% !important;
     height: auto;
-    max-height: 98%;
     transition: all 0.3s ease;
-    transform-origin: center center;
 }
 
-#mapa-container path {
-    transition: fill 0.2s ease, stroke-width 0.2s ease;
-    cursor: pointer;
-    -webkit-tap-highlight-color: transparent;
-}
-
-/* 5. BOTÃO DE TROCA (MAPA MINIMIZADO) */
 #mapa-minimizado {
     position: absolute;
     bottom: 25px;
-    /* A mágica está aqui: 44% é a largura da sua ficha técnica + 15px de respiro */
     right: calc(44% + 15px); 
-    width: 90px;
-    height: 70px;
+    width: 85px; height: 65px;
     background: white;
     border: 2px solid #00713a;
     border-radius: 10px;
-    cursor: pointer;
     z-index: 2000;
-    overflow: hidden;
     box-shadow: -5px 5px 15px rgba(0,0,0,0.3);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: transform 0.2s ease;
+    display: flex; align-items: center; justify-content: center;
 }
 
-#mapa-minimizado:active {
-    transform: scale(0.9);
-}
-
-#mapa-minimizado svg { width: 90%; height: 90%; }
-
-/* 6. FICHA TÉCNICA (Ajustada para subir os botões) */
+/* 6. FICHA TÉCNICA (DIREITA) */
 .ficha-tecnica {
     position: absolute; 
-    right: 0; 
-    top: 0;
-    width: 44%; 
-    height: 100%;
-    background: rgba(35, 35, 35, 0.95);
-    backdrop-filter: blur(10px); 
+    right: 0; top: 0;
+    width: 44%; height: 100%;
+    background: rgba(30, 30, 30, 0.96);
+    backdrop-filter: blur(12px); 
     color: white;
-    /* Reduzi o padding do topo de 40px para 15px */
-    padding: 15px 20px 40px 20px; 
+    padding: 15px 12px 40px 12px; 
     z-index: 1000;
     box-shadow: -10px 0 30px rgba(0,0,0,0.5);
     border-left: 1px solid rgba(255,255,255,0.1);
-    overflow-y: auto; /* Permite rolar a ficha se houver MUITOS botões */
+    overflow-y: auto;
 }
 
-/* Garante que o container de botões não tenha margem superior desnecessária */
+/* VITRINE COMPACTA DENTRO DA FICHA */
 #container-vitrine-botoes {
-    margin-top: 0;
     display: flex;
     flex-direction: column;
-    gap: 5px; /* Espaço uniforme entre os botões */
+    gap: 3px; 
+    margin-bottom: 15px;
+}
+
+#container-vitrine-botoes .menu-item-mrv {
+    min-height: auto !important; 
+    padding: 6px 8px 6px 12px !important; 
+    margin: 0 !important; 
+    font-size: 0.72rem !important; 
+    line-height: 1.1;
+    border-radius: 2px 6px 6px 2px;
+    border-right-width: 12px; /* Reduzimos a borda na vitrine para ganhar espaço horizontal */
+}
+
+/* Estilo Complexo na Vitrine (ajuste de contraste) */
+#container-vitrine-botoes .estilo-complexo {
+    border-right-color: rgba(255,255,255,0.3) !important;
 }
 
 #nome-imovel {
     color: #50c878; 
-    margin: 15px 0 10px 0; /* Ajustado para não colar nos botões acima */
-    font-size: 1.5rem; /* Leve redução para caber melhor no mobile */
+    margin: 15px 0 5px 0;
+    font-size: 1.3rem; 
     border-bottom: 2px solid #00713a; 
-    padding-bottom: 10px;
+    padding-bottom: 8px;
     text-transform: uppercase;
 }
 
 #detalhes-imovel { 
-    font-size: 1.3rem; 
-    line-height: 1.8; 
+    font-size: 1.1rem; 
+    line-height: 1.6; 
     color: #efefef; 
 }
 
 #detalhes-imovel strong { color: #50c878; }
 
-/* 7. IDENTIFICADOR DE CIDADE (TOPO) */
+/* 7. INDICADOR CIDADE (TOPO) */
 #identificador-cidade {
     position: absolute;
     top: 10px;
-    left: 28%;
+    left: 30%;
     transform: translateX(-50%);
-    font-size: 1.1rem;
+    font-size: 1rem;
     font-weight: bold;
     color: #00713a;
-    text-transform: uppercase;
-    letter-spacing: 3px;
-    pointer-events: none;
     z-index: 1500;
-    background: rgba(255,255,255,0.7);
-    padding: 5px 15px;
+    background: rgba(255,255,255,0.85);
+    padding: 4px 12px;
     border-radius: 20px;
-}
-
-/* ==========================================================================
-   BLOCO 8: VITRINE COMPACTA (COLUNA DIREITA)
-   ========================================================================== */
-#container-vitrine-botoes {
-    display: flex;
-    flex-direction: column;
-    gap: 2px; /* Espaço quase zero entre os botões */
-    margin-bottom: 10px;
-}
-
-#container-vitrine-botoes .menu-item-mrv {
-    min-height: auto !important; 
-    /* Reduzimos o respiro interno ao mínimo (4px em cima/baixo) */
-    padding: 4px 10px 4px 15px !important; 
-    
-    /* Reduzimos a margem externa para quase nada */
-    margin: 1px 5px !important; 
-    
-    font-size: 0.75rem !important; /* Fonte levemente menor para ajudar no encaixe */
-    line-height: 1;
-    border-radius: 2px 8px 8px 2px; /* Bordas mais sutis para o modo compacto */
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
