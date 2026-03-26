@@ -203,18 +203,35 @@ document.addEventListener('fullscreenchange', atualizarIconeFullscreen);
 document.addEventListener('webkitfullscreenchange', atualizarIconeFullscreen);
 
 document.addEventListener('click', (e) => {
-    // 1. Clique no mapa minimizado
-    if (e.target.closest('#mapa-minimizado')) {
-        trocarMapas();
-    }
-    
-    // 2. Clique no Botão de Menu (usando a classe ou ID)
-    if (e.target.closest('#btn-menu') || e.target.closest('.icon-top')) {
+    // Busca se o clique foi no botão de menu ou em qualquer coisa dentro dele
+    const clicouNoMenu = e.target.closest('#btn-menu');
+    const clicouNoFull = e.target.closest('#btn-fullscreen');
+    const clicouNoMini = e.target.closest('#mapa-minimizado');
+
+    if (clicouNoMenu) {
+        console.log("Menu clicado!"); // Verifique se isso aparece no console (F12)
         toggleMenu();
     }
 
-    // 3. Clique no Botão de Fullscreen
-    if (e.target.closest('#btn-fullscreen') || e.target.closest('.icon-bottom')) {
+    if (clicouNoFull) {
         toggleFullscreen();
     }
+
+    if (clicouNoMini) {
+        trocarMapas();
+    }
 });
+
+// Garanta que a função toggleMenu exista e seja esta:
+function toggleMenu() {
+    const menu = document.getElementById('menu-lateral');
+    if (!menu) return;
+
+    if (menu.classList.contains('menu-oculto')) {
+        menu.classList.remove('menu-oculto');
+        menu.classList.add('menu-aberto');
+    } else {
+        menu.classList.remove('menu-aberto');
+        menu.classList.add('menu-oculto');
+    }
+}
