@@ -172,6 +172,7 @@ function clicarNoMapa(pathElement, info, pDataRaw = null) {
     if (registroDestaque) exibirDadosResidencial(registroDestaque);
 }
 
+
 function exibirDadosResidencial(info) {
     const elNome = document.getElementById('nome-imovel');
     const elDetalhes = document.getElementById('detalhes-imovel');
@@ -179,28 +180,36 @@ function exibirDadosResidencial(info) {
     if(elNome) elNome.innerText = info.nomeCurto.toUpperCase();
     
     if(elDetalhes) {
-        const linkMaps = `http://googleusercontent.com/maps.google.com/maps?q=${encodeURIComponent(info.endereco)}`;
+        // Link do Maps e do Book (Coluna L)
+        const linkMaps = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(info.endereco)}`;
+        const linkBook = info.link || "#";
         
         elDetalhes.innerHTML = `
-            <div class="endereco-texto">📍 ${info.endereco || ""}</div>
-            
+            <div class="divisor-verde"></div>
             <div class="container-acoes">
-                <a href="${linkMaps}" target="_blank" class="btn-acao btn-maps">GOOGLE MAPS</a>
-            </div>
-
-            <div class="grid-caixas-mobile">
-                <div class="caixa-dado">
-                    <span class="label">ENTREGA</span>
-                    <span class="valor">${info.entrega || "-"}</span>
+                <span class="endereco-texto">📍 ${info.endereco || ""}</span>
+                <div style="display: flex; gap: 8px; margin-top: 5px;">
+                    <a href="${linkMaps}" target="_blank" class="btn-acao btn-maps">MAPS</a>
+                    <button onclick="copyToClipboard('${linkBook}')" class="btn-acao btn-link">LINK</button>
                 </div>
             </div>
 
-            <div class="texto-coluna-r" style="color:#50c878; font-weight:bold; margin-top:10px;">
+            <div class="grid-caixas-mobile" style="display: flex; flex-wrap: wrap; gap: 4px; margin-top: 10px;">
+                <div class="caixa-dado" style="background: white; border-radius: 4px; padding: 5px; flex: 1; min-width: 100px; border: 1px solid #ddd;">
+                    <span class="label" style="color: #00713a; font-weight: bold; font-size: 10px; display: block;">ENTREGA</span>
+                    <span class="valor" style="color: #333; font-weight: bold; font-size: 14px;">${info.entrega || "Não Consta"}</span>
+                </div>
+            </div>
+
+            <div class="texto-coluna-r" style="color:#00713a; font-weight:bold; margin-top:10px; font-size: 12px;">
                 ${info.textoColunaR || ""}
             </div>
         `;
     }
 }
+
+
+
 function gerarMenuResidenciais() {
     const lista = document.getElementById('lista-residenciais');
     if (!lista) return;
