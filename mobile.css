@@ -113,51 +113,54 @@ html, body {
     box-shadow: 0 4px 12px rgba(0,0,0,0.2) !important;
 }
 
-/* --- BLOCO 5: ESTILO CAIXAS DE DADOS (CLEAN DESKTOP STYLE) --- */
+/* --- BLOCO 5: FICHA TÉCNICA (FIXAÇÃO E AJUSTE) --- */
+.ficha-tecnica {
+    position: absolute; 
+    right: 0; 
+    top: 0;
+    width: 44%; /* Mantendo os 44% que você usava */
+    height: 100%;
+    background: rgba(30, 30, 30, 0.96);
+    backdrop-filter: blur(12px); 
+    color: white;
+    padding: 10px; 
+    z-index: 1000;
+    box-shadow: -5px 0 20px rgba(0,0,0,0.5);
+    overflow-y: auto; /* Permite rolar se o conteúdo for longo */
+    display: block !important; /* Força a exibição */
+}
+
+/* Container das Caixas Brancas - Blindado */
 .grid-caixas-mobile {
     display: flex;
     flex-direction: column;
-    gap: 8px; /* Espaço entre as caixas */
-    margin: 15px 0;
+    gap: 6px;
+    margin: 10px 0;
+    width: 100%; /* Não deixa sair do container */
 }
 
 .caixa-dado {
-    background: #ffffff; /* Fundo branco como no print */
-    padding: 8px 12px;
-    border-radius: 6px;
+    background: #ffffff;
+    padding: 6px 8px;
+    border-radius: 4px;
     display: flex;
     flex-direction: column;
-    align-items: center; /* Centraliza o texto como no desktop */
-    justify-content: center;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-    width: 100%; /* Garante que não ultrapasse a largura da coluna */
+    align-items: center;
+    width: 100%; /* Ocupa toda a largura da ficha */
+    box-sizing: border-box; /* Garante que o padding não aumente a largura */
 }
 
 .caixa-dado .label {
-    font-size: 0.6rem;
-    color: #888; /* Cinza suave para o rótulo */
+    font-size: 0.55rem;
+    color: #00713a; /* Verde para combinar com o desktop */
     font-weight: bold;
     text-transform: uppercase;
-    margin-bottom: 2px;
 }
 
 .caixa-dado .valor {
-    font-size: 0.85rem;
-    color: #1a1a1a; /* Texto escuro para leitura no branco */
+    font-size: 0.75rem;
+    color: #000;
     font-weight: 800;
     text-align: center;
-}
-
-/* Ajuste fino na Coluna R e Descrição para não apertar */
-.texto-coluna-r {
-    color: #50c878;
-    font-weight: bold;
-    margin: 10px 0;
-    font-size: 0.9rem !important;
-}
-
-#texto-descricao {
-    font-size: 0.8rem !important;
-    line-height: 1.5;
-    color: #ccc;
+    word-break: break-all; /* Evita que números grandes quebrem o layout */
 }
