@@ -1,8 +1,8 @@
 /* ==========================================================================
-   v140.10 - DASHBOARD MOBILE: FOCO EM COMPLEXOS, COLUNA R E TRAVA DE CLIQUE
+   v140.11 - DASHBOARD MOBILE: CORREÇÃO MAPEAMENTO COLUNA R E TRAVA DE CLIQUE
    ========================================================================== */
 
-// --- BLOCO 1: CONFIGURAÇÕES E CONSTANTS ---
+// --- BLOCO 1: CONFIGURAÇÕES E CONSTANTES ---
 const svgNS = "http://www.w3.org/2000/svg";
 const URL_PLANILHA = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSRKdJctOPQjKAtOZSDHyArD_H8SgKIouelAS1vF1d_-13pu7u_ic6J8nP3r0Ijd56WA-mbUmHjb4Me/pub?output=csv';
 
@@ -18,7 +18,7 @@ const AJUSTES_MAPA = {
     INTERIOR: { marginRight: "50%", marginLeft: "-100px", scale: "1.15" }
 };
 
-// --- BLOCO 2: CARREGAMENTO DA PLANILHA (Inclusão da Coluna R) ---
+// --- BLOCO 2: CARREGAMENTO DA PLANILHA (Mapeamento Rígido) ---
 async function carregarPlanilha() {
     try {
         const res = await fetch(URL_PLANILHA);
@@ -35,10 +35,10 @@ async function carregarPlanilha() {
                     categoria: limpar(c[1]).toUpperCase(),
                     ordem: parseInt(limpar(c[2])) || 9999,
                     nomeCurto: reg ? `${limpar(c[3]) || "Sem Nome"} - ${reg}` : limpar(c[3]) || "Sem Nome",
-                    endereco: limpar(c[6]),
-                    link: limpar(c[11]),
-                    descricao: limpar(c[12]), 
-                    textoColunaR: limpar(c[17]), // Coluna R
+                    endereco: limpar(c[6]),    // Coluna G
+                    link: limpar(c[11]),      // Coluna L
+                    descricao: limpar(c[12]), // Coluna M (Texto longo final)
+                    textoColunaR: limpar(c[17]), // <--- Coluna R (Índice 17)
                     regional: reg
                 });
             }
@@ -96,8 +96,7 @@ function desenharMapa(dados, targetId, ehMinimizado) {
             };
             path.onclick = () => { 
                 if (pData.id === "grandesaopaulo") { trocarMapas(); return; } 
-                // TRAVA: Só executa clique se for MRV
-                if (!ehMRV) return; 
+                if (!ehMRV) return; // Trava: Apenas verde é clicável
                 clicarNoMapa(path, window.dadosGerais.find(d => d.id === idLimpo), pData); 
             };
         }
@@ -132,143 +131,4 @@ function clicarNoMapa(pathElement, info, pDataRaw = null) {
             if (item.nomeCurto !== registroDestaque.nomeCurto) {
                 const btn = document.createElement('div');
                 btn.className = 'menu-item-mrv';
-                btn.innerText = item.nomeCurto.toUpperCase();
-                let corBorda = "#00713a";
-                if (btn.innerText.includes("ZO")) corBorda = "#ff8c00"; 
-                else if (btn.innerText.includes("ZL")) corBorda = "#e31c19"; 
-                else if (btn.innerText.includes("ZN")) corBorda = "#0054a6"; 
-                else if (btn.innerText.includes("ZS")) corBorda = "#d1147e";
-                btn.style.borderRightColor = corBorda;
-                if (item.categoria === "COMPLEXO") {
-                    btn.style.backgroundColor = corBorda;
-                    btn.style.color = "#ffffff";
-                    btn.classList.add('estilo-complexo');
-                }
-                btn.onclick = () => clicarNoMapa(pathElement, item, pDataRaw);
-                containerBotoes.appendChild(btn);
-            }
-        });
-    }
-    if (registroDestaque) exibirDadosResidencial(registroDestaque);
-}
-
-// --- BLOCO 4: FICHA TÉCNICA (LAYOUT ATUALIZADO COLUNA R) ---
-function exibirDadosResidencial(info) {
-    const elNome = document.getElementById('nome-imovel');
-    const elDetalhes = document.getElementById('detalhes-imovel');
-    
-    if(elNome) elNome.innerText = info.nomeCurto.toUpperCase();
-    
-    const endereco = info.endereco || "Endereço não cadastrado";
-    const linkMaps = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(endereco)}`;
-    const linkBook = info.link || "#";
-    const textoR = info.textoColunaR || "";
-
-    if(elDetalhes) {
-        elDetalhes.innerHTML = `
-            <div class="divisor-verde"></div>
-            
-            <div class="container-acoes">
-                <span class="endereco-texto">📍 ${endereco}</span>
-                <div style="display: flex; gap: 8px; margin-top: 5px;">
-                    <a href="${linkMaps}" target="_blank" class="btn-acao btn-maps">MAPS</a>
-                    <button onclick="copyToClipboard('${linkBook}')" class="btn-acao btn-link">LINK</button>
-                </div>
-                <div class="texto-coluna-r">${textoR}</div>
-            </div>
-
-            <div id="texto-descricao">
-                ${info.descricao || ""}
-            </div>
-        `;
-    }
-}
-
-// --- BLOCO 5: MENU LATERAL E NAVEGAÇÃO ---
-function gerarMenuResidenciais() {
-    const lista = document.getElementById('lista-residenciais');
-    if (!lista) return;
-    lista.innerHTML = ""; 
-    [...window.dadosGerais].sort((a, b) => a.ordem - b.ordem).forEach(info => {
-        const li = document.createElement('li');
-        li.className = 'menu-item-mrv'; 
-        li.innerText = info.nomeCurto.toUpperCase();
-        let corBorda = "#00713a";
-        if (li.innerText.includes("ZO")) corBorda = "#ff8c00"; 
-        else if (li.innerText.includes("ZL")) corBorda = "#e31c19"; 
-        else if (li.innerText.includes("ZN")) corBorda = "#0054a6"; 
-        else if (li.innerText.includes("ZS")) corBorda = "#d1147e";
-        li.style.borderRightColor = corBorda;
-        if (info.categoria === "COMPLEXO") { 
-            li.style.backgroundColor = corBorda; li.style.color = "#ffffff"; li.classList.add('estilo-complexo');
-        }
-        li.onclick = () => {
-            let p = document.getElementById(info.id);
-            if (!p) { trocarMapas(); setTimeout(() => { let np = document.getElementById(info.id); if (np) clicarNoMapa(np, info); }, 200); }
-            else clicarNoMapa(p, info);
-            toggleMenu(); 
-        };
-        lista.appendChild(li);
-    });
-}
-
-function atualizarVisualizacao() {
-    if (typeof MAPA_GSP !== 'undefined' && typeof MAPA_INTERIOR !== 'undefined') {
-        desenharMapa(mapaAtivo === "GSP" ? MAPA_GSP : MAPA_INTERIOR, "mapa-container", false);
-        desenharMapa(mapaAtivo === "GSP" ? MAPA_INTERIOR : MAPA_GSP, "mapa-minimizado", true);
-    }
-}
-
-function trocarMapas() {
-    mapaAtivo = (mapaAtivo === "GSP") ? "INTERIOR" : "GSP";
-    cidadeClicadaAtiva = null; 
-    atualizarTextoTopo(null);
-    atualizarVisualizacao();
-}
-
-function atualizarTextoTopo(nome) {
-    const indicador = document.getElementById('identificador-cidade');
-    if (!indicador) return;
-    indicador.innerText = (nome || (cidadeClicadaAtiva ? cidadeClicadaAtiva.name : "")).toUpperCase();
-}
-
-// --- BLOCO 6: UTILITÁRIOS ---
-function toggleMenu() {
-    const menu = document.getElementById('menu-lateral');
-    if(menu) {
-        menu.classList.toggle('menu-aberto');
-        menu.classList.toggle('menu-oculto');
-    }
-}
-
-function toggleFullscreen() {
-    if (!document.fullscreenElement) document.documentElement.requestFullscreen();
-    else if (document.exitFullscreen) document.exitFullscreen();
-}
-
-function atualizarIconeFullscreen() {
-    const p = document.getElementById('path-fullscreen');
-    const svg = document.getElementById('svg-fullscreen');
-    if (!p || !svg) return;
-    if (document.fullscreenElement) {
-        p.setAttribute('d', DNA_REDUZIR);
-        svg.setAttribute('viewBox', '55 120 80 80');
-    } else {
-        p.setAttribute('d', DNA_AMPLIAR);
-        svg.setAttribute('viewBox', '60 110 90 90');
-    }
-}
-
-function copyToClipboard(text) {
-    if(!text || text === "#") return alert("Link não disponível");
-    navigator.clipboard.writeText(text).then(() => alert("Link do Book copiado!"));
-}
-
-// --- BLOCO 7: LISTENERS ---
-window.onload = carregarPlanilha;
-document.addEventListener('fullscreenchange', atualizarIconeFullscreen);
-document.addEventListener('click', (e) => {
-    if (e.target.closest('#btn-menu')) toggleMenu();
-    if (e.target.closest('#btn-fullscreen')) toggleFullscreen();
-    if (e.target.closest('#mapa-minimizado')) trocarMapas();
-});
+                btn.innerText = item.nomeCurto.
