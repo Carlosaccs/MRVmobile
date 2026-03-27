@@ -1,10 +1,7 @@
 /* ==========================================================================
-   v140.17 - DASHBOARD MOBILE: ESTRUTURA ORGANIZADA EM BLOCOS
+   v140.17 - DASHBOARD MOBILE: DESAFIO FULLSCREEN TOTAL + PERSISTÊNCIA
    ========================================================================== */
 
-/* ==========================================================================
-   --- BLOCO 1: CONSTANTES, CONFIGURAÇÕES E DNA DE ÍCONES ---
-   ========================================================================== */
 const svgNS = "http://www.w3.org/2000/svg";
 const URL_PLANILHA = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSRKdJctOPQjKAtOZSDHyArD_H8SgKIouelAS1vF1d_-13pu7u_ic6J8nP3r0Ijd56WA-mbUmHjb4Me/pub?output=csv';
 
@@ -20,9 +17,7 @@ const AJUSTES_MAPA = {
     INTERIOR: { marginRight: "50%", marginLeft: "-100px", scale: "1.15" }
 };
 
-/* ==========================================================================
-   --- BLOCO 2: CARREGAMENTO DE DADOS (PLANILHA) E FULLSCREEN ---
-   ========================================================================== */
+// --- FUNÇÃO AUXILIAR DO DESAFIO ---
 function forcarFullscreen() {
     if (!document.fullscreenElement) {
         document.documentElement.requestFullscreen().catch(e => {
@@ -60,9 +55,6 @@ async function carregarPlanilha() {
     } catch (e) { console.error("Erro na planilha:", e); }
 }
 
-/* ==========================================================================
-   --- BLOCO 3: RENDERIZAÇÃO E LÓGICA DO MAPA SVG ---
-   ========================================================================== */
 function desenharMapa(dados, targetId, ehMinimizado) {
     const container = document.getElementById(targetId);
     if (!container || !dados) return;
@@ -113,7 +105,7 @@ function desenharMapa(dados, targetId, ehMinimizado) {
             };
             path.onclick = (e) => { 
                 e.stopPropagation();
-                forcarFullscreen();
+                forcarFullscreen(); // DESAFIO: Qualquer path amplia a tela
                 if (pData.id === "grandesaopaulo") { trocarMapas(); return; } 
 
                 if (ehMRV) {
@@ -130,59 +122,68 @@ function desenharMapa(dados, targetId, ehMinimizado) {
     container.appendChild(svg);
 }
 
-/* ========================
-   --- BLOCO 4: FICHA TÉCNICA (ESTILO CAIXAS BRANCAS)
-   ======================== */
-function exibirDadosResidencial(info) {
-    const elNome = document.getElementById('nome-imovel');
-    const elDetalhes = document.getElementById('detalhes-imovel');
+function clicarNoMapa(pathElement, info, pDataRaw = null) {
+    const idRegiao = pathElement.id.replace('mini-', '').toLowerCase();
     
-    if(elNome) elNome.innerText = info.nomeCurto.toUpperCase();
+    document.querySelectorAll('#mapa-container path').forEach(p => { 
+        p.setAttribute('data-selecionado', 'false'); 
+        p.style.fill = p.getAttribute('data-cor-base'); 
+    });
     
-    if(elDetalhes) {
-        const endereco = info.endereco || "Endereço não disponível";
-        const linkMaps = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(endereco)}`;
-        const linkBook = info.link || "#";
-
-        elDetalhes.innerHTML = `
-            <div style="font-size: 0.75rem; color: #ddd; margin-bottom: 10px;">📍 ${endereco}</div>
-            
-            <div class="container-acoes">
-                <a href="${linkMaps}" target="_blank" class="btn-acao btn-maps">MAPS</a>
-                <a href="${linkBook}" target="_blank" class="btn-acao btn-link">LINK</a>
-            </div>
-
-            <div class="grid-caixas-mobile">
-                <div class="caixa-dado"><span class="label">ENTREGA</span><span class="valor">${info.entrega || "-"}</span></div>
-                <div class="caixa-dado"><span class="label">OBRA</span><span class="valor">${info.obra || "0%"}</span></div>
-                <div class="caixa-dado"><span class="label">PLANTAS</span><span class="valor">${info.plantasMin}m² - ${info.plantasMax}m²</span></div>
-                <div class="caixa-dado"><span class="label">ESTOQUE</span><span class="valor">${info.estoque || "0"}</span></div>
-                <div class="caixa-dado"><span class="label">LIMITADOR</span><span class="valor">${info.limitador || "-"}</span></div>
-                <div class="caixa-dado"><span class="label">C. PAULISTA</span><span class="valor">${info.cPaulista || "NÃO POSSUI"}</span></div>
-            </div>
-
-            <div style="color: #50c878; font-weight: bold; font-size: 0.8rem; margin-top: 10px;">${info.textoColunaR || ""}</div>
-            <div style="font-size: 0.75rem; color: #eee; margin-top: 5px; text-align: justify;">${info.descricao || ""}</div>
-        `;
+    pathElement.setAttribute('data-selecionado', 'true');
+    pathElement.style.fill = "#FF4500"; 
+    
+    const nomeDaCidade = pDataRaw ? pDataRaw.name : pathElement.getAttribute('data-name');
+    cidadeClicadaAtiva = { name: nomeDaCidade || "" }; 
+    atualizarTextoTopo(cidadeClicadaAtiva.name);
+    
+    const todosDestaRegiao = window.dadosGerais.filter(d => d.id === idRegiao);
+    const containerBotoes = document.getElementById('container-vitrine-botoes');
+    if(containerBotoes) containerBotoes.innerHTML = ""; 
+    
+    const registroDestaque = info || todosDestaRegiao[0];
+    
+    if (todosDestaRegiao.length > 1 && containerBotoes) {
+        todosDestaRegiao.forEach(item => {
+            if (item.nomeCurto !== registroDestaque.nomeCurto) {
+                const btn = document.createElement('div');
+                btn.className = 'menu-item-mrv';
+                btn.innerText = item.nomeCurto.toUpperCase();
+                let corBorda = "#00713a";
+                if (btn.innerText.includes("ZO")) corBorda = "#ff8c00"; 
+                else if (btn.innerText.includes("ZL")) corBorda = "#e31c19"; 
+                else if (btn.innerText.includes("ZN")) corBorda = "#0054a6"; 
+                else if (btn.innerText.includes("ZS")) corBorda = "#d1147e";
+                btn.style.borderRightColor = corBorda;
+                if (item.categoria === "COMPLEXO") {
+                    btn.style.backgroundColor = corBorda;
+                    btn.style.color = "#ffffff";
+                    btn.classList.add('estilo-complexo');
+                }
+                btn.onclick = (e) => {
+                    e.stopPropagation();
+                    forcarFullscreen(); // DESAFIO: Botões de região ampliam a tela
+                    clicarNoMapa(pathElement, item, pDataRaw);
+                };
+                containerBotoes.appendChild(btn);
+            }
+        });
     }
+    if (registroDestaque) exibirDadosResidencial(registroDestaque);
 }
-/* ==========================================================================
-   --- BLOCO 5: EXIBIÇÃO DA FICHA TÉCNICA E MENU LATERAL ---
-   ========================================================================== */
+
 function exibirDadosResidencial(info) {
     const elNome = document.getElementById('nome-imovel');
     const elDetalhes = document.getElementById('detalhes-imovel');
-    
     if(elNome) elNome.innerText = info.nomeCurto.toUpperCase();
     
     const endereco = info.endereco || "Endereço não cadastrado";
     const linkMaps = `http://googleusercontent.com/maps.google.com/maps?q=${encodeURIComponent(endereco)}`;
     const linkBook = info.link || "#";
     const textoR = info.textoColunaR || "";
-    const descricao = info.descricao || "";
 
     if(elDetalhes) {
-        let htmlContent = `
+        elDetalhes.innerHTML = `
             <div class="divisor-verde"></div>
             <div class="container-acoes">
                 <span class="endereco-texto">📍 ${endereco}</span>
@@ -190,25 +191,10 @@ function exibirDadosResidencial(info) {
                     <a href="${linkMaps}" target="_blank" class="btn-acao btn-maps">MAPS</a>
                     <button onclick="copyToClipboard('${linkBook}')" class="btn-acao btn-link">LINK</button>
                 </div>
-        `;
-
-        if (info.categoria === "RESIDENCIAL") {
-            htmlContent += `
-                <div class="texto-coluna-r" style="margin-top: 15px; font-weight: bold; color: #00713a;">
-                    ${textoR}
-                </div>
-                <div id="texto-descricao" style="margin-top: 10px; line-height: 1.4;">
-                    ${descricao}
-                </div>
-            `;
-        } else {
-            htmlContent += `
                 <div class="texto-coluna-r">${textoR}</div>
-                <div id="texto-descricao">${descricao}</div>
-            `;
-        }
-        htmlContent += `</div>`; 
-        elDetalhes.innerHTML = htmlContent;
+            </div>
+            <div id="texto-descricao">${info.descricao || ""}</div>
+        `;
     }
 }
 
@@ -232,7 +218,7 @@ function gerarMenuResidenciais() {
         }
         li.onclick = (e) => {
             e.stopPropagation();
-            forcarFullscreen();
+            forcarFullscreen(); // DESAFIO: Itens do menu lateral ampliam a tela
             let p = document.getElementById(info.id);
             if (!p) { 
                 trocarMapas(); 
@@ -247,9 +233,6 @@ function gerarMenuResidenciais() {
     });
 }
 
-/* ==========================================================================
-   --- BLOCO 6: UTILITÁRIOS (MAPAS, FULLSCREEN E CLIPBOARD) ---
-   ========================================================================== */
 function atualizarVisualizacao() {
     if (typeof MAPA_GSP !== 'undefined' && typeof MAPA_INTERIOR !== 'undefined') {
         desenharMapa(mapaAtivo === "GSP" ? MAPA_GSP : MAPA_INTERIOR, "mapa-container", false);
@@ -258,7 +241,7 @@ function atualizarVisualizacao() {
 }
 
 function trocarMapas() {
-    forcarFullscreen(); 
+    forcarFullscreen(); // DESAFIO: Troca de mapas amplia a tela
     mapaAtivo = (mapaAtivo === "GSP") ? "INTERIOR" : "GSP";
     cidadeClicadaAtiva = null; 
     atualizarTextoTopo(null);
@@ -272,7 +255,7 @@ function atualizarTextoTopo(nome) {
 }
 
 function toggleMenu() {
-    forcarFullscreen(); 
+    forcarFullscreen(); // DESAFIO: Abrir o menu amplia a tela
     const menu = document.getElementById('menu-lateral');
     if(menu) {
         menu.classList.toggle('menu-aberto');
@@ -303,9 +286,6 @@ function copyToClipboard(text) {
     navigator.clipboard.writeText(text).then(() => alert("Link do Book copiado!"));
 }
 
-/* ==========================================================================
-   --- BLOCO 7: EVENTOS DE INICIALIZAÇÃO E CLIQUES ---
-   ========================================================================== */
 window.onload = carregarPlanilha;
 document.addEventListener('fullscreenchange', atualizarIconeFullscreen);
 document.addEventListener('click', (e) => {
