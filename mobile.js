@@ -172,18 +172,23 @@ function clicarNoMapa(pathElement, info, pDataRaw = null) {
     if (registroDestaque) exibirDadosResidencial(registroDestaque);
 }
 
+// --- BLOCO 4: FICHA TÉCNICA (CATEGORIA RESIDENCIAL & COMPLEXO) ---
 function exibirDadosResidencial(info) {
     const elNome = document.getElementById('nome-imovel');
     const elDetalhes = document.getElementById('detalhes-imovel');
+    
     if(elNome) elNome.innerText = info.nomeCurto.toUpperCase();
     
+    // Preparação dos dados comuns (Idêntico ao Desktop)
     const endereco = info.endereco || "Endereço não cadastrado";
     const linkMaps = `http://googleusercontent.com/maps.google.com/maps?q=${encodeURIComponent(endereco)}`;
     const linkBook = info.link || "#";
     const textoR = info.textoColunaR || "";
+    const descricao = info.descricao || "";
 
     if(elDetalhes) {
-        elDetalhes.innerHTML = `
+        // Estrutura Base: Divisor + Endereço + Botões (MAPS/LINK)
+        let htmlContent = `
             <div class="divisor-verde"></div>
             <div class="container-acoes">
                 <span class="endereco-texto">📍 ${endereco}</span>
@@ -191,13 +196,30 @@ function exibirDadosResidencial(info) {
                     <a href="${linkMaps}" target="_blank" class="btn-acao btn-maps">MAPS</a>
                     <button onclick="copyToClipboard('${linkBook}')" class="btn-acao btn-link">LINK</button>
                 </div>
-                <div class="texto-coluna-r">${textoR}</div>
-            </div>
-            <div id="texto-descricao">${info.descricao || ""}</div>
         `;
+
+        // Se for RESIDENCIAL, começamos a injetar o conteúdo específico
+        if (info.categoria === "RESIDENCIAL") {
+            htmlContent += `
+                <div class="texto-coluna-r" style="margin-top: 15px; font-weight: bold; color: #00713a;">
+                    ${textoR}
+                </div>
+                <div id="texto-descricao" style="margin-top: 10px; line-height: 1.4;">
+                    ${descricao}
+                </div>
+            `;
+        } else {
+            // Layout para outras categorias (ex: COMPLEXO) como estava antes
+            htmlContent += `
+                <div class="texto-coluna-r">${textoR}</div>
+                <div id="texto-descricao">${descricao}</div>
+            `;
+        }
+
+        htmlContent += `</div>`; // Fecha container-acoes
+        elDetalhes.innerHTML = htmlContent;
     }
 }
-
 function gerarMenuResidenciais() {
     const lista = document.getElementById('lista-residenciais');
     if (!lista) return;
