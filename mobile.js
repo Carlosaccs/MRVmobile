@@ -19,7 +19,7 @@ const AJUSTES_MAPA = {
     INTERIOR: { marginRight: "50%", marginLeft: "-100px", scale: "1.15" }
 };
 
-// --- BLOCO 2: CARREGAMENTO DA PLANILHA (Mapeamento G e M) ---
+// --- BLOCO 2: CARREGAMENTO DA PLANILHA (Inclusão da Coluna R) ---
 async function carregarPlanilha() {
     try {
         const res = await fetch(URL_PLANILHA);
@@ -36,9 +36,10 @@ async function carregarPlanilha() {
                     categoria: limpar(c[1]).toUpperCase(),
                     ordem: parseInt(limpar(c[2])) || 9999,
                     nomeCurto: reg ? `${limpar(c[3]) || "Sem Nome"} - ${reg}` : limpar(c[3]) || "Sem Nome",
-                    endereco: limpar(c[6]),    // Coluna G (índice 6)
-                    link: limpar(c[11]),      // Coluna L (Book)
-                    descricao: limpar(c[12]), // Coluna M (Texto longo)
+                    endereco: limpar(c[6]),    
+                    link: limpar(c[11]),      
+                    descricao: limpar(c[12]), 
+                    textoColunaR: limpar(c[17]), // <--- NOVA COLUNA R (Índice 17)
                     regional: reg
                 });
             }
@@ -47,7 +48,6 @@ async function carregarPlanilha() {
         gerarMenuResidenciais(); 
     } catch (e) { console.error("Erro na planilha:", e); }
 }
-
 // --- BLOCO 3: LÓGICA DE DESENHO E CLIQUES NO MAPA ---
 function desenharMapa(dados, targetId, ehMinimizado) {
     const container = document.getElementById(targetId);
@@ -132,18 +132,17 @@ function clicarNoMapa(pathElement, info, pDataRaw = null) {
     if (registroDestaque) exibirDadosResidencial(registroDestaque);
 }
 
-// --- BLOCO 4: FICHA TÉCNICA (LAYOUT DESKTOP NO MOBILE - v140.10) ---
+// --- BLOCO 4: FICHA TÉCNICA (ORDEM: ENDEREÇO > BOTÕES > TEXTO R) ---
 function exibirDadosResidencial(info) {
     const elNome = document.getElementById('nome-imovel');
     const elDetalhes = document.getElementById('detalhes-imovel');
     
     if(elNome) elNome.innerText = info.nomeCurto.toUpperCase();
     
-    // Pegando dados da planilha
     const endereco = info.endereco || "Endereço não cadastrado";
     const linkMaps = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(endereco)}`;
     const linkBook = info.link || "#";
-    const textoLongo = info.descricao || "";
+    const textoR = info.textoColunaR || ""; // Texto da Coluna R
 
     if(elDetalhes) {
         elDetalhes.innerHTML = `
@@ -151,19 +150,23 @@ function exibirDadosResidencial(info) {
             
             <div class="container-acoes">
                 <span class="endereco-texto">📍 ${endereco}</span>
-                <div style="display: flex; gap: 6px; align-items: flex-start;">
+                
+                <div style="display: flex; gap: 8px; margin-top: 5px;">
                     <a href="${linkMaps}" target="_blank" class="btn-acao btn-maps">MAPS</a>
                     <button onclick="copyToClipboard('${linkBook}')" class="btn-acao btn-link">LINK</button>
+                </div>
+
+                <div class="texto-coluna-r">
+                    ${textoR}
                 </div>
             </div>
             
             <div id="texto-descricao">
-                ${textoLongo}
+                ${info.descricao || ""}
             </div>
         `;
     }
 }
-
 // --- BLOCO 5: MENU LATERAL E NAVEGAÇÃO ---
 function gerarMenuResidenciais() {
     const lista = document.getElementById('lista-residenciais');
