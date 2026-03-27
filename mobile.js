@@ -186,14 +186,14 @@ function clicarNoMapa(pathElement, info, pDataRaw = null) {
     if (registroDestaque) exibirDadosResidencial(registroDestaque);
 }
 
-// BLOCO 6: EXIBIÇÃO DE DETALHES (CORREÇÃO COMPLEXO)
+// BLOCO 6: EXIBIÇÃO DE DETALHES (VERSÃO ESTÁVEL COM COLUNA P)
 function exibirDadosResidencial(info) {
     const elNome = document.getElementById('nome-imovel');
     const elDetalhes = document.getElementById('detalhes-imovel');
     if(elNome) elNome.innerText = info.nomeCurto.toUpperCase();
     
     if(elDetalhes) {
-        // Se for COMPLEXO, renderizamos um layout limpo sem as caixas técnicas
+        // Layout para COMPLEXO (Mantém seu padrão)
         if (info.categoria === "COMPLEXO") {
             elDetalhes.innerHTML = `
                 <div class="divisor-verde"></div>
@@ -204,73 +204,69 @@ function exibirDadosResidencial(info) {
                     ${info.textoColunaR || ""}
                 </div>
             `;
-            return; // Encerra aqui para não criar o grid de dados
+            return;
         }
 
-        // Layout para RESIDENCIAL (Padrão com caixas brancas)
+        // Layout para RESIDENCIAL
         const linkMaps = `http://googleusercontent.com/maps.google.com/maps?q=${encodeURIComponent(info.endereco)}`;
         const linkBook = info.link || "#";
 
-        let valorObra = info.obra || "0";
-        if (!valorObra.includes('%')) valorObra += "%";
-
-        let txtEstoque = "";
-        let estiloEstoque = "color: #333;"; 
-        const valorEstoque = info.estoque ? info.estoque.toString().trim().toUpperCase() : "";
-
-        if (valorEstoque === "" || valorEstoque === "VAZIO") {
-            txtEstoque = "";
-        } else if (valorEstoque === "0") {
-            txtEstoque = "VENDIDO";
-            estiloEstoque = "color: #888; text-decoration: line-through;";
-        } else {
-            const numEstoque = parseInt(valorEstoque);
-            txtEstoque = `RESTAM ${numEstoque} UN.`;
-            if (numEstoque < 6) estiloEstoque = "color: #e31c19;"; 
+        // --- LÓGICA DA COLUNA P (Destaque em Vermelho) ---
+        // Só renderiza se houver conteúdo na coluna P para não gerar espaços vazios
+        let htmlDestaque = "";
+        if (info.destaqueVermelho && info.destaqueVermelho.trim() !== "") {
+            htmlDestaque = `
+                <div style="background: #fff; border: 1px solid #ddd; border-bottom: none; border-radius: 4px 4px 0 0; color: #e31c19; font-weight: 800; text-align: center; padding: 6px; margin-top: 10px; font-size: 11px; text-transform: uppercase;">
+                    ${info.destaqueVermelho}
+                </div>
+            `;
         }
-        
-        const cssCaixa = `display: flex; justify-content: space-between; align-items: center; background: white; padding: 5px 8px; flex: 1 1 48%; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; min-height: 28px;`;
-        const cssLabel = `color: #00713a; font-weight: bold; font-size: 10px;`;
-        const cssValor = `font-weight: 800; font-size: 11px; text-align: right;`;
+
+        // Estilos das caixas brancas (Sincronizado com suas imagens)
+        const cssCaixa = `display: flex; justify-content: space-between; align-items: center; background: white; padding: 5px 8px; flex: 1 1 48%; border: 1px solid #ddd; border-radius: 4px; min-height: 28px; box-sizing: border-box;`;
+        const cssLabel = `color: #00713a; font-weight: bold; font-size: 9px;`;
+        const cssValor = `font-weight: 800; font-size: 10px; color: #333;`;
 
         elDetalhes.innerHTML = `
             <div class="divisor-verde"></div>
             <div class="container-acoes">
                 <span class="endereco-texto">📍 ${info.endereco || ""}</span>
-                <div style="display: flex; gap: 8px; margin-top: 5px;">
-                    <a href="${linkMaps}" target="_blank" class="btn-acao btn-maps">MAPS</a>
-                    <button onclick="copyToClipboard('${linkBook}')" class="btn-acao btn-link">LINK</button>
+                <div style="display: flex; gap: 8px; margin-top: 5px; margin-bottom: 5px;">
+                    <a href="${linkMaps}" target="_blank" class="btn-acao btn-maps" style="flex:1">MAPS</a>
+                    <button onclick="copyToClipboard('${linkBook}')" class="btn-acao btn-link" style="flex:1">LINK</button>
                 </div>
             </div>
 
-            <div class="grid-caixas-mobile" style="display: flex; flex-wrap: wrap; gap: 4px; margin-top: 10px; width: 100%;">
+            ${htmlDestaque}
+
+            <div class="grid-caixas-mobile" style="display: flex; flex-wrap: wrap; gap: 4px; width: 100%; ${htmlDestaque !== "" ? "margin-top: 0;" : "margin-top: 10px;"}">
                 <div class="caixa-dado" style="${cssCaixa}">
-                    <span class="label" style="${cssLabel}">ENTREGA</span>
-                    <span class="valor" style="${cssValor} color: #333;">${info.entrega || "-"}</span>
+                    <span style="${cssLabel}">ENTREGA</span>
+                    <span style="${cssValor}">${info.entrega || "-"}</span>
                 </div>
                 <div class="caixa-dado" style="${cssCaixa}">
-                    <span class="label" style="${cssLabel}">OBRA</span>
-                    <span class="valor" style="${cssValor} color: #333;">${valorObra}</span>
+                    <span style="${cssLabel}">OBRA</span>
+                    <span style="${cssValor}">${info.obra || "0"}%</span>
                 </div>
                 <div class="caixa-dado" style="${cssCaixa}">
-                    <span class="label" style="${cssLabel}">PLANTAS</span>
-                    <span class="valor" style="${cssValor} color: #333;">${info.plantaMin} a ${info.plantaMax}m²</span>
+                    <span style="${cssLabel}">PLANTAS</span>
+                    <span style="${cssValor}">${info.plantaMin}m²</span>
                 </div>
                 <div class="caixa-dado" style="${cssCaixa}">
-                    <span class="label" style="${cssLabel}">ESTOQUE</span>
-                    <span class="valor" style="${cssValor} ${estiloEstoque}">${txtEstoque}</span>
+                    <span style="${cssLabel}">ESTOQUE</span>
+                    <span style="${cssValor}">${info.estoque || "-"}</span>
                 </div>
                 <div class="caixa-dado" style="${cssCaixa}">
-                    <span class="label" style="${cssLabel}">LIMITADOR</span>
-                    <span class="valor" style="${cssValor} color: #333;">${info.limitador || "-"}</span>
+                    <span style="${cssLabel}">LIMITADOR</span>
+                    <span style="${cssValor}">${info.limitador || "-"}</span>
                 </div>
                 <div class="caixa-dado" style="${cssCaixa}">
-                    <span class="label" style="${cssLabel}">C. PAULISTA</span>
-                    <span class="valor" style="${cssValor} color: #333;">${info.cPaulista || "NÃO"}</span>
+                    <span style="${cssLabel}">C. PAULISTA</span>
+                    <span style="${cssValor}">${info.cPaulista || "NÃO"}</span>
                 </div>
             </div>
 
-            <div class="texto-coluna-r" style="color:#ffffff; margin-top:10px; font-size: 11px; text-align:justify; white-space: pre-line;">
+            <div class="texto-coluna-r" style="color:#ffffff; margin-top:15px; font-size: 11px; text-align:justify; white-space: pre-line;">
                 ${info.textoColunaR || ""}
             </div>
         `;
