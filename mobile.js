@@ -137,37 +137,32 @@ function exibirDadosResidencial(info) {
     const elNome = document.getElementById('nome-imovel');
     const elDetalhes = document.getElementById('detalhes-imovel');
     
-    // 1. Garante que o container está visível
-    const ficha = document.querySelector('.ficha-tecnica');
-    if(ficha) ficha.style.display = 'block';
-
     if(elNome) elNome.innerText = info.nomeCurto.toUpperCase();
     
     if(elDetalhes) {
-        const endereco = info.endereco || "Não informado";
+        const endereco = info.endereco || "Endereço não disponível";
         const linkMaps = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(endereco)}`;
         const linkBook = info.link || "#";
 
         elDetalhes.innerHTML = `
-            <div style="margin-bottom: 10px;">
-                <div style="font-size: 0.7rem; color: #ccc; margin-bottom: 5px;">📍 ${endereco}</div>
-                <div style="display: flex; gap: 4px;">
-                    <a href="${linkMaps}" target="_blank" class="btn-acao btn-maps" style="flex:1; font-size: 0.65rem;">MAPS</a>
-                    <a href="${linkBook}" target="_blank" class="btn-acao btn-link" style="flex:1; font-size: 0.65rem;">LINK</a>
-                </div>
+            <div style="font-size: 0.75rem; color: #ddd; margin-bottom: 10px;">📍 ${endereco}</div>
+            
+            <div class="container-acoes">
+                <a href="${linkMaps}" target="_blank" class="btn-acao btn-maps">MAPS</a>
+                <a href="${linkBook}" target="_blank" class="btn-acao btn-link">LINK</a>
             </div>
 
             <div class="grid-caixas-mobile">
                 <div class="caixa-dado"><span class="label">ENTREGA</span><span class="valor">${info.entrega || "-"}</span></div>
                 <div class="caixa-dado"><span class="label">OBRA</span><span class="valor">${info.obra || "0%"}</span></div>
-                <div class="caixa-dado"><span class="label">PLANTAS</span><span class="valor">${info.plantasMin}m²-${info.plantasMax}m²</span></div>
+                <div class="caixa-dado"><span class="label">PLANTAS</span><span class="valor">${info.plantasMin}m² - ${info.plantasMax}m²</span></div>
                 <div class="caixa-dado"><span class="label">ESTOQUE</span><span class="valor">${info.estoque || "0"}</span></div>
                 <div class="caixa-dado"><span class="label">LIMITADOR</span><span class="valor">${info.limitador || "-"}</span></div>
-                <div class="caixa-dado"><span class="label">C. PAULISTA</span><span class="valor">${info.cPaulista || "-"}</span></div>
+                <div class="caixa-dado"><span class="label">C. PAULISTA</span><span class="valor">${info.cPaulista || "NÃO POSSUI"}</span></div>
             </div>
 
-            <div class="texto-coluna-r" style="font-size: 0.75rem; color: #50c878; margin-top: 8px;">${info.textoColunaR || ""}</div>
-            <div id="texto-descricao" style="font-size: 0.7rem; color: #eee; margin-top: 5px; text-align: left;">${info.descricao || ""}</div>
+            <div style="color: #50c878; font-weight: bold; font-size: 0.8rem; margin-top: 10px;">${info.textoColunaR || ""}</div>
+            <div style="font-size: 0.75rem; color: #eee; margin-top: 5px; text-align: justify;">${info.descricao || ""}</div>
         `;
     }
 }
