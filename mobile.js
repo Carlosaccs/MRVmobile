@@ -175,29 +175,32 @@ function clicarNoMapa(pathElement, info, pDataRaw = null) {
 function exibirDadosResidencial(info) {
     const elNome = document.getElementById('nome-imovel');
     const elDetalhes = document.getElementById('detalhes-imovel');
+    
     if(elNome) elNome.innerText = info.nomeCurto.toUpperCase();
     
-    const endereco = info.endereco || "Endereço não cadastrado";
-    const linkMaps = `http://googleusercontent.com/maps.google.com/maps?q=${encodeURIComponent(endereco)}`;
-    const linkBook = info.link || "#";
-    const textoR = info.textoColunaR || "";
-
     if(elDetalhes) {
+        const linkMaps = `http://googleusercontent.com/maps.google.com/maps?q=${encodeURIComponent(info.endereco)}`;
+        
         elDetalhes.innerHTML = `
-            <div class="divisor-verde"></div>
+            <div class="endereco-texto">📍 ${info.endereco || ""}</div>
+            
             <div class="container-acoes">
-                <span class="endereco-texto">📍 ${endereco}</span>
-                <div style="display: flex; gap: 8px; margin-top: 5px;">
-                    <a href="${linkMaps}" target="_blank" class="btn-acao btn-maps">MAPS</a>
-                    <button onclick="copyToClipboard('${linkBook}')" class="btn-acao btn-link">LINK</button>
-                </div>
-                <div class="texto-coluna-r">${textoR}</div>
+                <a href="${linkMaps}" target="_blank" class="btn-acao btn-maps">GOOGLE MAPS</a>
             </div>
-            <div id="texto-descricao">${info.descricao || ""}</div>
+
+            <div class="grid-caixas-mobile">
+                <div class="caixa-dado">
+                    <span class="label">ENTREGA</span>
+                    <span class="valor">${info.entrega || "-"}</span>
+                </div>
+            </div>
+
+            <div class="texto-coluna-r" style="color:#50c878; font-weight:bold; margin-top:10px;">
+                ${info.textoColunaR || ""}
+            </div>
         `;
     }
 }
-
 function gerarMenuResidenciais() {
     const lista = document.getElementById('lista-residenciais');
     if (!lista) return;
