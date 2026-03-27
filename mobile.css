@@ -1,204 +1,236 @@
 /* ==========================================================================
-   v140.18 - DASHBOARD MOBILE: CSS ESTRUTURADO EM BLOCOS
+   v140.10 - CSS CONSOLIDADO (DASHBOARD MRV MOBILE)
+   Foco: Padronização de Fontes, Botões Desktop e Coluna R
    ========================================================================== */
 
-/* --- BLOCO 1: RESET E CONFIGURAÇÕES GERAIS --- */
-* {
-    margin: 0;
-    padding: 0;
-    box-box-sizing: border-box;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    -webkit-tap-highlight-color: transparent;
-}
-
-body {
-    background-color: #f4f4f4;
-    overflow: hidden; /* Trava o scroll geral para o modo App */
-    height: 100vh;
-    width: 100vw;
-}
-
-/* --- BLOCO 2: CONTAINER PRINCIPAL E MAPA --- */
-#dashboard-container {
-    position: relative;
-    width: 100%;
+/* 1. FUNDAÇÃO E RESET */
+html, body {
+    margin: 0; 
+    padding: 0; 
+    width: 100%; 
     height: 100%;
-    display: flex;
-    flex-direction: column;
+    overflow: hidden; 
+    background: #fff;
 }
 
-#mapa-container {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: #ffffff;
+* { 
+    box-sizing: border-box; 
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+}
+
+:root {
+    --ft-font-size: 0.85rem; /* Fonte padrão para alinhar com os botões */
+}
+
+.mobile-wrapper {
+    display: flex; 
+    width: 100vw; 
+    height: 100%;
+    position: relative; 
     overflow: hidden;
 }
 
-#mapa-container svg {
-    width: 100%;
-    height: auto;
-    transition: transform 0.3s ease;
-}
-
-/* --- BLOCO 3: INTERFACE DE TOPO (HEADER) --- */
-#header-mobile {
+/* 2. FAIXA VERDE LATERAL (FIXA) */
+.faixa-verde-vertical {
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    padding: 15px;
-    z-index: 10;
-    pointer-events: none; /* Deixa cliques passarem para o mapa se necessário */
+    left: 0; top: 0;
+    width: 60px;
+    height: 100%;
+    background-color: #00713a;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px 0;
+    z-index: 4000;
+    box-shadow: 2px 0 10px rgba(0,0,0,0.3);
 }
 
-#identificador-cidade {
-    background: rgba(0, 113, 58, 0.9);
-    color: #ffffff;
-    padding: 8px 15px;
-    border-radius: 20px;
+.titulo-vertical {
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
     font-weight: bold;
-    font-size: 0.9rem;
-    display: inline-block;
-    pointer-events: auto;
+    font-size: 1.1rem;
+    letter-spacing: 2px;
+    color: white !important;
+    white-space: nowrap;
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-/* --- BLOCO 4: VITRINE E FICHA TÉCNICA (O CORAÇÃO DO MOBILE) --- */
-#vitrine-residencial {
-    background: #f9f9f9;
-    border-top: 3px solid #00713a;
-    padding: 15px;
-    min-height: 250px;
-    max-height: 50vh;
+/* 3. MENU LATERAL (ESQUERDA) */
+#menu-lateral {
+    position: fixed;
+    left: 55px; 
+    top: 0;
+    width: calc(100% - 80px);
+    max-width: 330px;
+    height: 100%;
+    background: transparent; 
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    z-index: 3000; 
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    pointer-events: none; 
+}
+
+#menu-lateral.menu-aberto { transform: translateX(0); pointer-events: auto; }
+#menu-lateral.menu-oculto { transform: translateX(-120%); }
+
+.menu-lista {
+    list-style: none;
+    padding: 10px 0;
+    margin: 0;
+    height: 100vh;
     overflow-y: auto;
-    z-index: 5;
-    box-shadow: 0 -5px 15px rgba(0,0,0,0.1);
+}
+
+/* 4. ESTILO DOS BOTÕES (BASE) */
+.menu-item-mrv {
+    background: #ffffff;
+    border: 1px solid #d1d1d1;
+    border-right: 18px solid #00713a; 
+    margin: 8px 10px 8px 5px;  
+    padding: 12px 12px 12px 25px; 
+    border-radius: 2px 12px 12px 2px;
+    color: #333;
+    font-weight: 600;
+    font-size: 0.85rem;
+    display: block;
+    box-shadow: 4px 4px 10px rgba(0,0,0,0.1);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-transform: uppercase;
+}
+
+.estilo-complexo {
+    border-right-width: 4px !important;
+    font-weight: 800 !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2) !important;
+}
+
+/* 5. MAPA E INTERAÇÃO */
+#mapa-container {
+    position: absolute;
+    left: 0; top: 0;
+    width: 100%; height: 100%;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-left: 60px;
+}
+
+#mapa-minimizado {
+    position: absolute;
+    bottom: 25px;
+    right: calc(44% + 15px); 
+    width: 85px; height: 65px;
+    background: white;
+    border: 2px solid #00713a;
+    border-radius: 10px;
+    z-index: 2000;
+    box-shadow: -5px 5px 15px rgba(0,0,0,0.3);
+}
+
+/* 6. FICHA TÉCNICA (DIREITA) */
+.ficha-tecnica {
+    position: absolute; 
+    right: 0; top: 0;
+    width: 44%; height: 100%;
+    background: rgba(30, 30, 30, 0.96);
+    backdrop-filter: blur(12px); 
+    color: white;
+    padding: 15px 12px 40px 12px; 
+    z-index: 1000;
+    box-shadow: -10px 0 30px rgba(0,0,0,0.5);
+    border-left: 1px solid rgba(255,255,255,0.1);
+    overflow-y: auto;
+}
+
+/* Padronização de Fontes na Ficha */
+#nome-imovel, .endereco-texto, .texto-coluna-r, #texto-descricao, .btn-acao {
+    font-size: var(--ft-font-size) !important;
+    line-height: 1.4;
 }
 
 #nome-imovel {
-    color: #00713a;
-    font-size: 1.2rem;
-    font-weight: 800;
-    margin-bottom: 5px;
+    color: #50c878; 
+    margin: 15px 0 5px 0;
+    font-weight: 700;
+    border-bottom: 2px solid #00713a; 
+    padding-bottom: 8px;
+    text-transform: uppercase;
 }
 
-.divisor-verde {
-    height: 2px;
-    background: #00713a;
-    width: 50px;
-    margin-bottom: 10px;
-}
-
-/* --- BLOCO 5: GRADE TÉCNICA (CARDS BRANCOS) --- */
-.grid-tecnico {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
+.container-acoes {
+    display: flex;
+    flex-direction: column;
     gap: 8px;
     margin: 12px 0;
 }
 
-.item-tecnico {
-    background-color: #ffffff;
-    padding: 10px 5px;
-    border-radius: 8px;
+.endereco-texto { color: #ddd; }
+
+.texto-coluna-r {
+    color: #ffffff;
+    margin-top: 5px;
+    font-weight: 500;
+}
+
+/* Botões MAPS e LINK - Estilo Desktop */
+.btn-acao {
+    padding: 6px 15px;
+    border-radius: 4px;
+    font-weight: 800;
+    text-decoration: none;
+    text-transform: uppercase;
+    color: white;
+    border: none;
+    display: inline-block;
+    text-align: center;
+}
+
+.btn-maps { background-color: #4285F4; }
+.btn-link { background-color: #444444; }
+
+#texto-descricao {
+    color: #efefef; 
+    margin-top: 15px;
+    text-align: justify;
+}
+
+/* 7. INDICADOR CIDADE (TOPO) */
+#identificador-cidade {
+    position: absolute;
+    top: 10px;
+    left: 28%;
+    transform: translateX(-50%);
+    font-size: 0.9rem;
+    font-weight: bold;
+    color: #00713a;
+    z-index: 1500;
+    background: rgba(255,255,255,0.9);
+    padding: 5px 15px;
+    border-radius: 20px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    text-transform: uppercase;
+}
+
+/* 8. VITRINE (LISTA SUPERIOR) */
+#container-vitrine-botoes {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    border: 1px solid #e0e0e0;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+    gap: 3px; 
+    margin-bottom: 15px;
 }
 
-.item-tecnico .label {
-    font-size: 0.6rem;
-    color: #999;
-    font-weight: bold;
-    text-transform: uppercase;
-    margin-bottom: 3px;
-}
-
-.item-tecnico .valor {
-    font-size: 0.8rem;
-    color: #333;
-    font-weight: 700;
-}
-
-/* --- BLOCO 6: BOTÕES DE AÇÃO E MENUS --- */
-.container-acoes {
-    margin-top: 10px;
-}
-
-.btn-acao {
-    padding: 8px 12px;
-    border-radius: 5px;
-    font-size: 0.75rem;
-    font-weight: bold;
-    text-decoration: none;
-    border: none;
-    cursor: pointer;
-}
-
-.btn-maps { background: #4285F4; color: white; }
-.btn-link { background: #00713a; color: white; }
-
-#btn-menu {
-    position: absolute;
-    bottom: 20px;
-    right: 20px;
-    width: 55px;
-    height: 55px;
-    background: #00713a;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-    z-index: 20;
-}
-
-/* --- BLOCO 7: MENU LATERAL E MINIMAPA --- */
-#menu-lateral {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 80%;
-    height: 100%;
-    background: white;
-    z-index: 100;
-    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    padding: 20px;
-    box-shadow: 5px 0 15px rgba(0,0,0,0.2);
-}
-
-.menu-oculto { transform: translateX(-105%); }
-.menu-aberto { transform: translateX(0); }
-
-#mapa-minimizado {
-    position: absolute;
-    top: 15px;
-    right: 15px;
-    width: 100px;
-    height: 100px;
-    background: #eee;
-    border: 2px solid #00713a;
-    border-radius: 8px;
-    overflow: hidden;
-}
-
-/* --- BLOCO 8: ITENS DE LISTA E CATEGORIAS --- */
-.menu-item-mrv {
-    padding: 12px;
-    border-right: 8px solid #00713a;
-    background: #f1f1f1;
-    margin-bottom: 8px;
-    font-size: 0.8rem;
-    font-weight: bold;
-    list-style: none;
-}
-
-.estilo-complexo {
-    border-radius: 4px;
-    text-align: center;
-    border-right: none !important;
+#container-vitrine-botoes .menu-item-mrv {
+    min-height: auto !important; 
+    padding: 6px 8px 6px 12px !important; 
+    margin: 0 !important; 
+    font-size: 0.72rem !important; 
+    border-radius: 2px 6px 6px 2px;
 }
