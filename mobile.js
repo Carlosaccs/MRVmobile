@@ -1,8 +1,7 @@
 /* ==========================================================================
-   v140.10 - DASHBOARD MOBILE: FOCO EM COMPLEXOS, COLUNA R E TRAVA DE CLIQUE
+   v140.13 - DASHBOARD MOBILE: TRAVA DE DESTAQUE PARA REGIÕES CINZAS
    ========================================================================== */
 
-// --- BLOCO 1: CONFIGURAÇÕES E CONSTANTS ---
 const svgNS = "http://www.w3.org/2000/svg";
 const URL_PLANILHA = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSRKdJctOPQjKAtOZSDHyArD_H8SgKIouelAS1vF1d_-13pu7u_ic6J8nP3r0Ijd56WA-mbUmHjb4Me/pub?output=csv';
 
@@ -18,7 +17,7 @@ const AJUSTES_MAPA = {
     INTERIOR: { marginRight: "50%", marginLeft: "-100px", scale: "1.15" }
 };
 
-// --- BLOCO 2: CARREGAMENTO DA PLANILHA (Inclusão da Coluna R) ---
+// --- BLOCO 2: CARREGAMENTO DA PLANILHA ---
 async function carregarPlanilha() {
     try {
         const res = await fetch(URL_PLANILHA);
@@ -38,7 +37,7 @@ async function carregarPlanilha() {
                     endereco: limpar(c[6]),
                     link: limpar(c[11]),
                     descricao: limpar(c[12]), 
-                    textoColunaR: limpar(c[17]), // Coluna R
+                    textoColunaR: limpar(c[17]),
                     regional: reg
                 });
             }
@@ -48,21 +47,24 @@ async function carregarPlanilha() {
     } catch (e) { console.error("Erro na planilha:", e); }
 }
 
-// --- BLOCO 3: LÓGICA DE DESENHO E CLIQUES ---
+// --- BLOCO 3: DESENHO E TRATAMENTO DE CLIQUES ---
 function desenharMapa(dados, targetId, ehMinimizado) {
     const container = document.getElementById(targetId);
     if (!container || !dados) return;
     container.innerHTML = "";
     const svg = document.createElementNS(svgNS, "svg");
     svg.setAttribute("viewBox", dados.viewBox);
+    
     if (!ehMinimizado) {
         const conf = AJUSTES_MAPA[mapaAtivo];
         svg.style.marginRight = conf.marginRight;
         svg.style.marginLeft = conf.marginLeft;
         svg.style.transform = `scale(${conf.scale})`;
     }
+
     const g = document.createElementNS(svgNS, "g");
     if(dados.transform) g.setAttribute("transform", dados.transform);
+
     dados.paths.forEach(pData => {
         const path = document.createElementNS(svgNS, "path");
         const idLimpo = pData.id.toLowerCase();
@@ -96,9 +98,19 @@ function desenharMapa(dados, targetId, ehMinimizado) {
             };
             path.onclick = () => { 
                 if (pData.id === "grandesaopaulo") { trocarMapas(); return; } 
-                // TRAVA: Só executa clique se for MRV
-                if (!ehMRV) return; 
-                clicarNoMapa(path, window.dadosGerais.find(d => d.id === idLimpo), pData); 
+
+                // --- LÓGICA DE CLIQUE DIFERENCIADA ---
+                if (ehMRV) {
+                    // Se for MRV, destaca e abre a ficha
+                    clicarNoMapa(path, window.dadosGerais.find(d => d.id === idLimpo), pData); 
+                } else {
+                    // Se for Cinza, apenas limpa seleções anteriores e fecha a ficha
+                    limparSelecaoMapa();
+                    document.getElementById('nome-imovel').innerText = "SELECIONE UM RESIDENCIAL";
+                    document.getElementById('detalhes-imovel').innerHTML = "";
+                    document.getElementById('container-vitrine-botoes').innerHTML = "";
+                    cidadeClicadaAtiva = null;
+                }
             };
         }
         g.appendChild(path);
@@ -107,15 +119,20 @@ function desenharMapa(dados, targetId, ehMinimizado) {
     container.appendChild(svg);
 }
 
-function clicarNoMapa(pathElement, info, pDataRaw = null) {
-    const idRegiao = pathElement.id.replace('mini-', '').toLowerCase();
+function limparSelecaoMapa() {
     document.querySelectorAll('#mapa-container path').forEach(p => { 
         p.setAttribute('data-selecionado', 'false'); 
         p.style.fill = p.getAttribute('data-cor-base'); 
     });
+}
+
+function clicarNoMapa(pathElement, info, pDataRaw = null) {
+    const idRegiao = pathElement.id.replace('mini-', '').toLowerCase();
+    
+    limparSelecaoMapa();
     
     pathElement.setAttribute('data-selecionado', 'true');
-    pathElement.style.fill = "#FF4500";
+    pathElement.style.fill = "#FF4500"; // Destaque laranja fixo apenas para MRV
     
     const nomeDaCidade = pDataRaw ? pDataRaw.name : pathElement.getAttribute('data-name');
     cidadeClicadaAtiva = { name: nomeDaCidade || "" }; 
@@ -152,22 +169,20 @@ function clicarNoMapa(pathElement, info, pDataRaw = null) {
     if (registroDestaque) exibirDadosResidencial(registroDestaque);
 }
 
-// --- BLOCO 4: FICHA TÉCNICA (LAYOUT ATUALIZADO COLUNA R) ---
+// --- BLOCO 4: FICHA TÉCNICA ---
 function exibirDadosResidencial(info) {
     const elNome = document.getElementById('nome-imovel');
     const elDetalhes = document.getElementById('detalhes-imovel');
-    
     if(elNome) elNome.innerText = info.nomeCurto.toUpperCase();
     
     const endereco = info.endereco || "Endereço não cadastrado";
-    const linkMaps = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(endereco)}`;
+    const linkMaps = `https://www.google.com/maps?q=${encodeURIComponent(endereco)}`;
     const linkBook = info.link || "#";
     const textoR = info.textoColunaR || "";
 
     if(elDetalhes) {
         elDetalhes.innerHTML = `
             <div class="divisor-verde"></div>
-            
             <div class="container-acoes">
                 <span class="endereco-texto">📍 ${endereco}</span>
                 <div style="display: flex; gap: 8px; margin-top: 5px;">
@@ -176,15 +191,12 @@ function exibirDadosResidencial(info) {
                 </div>
                 <div class="texto-coluna-r">${textoR}</div>
             </div>
-
-            <div id="texto-descricao">
-                ${info.descricao || ""}
-            </div>
+            <div id="texto-descricao">${info.descricao || ""}</div>
         `;
     }
 }
 
-// --- BLOCO 5: MENU LATERAL E NAVEGAÇÃO ---
+// --- BLOCO 5: NAVEGAÇÃO E SISTEMA ---
 function gerarMenuResidenciais() {
     const lista = document.getElementById('lista-residenciais');
     if (!lista) return;
@@ -232,7 +244,6 @@ function atualizarTextoTopo(nome) {
     indicador.innerText = (nome || (cidadeClicadaAtiva ? cidadeClicadaAtiva.name : "")).toUpperCase();
 }
 
-// --- BLOCO 6: UTILITÁRIOS ---
 function toggleMenu() {
     const menu = document.getElementById('menu-lateral');
     if(menu) {
@@ -264,7 +275,6 @@ function copyToClipboard(text) {
     navigator.clipboard.writeText(text).then(() => alert("Link do Book copiado!"));
 }
 
-// --- BLOCO 7: LISTENERS ---
 window.onload = carregarPlanilha;
 document.addEventListener('fullscreenchange', atualizarIconeFullscreen);
 document.addEventListener('click', (e) => {
