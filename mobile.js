@@ -136,55 +136,39 @@ function desenharMapa(dados, targetId, ehMinimizado) {
 function exibirDadosResidencial(info) {
     const elNome = document.getElementById('nome-imovel');
     const elDetalhes = document.getElementById('detalhes-imovel');
+    
+    // 1. Garante que o container está visível
+    const ficha = document.querySelector('.ficha-tecnica');
+    if(ficha) ficha.style.display = 'block';
+
     if(elNome) elNome.innerText = info.nomeCurto.toUpperCase();
     
-    const endereco = info.endereco || "Endereço não cadastrado";
-    const linkMaps = `http://googleusercontent.com/maps.google.com/maps?q=${encodeURIComponent(endereco)}`;
-    const linkBook = info.link || "#";
-
     if(elDetalhes) {
-        let htmlContent = `
-            <div class="container-acoes">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                    <span class="endereco-texto">📍 ${endereco}</span>
-                    <div style="display: flex; gap: 5px;">
-                        <a href="${linkMaps}" target="_blank" class="btn-acao btn-maps">MAPS</a>
-                        <button onclick="copyToClipboard('${linkBook}')" class="btn-acao btn-link">LINK</button>
-                    </div>
+        const endereco = info.endereco || "Não informado";
+        const linkMaps = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(endereco)}`;
+        const linkBook = info.link || "#";
+
+        elDetalhes.innerHTML = `
+            <div style="margin-bottom: 10px;">
+                <div style="font-size: 0.7rem; color: #ccc; margin-bottom: 5px;">📍 ${endereco}</div>
+                <div style="display: flex; gap: 4px;">
+                    <a href="${linkMaps}" target="_blank" class="btn-acao btn-maps" style="flex:1; font-size: 0.65rem;">MAPS</a>
+                    <a href="${linkBook}" target="_blank" class="btn-acao btn-link" style="flex:1; font-size: 0.65rem;">LINK</a>
                 </div>
             </div>
 
             <div class="grid-caixas-mobile">
-                <div class="caixa-dado">
-                    <span class="label">ENTREGA</span>
-                    <span class="valor">${info.entrega || "-"}</span>
-                </div>
-                <div class="caixa-dado">
-                    <span class="label">OBRA</span>
-                    <span class="valor">${info.obra || "0%"}</span>
-                </div>
-                <div class="caixa-dado">
-                    <span class="label">PLANTAS</span>
-                    <span class="valor">${info.plantasMin}m² - ${info.plantasMax}m²</span>
-                </div>
-                <div class="caixa-dado">
-                    <span class="label">ESTOQUE</span>
-                    <span class="valor">${info.estoque || "0"}</span>
-                </div>
-                <div class="caixa-dado">
-                    <span class="label">LIMITADOR</span>
-                    <span class="valor">${info.limitador || "SEM LIMITADOR"}</span>
-                </div>
-                <div class="caixa-dado">
-                    <span class="label">C. PAULISTA</span>
-                    <span class="valor">${info.cPaulista || "NÃO POSSUI"}</span>
-                </div>
+                <div class="caixa-dado"><span class="label">ENTREGA</span><span class="valor">${info.entrega || "-"}</span></div>
+                <div class="caixa-dado"><span class="label">OBRA</span><span class="valor">${info.obra || "0%"}</span></div>
+                <div class="caixa-dado"><span class="label">PLANTAS</span><span class="valor">${info.plantasMin}m²-${info.plantasMax}m²</span></div>
+                <div class="caixa-dado"><span class="label">ESTOQUE</span><span class="valor">${info.estoque || "0"}</span></div>
+                <div class="caixa-dado"><span class="label">LIMITADOR</span><span class="valor">${info.limitador || "-"}</span></div>
+                <div class="caixa-dado"><span class="label">C. PAULISTA</span><span class="valor">${info.cPaulista || "-"}</span></div>
             </div>
 
-            <div class="texto-coluna-r">${info.textoColunaR || ""}</div>
-            <div id="texto-descricao">${info.descricao || ""}</div>
+            <div class="texto-coluna-r" style="font-size: 0.75rem; color: #50c878; margin-top: 8px;">${info.textoColunaR || ""}</div>
+            <div id="texto-descricao" style="font-size: 0.7rem; color: #eee; margin-top: 5px; text-align: left;">${info.descricao || ""}</div>
         `;
-        elDetalhes.innerHTML = htmlContent;
     }
 }
 /* ==========================================================================
