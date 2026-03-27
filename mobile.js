@@ -202,17 +202,45 @@ function exibirDadosResidencial(info) {
 }
 
 // RESTANTE DO CÓDIGO (MENU, MAPAS, ETC) IGUAL À VERSÃO ANTERIOR...
-function gerarMenuResidenciais() { /* ... */ }
-function atualizarVisualizacao() { /* ... */ }
-function trocarMapas() { /* ... */ }
-function atualizarTextoTopo(nome) { /* ... */ }
-function toggleMenu() { /* ... */ }
-window.onload = carregarPlanilha;// BLOCO 8: CONTROLE GERAL
-function atualizarVisualizacao() {
-    if (typeof MAPA_GSP !== 'undefined' && typeof MAPA_INTERIOR !== 'undefined') {
-        desenharMapa(mapaAtivo === "GSP" ? MAPA_GSP : MAPA_INTERIOR, "mapa-container", false);
-        desenharMapa(mapaAtivo === "GSP" ? MAPA_INTERIOR : MAPA_GSP, "mapa-minimizado", true);
-    }
+function gerarMenuResidenciais() {
+    const containerMenu = document.getElementById('lista-residenciais-menu');
+    if (!containerMenu) return;
+
+    // Limpa o menu antes de gerar para evitar duplicidade ou lixo
+    containerMenu.innerHTML = "";
+
+    // Filtra apenas o que for da regional atual e que tenha ID (evita linhas vazias)
+    const filtrados = window.dadosGerais.filter(d => 
+        d.id && d.id !== "" && (d.regional === (mapaAtivo === "GSP" ? "GSP" : "INTERIOR"))
+    );
+
+    // Ordena conforme a coluna 'ordem' da planilha
+    filtrados.sort((a, b) => a.ordem - b.ordem);
+
+    filtrados.forEach(item => {
+        const btn = document.createElement('div');
+        btn.className = 'menu-item-mrv';
+        btn.style.marginBottom = "5px"; // Espaçamento entre botões
+        btn.innerText = item.nomeCurto.toUpperCase();
+
+        btn.onclick = (e) => {
+            e.stopPropagation();
+            forcarFullscreen();
+            
+            // Simula o clique no mapa para destacar a região e exibir os dados
+            const pathAlvo = document.getElementById(item.id);
+            if (pathAlvo) {
+                clicarNoMapa(pathAlvo, item);
+            } else {
+                // Se não achar o path no mapa, exibe direto os dados
+                exibirDadosResidencial(item);
+            }
+            
+            // Fecha o menu no mobile após clicar
+            toggleMenu();
+        };
+        containerMenu.appendChild(btn);
+    });
 }
 
 function trocarMapas() {
