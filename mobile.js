@@ -1,5 +1,5 @@
 /* ==========================================================================
-   v140.16 - DASHBOARD MOBILE: MENU PERSISTENTE E TRAVA DE DESTAQUE
+   v140.17 - DASHBOARD MOBILE: DESAFIO FULLSCREEN TOTAL + PERSISTÊNCIA
    ========================================================================== */
 
 const svgNS = "http://www.w3.org/2000/svg";
@@ -9,7 +9,7 @@ let mapaAtivo = "GSP";
 let cidadeClicadaAtiva = null; 
 window.dadosGerais = [];
 
-const DNA_AMPLIAR = "M 75.757133 114.16926 L 75.757133 124.7898 L 75.757133 135.41086 L 78.412268 135.41086 L 81.067403 135.41086 L 81.067403 127.44493 L 81.067403 119.47953 L 89.032808 119.47953 L 96.99873 119.47953 L 96.99873 116.82439 L 96.99873 114.16926 L 86.377673 114.16926 L 75.757133 114.16926 z M 115.58468 114.16926 L 115.58468 116.82439 L 115.58468 119.47953 L 123.36043 119.47953 L 131.13618 119.47953 L 131.13618 127.44493 L 131.13618 135.41086 L 133.79183 135.41086 L 136.44697 114.16926 L 126.01556 114.16926 L 115.58468 114.16926 z M 75.757133 153.9968 L 75.757133 164.61734 L 75.757133 175.2384 L 86.377673 175.2384 L 96.99873 175.2384 L 96.99873 172.39361 L 96.99873 169.54882 L 89.032808 169.54882 L 81.067403 169.54882 L 81.067403 161.77255 L 81.067403 153.9968 L 78.412268 153.9968 L 75.757133 153.9968 z M 131.13618 153.9968 L 131.13618 161.77255 L 131.13618 169.54882 L 123.36043 169.54882 L 115.58468 169.54882 L 115.58468 172.39361 L 115.58468 175.2384 L 126.01556 175.2384 L 136.44697 175.2384 L 136.44697 164.61734 L 136.44697 153.9968 L 133.79183 153.9968 L 131.13618 153.9968 z";
+const DNA_AMPLIAR = "M 75.757133 114.16926 L 75.757133 124.7898 L 75.757133 135.41086 L 78.412268 135.41086 L 81.067403 135.41086 L 81.067403 127.44493 L 81.067403 119.47953 L 89.032808 119.47953 L 96.99873 119.47953 L 96.99873 116.82439 L 96.99873 114.16926 L 86.377673 114.16926 L 75.757133 114.16926 z M 115.58468 114.16926 L 115.58468 116.82439 L 115.58468 119.47953 L 123.36043 119.47953 L 131.13618 119.47953 L 131.13618 127.44493 L 131.13618 135.41086 L 133.79183 135.41086 L 136.44697 114.16926 L 126.01556 114.16926 L 115.58468 114.16926 z M 75.757133 153.9968 L 75.757133 164.61734 L 75.757133 175.2384 L 86.377673 175.2384 L 96.99873 175.2384 L 96.99873 172.39361 L 96.99873 169.54882 L 89.032808 169.54882 L 81.067403 169.54882 L 81.067403 161.77255 L 81.067403 153.9968 L 78.412268 153.9968 L 75.757133 153.9968 z M 131.13618 153.9968 L 131.13618 161.77255 L 131.13618 169.54882 L 123.36043 169.54882 L 115.58054 169.54882 L 115.58468 172.39361 L 115.58468 175.2384 L 126.01556 175.2384 L 136.44697 175.2384 L 136.44697 164.61734 L 136.44697 153.9968 L 133.79183 153.9968 L 131.13618 153.9968 z";
 const DNA_REDUZIR = "M 78.408134 124.88437 L 78.408134 132.66012 L 78.408134 140.43587 L 70.442729 140.43587 L 62.476807 140.43587 L 62.476807 143.28066 L 62.476807 146.12596 L 73.097864 146.12596 L 83.718404 146.12596 L 83.718404 135.50491 L 83.718404 124.88437 L 81.063269 124.88437 L 78.408134 124.88437 z M 102.30435 124.88437 L 102.30435 135.50491 L 102.30435 146.12596 L 112.92541 146.12596 L 123.54595 146.12596 L 123.54595 143.28066 L 123.54595 140.43587 L 115.58054 140.43587 L 107.61514 140.43587 L 107.61514 132.66012 L 107.61514 124.88437 L 104.96 124.88437 L 102.30435 124.88437 z M 62.476807 164.3326 L 62.476807 167.17739 L 62.476807 170.02218 L 70.442729 170.02218 L 78.408134 170.02218 L 78.408134 177.79793 L 78.408134 185.5742 L 81.063269 185.5742 L 83.718404 185.5742 L 83.718404 174.95315 L 83.718404 164.3326 L 73.097864 164.3326 L 62.476807 164.3326 z M 102.30435 164.3326 L 102.30435 174.95315 L 102.30435 185.5742 L 104.96 185.5742 L 107.61514 185.5742 L 107.61514 177.79793 L 107.61514 170.02218 L 115.58054 170.02218 L 123.54595 170.02218 L 123.54595 167.17739 L 123.54595 164.3326 L 112.92541 164.3326 L 102.30435 164.3326 z";
 
 const AJUSTES_MAPA = {
@@ -17,7 +17,15 @@ const AJUSTES_MAPA = {
     INTERIOR: { marginRight: "50%", marginLeft: "-100px", scale: "1.15" }
 };
 
-// --- BLOCO 2: CARREGAMENTO ---
+// --- FUNÇÃO AUXILIAR DO DESAFIO ---
+function forcarFullscreen() {
+    if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(e => {
+            console.log("Auto-Fullscreen bloqueado pelo navegador ou falhou.");
+        });
+    }
+}
+
 async function carregarPlanilha() {
     try {
         const res = await fetch(URL_PLANILHA);
@@ -47,7 +55,6 @@ async function carregarPlanilha() {
     } catch (e) { console.error("Erro na planilha:", e); }
 }
 
-// --- BLOCO 3: MAPA E CLIQUES ---
 function desenharMapa(dados, targetId, ehMinimizado) {
     const container = document.getElementById(targetId);
     if (!container || !dados) return;
@@ -98,6 +105,7 @@ function desenharMapa(dados, targetId, ehMinimizado) {
             };
             path.onclick = (e) => { 
                 e.stopPropagation();
+                forcarFullscreen(); // DESAFIO: Qualquer path amplia a tela
                 if (pData.id === "grandesaopaulo") { trocarMapas(); return; } 
 
                 if (ehMRV) {
@@ -152,7 +160,11 @@ function clicarNoMapa(pathElement, info, pDataRaw = null) {
                     btn.style.color = "#ffffff";
                     btn.classList.add('estilo-complexo');
                 }
-                btn.onclick = () => clicarNoMapa(pathElement, item, pDataRaw);
+                btn.onclick = (e) => {
+                    e.stopPropagation();
+                    forcarFullscreen(); // DESAFIO: Botões de região ampliam a tela
+                    clicarNoMapa(pathElement, item, pDataRaw);
+                };
                 containerBotoes.appendChild(btn);
             }
         });
@@ -160,7 +172,6 @@ function clicarNoMapa(pathElement, info, pDataRaw = null) {
     if (registroDestaque) exibirDadosResidencial(registroDestaque);
 }
 
-// --- BLOCO 4: FICHA TÉCNICA ---
 function exibirDadosResidencial(info) {
     const elNome = document.getElementById('nome-imovel');
     const elDetalhes = document.getElementById('detalhes-imovel');
@@ -187,13 +198,11 @@ function exibirDadosResidencial(info) {
     }
 }
 
-// --- BLOCO 5: MENU LATERAL ---
 function gerarMenuResidenciais() {
     const lista = document.getElementById('lista-residenciais');
     if (!lista) return;
     lista.innerHTML = ""; 
     
-    // Removido o título manual que o código anterior inseria
     [...window.dadosGerais].sort((a, b) => a.ordem - b.ordem).forEach(info => {
         const li = document.createElement('li');
         li.className = 'menu-item-mrv'; 
@@ -207,7 +216,9 @@ function gerarMenuResidenciais() {
         if (info.categoria === "COMPLEXO") { 
             li.style.backgroundColor = corBorda; li.style.color = "#ffffff"; li.classList.add('estilo-complexo');
         }
-        li.onclick = () => {
+        li.onclick = (e) => {
+            e.stopPropagation();
+            forcarFullscreen(); // DESAFIO: Itens do menu lateral ampliam a tela
             let p = document.getElementById(info.id);
             if (!p) { 
                 trocarMapas(); 
@@ -217,7 +228,6 @@ function gerarMenuResidenciais() {
                 }, 200); 
             }
             else clicarNoMapa(p, info);
-            // REMOVIDO o toggleMenu() daqui para o menu não fechar ao clicar
         };
         lista.appendChild(li);
     });
@@ -231,6 +241,7 @@ function atualizarVisualizacao() {
 }
 
 function trocarMapas() {
+    forcarFullscreen(); // DESAFIO: Troca de mapas amplia a tela
     mapaAtivo = (mapaAtivo === "GSP") ? "INTERIOR" : "GSP";
     cidadeClicadaAtiva = null; 
     atualizarTextoTopo(null);
@@ -244,6 +255,7 @@ function atualizarTextoTopo(nome) {
 }
 
 function toggleMenu() {
+    forcarFullscreen(); // DESAFIO: Abrir o menu amplia a tela
     const menu = document.getElementById('menu-lateral');
     if(menu) {
         menu.classList.toggle('menu-aberto');
