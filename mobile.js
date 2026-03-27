@@ -1,5 +1,5 @@
 /* ==========================================================================
-   v140.13 - DASHBOARD MOBILE: TRAVA DE DESTAQUE PARA REGIÕES CINZAS
+   v140.14 - DASHBOARD MOBILE: SELEÇÃO VERDE PERSISTENTE (CINZA NÃO DESFAZ)
    ========================================================================== */
 
 const svgNS = "http://www.w3.org/2000/svg";
@@ -99,17 +99,15 @@ function desenharMapa(dados, targetId, ehMinimizado) {
             path.onclick = () => { 
                 if (pData.id === "grandesaopaulo") { trocarMapas(); return; } 
 
-                // --- LÓGICA DE CLIQUE DIFERENCIADA ---
                 if (ehMRV) {
-                    // Se for MRV, destaca e abre a ficha
+                    // Clique no Verde: Executa a troca de destaque completa
                     clicarNoMapa(path, window.dadosGerais.find(d => d.id === idLimpo), pData); 
                 } else {
-                    // Se for Cinza, apenas limpa seleções anteriores e fecha a ficha
-                    limparSelecaoMapa();
-                    document.getElementById('nome-imovel').innerText = "SELECIONE UM RESIDENCIAL";
-                    document.getElementById('detalhes-imovel').innerHTML = "";
-                    document.getElementById('container-vitrine-botoes').innerHTML = "";
-                    cidadeClicadaAtiva = null;
+                    // Clique no Cinza: APENAS atualiza o nome no topo. 
+                    // NÃO limpa a seleção verde anterior nem a ficha.
+                    const nomeDaCidade = pData.name || path.getAttribute('data-name');
+                    cidadeClicadaAtiva = { name: nomeDaCidade || "" }; 
+                    atualizarTextoTopo(cidadeClicadaAtiva.name);
                 }
             };
         }
@@ -119,20 +117,18 @@ function desenharMapa(dados, targetId, ehMinimizado) {
     container.appendChild(svg);
 }
 
-function limparSelecaoMapa() {
+function clicarNoMapa(pathElement, info, pDataRaw = null) {
+    const idRegiao = pathElement.id.replace('mini-', '').toLowerCase();
+    
+    // Resetar todos os paths para a cor base (Limpa destaque anterior)
     document.querySelectorAll('#mapa-container path').forEach(p => { 
         p.setAttribute('data-selecionado', 'false'); 
         p.style.fill = p.getAttribute('data-cor-base'); 
     });
-}
-
-function clicarNoMapa(pathElement, info, pDataRaw = null) {
-    const idRegiao = pathElement.id.replace('mini-', '').toLowerCase();
     
-    limparSelecaoMapa();
-    
+    // Aplicar Destaque Laranja apenas neste path verde
     pathElement.setAttribute('data-selecionado', 'true');
-    pathElement.style.fill = "#FF4500"; // Destaque laranja fixo apenas para MRV
+    pathElement.style.fill = "#FF4500"; 
     
     const nomeDaCidade = pDataRaw ? pDataRaw.name : pathElement.getAttribute('data-name');
     cidadeClicadaAtiva = { name: nomeDaCidade || "" }; 
@@ -176,7 +172,7 @@ function exibirDadosResidencial(info) {
     if(elNome) elNome.innerText = info.nomeCurto.toUpperCase();
     
     const endereco = info.endereco || "Endereço não cadastrado";
-    const linkMaps = `https://www.google.com/maps?q=${encodeURIComponent(endereco)}`;
+    const linkMaps = `http://googleusercontent.com/maps.google.com/maps?q=${encodeURIComponent(endereco)}`;
     const linkBook = info.link || "#";
     const textoR = info.textoColunaR || "";
 
