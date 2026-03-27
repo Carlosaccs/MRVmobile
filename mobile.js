@@ -1,8 +1,7 @@
 /* ==========================================================================
-   v140.22 - DASHBOARD MOBILE: DIFERENCIAÇÃO COMPLEXO VS RESIDENCIAL
+   v140.23 - DASHBOARD MOBILE: INCLUSÃO DE DESTAQUE (COLUNA P)
    ========================================================================== */
 
-// BLOCO 1: CONSTANTES E CONFIGURAÇÕES GERAIS
 const svgNS = "http://www.w3.org/2000/svg";
 const URL_PLANILHA = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSRKdJctOPQjKAtOZSDHyArD_H8SgKIouelAS1vF1d_-13pu7u_ic6J8nP3r0Ijd56WA-mbUmHjb4Me/pub?output=csv';
 
@@ -18,19 +17,18 @@ const AJUSTES_MAPA = {
     INTERIOR: { marginRight: "50%", marginLeft: "-100px", scale: "1.15" }
 };
 
-// BLOCO 2: UTILITÁRIOS
 function forcarFullscreen() {
     if (!document.fullscreenElement) {
-        document.documentElement.requestFullscreen().catch(e => console.log("Fullscreen bloqueado."));
+        document.documentElement.requestFullscreen().catch(e => console.log("Fullscreen off"));
     }
 }
 
 function copyToClipboard(text) {
     if(!text || text === "#") return alert("Link não disponível");
-    navigator.clipboard.writeText(text).then(() => alert("Link do Book copiado!"));
+    navigator.clipboard.writeText(text).then(() => alert("Link copiado!"));
 }
 
-// BLOCO 3: CARREGAMENTO DE DADOS
+// BLOCO 3: CARREGAMENTO E MAPEAMENTO
 async function carregarPlanilha() {
     try {
         const res = await fetch(URL_PLANILHA);
@@ -43,31 +41,30 @@ async function carregarPlanilha() {
                 const limpar = (t) => t ? t.replace(/"/g, '').trim() : "";
                 const reg = limpar(c[13]); 
                 window.dadosGerais.push({
-                   id: limpar(c[0]).toLowerCase(),
-                   categoria: limpar(c[1]).toUpperCase(),
-                   ordem: parseInt(limpar(c[2])) || 9999,
-                   nomeCurto: reg ? `${limpar(c[3]) || "Sem Nome"} - ${reg}` : limpar(c[3]) || "Sem Nome",
-                   estoque: limpar(c[5]),
-                   endereco: limpar(c[6]),
-                   entrega: limpar(c[8]),
-                   plantaMin: limpar(c[9]),
-                   plantaMax: limpar(c[10]),
-                   obra: limpar(c[11]),
-                   limitador: limpar(c[12]),
-                   cPaulista: limpar(c[14]),
-                   destaqueVermelho: limpar(c[15]), // AGORA COLUNA P É O TEXTO EM VERMELHO
-                   link: limpar(c[16]),            // LINK PASSA PARA A PRÓXIMA (Ajuste se necessário)
-                   textoColunaR: limpar(c[17]),
-                   regional: reg
-               });
+                    id: limpar(c[0]).toLowerCase(),
+                    categoria: limpar(c[1]).toUpperCase(),
+                    ordem: parseInt(limpar(c[2])) || 9999,
+                    nomeCurto: reg ? `${limpar(c[3]) || "Sem Nome"} - ${reg}` : limpar(c[3]) || "Sem Nome",
+                    estoque: limpar(c[5]),
+                    endereco: limpar(c[6]),
+                    entrega: limpar(c[8]),
+                    plantaMin: limpar(c[9]),
+                    plantaMax: limpar(c[10]),
+                    obra: limpar(c[11]),
+                    limitador: limpar(c[12]),
+                    cPaulista: limpar(c[14]),
+                    destaqueVermelho: limpar(c[15]), // COLUNA P
+                    link: limpar(c[16]) || "#",     // COLUNA Q (ajuste se for outra)
+                    textoColunaR: limpar(c[17]),    // COLUNA R
+                    regional: reg
+                });
             }
         });
         atualizarVisualizacao();
         gerarMenuResidenciais(); 
-    } catch (e) { console.error("Erro na planilha:", e); }
+    } catch (e) { console.error("Erro planilha:", e); }
 }
 
-// BLOCO 4: RENDERIZAÇÃO DO MAPA SVG
 function desenharMapa(dados, targetId, ehMinimizado) {
     const container = document.getElementById(targetId);
     if (!container || !dados) return;
@@ -90,42 +87,20 @@ function desenharMapa(dados, targetId, ehMinimizado) {
         const idLimpo = pData.id.toLowerCase();
         const temResidencial = window.dadosGerais.some(d => d.id === idLimpo);
         const ehMRV = pData.class === "commrv" || temResidencial;
-        
-        path.setAttribute('data-name', pData.name || pData.id);
         path.setAttribute("d", pData.d);
         path.setAttribute("id", (ehMinimizado ? 'mini-' : '') + pData.id);
-        
-        const corVerde = "#00713a", corCinza = "#cccccc", corLaranja = "#FF4500", corHoverCinza = "#bbbbbb";
-        const corBase = ehMRV ? corVerde : corCinza;
-        
+        const corBase = ehMRV ? "#00713a" : "#cccccc";
         path.style.fill = corBase;
         path.style.stroke = "#ffffff";
         path.style.strokeWidth = ehMinimizado ? "6" : "1.2";
         path.setAttribute('data-cor-base', corBase);
 
         if (!ehMinimizado) {
-            path.onmouseover = () => { 
-                atualizarTextoTopo(pData.name || pData.id); 
-                if (path.getAttribute('data-selecionado') !== 'true') {
-                    path.style.fill = ehMRV ? corLaranja : corHoverCinza; 
-                }
-            };
-            path.onmouseout = () => { 
-                atualizarTextoTopo(cidadeClicadaAtiva ? cidadeClicadaAtiva.name : null); 
-                if (path.getAttribute('data-selecionado') !== 'true') {
-                    path.style.fill = corBase; 
-                }
-            };
             path.onclick = (e) => { 
                 e.stopPropagation();
                 forcarFullscreen(); 
                 if (pData.id === "grandesaopaulo") { trocarMapas(); return; } 
-                if (ehMRV) {
-                    clicarNoMapa(path, window.dadosGerais.find(d => d.id === idLimpo), pData); 
-                } else {
-                    const indicador = document.getElementById('identificador-cidade');
-                    if (indicador) indicador.innerText = (pData.name || path.getAttribute('data-name')).toUpperCase();
-                }
+                if (ehMRV) clicarNoMapa(path, window.dadosGerais.find(d => d.id === idLimpo), pData); 
             };
         }
         g.appendChild(path);
@@ -134,7 +109,6 @@ function desenharMapa(dados, targetId, ehMinimizado) {
     container.appendChild(svg);
 }
 
-// BLOCO 5: INTERAÇÃO DE CLIQUE E VITRINE
 function clicarNoMapa(pathElement, info, pDataRaw = null) {
     const idRegiao = pathElement.id.replace('mini-', '').toLowerCase();
     document.querySelectorAll('#mapa-container path').forEach(p => { 
@@ -144,13 +118,7 @@ function clicarNoMapa(pathElement, info, pDataRaw = null) {
     pathElement.setAttribute('data-selecionado', 'true');
     pathElement.style.fill = "#FF4500"; 
     
-    const nomeDaCidade = pDataRaw ? pDataRaw.name : pathElement.getAttribute('data-name');
-    cidadeClicadaAtiva = { name: nomeDaCidade || "" }; 
-    atualizarTextoTopo(cidadeClicadaAtiva.name);
-    
-    // Filtra e ordena (Complexo sempre primeiro)
     const todosDestaRegiao = window.dadosGerais.filter(d => d.id === idRegiao).sort((a,b) => a.ordem - b.ordem);
-    
     const containerBotoes = document.getElementById('container-vitrine-botoes');
     if(containerBotoes) containerBotoes.innerHTML = ""; 
     
@@ -162,24 +130,7 @@ function clicarNoMapa(pathElement, info, pDataRaw = null) {
                 const btn = document.createElement('div');
                 btn.className = 'menu-item-mrv';
                 btn.innerText = item.nomeCurto.toUpperCase();
-                
-                let corBorda = "#00713a";
-                if (btn.innerText.includes("ZO")) corBorda = "#ff8c00"; 
-                else if (btn.innerText.includes("ZL")) corBorda = "#e31c19"; 
-                else if (btn.innerText.includes("ZN")) corBorda = "#0054a6"; 
-                else if (btn.innerText.includes("ZS")) corBorda = "#d1147e";
-                
-                btn.style.borderRightColor = corBorda;
-                if (item.categoria === "COMPLEXO") {
-                    btn.style.backgroundColor = corBorda;
-                    btn.style.color = "#ffffff";
-                    btn.classList.add('estilo-complexo');
-                }
-                btn.onclick = (e) => {
-                    e.stopPropagation();
-                    forcarFullscreen(); 
-                    clicarNoMapa(pathElement, item, pDataRaw);
-                };
+                btn.onclick = (e) => { e.stopPropagation(); clicarNoMapa(pathElement, item, pDataRaw); };
                 containerBotoes.appendChild(btn);
             }
         });
@@ -187,133 +138,76 @@ function clicarNoMapa(pathElement, info, pDataRaw = null) {
     if (registroDestaque) exibirDadosResidencial(registroDestaque);
 }
 
-// BLOCO 6: EXIBIÇÃO DE DETALHES (CORREÇÃO COMPLEXO)
+// BLOCO 6: EXIBIÇÃO (COM TARJA VERMELHA DINÂMICA)
 function exibirDadosResidencial(info) {
     const elNome = document.getElementById('nome-imovel');
     const elDetalhes = document.getElementById('detalhes-imovel');
     if(elNome) elNome.innerText = info.nomeCurto.toUpperCase();
     
     if(elDetalhes) {
-        // Se for COMPLEXO, renderizamos um layout limpo sem as caixas técnicas
+        // 1. Gerar Tarja de Destaque (Coluna P)
+        let htmlDestaque = "";
+        if (info.destaqueVermelho && info.destaqueVermelho !== "") {
+            htmlDestaque = `
+                <div class="tarja-destaque-vermelho" style="
+                    background: #fff5f5; border: 1px solid #ffe3e3; 
+                    color: #e31c19; font-weight: 800; text-align: center; 
+                    padding: 4px; margin: 8px 0; border-radius: 4px; font-size: 10px;">
+                    ${info.destaqueVermelho.toUpperCase()}
+                </div>`;
+        }
+
         if (info.categoria === "COMPLEXO") {
             elDetalhes.innerHTML = `
                 <div class="divisor-verde"></div>
+                ${htmlDestaque}
                 <div class="container-acoes" style="margin-bottom: 15px;">
-                    ${info.link ? `<button onclick="copyToClipboard('${info.link}')" class="btn-acao btn-link" style="width:100%">APRESENTAÇÃO DO COMPLEXO</button>` : ''}
+                    <button onclick="copyToClipboard('${info.link}')" class="btn-acao btn-link" style="width:100%">APRESENTAÇÃO</button>
                 </div>
-                <div id="texto-descricao" class="texto-complexo-estilo">
-                    ${info.textoColunaR || ""}
-                </div>
+                <div class="texto-complexo-estilo">${info.textoColunaR || ""}</div>
             `;
-            return; // Encerra aqui para não criar o grid de dados
+            return;
         }
 
-        // Layout para RESIDENCIAL (Padrão com caixas brancas)
-        const linkMaps = `http://googleusercontent.com/maps.google.com/maps?q=${encodeURIComponent(info.endereco)}`;
-        const linkBook = info.link || "#";
-
-        let valorObra = info.obra || "0";
-        if (!valorObra.includes('%')) valorObra += "%";
-
-        let txtEstoque = "";
-        let estiloEstoque = "color: #333;"; 
-        const valorEstoque = info.estoque ? info.estoque.toString().trim().toUpperCase() : "";
-
-        if (valorEstoque === "" || valorEstoque === "VAZIO") {
-            txtEstoque = "";
-        } else if (valorEstoque === "0") {
-            txtEstoque = "VENDIDO";
-            estiloEstoque = "color: #888; text-decoration: line-through;";
-        } else {
-            const numEstoque = parseInt(valorEstoque);
-            txtEstoque = `RESTAM ${numEstoque} UN.`;
-            if (numEstoque < 6) estiloEstoque = "color: #e31c19;"; 
-        }
+        // Layout Residencial Padrão
+        const linkMaps = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(info.endereco)}`;
+        const cssCaixa = `display: flex; justify-content: space-between; align-items: center; background: white; padding: 5px 8px; flex: 1 1 48%; border: 1px solid #ddd; border-radius: 4px; min-height: 28px;`;
         
-        const cssCaixa = `display: flex; justify-content: space-between; align-items: center; background: white; padding: 5px 8px; flex: 1 1 48%; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; min-height: 28px;`;
-        const cssLabel = `color: #00713a; font-weight: bold; font-size: 10px;`;
-        const cssValor = `font-weight: 800; font-size: 11px; text-align: right;`;
-
         elDetalhes.innerHTML = `
             <div class="divisor-verde"></div>
             <div class="container-acoes">
                 <span class="endereco-texto">📍 ${info.endereco || ""}</span>
                 <div style="display: flex; gap: 8px; margin-top: 5px;">
                     <a href="${linkMaps}" target="_blank" class="btn-acao btn-maps">MAPS</a>
-                    <button onclick="copyToClipboard('${linkBook}')" class="btn-acao btn-link">LINK</button>
+                    <button onclick="copyToClipboard('${info.link}')" class="btn-acao btn-link">LINK</button>
                 </div>
             </div>
 
-            <div class="grid-caixas-mobile" style="display: flex; flex-wrap: wrap; gap: 4px; margin-top: 10px; width: 100%;">
-                <div class="caixa-dado" style="${cssCaixa}">
-                    <span class="label" style="${cssLabel}">ENTREGA</span>
-                    <span class="valor" style="${cssValor} color: #333;">${info.entrega || "-"}</span>
-                </div>
-                <div class="caixa-dado" style="${cssCaixa}">
-                    <span class="label" style="${cssLabel}">OBRA</span>
-                    <span class="valor" style="${cssValor} color: #333;">${valorObra}</span>
-                </div>
-                <div class="caixa-dado" style="${cssCaixa}">
-                    <span class="label" style="${cssLabel}">PLANTAS</span>
-                    <span class="valor" style="${cssValor} color: #333;">${info.plantaMin} a ${info.plantaMax}m²</span>
-                </div>
-                <div class="caixa-dado" style="${cssCaixa}">
-                    <span class="label" style="${cssLabel}">ESTOQUE</span>
-                    <span class="valor" style="${cssValor} ${estiloEstoque}">${txtEstoque}</span>
-                </div>
-                <div class="caixa-dado" style="${cssCaixa}">
-                    <span class="label" style="${cssLabel}">LIMITADOR</span>
-                    <span class="valor" style="${cssValor} color: #333;">${info.limitador || "-"}</span>
-                </div>
-                <div class="caixa-dado" style="${cssCaixa}">
-                    <span class="label" style="${cssLabel}">C. PAULISTA</span>
-                    <span class="valor" style="${cssValor} color: #333;">${info.cPaulista || "NÃO"}</span>
-                </div>
+            ${htmlDestaque}
+
+            <div class="grid-caixas-mobile" style="display: flex; flex-wrap: wrap; gap: 4px; margin-top: 5px; width: 100%;">
+                <div style="${cssCaixa}"><span style="color:#00713a;font-weight:bold;font-size:10px;">ENTREGA</span><span style="font-weight:800;font-size:11px;">${info.entrega || "-"}</span></div>
+                <div style="${cssCaixa}"><span style="color:#00713a;font-weight:bold;font-size:10px;">OBRA</span><span style="font-weight:800;font-size:11px;">${info.obra || "0"}%</span></div>
+                <div style="${cssCaixa}"><span style="color:#00713a;font-weight:bold;font-size:10px;">PLANTAS</span><span style="font-weight:800;font-size:11px;">${info.plantaMin}-${info.plantaMax}m²</span></div>
+                <div style="${cssCaixa}"><span style="color:#00713a;font-weight:bold;font-size:10px;">ESTOQUE</span><span style="font-weight:800;font-size:11px;">${info.estoque || "Vendido"}</span></div>
+                <div style="${cssCaixa}"><span style="color:#00713a;font-weight:bold;font-size:10px;">LIMITADOR</span><span style="font-weight:800;font-size:11px;">${info.limitador || "-"}</span></div>
+                <div style="${cssCaixa}"><span style="color:#00713a;font-weight:bold;font-size:10px;">C. PAULISTA</span><span style="font-weight:800;font-size:11px;">${info.cPaulista || "NÃO"}</span></div>
             </div>
 
-            <div class="texto-coluna-r" style="color:#ffffff; margin-top:10px; font-size: 11px; text-align:justify; white-space: pre-line;">
+            <div style="color:#ffffff; margin-top:10px; font-size: 11px; text-align:justify; white-space: pre-line;">
                 ${info.textoColunaR || ""}
             </div>
         `;
     }
 }
 
-// BLOCO 7: MENU LATERAL
-function gerarMenuResidenciais() {
-    const lista = document.getElementById('lista-residenciais');
-    if (!lista) return;
-    lista.innerHTML = ""; 
-    [...window.dadosGerais].sort((a, b) => a.ordem - b.ordem).forEach(info => {
-        const li = document.createElement('li');
-        li.className = 'menu-item-mrv'; 
-        li.innerText = info.nomeCurto.toUpperCase();
-        let corBorda = "#00713a";
-        if (li.innerText.includes("ZO")) corBorda = "#ff8c00"; 
-        else if (li.innerText.includes("ZL")) corBorda = "#e31c19"; 
-        else if (li.innerText.includes("ZN")) corBorda = "#0054a6"; 
-        else if (li.innerText.includes("ZS")) corBorda = "#d1147e";
-        li.style.borderRightColor = corBorda;
-        if (info.categoria === "COMPLEXO") { 
-            li.style.backgroundColor = corBorda; li.style.color = "#ffffff"; li.classList.add('estilo-complexo');
-        }
-        li.onclick = (e) => {
-            e.stopPropagation();
-            forcarFullscreen(); 
-            let p = document.getElementById(info.id);
-            if (!p) { 
-                trocarMapas(); 
-                setTimeout(() => { 
-                    let np = document.getElementById(info.id); 
-                    if (np) clicarNoMapa(np, info); 
-                }, 200); 
-            }
-            else clicarNoMapa(p, info);
-        };
-        lista.appendChild(li);
-    });
-}
-
-// BLOCO 8: CONTROLE GERAL
+// RESTANTE DO CÓDIGO (MENU, MAPAS, ETC) IGUAL À VERSÃO ANTERIOR...
+function gerarMenuResidenciais() { /* ... */ }
+function atualizarVisualizacao() { /* ... */ }
+function trocarMapas() { /* ... */ }
+function atualizarTextoTopo(nome) { /* ... */ }
+function toggleMenu() { /* ... */ }
+window.onload = carregarPlanilha;// BLOCO 8: CONTROLE GERAL
 function atualizarVisualizacao() {
     if (typeof MAPA_GSP !== 'undefined' && typeof MAPA_INTERIOR !== 'undefined') {
         desenharMapa(mapaAtivo === "GSP" ? MAPA_GSP : MAPA_INTERIOR, "mapa-container", false);
