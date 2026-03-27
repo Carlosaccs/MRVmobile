@@ -1,6 +1,6 @@
 /* ==========================================================================
-   v140.10 - CSS CONSOLIDADO (DASHBOARD MRV MOBILE)
-   Foco: Padronização de Fontes, Botões Desktop e Coluna R
+   v140.11 - CSS CONSOLIDADO (DASHBOARD MRV MOBILE)
+   Foco: Diferenciação COMPLEXO vs RESIDENCIAL e Zoneamento
    ========================================================================== */
 
 /* 1. FUNDAÇÃO E RESET */
@@ -165,6 +165,14 @@ html, body {
     text-transform: uppercase;
 }
 
+/* Ajuste para o texto do COMPLEXO (Tabulado e Branco) */
+.texto-complexo-estilo {
+    color: #ffffff !important;
+    text-align: justify;
+    white-space: pre-line; /* Mantém as quebras de linha e tabulação da planilha */
+    margin-top: 15px;
+}
+
 .container-acoes {
     display: flex;
     flex-direction: column;
@@ -234,3 +242,11 @@ html, body {
     font-size: 0.72rem !important; 
     border-radius: 2px 6px 6px 2px;
 }
+
+/* 9. CORES POR ZONEAMENTO (PARA BOTÃO COMPLEXO NA VITRINE) */
+/* Essas classes devem ser aplicadas via JS baseadas na Coluna de Zoneamento */
+.zona-sul { background-color: #0056b3 !important; color: white !important; border-right-color: #003d7a !important; }
+.zona-leste { background-color: #d9534f !important; color: white !important; border-right-color: #b52b27 !important; }
+.zona-norte { background-color: #f0ad4e !important; color: white !important; border-right-color: #d58512 !important; }
+.zona-oeste { background-color: #5bc0de !important; color: white !important; border-right-color: #2aabd2 !important; }
+.zona-centro { background-color: #555555 !important; color: white !important; border-right-color: #333333 !important; }
