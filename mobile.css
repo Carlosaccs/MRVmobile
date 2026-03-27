@@ -1,11 +1,14 @@
 /* ==========================================================================
    v140.18 - CSS CONSOLIDADO (DASHBOARD MRV MOBILE)
-   Foco: Organização Estrutural e Implementação da Grade Técnica
+   Foco: Unificação e Estabilidade de Layout
    ========================================================================== */
 
 /* --- BLOCO 1: FUNDAÇÃO E VARIÁVEIS --- */
-html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #fff; }
-* { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+html, body { 
+    margin: 0; padding: 0; 
+    width: 100%; height: 100%; 
+    overflow: hidden; background: #fff; 
+}
 
 * { 
     box-sizing: border-box; 
@@ -24,10 +27,13 @@ html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden;
     position: relative; overflow: hidden;
 }
 
-/* --- BLOCO 2: ELEMENTOS FIXOS (FAIXA E TOPO) --- */
+/* --- BLOCO 2: ELEMENTOS FIXOS --- */
 .faixa-verde-vertical {
-    position: absolute; left: 0; top: 0; width: 60px; height: 100%;
-    background-color: #00713a; z-index: 4000; display: flex; flex-direction: column; align-items: center;
+    position: absolute; left: 0; top: 0; 
+    width: 60px; height: 100%;
+    background-color: var(--verde-mrv); 
+    z-index: 4000; display: flex; 
+    flex-direction: column; align-items: center;
 }
 
 .titulo-vertical {
@@ -50,27 +56,35 @@ html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden;
     text-transform: uppercase;
 }
 
-/* --- BLOCO 3: MAPAS E INTERAÇÃO --- */
+/* --- BLOCO 3: MAPA (AJUSTADO) --- */
 #mapa-container {
-    position: absolute; left: 0; top: 0;
-    width: 100%; height: 100%;
-    z-index: 10; display: flex;
-    align-items: center; justify-content: center;
-    padding-left: 60px;
+    position: absolute; 
+    left: 60px; /* Começa após a faixa verde */
+    top: 0;
+    width: calc(100% - 60px); /* Ocupa o resto da tela */
+    height: 100%;
+    z-index: 10; 
+    display: flex; align-items: center; justify-content: center;
+    transition: width 0.3s ease; /* Suaviza se a ficha abrir/fechar */
+}
+
+/* Quando a ficha técnica está aberta, o mapa diminui para não ficar por baixo */
+.ficha-tecnica-ativa #mapa-container {
+    width: calc(100% - 44% - 60px);
 }
 
 #mapa-minimizado {
     position: absolute; bottom: 25px;
-    right: calc(44% + 15px); 
+    right: 15px; /* Ajustado para não flutuar dependendo da ficha */
     width: 85px; height: 65px;
     background: white; border: 2px solid var(--verde-mrv);
     border-radius: 10px; z-index: 2000;
     box-shadow: -5px 5px 15px rgba(0,0,0,0.3);
 }
 
-/* --- BLOCO 4: MENU LATERAL E BOTÕES --- */
+/* --- BLOCO 4: MENU LATERAL --- */
 #menu-lateral {
-    position: fixed; left: 55px; top: 0;
+    position: fixed; left: 60px; top: 0;
     width: calc(100% - 80px); max-width: 330px; height: 100%;
     background: transparent; backdrop-filter: blur(15px);
     -webkit-backdrop-filter: blur(15px); z-index: 3000; 
@@ -81,67 +95,39 @@ html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden;
 #menu-lateral.menu-aberto { transform: translateX(0); pointer-events: auto; }
 #menu-lateral.menu-oculto { transform: translateX(-120%); }
 
-.menu-lista {
-    list-style: none; padding: 10px 0; margin: 0;
-    height: 100vh; overflow-y: auto;
-}
-
 .menu-item-mrv {
     background: #ffffff; border: 1px solid #d1d1d1;
     border-right: 18px solid var(--verde-mrv); 
-    margin: 8px 10px 8px 5px;  
-    padding: 12px 12px 12px 25px; 
+    margin: 8px 10px; padding: 12px 12px 12px 25px; 
     border-radius: 2px 12px 12px 2px;
     color: #333; font-weight: 600; font-size: 0.85rem;
     display: block; box-shadow: 4px 4px 10px rgba(0,0,0,0.1);
-    cursor: pointer; transition: all 0.2s ease;
-    text-transform: uppercase;
+    cursor: pointer; text-transform: uppercase;
 }
 
-.estilo-complexo {
-    border-right-width: 4px !important;
-    font-weight: 800 !important;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2) !important;
-}
-
-/* --- BLOCO 5: FICHA TÉCNICA (FIXAÇÃO E AJUSTE) --- */
+/* --- BLOCO 5: FICHA TÉCNICA E CAIXAS --- */
 .ficha-tecnica {
     position: absolute; right: 0; top: 0;
     width: 44%; height: 100%;
-    background: rgba(30, 30, 30, 0.96);
+    background: var(--bg-ficha);
     color: white; padding: 15px; z-index: 1000;
     overflow-y: auto; box-shadow: -5px 0 15px rgba(0,0,0,0.5);
 }
 
-/* ESTILO DAS CAIXAS BRANCAS (IGUAL DESKTOP) */
-.grid-caixas-mobile {
-    display: flex; flex-direction: column; gap: 8px; margin: 15px 0;
-}
+.grid-caixas-mobile { display: flex; flex-direction: column; gap: 8px; margin: 15px 0; }
 
 .caixa-dado {
     background: #ffffff; padding: 8px; border-radius: 5px;
     display: flex; flex-direction: column; align-items: center;
 }
 
-.caixa-dado .label {
-    font-size: 0.6rem; color: #00713a; font-weight: bold; text-transform: uppercase;
-}
+.caixa-dado .label { font-size: 0.6rem; color: var(--verde-mrv); font-weight: bold; text-transform: uppercase; }
+.caixa-dado .valor { font-size: 0.8rem; color: #000; font-weight: 800; text-align: center; }
 
-.caixa-dado .valor {
-    font-size: 0.8rem; color: #000; font-weight: 800; text-align: center;
-}
-
-/* BOTÕES MAPS E LINK */
 .container-acoes { display: flex; gap: 5px; margin-bottom: 10px; }
 .btn-acao {
     flex: 1; padding: 8px; border-radius: 4px; font-weight: 800;
     text-align: center; text-decoration: none; color: white; font-size: 0.7rem;
 }
 .btn-maps { background-color: #4285F4; }
-.btn-link { background-color: #00713a; }
-
-/* MAPA */
-#mapa-container {
-    position: absolute; left: 60px; top: 0;
-    width: calc(100% - 44% - 60px); height: 100%; z-index: 10;
-}
+.btn-link { background-color: var(--verde-mrv); }
