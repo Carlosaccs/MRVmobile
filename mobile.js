@@ -1,12 +1,12 @@
 /* ==========================================================================
-   v140.15 - FIX DEFINITIVO: TRAVA DE SELEÇÃO VERDE
+   v140.16 - DASHBOARD MOBILE: MENU PERSISTENTE E TRAVA DE DESTAQUE
    ========================================================================== */
 
 const svgNS = "http://www.w3.org/2000/svg";
 const URL_PLANILHA = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSRKdJctOPQjKAtOZSDHyArD_H8SgKIouelAS1vF1d_-13pu7u_ic6J8nP3r0Ijd56WA-mbUmHjb4Me/pub?output=csv';
 
 let mapaAtivo = "GSP";
-let cidadeClicadaAtiva = null; // Armazena apenas o VERDE selecionado
+let cidadeClicadaAtiva = null; 
 window.dadosGerais = [];
 
 const DNA_AMPLIAR = "M 75.757133 114.16926 L 75.757133 124.7898 L 75.757133 135.41086 L 78.412268 135.41086 L 81.067403 135.41086 L 81.067403 127.44493 L 81.067403 119.47953 L 89.032808 119.47953 L 96.99873 119.47953 L 96.99873 116.82439 L 96.99873 114.16926 L 86.377673 114.16926 L 75.757133 114.16926 z M 115.58468 114.16926 L 115.58468 116.82439 L 115.58468 119.47953 L 123.36043 119.47953 L 131.13618 119.47953 L 131.13618 127.44493 L 131.13618 135.41086 L 133.79183 135.41086 L 136.44697 114.16926 L 126.01556 114.16926 L 115.58468 114.16926 z M 75.757133 153.9968 L 75.757133 164.61734 L 75.757133 175.2384 L 86.377673 175.2384 L 96.99873 175.2384 L 96.99873 172.39361 L 96.99873 169.54882 L 89.032808 169.54882 L 81.067403 169.54882 L 81.067403 161.77255 L 81.067403 153.9968 L 78.412268 153.9968 L 75.757133 153.9968 z M 131.13618 153.9968 L 131.13618 161.77255 L 131.13618 169.54882 L 123.36043 169.54882 L 115.58468 169.54882 L 115.58468 172.39361 L 115.58468 175.2384 L 126.01556 175.2384 L 136.44697 175.2384 L 136.44697 164.61734 L 136.44697 153.9968 L 133.79183 153.9968 L 131.13618 153.9968 z";
@@ -17,6 +17,7 @@ const AJUSTES_MAPA = {
     INTERIOR: { marginRight: "50%", marginLeft: "-100px", scale: "1.15" }
 };
 
+// --- BLOCO 2: CARREGAMENTO ---
 async function carregarPlanilha() {
     try {
         const res = await fetch(URL_PLANILHA);
@@ -46,6 +47,7 @@ async function carregarPlanilha() {
     } catch (e) { console.error("Erro na planilha:", e); }
 }
 
+// --- BLOCO 3: MAPA E CLIQUES ---
 function desenharMapa(dados, targetId, ehMinimizado) {
     const container = document.getElementById(targetId);
     if (!container || !dados) return;
@@ -89,8 +91,6 @@ function desenharMapa(dados, targetId, ehMinimizado) {
                 }
             };
             path.onmouseout = () => { 
-                // Se houver um verde selecionado, o topo volta para o nome dele. 
-                // Se não, volta para o padrão.
                 atualizarTextoTopo(cidadeClicadaAtiva ? cidadeClicadaAtiva.name : null); 
                 if (path.getAttribute('data-selecionado') !== 'true') {
                     path.style.fill = corBase; 
@@ -101,14 +101,10 @@ function desenharMapa(dados, targetId, ehMinimizado) {
                 if (pData.id === "grandesaopaulo") { trocarMapas(); return; } 
 
                 if (ehMRV) {
-                    // SE FOR VERDE: Executa o clique de seleção
                     clicarNoMapa(path, window.dadosGerais.find(d => d.id === idLimpo), pData); 
                 } else {
-                    // SE FOR CINZA: Apenas fixa o nome no topo momentaneamente.
-                    // NÃO CHAMA clicarNoMapa, logo não mexe nas cores nem na ficha técnica.
-                    const nomeParaTopo = pData.name || path.getAttribute('data-name');
                     const indicador = document.getElementById('identificador-cidade');
-                    if (indicador) indicador.innerText = nomeParaTopo.toUpperCase();
+                    if (indicador) indicador.innerText = (pData.name || path.getAttribute('data-name')).toUpperCase();
                 }
             };
         }
@@ -121,22 +117,18 @@ function desenharMapa(dados, targetId, ehMinimizado) {
 function clicarNoMapa(pathElement, info, pDataRaw = null) {
     const idRegiao = pathElement.id.replace('mini-', '').toLowerCase();
     
-    // 1. Resetar visual de TODOS os paths
     document.querySelectorAll('#mapa-container path').forEach(p => { 
         p.setAttribute('data-selecionado', 'false'); 
         p.style.fill = p.getAttribute('data-cor-base'); 
     });
     
-    // 2. Destacar o VERDE clicado
     pathElement.setAttribute('data-selecionado', 'true');
     pathElement.style.fill = "#FF4500"; 
     
-    // 3. Atualizar a variável de ESTADO (Importante para o mouseout)
     const nomeDaCidade = pDataRaw ? pDataRaw.name : pathElement.getAttribute('data-name');
     cidadeClicadaAtiva = { name: nomeDaCidade || "" }; 
     atualizarTextoTopo(cidadeClicadaAtiva.name);
     
-    // 4. Vitrine de botões e Ficha Técnica
     const todosDestaRegiao = window.dadosGerais.filter(d => d.id === idRegiao);
     const containerBotoes = document.getElementById('container-vitrine-botoes');
     if(containerBotoes) containerBotoes.innerHTML = ""; 
@@ -168,6 +160,7 @@ function clicarNoMapa(pathElement, info, pDataRaw = null) {
     if (registroDestaque) exibirDadosResidencial(registroDestaque);
 }
 
+// --- BLOCO 4: FICHA TÉCNICA ---
 function exibirDadosResidencial(info) {
     const elNome = document.getElementById('nome-imovel');
     const elDetalhes = document.getElementById('detalhes-imovel');
@@ -194,10 +187,13 @@ function exibirDadosResidencial(info) {
     }
 }
 
+// --- BLOCO 5: MENU LATERAL ---
 function gerarMenuResidenciais() {
     const lista = document.getElementById('lista-residenciais');
     if (!lista) return;
     lista.innerHTML = ""; 
+    
+    // Removido o título manual que o código anterior inseria
     [...window.dadosGerais].sort((a, b) => a.ordem - b.ordem).forEach(info => {
         const li = document.createElement('li');
         li.className = 'menu-item-mrv'; 
@@ -213,9 +209,15 @@ function gerarMenuResidenciais() {
         }
         li.onclick = () => {
             let p = document.getElementById(info.id);
-            if (!p) { trocarMapas(); setTimeout(() => { let np = document.getElementById(info.id); if (np) clicarNoMapa(np, info); }, 200); }
+            if (!p) { 
+                trocarMapas(); 
+                setTimeout(() => { 
+                    let np = document.getElementById(info.id); 
+                    if (np) clicarNoMapa(np, info); 
+                }, 200); 
+            }
             else clicarNoMapa(p, info);
-            toggleMenu(); 
+            // REMOVIDO o toggleMenu() daqui para o menu não fechar ao clicar
         };
         lista.appendChild(li);
     });
