@@ -43,22 +43,23 @@ async function carregarPlanilha() {
                 const limpar = (t) => t ? t.replace(/"/g, '').trim() : "";
                 const reg = limpar(c[13]); 
                 window.dadosGerais.push({
-                    id: limpar(c[0]).toLowerCase(),
-                    categoria: limpar(c[1]).toUpperCase(),
-                    ordem: parseInt(limpar(c[2])) || 9999,
-                    nomeCurto: reg ? `${limpar(c[3]) || "Sem Nome"} - ${reg}` : limpar(c[3]) || "Sem Nome",
-                    estoque: limpar(c[5]),
-                    endereco: limpar(c[6]),
-                    entrega: limpar(c[8]),
-                    plantaMin: limpar(c[9]),
-                    plantaMax: limpar(c[10]),
-                    obra: limpar(c[11]),
-                    link: limpar(c[15]),
-                    limitador: limpar(c[12]),
-                    cPaulista: limpar(c[14]),
-                    textoColunaR: limpar(c[17]), // Coluna R
-                    regional: reg
-                });
+                   id: limpar(c[0]).toLowerCase(),
+                   categoria: limpar(c[1]).toUpperCase(),
+                   ordem: parseInt(limpar(c[2])) || 9999,
+                   nomeCurto: reg ? `${limpar(c[3]) || "Sem Nome"} - ${reg}` : limpar(c[3]) || "Sem Nome",
+                   estoque: limpar(c[5]),
+                   endereco: limpar(c[6]),
+                   entrega: limpar(c[8]),
+                   plantaMin: limpar(c[9]),
+                   plantaMax: limpar(c[10]),
+                   obra: limpar(c[11]),
+                   limitador: limpar(c[12]),
+                   cPaulista: limpar(c[14]),
+                   destaqueVermelho: limpar(c[15]), // AGORA COLUNA P É O TEXTO EM VERMELHO
+                   link: limpar(c[16]),            // LINK PASSA PARA A PRÓXIMA (Ajuste se necessário)
+                   textoColunaR: limpar(c[17]),
+                   regional: reg
+               });
             }
         });
         atualizarVisualizacao();
