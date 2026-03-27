@@ -130,59 +130,63 @@ function desenharMapa(dados, targetId, ehMinimizado) {
     container.appendChild(svg);
 }
 
-/* ==========================================================================
-   --- BLOCO 4: INTERAÇÃO DE CLIQUE E VITRINE ---
-   ========================================================================== */
-function clicarNoMapa(pathElement, info, pDataRaw = null) {
-    const idRegiao = pathElement.id.replace('mini-', '').toLowerCase();
+/* ========================
+   --- BLOCO 4: FICHA TÉCNICA (ESTILO CAIXAS BRANCAS)
+   ======================== */
+function exibirDadosResidencial(info) {
+    const elNome = document.getElementById('nome-imovel');
+    const elDetalhes = document.getElementById('detalhes-imovel');
+    if(elNome) elNome.innerText = info.nomeCurto.toUpperCase();
     
-    document.querySelectorAll('#mapa-container path').forEach(p => { 
-        p.setAttribute('data-selecionado', 'false'); 
-        p.style.fill = p.getAttribute('data-cor-base'); 
-    });
-    
-    pathElement.setAttribute('data-selecionado', 'true');
-    pathElement.style.fill = "#FF4500"; 
-    
-    const nomeDaCidade = pDataRaw ? pDataRaw.name : pathElement.getAttribute('data-name');
-    cidadeClicadaAtiva = { name: nomeDaCidade || "" }; 
-    atualizarTextoTopo(cidadeClicadaAtiva.name);
-    
-    const todosDestaRegiao = window.dadosGerais.filter(d => d.id === idRegiao);
-    const containerBotoes = document.getElementById('container-vitrine-botoes');
-    if(containerBotoes) containerBotoes.innerHTML = ""; 
-    
-    const registroDestaque = info || todosDestaRegiao[0];
-    
-    if (todosDestaRegiao.length > 1 && containerBotoes) {
-        todosDestaRegiao.forEach(item => {
-            if (item.nomeCurto !== registroDestaque.nomeCurto) {
-                const btn = document.createElement('div');
-                btn.className = 'menu-item-mrv';
-                btn.innerText = item.nomeCurto.toUpperCase();
-                let corBorda = "#00713a";
-                if (btn.innerText.includes("ZO")) corBorda = "#ff8c00"; 
-                else if (btn.innerText.includes("ZL")) corBorda = "#e31c19"; 
-                else if (btn.innerText.includes("ZN")) corBorda = "#0054a6"; 
-                else if (btn.innerText.includes("ZS")) corBorda = "#d1147e";
-                btn.style.borderRightColor = corBorda;
-                if (item.categoria === "COMPLEXO") {
-                    btn.style.backgroundColor = corBorda;
-                    btn.style.color = "#ffffff";
-                    btn.classList.add('estilo-complexo');
-                }
-                btn.onclick = (e) => {
-                    e.stopPropagation();
-                    forcarFullscreen();
-                    clicarNoMapa(pathElement, item, pDataRaw);
-                };
-                containerBotoes.appendChild(btn);
-            }
-        });
-    }
-    if (registroDestaque) exibirDadosResidencial(registroDestaque);
-}
+    const endereco = info.endereco || "Endereço não cadastrado";
+    const linkMaps = `http://googleusercontent.com/maps.google.com/maps?q=${encodeURIComponent(endereco)}`;
+    const linkBook = info.link || "#";
 
+    if(elDetalhes) {
+        let htmlContent = `
+            <div class="container-acoes">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <span class="endereco-texto">📍 ${endereco}</span>
+                    <div style="display: flex; gap: 5px;">
+                        <a href="${linkMaps}" target="_blank" class="btn-acao btn-maps">MAPS</a>
+                        <button onclick="copyToClipboard('${linkBook}')" class="btn-acao btn-link">LINK</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid-caixas-mobile">
+                <div class="caixa-dado">
+                    <span class="label">ENTREGA</span>
+                    <span class="valor">${info.entrega || "-"}</span>
+                </div>
+                <div class="caixa-dado">
+                    <span class="label">OBRA</span>
+                    <span class="valor">${info.obra || "0%"}</span>
+                </div>
+                <div class="caixa-dado">
+                    <span class="label">PLANTAS</span>
+                    <span class="valor">${info.plantasMin}m² - ${info.plantasMax}m²</span>
+                </div>
+                <div class="caixa-dado">
+                    <span class="label">ESTOQUE</span>
+                    <span class="valor">${info.estoque || "0"}</span>
+                </div>
+                <div class="caixa-dado">
+                    <span class="label">LIMITADOR</span>
+                    <span class="valor">${info.limitador || "SEM LIMITADOR"}</span>
+                </div>
+                <div class="caixa-dado">
+                    <span class="label">C. PAULISTA</span>
+                    <span class="valor">${info.cPaulista || "NÃO POSSUI"}</span>
+                </div>
+            </div>
+
+            <div class="texto-coluna-r">${info.textoColunaR || ""}</div>
+            <div id="texto-descricao">${info.descricao || ""}</div>
+        `;
+        elDetalhes.innerHTML = htmlContent;
+    }
+}
 /* ==========================================================================
    --- BLOCO 5: EXIBIÇÃO DA FICHA TÉCNICA E MENU LATERAL ---
    ========================================================================== */
