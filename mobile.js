@@ -1,5 +1,5 @@
 /* ==========================================================================
-   v140.17 - DASHBOARD MOBILE: DESAFIO FULLSCREEN TOTAL + PERSISTÊNCIA
+   v140.20 - DASHBOARD MOBILE: GRADE COMPLETA (6 CAMPOS) + FULLSCREEN TOTAL
    ========================================================================== */
 
 const svgNS = "http://www.w3.org/2000/svg";
@@ -17,11 +17,10 @@ const AJUSTES_MAPA = {
     INTERIOR: { marginRight: "50%", marginLeft: "-100px", scale: "1.15" }
 };
 
-// --- FUNÇÃO AUXILIAR DO DESAFIO ---
 function forcarFullscreen() {
     if (!document.fullscreenElement) {
         document.documentElement.requestFullscreen().catch(e => {
-            console.log("Auto-Fullscreen bloqueado pelo navegador ou falhou.");
+            console.log("Auto-Fullscreen bloqueado ou falhou.");
         });
     }
 }
@@ -34,7 +33,7 @@ async function carregarPlanilha() {
         window.dadosGerais = []; 
         linhas.slice(1).forEach((linha) => {
             const c = linha.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
-            if (c.length >= 4) {
+            if (c.length >= 15) { // Precisa ler até a coluna O (índice 14)
                 const limpar = (t) => t ? t.replace(/"/g, '').trim() : "";
                 const reg = limpar(c[13]); 
                 window.dadosGerais.push({
@@ -42,10 +41,16 @@ async function carregarPlanilha() {
                     categoria: limpar(c[1]).toUpperCase(),
                     ordem: parseInt(limpar(c[2])) || 9999,
                     nomeCurto: reg ? `${limpar(c[3]) || "Sem Nome"} - ${reg}` : limpar(c[3]) || "Sem Nome",
-                    endereco: limpar(c[6]),
-                    link: limpar(c[11]),
-                    descricao: limpar(c[12]), 
-                    textoColunaR: limpar(c[17]),
+                    estoque: limpar(c[5]),      // Coluna F
+                    endereco: limpar(c[6]),     // Coluna G
+                    entrega: limpar(c[8]),      // Coluna I
+                    plantaMin: limpar(c[9]),    // Coluna J
+                    plantaMax: limpar(c[10]),   // Coluna K
+                    obra: limpar(c[11]),        // Coluna L
+                    link: limpar(c[11]),        // Coluna L
+                    limitador: limpar(c[12]),   // Coluna M
+                    cPaulista: limpar(c[14]),   // Coluna O
+                    textoColunaR: limpar(c[17]),// Coluna R
                     regional: reg
                 });
             }
@@ -105,9 +110,8 @@ function desenharMapa(dados, targetId, ehMinimizado) {
             };
             path.onclick = (e) => { 
                 e.stopPropagation();
-                forcarFullscreen(); // DESAFIO: Qualquer path amplia a tela
+                forcarFullscreen(); 
                 if (pData.id === "grandesaopaulo") { trocarMapas(); return; } 
-
                 if (ehMRV) {
                     clicarNoMapa(path, window.dadosGerais.find(d => d.id === idLimpo), pData); 
                 } else {
@@ -124,12 +128,10 @@ function desenharMapa(dados, targetId, ehMinimizado) {
 
 function clicarNoMapa(pathElement, info, pDataRaw = null) {
     const idRegiao = pathElement.id.replace('mini-', '').toLowerCase();
-    
     document.querySelectorAll('#mapa-container path').forEach(p => { 
         p.setAttribute('data-selecionado', 'false'); 
         p.style.fill = p.getAttribute('data-cor-base'); 
     });
-    
     pathElement.setAttribute('data-selecionado', 'true');
     pathElement.style.fill = "#FF4500"; 
     
@@ -149,11 +151,13 @@ function clicarNoMapa(pathElement, info, pDataRaw = null) {
                 const btn = document.createElement('div');
                 btn.className = 'menu-item-mrv';
                 btn.innerText = item.nomeCurto.toUpperCase();
+                
                 let corBorda = "#00713a";
                 if (btn.innerText.includes("ZO")) corBorda = "#ff8c00"; 
                 else if (btn.innerText.includes("ZL")) corBorda = "#e31c19"; 
                 else if (btn.innerText.includes("ZN")) corBorda = "#0054a6"; 
                 else if (btn.innerText.includes("ZS")) corBorda = "#d1147e";
+                
                 btn.style.borderRightColor = corBorda;
                 if (item.categoria === "COMPLEXO") {
                     btn.style.backgroundColor = corBorda;
@@ -162,7 +166,7 @@ function clicarNoMapa(pathElement, info, pDataRaw = null) {
                 }
                 btn.onclick = (e) => {
                     e.stopPropagation();
-                    forcarFullscreen(); // DESAFIO: Botões de região ampliam a tela
+                    forcarFullscreen(); 
                     clicarNoMapa(pathElement, item, pDataRaw);
                 };
                 containerBotoes.appendChild(btn);
@@ -172,17 +176,20 @@ function clicarNoMapa(pathElement, info, pDataRaw = null) {
     if (registroDestaque) exibirDadosResidencial(registroDestaque);
 }
 
-
 function exibirDadosResidencial(info) {
     const elNome = document.getElementById('nome-imovel');
     const elDetalhes = document.getElementById('detalhes-imovel');
-    
     if(elNome) elNome.innerText = info.nomeCurto.toUpperCase();
     
     if(elDetalhes) {
         const linkMaps = `http://googleusercontent.com/maps.google.com/maps?q=${encodeURIComponent(info.endereco)}`;
         const linkBook = info.link || "#";
         
+        // CSS in-line para manter as 6 caixas organizadas no mobile
+        const cssCaixa = `display: flex; justify-content: space-between; align-items: center; background: white; padding: 5px 8px; flex: 1 1 48%; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; min-height: 28px;`;
+        const cssLabel = `color: #00713a; font-weight: bold; font-size: 10px;`;
+        const cssValor = `color: #333; font-weight: 800; font-size: 11px; text-align: right;`;
+
         elDetalhes.innerHTML = `
             <div class="divisor-verde"></div>
             <div class="container-acoes">
@@ -193,34 +200,44 @@ function exibirDadosResidencial(info) {
                 </div>
             </div>
 
-            <div class="grid-caixas-mobile" style="display: flex; flex-wrap: wrap; gap: 2px; margin-top: 10px; width: 100%;">
-                
-                <div class="caixa-dado" style="display: flex; justify-content: space-between; align-items: center; background: white; padding: 6px; flex: 1 1 48%; border: 1px solid #ddd; border-radius: 4px;">
-                    <span class="label" style="color: #00713a; font-weight: bold; font-size: 10px;">ENTREGA</span>
-                    <span class="valor" style="color: #333; font-weight: bold; font-size: 11px;">${info.entrega || "-"}</span>
+            <div class="grid-caixas-mobile" style="display: flex; flex-wrap: wrap; gap: 4px; margin-top: 10px; width: 100%;">
+                <div class="caixa-dado" style="${cssCaixa}">
+                    <span class="label" style="${cssLabel}">ENTREGA</span>
+                    <span class="valor" style="${cssValor}">${info.entrega || "-"}</span>
                 </div>
-
-                <div class="caixa-dado" style="display: flex; justify-content: space-between; align-items: center; background: white; padding: 6px; flex: 1 1 48%; border: 1px solid #ddd; border-radius: 4px;">
-                    <span class="label" style="color: #00713a; font-weight: bold; font-size: 10px;">OBRA</span>
-                    <span class="valor" style="color: #333; font-weight: bold; font-size: 11px;">${info.obra || "0%"}</span>
+                <div class="caixa-dado" style="${cssCaixa}">
+                    <span class="label" style="${cssLabel}">OBRA</span>
+                    <span class="valor" style="${cssValor}">${info.obra || "0%"}</span>
                 </div>
-
+                <div class="caixa-dado" style="${cssCaixa}">
+                    <span class="label" style="${cssLabel}">PLANTAS</span>
+                    <span class="valor" style="${cssValor}">${info.plantaMin} a ${info.plantaMax}m²</span>
+                </div>
+                <div class="caixa-dado" style="${cssCaixa}">
+                    <span class="label" style="${cssLabel}">ESTOQUE</span>
+                    <span class="valor" style="${cssValor}">${info.estoque || "0"}</span>
+                </div>
+                <div class="caixa-dado" style="${cssCaixa}">
+                    <span class="label" style="${cssLabel}">LIMITADOR</span>
+                    <span class="valor" style="${cssValor}">${info.limitador || "-"}</span>
+                </div>
+                <div class="caixa-dado" style="${cssCaixa}">
+                    <span class="label" style="${cssLabel}">C. PAULISTA</span>
+                    <span class="valor" style="${cssValor}">${info.cPaulista || "NÃO"}</span>
+                </div>
             </div>
 
-            <div class="texto-coluna-r" style="color:#00713a; font-weight:bold; margin-top:10px; font-size: 12px;">
+            <div class="texto-coluna-r" style="color:#00713a; font-weight:bold; margin-top:10px; font-size: 11px; text-align:center;">
                 ${info.textoColunaR || ""}
             </div>
         `;
     }
 }
 
-
-
 function gerarMenuResidenciais() {
     const lista = document.getElementById('lista-residenciais');
     if (!lista) return;
     lista.innerHTML = ""; 
-    
     [...window.dadosGerais].sort((a, b) => a.ordem - b.ordem).forEach(info => {
         const li = document.createElement('li');
         li.className = 'menu-item-mrv'; 
@@ -236,7 +253,7 @@ function gerarMenuResidenciais() {
         }
         li.onclick = (e) => {
             e.stopPropagation();
-            forcarFullscreen(); // DESAFIO: Itens do menu lateral ampliam a tela
+            forcarFullscreen(); 
             let p = document.getElementById(info.id);
             if (!p) { 
                 trocarMapas(); 
@@ -259,7 +276,7 @@ function atualizarVisualizacao() {
 }
 
 function trocarMapas() {
-    forcarFullscreen(); // DESAFIO: Troca de mapas amplia a tela
+    forcarFullscreen(); 
     mapaAtivo = (mapaAtivo === "GSP") ? "INTERIOR" : "GSP";
     cidadeClicadaAtiva = null; 
     atualizarTextoTopo(null);
@@ -273,7 +290,7 @@ function atualizarTextoTopo(nome) {
 }
 
 function toggleMenu() {
-    forcarFullscreen(); // DESAFIO: Abrir o menu amplia a tela
+    forcarFullscreen(); 
     const menu = document.getElementById('menu-lateral');
     if(menu) {
         menu.classList.toggle('menu-aberto');
