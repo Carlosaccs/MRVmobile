@@ -1,8 +1,10 @@
 /* ==========================================================================
-   v140.18 - DASHBOARD MOBILE: ESTRUTURA RESIDENCIAL COMPLETA (GRADE TÉCNICA)
+   v140.17 - DASHBOARD MOBILE: ESTRUTURA ORGANIZADA EM BLOCOS
    ========================================================================== */
 
-// --- BLOCO 1: CONSTANTES E CONFIGURAÇÕES ---
+/* ==========================================================================
+   --- BLOCO 1: CONSTANTES, CONFIGURAÇÕES E DNA DE ÍCONES ---
+   ========================================================================== */
 const svgNS = "http://www.w3.org/2000/svg";
 const URL_PLANILHA = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSRKdJctOPQjKAtOZSDHyArD_H8SgKIouelAS1vF1d_-13pu7u_ic6J8nP3r0Ijd56WA-mbUmHjb4Me/pub?output=csv';
 
@@ -18,15 +20,17 @@ const AJUSTES_MAPA = {
     INTERIOR: { marginRight: "50%", marginLeft: "-100px", scale: "1.15" }
 };
 
+/* ==========================================================================
+   --- BLOCO 2: CARREGAMENTO DE DADOS (PLANILHA) E FULLSCREEN ---
+   ========================================================================== */
 function forcarFullscreen() {
     if (!document.fullscreenElement) {
         document.documentElement.requestFullscreen().catch(e => {
-            console.log("Auto-Fullscreen bloqueado.");
+            console.log("Auto-Fullscreen bloqueado pelo navegador ou falhou.");
         });
     }
 }
 
-// --- BLOCO 2: CARREGAMENTO DE DADOS ---
 async function carregarPlanilha() {
     try {
         const res = await fetch(URL_PLANILHA);
@@ -43,15 +47,8 @@ async function carregarPlanilha() {
                     categoria: limpar(c[1]).toUpperCase(),
                     ordem: parseInt(limpar(c[2])) || 9999,
                     nomeCurto: reg ? `${limpar(c[3]) || "Sem Nome"} - ${reg}` : limpar(c[3]) || "Sem Nome",
-                    estoque: limpar(c[5]),      // Coluna F
-                    endereco: limpar(c[6]),     // Coluna G
-                    entrega: limpar(c[8]),      // Coluna I
-                    plantasMin: limpar(c[9]),   // Coluna J
-                    plantasMax: limpar(c[10]),  // Coluna K
-                    obra: limpar(c[11]),        // Coluna L
-                    limitador: limpar(c[12]),   // Coluna M
-                    cPaulista: limpar(c[14]),   // Coluna O
-                    link: limpar(c[11]),        // Link (Ajuste se necessário)
+                    endereco: limpar(c[6]),
+                    link: limpar(c[11]),
                     descricao: limpar(c[12]), 
                     textoColunaR: limpar(c[17]),
                     regional: reg
@@ -63,7 +60,9 @@ async function carregarPlanilha() {
     } catch (e) { console.error("Erro na planilha:", e); }
 }
 
-// --- BLOCO 3: MAPA E INTERAÇÕES ---
+/* ==========================================================================
+   --- BLOCO 3: RENDERIZAÇÃO E LÓGICA DO MAPA SVG ---
+   ========================================================================== */
 function desenharMapa(dados, targetId, ehMinimizado) {
     const container = document.getElementById(targetId);
     if (!container || !dados) return;
@@ -131,8 +130,12 @@ function desenharMapa(dados, targetId, ehMinimizado) {
     container.appendChild(svg);
 }
 
+/* ==========================================================================
+   --- BLOCO 4: INTERAÇÃO DE CLIQUE E VITRINE ---
+   ========================================================================== */
 function clicarNoMapa(pathElement, info, pDataRaw = null) {
     const idRegiao = pathElement.id.replace('mini-', '').toLowerCase();
+    
     document.querySelectorAll('#mapa-container path').forEach(p => { 
         p.setAttribute('data-selecionado', 'false'); 
         p.style.fill = p.getAttribute('data-cor-base'); 
@@ -180,80 +183,57 @@ function clicarNoMapa(pathElement, info, pDataRaw = null) {
     if (registroDestaque) exibirDadosResidencial(registroDestaque);
 }
 
-// --- BLOCO 4: FICHA TÉCNICA (VITRINE) ---
+/* ==========================================================================
+   --- BLOCO 5: EXIBIÇÃO DA FICHA TÉCNICA E MENU LATERAL ---
+   ========================================================================== */
 function exibirDadosResidencial(info) {
     const elNome = document.getElementById('nome-imovel');
     const elDetalhes = document.getElementById('detalhes-imovel');
+    
     if(elNome) elNome.innerText = info.nomeCurto.toUpperCase();
     
     const endereco = info.endereco || "Endereço não cadastrado";
     const linkMaps = `http://googleusercontent.com/maps.google.com/maps?q=${encodeURIComponent(endereco)}`;
     const linkBook = info.link || "#";
+    const textoR = info.textoColunaR || "";
+    const descricao = info.descricao || "";
 
     if(elDetalhes) {
         let htmlContent = `
             <div class="divisor-verde"></div>
             <div class="container-acoes">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                    <span class="endereco-texto" style="font-size: 0.9rem;">📍 ${endereco}</span>
-                    <div style="display: flex; gap: 5px;">
-                        <a href="${linkMaps}" target="_blank" class="btn-acao btn-maps">MAPS</a>
-                        <button onclick="copyToClipboard('${linkBook}')" class="btn-acao btn-link">LINK</button>
-                    </div>
+                <span class="endereco-texto">📍 ${endereco}</span>
+                <div style="display: flex; gap: 8px; margin-top: 5px;">
+                    <a href="${linkMaps}" target="_blank" class="btn-acao btn-maps">MAPS</a>
+                    <button onclick="copyToClipboard('${linkBook}')" class="btn-acao btn-link">LINK</button>
                 </div>
         `;
 
         if (info.categoria === "RESIDENCIAL") {
             htmlContent += `
-                <div class="grid-tecnico">
-                    <div class="item-tecnico">
-                        <span class="label">ENTREGA</span>
-                        <span class="valor">${info.entrega || "-"}</span>
-                    </div>
-                    <div class="item-tecnico">
-                        <span class="label">OBRA</span>
-                        <span class="valor">${info.obra || "0%"}</span>
-                    </div>
-                    <div class="item-tecnico">
-                        <span class="label">PLANTAS</span>
-                        <span class="valor">${info.plantasMin}m² - ${info.plantasMax}m²</span>
-                    </div>
-                    <div class="item-tecnico">
-                        <span class="label">ESTOQUE</span>
-                        <span class="valor">${info.estoque || "CONSULTE"}</span>
-                    </div>
-                    <div class="item-tecnico">
-                        <span class="label">LIMITADOR</span>
-                        <span class="valor">${info.limitador || "-"}</span>
-                    </div>
-                    <div class="item-tecnico">
-                        <span class="label">C. PAULISTA</span>
-                        <span class="valor">${info.cPaulista || "NÃO"}</span>
-                    </div>
+                <div class="texto-coluna-r" style="margin-top: 15px; font-weight: bold; color: #00713a;">
+                    ${textoR}
                 </div>
-                <div class="texto-coluna-r" style="margin-top: 15px; font-weight: bold; color: #00713a; font-size: 1.1em;">
-                    ${info.textoColunaR || ""}
-                </div>
-                <div id="texto-descricao" style="margin-top: 10px; line-height: 1.4; color: #333; font-size: 0.95rem;">
-                    ${info.descricao || ""}
+                <div id="texto-descricao" style="margin-top: 10px; line-height: 1.4;">
+                    ${descricao}
                 </div>
             `;
         } else {
             htmlContent += `
-                <div class="texto-coluna-r">${info.textoColunaR || ""}</div>
-                <div id="texto-descricao">${info.descricao || ""}</div>
+                <div class="texto-coluna-r">${textoR}</div>
+                <div id="texto-descricao">${descricao}</div>
             `;
         }
-        htmlContent += `</div>`;
+        htmlContent += `</div>`; 
         elDetalhes.innerHTML = htmlContent;
     }
 }
 
-// --- BLOCO 5: MENU E UTILITÁRIOS ---
 function gerarMenuResidenciais() {
     const lista = document.getElementById('lista-residenciais');
     if (!lista) return;
     lista.innerHTML = ""; 
+    
     [...window.dadosGerais].sort((a, b) => a.ordem - b.ordem).forEach(info => {
         const li = document.createElement('li');
         li.className = 'menu-item-mrv'; 
@@ -277,12 +257,16 @@ function gerarMenuResidenciais() {
                     let np = document.getElementById(info.id); 
                     if (np) clicarNoMapa(np, info); 
                 }, 200); 
-            } else clicarNoMapa(p, info);
+            }
+            else clicarNoMapa(p, info);
         };
         lista.appendChild(li);
     });
 }
 
+/* ==========================================================================
+   --- BLOCO 6: UTILITÁRIOS (MAPAS, FULLSCREEN E CLIPBOARD) ---
+   ========================================================================== */
 function atualizarVisualizacao() {
     if (typeof MAPA_GSP !== 'undefined' && typeof MAPA_INTERIOR !== 'undefined') {
         desenharMapa(mapaAtivo === "GSP" ? MAPA_GSP : MAPA_INTERIOR, "mapa-container", false);
@@ -291,7 +275,7 @@ function atualizarVisualizacao() {
 }
 
 function trocarMapas() {
-    forcarFullscreen();
+    forcarFullscreen(); 
     mapaAtivo = (mapaAtivo === "GSP") ? "INTERIOR" : "GSP";
     cidadeClicadaAtiva = null; 
     atualizarTextoTopo(null);
@@ -305,7 +289,7 @@ function atualizarTextoTopo(nome) {
 }
 
 function toggleMenu() {
-    forcarFullscreen();
+    forcarFullscreen(); 
     const menu = document.getElementById('menu-lateral');
     if(menu) {
         menu.classList.toggle('menu-aberto');
@@ -336,6 +320,9 @@ function copyToClipboard(text) {
     navigator.clipboard.writeText(text).then(() => alert("Link do Book copiado!"));
 }
 
+/* ==========================================================================
+   --- BLOCO 7: EVENTOS DE INICIALIZAÇÃO E CLIQUES ---
+   ========================================================================== */
 window.onload = carregarPlanilha;
 document.addEventListener('fullscreenchange', atualizarIconeFullscreen);
 document.addEventListener('click', (e) => {
