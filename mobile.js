@@ -180,8 +180,7 @@ function exibirDadosResidencial(info) {
     if(elNome) elNome.innerText = info.nomeCurto.toUpperCase();
     
     if(elDetalhes) {
-        // Link do Maps e do Book (Coluna L)
-        const linkMaps = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(info.endereco)}`;
+        const linkMaps = `http://googleusercontent.com/maps.google.com/maps?q=${encodeURIComponent(info.endereco)}`;
         const linkBook = info.link || "#";
         
         elDetalhes.innerHTML = `
@@ -194,11 +193,18 @@ function exibirDadosResidencial(info) {
                 </div>
             </div>
 
-            <div class="grid-caixas-mobile" style="display: flex; flex-wrap: wrap; gap: 4px; margin-top: 10px;">
-                <div class="caixa-dado" style="background: white; border-radius: 4px; padding: 5px; flex: 1; min-width: 100px; border: 1px solid #ddd;">
-                    <span class="label" style="color: #00713a; font-weight: bold; font-size: 10px; display: block;">ENTREGA</span>
-                    <span class="valor" style="color: #333; font-weight: bold; font-size: 14px;">${info.entrega || "Não Consta"}</span>
+            <div class="grid-caixas-mobile" style="display: flex; flex-wrap: wrap; gap: 2px; margin-top: 10px; width: 100%;">
+                
+                <div class="caixa-dado" style="display: flex; justify-content: space-between; align-items: center; background: white; padding: 6px; flex: 1 1 48%; border: 1px solid #ddd; border-radius: 4px;">
+                    <span class="label" style="color: #00713a; font-weight: bold; font-size: 10px;">ENTREGA</span>
+                    <span class="valor" style="color: #333; font-weight: bold; font-size: 11px;">${info.entrega || "-"}</span>
                 </div>
+
+                <div class="caixa-dado" style="display: flex; justify-content: space-between; align-items: center; background: white; padding: 6px; flex: 1 1 48%; border: 1px solid #ddd; border-radius: 4px;">
+                    <span class="label" style="color: #00713a; font-weight: bold; font-size: 10px;">OBRA</span>
+                    <span class="valor" style="color: #333; font-weight: bold; font-size: 11px;">${info.obra || "0%"}</span>
+                </div>
+
             </div>
 
             <div class="texto-coluna-r" style="color:#00713a; font-weight:bold; margin-top:10px; font-size: 12px;">
