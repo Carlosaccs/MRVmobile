@@ -1,7 +1,8 @@
 /* ==========================================================================
-   v140.17 - DASHBOARD MOBILE: DESAFIO FULLSCREEN TOTAL + PERSISTÊNCIA
+   v140.18 - DASHBOARD MOBILE: ESTRUTURA RESIDENCIAL COMPLETA (GRADE TÉCNICA)
    ========================================================================== */
 
+// --- BLOCO 1: CONSTANTES E CONFIGURAÇÕES ---
 const svgNS = "http://www.w3.org/2000/svg";
 const URL_PLANILHA = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSRKdJctOPQjKAtOZSDHyArD_H8SgKIouelAS1vF1d_-13pu7u_ic6J8nP3r0Ijd56WA-mbUmHjb4Me/pub?output=csv';
 
@@ -17,15 +18,15 @@ const AJUSTES_MAPA = {
     INTERIOR: { marginRight: "50%", marginLeft: "-100px", scale: "1.15" }
 };
 
-// --- FUNÇÃO AUXILIAR DO DESAFIO ---
 function forcarFullscreen() {
     if (!document.fullscreenElement) {
         document.documentElement.requestFullscreen().catch(e => {
-            console.log("Auto-Fullscreen bloqueado pelo navegador ou falhou.");
+            console.log("Auto-Fullscreen bloqueado.");
         });
     }
 }
 
+// --- BLOCO 2: CARREGAMENTO DE DADOS ---
 async function carregarPlanilha() {
     try {
         const res = await fetch(URL_PLANILHA);
@@ -42,8 +43,15 @@ async function carregarPlanilha() {
                     categoria: limpar(c[1]).toUpperCase(),
                     ordem: parseInt(limpar(c[2])) || 9999,
                     nomeCurto: reg ? `${limpar(c[3]) || "Sem Nome"} - ${reg}` : limpar(c[3]) || "Sem Nome",
-                    endereco: limpar(c[6]),
-                    link: limpar(c[11]),
+                    estoque: limpar(c[5]),      // Coluna F
+                    endereco: limpar(c[6]),     // Coluna G
+                    entrega: limpar(c[8]),      // Coluna I
+                    plantasMin: limpar(c[9]),   // Coluna J
+                    plantasMax: limpar(c[10]),  // Coluna K
+                    obra: limpar(c[11]),        // Coluna L
+                    limitador: limpar(c[12]),   // Coluna M
+                    cPaulista: limpar(c[14]),   // Coluna O
+                    link: limpar(c[11]),        // Link (Ajuste se necessário)
                     descricao: limpar(c[12]), 
                     textoColunaR: limpar(c[17]),
                     regional: reg
@@ -55,6 +63,7 @@ async function carregarPlanilha() {
     } catch (e) { console.error("Erro na planilha:", e); }
 }
 
+// --- BLOCO 3: MAPA E INTERAÇÕES ---
 function desenharMapa(dados, targetId, ehMinimizado) {
     const container = document.getElementById(targetId);
     if (!container || !dados) return;
@@ -105,7 +114,7 @@ function desenharMapa(dados, targetId, ehMinimizado) {
             };
             path.onclick = (e) => { 
                 e.stopPropagation();
-                forcarFullscreen(); // DESAFIO: Qualquer path amplia a tela
+                forcarFullscreen();
                 if (pData.id === "grandesaopaulo") { trocarMapas(); return; } 
 
                 if (ehMRV) {
@@ -124,7 +133,6 @@ function desenharMapa(dados, targetId, ehMinimizado) {
 
 function clicarNoMapa(pathElement, info, pDataRaw = null) {
     const idRegiao = pathElement.id.replace('mini-', '').toLowerCase();
-    
     document.querySelectorAll('#mapa-container path').forEach(p => { 
         p.setAttribute('data-selecionado', 'false'); 
         p.style.fill = p.getAttribute('data-cor-base'); 
@@ -162,7 +170,7 @@ function clicarNoMapa(pathElement, info, pDataRaw = null) {
                 }
                 btn.onclick = (e) => {
                     e.stopPropagation();
-                    forcarFullscreen(); // DESAFIO: Botões de região ampliam a tela
+                    forcarFullscreen();
                     clicarNoMapa(pathElement, item, pDataRaw);
                 };
                 containerBotoes.appendChild(btn);
@@ -172,59 +180,80 @@ function clicarNoMapa(pathElement, info, pDataRaw = null) {
     if (registroDestaque) exibirDadosResidencial(registroDestaque);
 }
 
-// --- BLOCO 4: FICHA TÉCNICA (CATEGORIA RESIDENCIAL & COMPLEXO) ---
+// --- BLOCO 4: FICHA TÉCNICA (VITRINE) ---
 function exibirDadosResidencial(info) {
     const elNome = document.getElementById('nome-imovel');
     const elDetalhes = document.getElementById('detalhes-imovel');
-    
     if(elNome) elNome.innerText = info.nomeCurto.toUpperCase();
     
-    // Preparação dos dados comuns (Idêntico ao Desktop)
     const endereco = info.endereco || "Endereço não cadastrado";
     const linkMaps = `http://googleusercontent.com/maps.google.com/maps?q=${encodeURIComponent(endereco)}`;
     const linkBook = info.link || "#";
-    const textoR = info.textoColunaR || "";
-    const descricao = info.descricao || "";
 
     if(elDetalhes) {
-        // Estrutura Base: Divisor + Endereço + Botões (MAPS/LINK)
         let htmlContent = `
             <div class="divisor-verde"></div>
             <div class="container-acoes">
-                <span class="endereco-texto">📍 ${endereco}</span>
-                <div style="display: flex; gap: 8px; margin-top: 5px;">
-                    <a href="${linkMaps}" target="_blank" class="btn-acao btn-maps">MAPS</a>
-                    <button onclick="copyToClipboard('${linkBook}')" class="btn-acao btn-link">LINK</button>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <span class="endereco-texto" style="font-size: 0.9rem;">📍 ${endereco}</span>
+                    <div style="display: flex; gap: 5px;">
+                        <a href="${linkMaps}" target="_blank" class="btn-acao btn-maps">MAPS</a>
+                        <button onclick="copyToClipboard('${linkBook}')" class="btn-acao btn-link">LINK</button>
+                    </div>
                 </div>
         `;
 
-        // Se for RESIDENCIAL, começamos a injetar o conteúdo específico
         if (info.categoria === "RESIDENCIAL") {
             htmlContent += `
-                <div class="texto-coluna-r" style="margin-top: 15px; font-weight: bold; color: #00713a;">
-                    ${textoR}
+                <div class="grid-tecnico">
+                    <div class="item-tecnico">
+                        <span class="label">ENTREGA</span>
+                        <span class="valor">${info.entrega || "-"}</span>
+                    </div>
+                    <div class="item-tecnico">
+                        <span class="label">OBRA</span>
+                        <span class="valor">${info.obra || "0%"}</span>
+                    </div>
+                    <div class="item-tecnico">
+                        <span class="label">PLANTAS</span>
+                        <span class="valor">${info.plantasMin}m² - ${info.plantasMax}m²</span>
+                    </div>
+                    <div class="item-tecnico">
+                        <span class="label">ESTOQUE</span>
+                        <span class="valor">${info.estoque || "CONSULTE"}</span>
+                    </div>
+                    <div class="item-tecnico">
+                        <span class="label">LIMITADOR</span>
+                        <span class="valor">${info.limitador || "-"}</span>
+                    </div>
+                    <div class="item-tecnico">
+                        <span class="label">C. PAULISTA</span>
+                        <span class="valor">${info.cPaulista || "NÃO"}</span>
+                    </div>
                 </div>
-                <div id="texto-descricao" style="margin-top: 10px; line-height: 1.4;">
-                    ${descricao}
+                <div class="texto-coluna-r" style="margin-top: 15px; font-weight: bold; color: #00713a; font-size: 1.1em;">
+                    ${info.textoColunaR || ""}
+                </div>
+                <div id="texto-descricao" style="margin-top: 10px; line-height: 1.4; color: #333; font-size: 0.95rem;">
+                    ${info.descricao || ""}
                 </div>
             `;
         } else {
-            // Layout para outras categorias (ex: COMPLEXO) como estava antes
             htmlContent += `
-                <div class="texto-coluna-r">${textoR}</div>
-                <div id="texto-descricao">${descricao}</div>
+                <div class="texto-coluna-r">${info.textoColunaR || ""}</div>
+                <div id="texto-descricao">${info.descricao || ""}</div>
             `;
         }
-
-        htmlContent += `</div>`; // Fecha container-acoes
+        htmlContent += `</div>`;
         elDetalhes.innerHTML = htmlContent;
     }
 }
+
+// --- BLOCO 5: MENU E UTILITÁRIOS ---
 function gerarMenuResidenciais() {
     const lista = document.getElementById('lista-residenciais');
     if (!lista) return;
     lista.innerHTML = ""; 
-    
     [...window.dadosGerais].sort((a, b) => a.ordem - b.ordem).forEach(info => {
         const li = document.createElement('li');
         li.className = 'menu-item-mrv'; 
@@ -240,7 +269,7 @@ function gerarMenuResidenciais() {
         }
         li.onclick = (e) => {
             e.stopPropagation();
-            forcarFullscreen(); // DESAFIO: Itens do menu lateral ampliam a tela
+            forcarFullscreen();
             let p = document.getElementById(info.id);
             if (!p) { 
                 trocarMapas(); 
@@ -248,8 +277,7 @@ function gerarMenuResidenciais() {
                     let np = document.getElementById(info.id); 
                     if (np) clicarNoMapa(np, info); 
                 }, 200); 
-            }
-            else clicarNoMapa(p, info);
+            } else clicarNoMapa(p, info);
         };
         lista.appendChild(li);
     });
@@ -263,7 +291,7 @@ function atualizarVisualizacao() {
 }
 
 function trocarMapas() {
-    forcarFullscreen(); // DESAFIO: Troca de mapas amplia a tela
+    forcarFullscreen();
     mapaAtivo = (mapaAtivo === "GSP") ? "INTERIOR" : "GSP";
     cidadeClicadaAtiva = null; 
     atualizarTextoTopo(null);
@@ -277,7 +305,7 @@ function atualizarTextoTopo(nome) {
 }
 
 function toggleMenu() {
-    forcarFullscreen(); // DESAFIO: Abrir o menu amplia a tela
+    forcarFullscreen();
     const menu = document.getElementById('menu-lateral');
     if(menu) {
         menu.classList.toggle('menu-aberto');
