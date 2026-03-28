@@ -226,7 +226,7 @@ function desenharMapa(dados, targetId, ehMinimizado) {
 }
 
 /* ==========================================================================
-   BLOCO 7: NAVEGAÇÃO E FICHA TÉCNICA - COM DESCRIÇÃO PARA COMPLEXOS
+   BLOCO 7: NAVEGAÇÃO E FICHA TÉCNICA - CORREÇÃO COLUNA S
    ========================================================================== */
 function trocarMapas() {
     solicitarFullscreen();
@@ -254,11 +254,16 @@ function exibirDadosResidencial(info) {
         const linkMaps = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(info.endereco)}`;
         const linkCopia = info.linkCorretor || info.linkCliente || "";
         
-        // Verifica se é um COMPLEXO para exibir a descrição (Coluna S / descLonga)
-        const eComplexo = info.categoria === "COMPLEXO" || info.tipo === "N";
-        const htmlDescricao = (eComplexo && info.descLonga) 
-            ? `<div style="margin-top: 15px; font-size: 0.68rem; color: #bbb; line-height: 1.4; text-align: justify;">${info.descLonga}</div>` 
-            : "";
+        // Validação da Coluna S (descLonga) para COMPLEXO
+        const eComplexo = String(info.categoria).toUpperCase() === "COMPLEXO" || info.tipo === "N";
+        let htmlDescricao = "";
+
+        if (eComplexo && info.descLonga) {
+            htmlDescricao = `
+                <div style="margin-top: 15px; border-top: 1px solid #444; padding-top: 10px; font-size: 0.68rem; color: #bbb; line-height: 1.4; text-align: justify;">
+                    ${info.descLonga}
+                </div>`;
+        }
 
         elDetalhes.innerHTML = `
             <div style="margin-top: 10px; border-top: 1px solid #00713a; padding-top: 8px;">
@@ -266,7 +271,7 @@ function exibirDadosResidencial(info) {
                     📍 ${info.endereco || "Endereço não informado"}
                 </div>
                 
-                <div style="display: flex; gap: 5px; width: 100%;">
+                <div style="display: flex; gap: 5px; width: 100%; margin-bottom: 10px;">
                     <button onclick="window.open('${linkMaps}', '_blank')" 
                             class="menu-item-mrv" 
                             style="width: 70px; justify-content: center; margin: 0; height: 32px; background: #4285F4; color: white; border: none; font-size: 0.6rem; padding: 0;">
@@ -297,7 +302,7 @@ function gerarMenuResidenciais() {
         li.innerText = info.nomeCurto.toUpperCase();
         const corZona = obterCorPorZona(info);
 
-        if (info.categoria === "COMPLEXO") {
+        if (String(info.categoria).toUpperCase() === "COMPLEXO") {
             li.classList.add('estilo-complexo');
             li.style.backgroundColor = corZona;
             li.style.color = "#ffffff";
