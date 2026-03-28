@@ -47,7 +47,7 @@ function alternarFullscreen() {
 }
 
 /* ==========================================================================
-   BLOCO 3: GESTÃO DE DADOS (PLANILHA)
+   BLOCO 3: GESTÃO DE DADOS (PLANILHA) - CORREÇÃO COLUNA S
    ========================================================================== */
 async function carregarPlanilha() {
     try {
@@ -76,10 +76,7 @@ async function carregarPlanilha() {
                     regional: limpar(c[14]),
                     cPaulista: limpar(c[15]),
                     link: limpar(c[16]),
-                    descLonga: limpar(c[18]), // CORRIGIDO: Parentese fechado aqui
-                    linkBookCliente: limpar(c[19]),  
-                    linkBookCorretor: limpar(c[21]), 
-                    materiaisExtras: limpar(c[28])   
+                    descLonga: limpar(c[18]) // CORRIGIDO: Agora usando Coluna S (índice 18) como descLonga
                 });
             }
         });
@@ -229,63 +226,72 @@ function desenharMapa(dados, targetId, ehMinimizado) {
 }
 
 /* ==========================================================================
-   BLOCO 7: MATERIAIS DE APOIO (ESTILO DESKTOP NO MOBILE)
+   BLOCO 7: NAVEGAÇÃO E FICHA TÉCNICA - FINALIZADO
    ========================================================================== */
+function trocarMapas() {
+    solicitarFullscreen();
+    limparSelecaoAnterior();
+    mapaAtivo = (mapaAtivo === "GSP") ? "INTERIOR" : "GSP";
+    atualizarVisualizacao();
+}
+
+function atualizarVisualizacao() {
+    if (typeof MAPA_GSP !== 'undefined' && typeof MAPA_INTERIOR !== 'undefined') {
+        desenharMapa(mapaAtivo === "GSP" ? MAPA_GSP : MAPA_INTERIOR, "mapa-container", false);
+        desenharMapa(mapaAtivo === "GSP" ? MAPA_INTERIOR : MAPA_GSP, "mapa-minimizado", true);
+    }
+}
+
 function exibirDadosResidencial(info) {
     const elNome = document.getElementById('nome-imovel');
     const elDetalhes = document.getElementById('detalhes-imovel');
-    if (elNome) elNome.innerText = (info.nomeCurto || "").toUpperCase();
-    if (!elDetalhes) return;
-
-    const criarLinhaMaterial = (titulo, url, icone = "📄") => {
-        if (!url || url === "#" || url === "" || url === "---") return "";
-        const urlSegura = url.includes('drive.google.com') ? url.replace(/\/view.*|\/edit.*/, '/preview') : url;
-
-        return `
-            <div style="background: #fff; border-radius: 8px; padding: 8px 12px; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between; border: 1px solid #ddd; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
-                <div style="display: flex; align-items: center; gap: 10px; flex: 1; overflow: hidden;">
-                    <span style="font-size: 1.1rem;">${icone}</span>
-                    <span style="font-size: 0.72rem; color: #333; font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${titulo}</span>
-                </div>
-                <div style="display: flex; gap: 5px;">
-                    <button onclick="window.open('${urlSegura}', '_blank')" style="background: #00713a; color: white; border: none; padding: 6px 10px; border-radius: 4px; font-size: 0.65rem; font-weight: bold; cursor: pointer;">ABRIR</button>
-                    <button onclick="copyToClipboard('${urlSegura}')" style="background: #ff8c00; color: white; border: none; padding: 6px 10px; border-radius: 4px; font-size: 0.65rem; font-weight: bold; cursor: pointer;">COPIAR</button>
-                </div>
-            </div>`;
-    };
-
-    let htmlMateriaisExtras = "";
-    if (info.materiaisExtras && info.materiaisExtras !== "---") {
-        info.materiaisExtras.split(';').forEach(par => {
-            const dados = par.split(',');
-            if (dados.length === 2) {
-                htmlMateriaisExtras += criarLinhaMaterial(dados[0].trim(), dados[1].trim(), "🎬");
-            }
-        });
+    
+    if (elNome) {
+        elNome.innerText = (info.nomeCurto || "").toUpperCase();
     }
+    
+    if (elDetalhes) {
+        // Gera o link do Google Maps usando o endereço
+        const linkMaps = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(info.endereco)}`;
+        // Usa o link da coluna 16 da planilha
+        const linkCopia = info.link || "#";
+        
+        // Validação da Coluna S (descLonga) para COMPLEXO
+        const eComplexo = info.categoria === "COMPLEXO";
+        let htmlDescricao = "";
 
-    const linkMaps = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(info.endereco)}`;
-    const eComplexo = info.categoria === "COMPLEXO";
+        // Só exibe o texto se for complexo e houver texto na descLonga
+        if (eComplexo && info.descLonga) {
+            htmlDescricao = `
+                <div style="margin-top: 15px; border-top: 1px solid #444; padding-top: 10px; font-size: 0.68rem; color: #bbb; line-height: 1.4; text-align: justify;">
+                    ${info.descLonga}
+                </div>`;
+        }
 
-    elDetalhes.innerHTML = `
-        <div style="margin-top: 10px; border-top: 1px solid #00713a; padding-top: 8px;">
-            <div style="font-size: 0.68rem; color: #cccccc; margin-bottom: 10px;">📍 ${info.endereco || ""}</div>
-            
-            <div style="display: flex; gap: 8px; margin-bottom: 15px;">
-                <button onclick="window.open('${linkMaps}', '_blank')" class="menu-item-mrv" style="width: 70px; height: 32px; background: #4285F4; color: white; border: none; font-size: 0.6rem; display: flex; align-items: center; justify-content: center;">MAPS</button>
-                <button onclick="copyToClipboard('${info.link || ""}')" class="menu-item-mrv" style="width: 70px; height: 32px; background: #444; color: white; border: none; font-size: 0.6rem; display: flex; align-items: center; justify-content: center;">LINK</button>
+        elDetalhes.innerHTML = `
+            <div style="margin-top: 10px; border-top: 1px solid #00713a; padding-top: 8px;">
+                <div style="font-size: 0.68rem; color: #cccccc; margin-bottom: 8px; line-height: 1.2;">
+                    📍 ${info.endereco || "Endereço não informado"}
+                </div>
+                
+                <div style="display: flex; gap: 5px; width: 100%; margin-bottom: 10px;">
+                    <button onclick="window.open('${linkMaps}', '_blank')" 
+                            class="menu-item-mrv" 
+                            style="width: 70px; justify-content: center; margin: 0; height: 32px; background: #4285F4; color: white; border: none; font-size: 0.6rem; padding: 0;">
+                        MAPS
+                    </button>
+                    
+                    <button onclick="copyToClipboard('${linkCopia}')" 
+                            class="menu-item-mrv" 
+                            style="width: 70px; justify-content: center; margin: 0; height: 32px; background: #444; color: white; border: none; font-size: 0.6rem; padding: 0;">
+                        LINK
+                    </button>
+                </div>
+
+                ${htmlDescricao}
             </div>
-
-            ${eComplexo && info.descLonga ? `<div style="font-size: 0.68rem; color: #bbb; margin-bottom: 15px; text-align: justify; line-height: 1.3;">${info.descLonga}</div>` : ""}
-
-            <div style="margin-top: 15px;">
-                <div style="font-size: 0.6rem; color: #aaa; margin-bottom: 8px; font-weight: bold; letter-spacing: 1px; text-transform: uppercase;">Materiais de Apoio</div>
-                ${criarLinhaMaterial("Book Cliente", info.linkBookCliente, "📄")}
-                ${criarLinhaMaterial("Book Corretor", info.linkBookCorretor, "💼")}
-                ${htmlMateriaisExtras}
-            </div>
-        </div>
-    `;
+        `;
+    }
 }
 
 function gerarMenuResidenciais() {
@@ -324,7 +330,6 @@ function gerarMenuResidenciais() {
         lista.appendChild(li);
     });
 }
-
 /* ==========================================================================
    BLOCO 8: SISTEMA (MENU, CLIPBOARD E EVENTOS)
    ========================================================================== */
@@ -335,7 +340,7 @@ function toggleMenu() {
 }
 
 function copyToClipboard(text) {
-    if(!text || text === "#" || text === "") return alert("Link não disponível");
+    if(!text || text === "#") return alert("Link não disponível");
     navigator.clipboard.writeText(text).then(() => alert("Copiado!"));
 }
 
