@@ -47,7 +47,7 @@ function alternarFullscreen() {
 }
 
 /* ==========================================================================
-   BLOCO 3: GESTÃO DE DADOS (PLANILHA) - CORREÇÃO COLUNA S
+   BLOCO 3: GESTÃO DE DADOS (PLANILHA) - ADICIONADO NOVOS CAMPOS
    ========================================================================== */
 async function carregarPlanilha() {
     try {
@@ -58,7 +58,8 @@ async function carregarPlanilha() {
 
         linhas.slice(1).forEach((linha) => {
             const c = linha.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
-            if (c.length >= 18) { 
+            // Verificamos se tem colunas suficientes para chegar até a AC (índice 28)
+            if (c.length >= 20) { 
                 const limpar = (t) => t ? t.replace(/"/g, '').trim() : "";
                 window.dadosGerais.push({
                     id: limpar(c[0]).toLowerCase(),
@@ -75,8 +76,11 @@ async function carregarPlanilha() {
                     limitador: limpar(c[13]),
                     regional: limpar(c[14]),
                     cPaulista: limpar(c[15]),
-                    link: limpar(c[16]),
-                    descLonga: limpar(c[18]) // CORRIGIDO: Agora usando Coluna S (índice 18) como descLonga
+                    link: limpar(c[16]), // Coluna Q
+                    descLonga: limpar(c[18]), // Coluna S
+                    bookCliente: limpar(c[19]), // Coluna T (Novo)
+                    bookCorretor: limpar(c[21]), // Coluna V (Novo)
+                    materiais: limpar(c[28]) // Coluna AC (Novo)
                 });
             }
         });
@@ -226,7 +230,7 @@ function desenharMapa(dados, targetId, ehMinimizado) {
 }
 
 /* ==========================================================================
-   BLOCO 7: NAVEGAÇÃO E FICHA TÉCNICA - FINALIZADO
+   BLOCO 7: NAVEGAÇÃO E FICHA TÉCNICA - COM NOVOS BOTÕES
    ========================================================================== */
 function trocarMapas() {
     solicitarFullscreen();
@@ -251,16 +255,21 @@ function exibirDadosResidencial(info) {
     }
     
     if (elDetalhes) {
-        // Gera o link do Google Maps usando o endereço
         const linkMaps = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(info.endereco)}`;
-        // Usa o link da coluna 16 da planilha
-        const linkCopia = info.link || "#";
         
-        // Validação da Coluna S (descLonga) para COMPLEXO
+        // Função auxiliar para criar botões apenas se houver link
+        const criarBotao = (label, link, cor) => {
+            if(!link || link === "#" || link === "") return "";
+            return `
+                <button onclick="window.open('${link}', '_blank')" 
+                        class="menu-item-mrv" 
+                        style="flex: 1; justify-content: center; margin: 0; height: 32px; background: ${cor}; color: white; border: none; font-size: 0.55rem; padding: 0 4px; font-weight: bold;">
+                    ${label}
+                </button>`;
+        };
+
         const eComplexo = info.categoria === "COMPLEXO";
         let htmlDescricao = "";
-
-        // Só exibe o texto se for complexo e houver texto na descLonga
         if (eComplexo && info.descLonga) {
             htmlDescricao = `
                 <div style="margin-top: 15px; border-top: 1px solid #444; padding-top: 10px; font-size: 0.68rem; color: #bbb; line-height: 1.4; text-align: justify;">
@@ -274,18 +283,19 @@ function exibirDadosResidencial(info) {
                     📍 ${info.endereco || "Endereço não informado"}
                 </div>
                 
-                <div style="display: flex; gap: 5px; width: 100%; margin-bottom: 10px;">
-                    <button onclick="window.open('${linkMaps}', '_blank')" 
+                <div style="display: flex; gap: 4px; width: 100%; margin-bottom: 4px;">
+                    ${criarBotao("MAPS", linkMaps, "#4285F4")}
+                    <button onclick="copyToClipboard('${info.link}')" 
                             class="menu-item-mrv" 
-                            style="width: 70px; justify-content: center; margin: 0; height: 32px; background: #4285F4; color: white; border: none; font-size: 0.6rem; padding: 0;">
-                        MAPS
+                            style="flex: 1; justify-content: center; margin: 0; height: 32px; background: #444; color: white; border: none; font-size: 0.55rem; padding: 0;">
+                        COPIAR LINK
                     </button>
-                    
-                    <button onclick="copyToClipboard('${linkCopia}')" 
-                            class="menu-item-mrv" 
-                            style="width: 70px; justify-content: center; margin: 0; height: 32px; background: #444; color: white; border: none; font-size: 0.6rem; padding: 0;">
-                        LINK
-                    </button>
+                </div>
+
+                <div style="display: flex; gap: 4px; width: 100%; margin-bottom: 10px;">
+                    ${criarBotao("BOOK CLI", info.bookCliente, "#00713a")}
+                    ${criarBotao("BOOK COR", info.bookCorretor, "#d1147e")}
+                    ${criarBotao("EXTRAS", info.materiais, "#ff8c00")}
                 </div>
 
                 ${htmlDescricao}
@@ -340,7 +350,7 @@ function toggleMenu() {
 }
 
 function copyToClipboard(text) {
-    if(!text || text === "#") return alert("Link não disponível");
+    if(!text || text === "#" || text === "") return alert("Link não disponível");
     navigator.clipboard.writeText(text).then(() => alert("Copiado!"));
 }
 
