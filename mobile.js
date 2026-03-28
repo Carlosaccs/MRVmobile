@@ -321,29 +321,14 @@ function exibirDadosResidencial(info) {
     const elNome = document.getElementById('nome-imovel');
     const elDetalhes = document.getElementById('detalhes-imovel');
     
-    // 1. Lógica de Estoque
-    let estoqueHTML = "";
-    const est = info.estoque;
-
-    if (est === 0 || est === "0") {
-        estoqueHTML = `<b class="estoque-vendido">VENDIDO</b>`;
-    } else if (est === "-") {
-        estoqueHTML = `<b>CONSULTAR</b>`;
-    } else {
-        const numEst = parseInt(est);
-        const corClasse = numEst < 6 ? "estoque-alerta" : "";
-        estoqueHTML = `<b class="${corClasse}">RESTAM ${numEst} UN.</b>`;
+    if(elNome) {
+        elNome.innerText = info.nomeCurto.toUpperCase();
     }
-
-    // 2. Lógica de Plantas (Coluna K + Coluna L)
-    const plantasFormatado = `${info.plantaMin} a ${info.plantaMax}`;
-
-    if(elNome) elNome.innerText = info.nomeCurto.toUpperCase();
 
     if(elDetalhes) {
         elDetalhes.innerHTML = `
             <div class="endereco-texto" style="margin-bottom: 8px; font-size: 0.72rem; color: #ccc;">
-                📍 ${info.endereco || ""}
+                📍 ${info.endereco || "Endereço não disponível"}
             </div>
 
             <div class="container-acoes-grid">
@@ -355,14 +340,14 @@ function exibirDadosResidencial(info) {
                 <div class="caixa-dado-mrv"><span>ENTREGA</span><b>${info.entrega}</b></div>
                 <div class="caixa-dado-mrv"><span>OBRA</span><b>${info.obra}%</b></div>
                 
-                <div class="caixa-dado-mrv"><span>ESTOQUE</span>${estoqueHTML}</div>
+                <div class="caixa-dado-mrv"><span>ESTOQUE</span><b>${info.estoque}</b></div>
                 <div class="caixa-dado-mrv"><span>C. PAUL.</span><b>${info.cPaulista}</b></div>
                 
-                <div class="caixa-dado-mrv"><span>PLANTAS</span><b>${plantasFormatado}</b></div>
+                <div class="caixa-dado-mrv"><span>PLANTAS</span><b>${info.plantaMin}</b></div>
                 <div class="caixa-dado-mrv"><span>LIMIT.</span><b>${info.limitador}</b></div>
             </div>
             
-            <div id="texto-descricao" style="margin-top: 12px; font-size: 0.85rem;">${info.descricao || ""}</div>
+            <div id="texto-descricao" style="margin-top: 12px;">${info.descricao || ""}</div>
         `;
     }
 }
