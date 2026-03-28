@@ -90,9 +90,11 @@ function atualizarTextoTopo(nome) {
 // --- LÓGICA DE LIMPEZA DE SELEÇÃO ---
 function limparSelecaoAnterior() {
     cidadeClicadaAtiva = null;
+    // Seleciona todos os paths do mapa principal e volta para a cor base
     document.querySelectorAll('#mapa-container path').forEach(p => {
         p.setAttribute('data-selecionado', 'false');
-        p.style.fill = p.getAttribute('data-cor-base');
+        const corOriginal = p.getAttribute('data-cor-base');
+        p.style.fill = corOriginal;
     });
     atualizarTextoTopo(null);
 }
@@ -169,13 +171,17 @@ function desenharMapa(dados, targetId, ehMinimizado) {
         path.setAttribute('data-cor-base', corBase);
 
         if (!ehMinimizado) {
-            // Evento de toque/hover volátil
-            path.onpointerenter = () => {
+            // AQUI ESTÁ O SEGREDO: Pointerdown para mobile ser instantâneo
+            path.onpointerdown = (e) => {
                 atualizarTextoTopo(pData.name);
+
+                if (!ehMRV) {
+                    // SE TOCOU NO CINZA: Limpa o laranja de todos os outros IMEDIATAMENTE
+                    limparSelecaoAnterior();
+                }
             };
 
             path.onpointerleave = () => {
-                // Se não há nada fixado (laranja), volta pro nome do mapa
                 const nomeVolta = cidadeClicadaAtiva ? cidadeClicadaAtiva.name : null;
                 atualizarTextoTopo(nomeVolta);
             };
@@ -187,7 +193,7 @@ function desenharMapa(dados, targetId, ehMinimizado) {
                 if (ehMRV) {
                     clicarNoMapa(path, null, pData);
                 } else {
-                    // Clique em path CINZA: Limpa qualquer destaque laranja ativo
+                    // Reforço no clique do cinza
                     limparSelecaoAnterior();
                 }
             };
