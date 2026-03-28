@@ -90,13 +90,94 @@ function atualizarTextoTopo(nome) {
 // --- LÓGICA DE LIMPEZA DE SELEÇÃO ---
 function limparSelecaoAnterior() {
     cidadeClicadaAtiva = null;
-    // Seleciona todos os paths do mapa principal e volta para a cor base
+    // Remove o estado 'data-selecionado' e reseta a cor de TODOS os caminhos
     document.querySelectorAll('#mapa-container path').forEach(p => {
         p.setAttribute('data-selecionado', 'false');
-        const corOriginal = p.getAttribute('data-cor-base');
-        p.style.fill = corOriginal;
+        p.style.fill = p.getAttribute('data-cor-base'); // Volta para Verde ou Cinza original
     });
-    atualizarTextoTopo(null);
+    
+    // Limpa a vitrine de botões à direita
+    const containerBotoes = document.getElementById('container-vitrine-botoes');
+    if (containerBotoes) containerBotoes.innerHTML = "";
+    
+    // Opcional: Limpar os dados do residencial na ficha técnica
+    const elNome = document.getElementById('nome-imovel');
+    if (elNome) elNome.innerText = "";
+    
+    atualizarTextoTopo(null); // Volta para "GRANDE SP" ou "ESTADO DE SP"
+}
+
+function desenharMapa(dados, targetId, ehMinimizado) {
+    const container = document.getElementById(targetId);
+    if (!container || !dados) return;
+    container.innerHTML = "";
+    const svg = document.createElementNS(svgNS, "svg");
+    svg.setAttribute("viewBox", dados.viewBox);
+    
+    if (!ehMinimizado) {
+        const conf = AJUSTES_MAPA[mapaAtivo];
+        svg.style.marginRight = conf.marginRight;
+        svg.style.marginLeft = conf.marginLeft;
+        svg.style.transform = `scale(${conf.scale})`;
+    }
+
+    const g = document.createElementNS(svgNS, "g");
+    if(dados.transform) g.setAttribute("transform", dados.transform);
+
+    dados.paths.forEach(pData => {
+        const path = document.createElementNS(svgNS, "path");
+        const idLimpo = pData.id.toLowerCase();
+        const ehMRV = pData.class === "commrv" || window.dadosGerais.some(d => d.id === idLimpo);
+        
+        path.setAttribute("d", pData.d);
+        path.setAttribute("id", (ehMinimizado ? 'mini-' : '') + pData.id);
+        path.setAttribute('data-name', pData.name || pData.id);
+        
+        const corBase = ehMRV ? "#00713a" : "#cccccc";
+        path.style.fill = corBase;
+        path.style.stroke = "#ffffff";
+        path.style.strokeWidth = (ehMinimizado || !ehMRV) ? "0" : "1.2";
+        path.setAttribute('data-cor-base', corBase);
+
+        if (!ehMinimizado) {
+            // TOQUE (Dedo encosta)
+            path.onpointerdown = (e) => {
+                e.stopPropagation();
+                atualizarTextoTopo(pData.name);
+                
+                if (!ehMRV) {
+                    // Se for cinza, remove qualquer seleção laranja ativa
+                    limparSelecaoAnterior();
+                }
+            };
+
+            // SAÍDA (Dedo levanta ou desliza para fora)
+            path.onpointerleave = () => {
+                // Se houver uma cidade laranja (fixa), mantém o nome dela. 
+                // Se não, volta para o nome do Mapa.
+                const nomeVolta = cidadeClicadaAtiva ? cidadeClicadaAtiva.name : null;
+                atualizarTextoTopo(nomeVolta);
+            };
+
+            // CLIQUE (Finaliza a ação)
+            path.onclick = (e) => { 
+                e.stopPropagation();
+                if (pData.id === "grandesaopaulo") { trocarMapas(); return; } 
+                
+                if (ehMRV) {
+                    clicarNoMapa(path, null, pData);
+                } else {
+                    // Reforça a limpeza ao clicar no cinza
+                    limparSelecaoAnterior();
+                }
+            };
+        }
+        g.appendChild(path);
+    });
+    svg.appendChild(g);
+    container.appendChild(svg);
+    
+    if (!cidadeClicadaAtiva) atualizarTextoTopo(null);
 }
 
 function clicarNoMapa(pathElement, infoSelecionado, pDataRaw = null) {
