@@ -1,5 +1,5 @@
 /* ==========================================================================
-   v140.55 - VERSÃO CONSOLIDADA E LIMPA (SEM DUPLICATAS)
+   v140.60 - FULLSCREEN AMPLIADO + CIDADES CINZAS INFORMATIVAS
    ========================================================================== */
 
 const svgNS = "http://www.w3.org/2000/svg";
@@ -14,7 +14,7 @@ const AJUSTES_MAPA = {
     INTERIOR: { marginRight: "50%", marginLeft: "-100px", scale: "1.15" }
 };
 
-// --- 1. AUXILIARES E CORES ---
+// --- 1. AUXILIARES E FULLSCREEN ---
 function obterCorPorZona(info) {
     const z = info.zona ? info.zona.trim().toUpperCase() : "";
     switch(z) {
@@ -26,9 +26,19 @@ function obterCorPorZona(info) {
     }
 }
 
+// Função para apenas ampliar (sem alternar) quando clicar em elementos do mapa
+function solicitarFullscreen() {
+    const elem = document.documentElement;
+    if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+        if (elem.requestFullscreen) elem.requestFullscreen();
+        else if (elem.webkitRequestFullscreen) elem.webkitRequestFullscreen();
+    }
+}
+
+// Função do botão específico da faixa verde (que alterna)
 function alternarFullscreen() {
     const elem = document.documentElement;
-    if (!document.fullscreenElement) {
+    if (!document.fullscreenElement && !document.webkitFullscreenElement) {
         if (elem.requestFullscreen) elem.requestFullscreen();
         else if (elem.webkitRequestFullscreen) elem.webkitRequestFullscreen();
     } else {
@@ -37,7 +47,7 @@ function alternarFullscreen() {
     }
 }
 
-// --- 2. GESTÃO DE DADOS (PLANILHA) ---
+// --- 2. GESTÃO DE DADOS ---
 async function carregarPlanilha() {
     try {
         const res = await fetch(URL_PLANILHA);
@@ -92,17 +102,15 @@ function limparSelecaoAnterior() {
         p.setAttribute('data-selecionado', 'false');
         p.style.fill = p.getAttribute('data-cor-base');
     });
-    
     const containerBotoes = document.getElementById('container-vitrine-botoes');
     if (containerBotoes) containerBotoes.innerHTML = "";
-    
     const elNome = document.getElementById('nome-imovel');
     if (elNome) elNome.innerText = "";
-    
     atualizarTextoTopo(null);
 }
 
 function clicarNoMapa(pathElement, infoSelecionado, pDataRaw = null) {
+    solicitarFullscreen(); // Amplia ao selecionar um residencial
     const idRegiao = pathElement.id.replace('mini-', '').toLowerCase();
     
     document.querySelectorAll('#mapa-container path').forEach(p => { 
@@ -175,7 +183,9 @@ function desenharMapa(dados, targetId, ehMinimizado) {
         if (!ehMinimizado) {
             path.onpointerdown = (e) => {
                 e.stopPropagation();
-                atualizarTextoTopo(pData.name);
+                solicitarFullscreen(); // Amplia ao tocar em qualquer cidade
+                atualizarTextoTopo(pData.name); // Agora informa o nome mesmo se for cinza
+                
                 if (!ehMRV) {
                     limparSelecaoAnterior(); // Toque no cinza reseta o verde/laranja
                 }
@@ -205,6 +215,7 @@ function desenharMapa(dados, targetId, ehMinimizado) {
 
 // --- 4. NAVEGAÇÃO E MENUS ---
 function trocarMapas() {
+    solicitarFullscreen(); // Amplia ao trocar de mapa
     mapaAtivo = (mapaAtivo === "GSP") ? "INTERIOR" : "GSP";
     limparSelecaoAnterior();
     atualizarVisualizacao();
@@ -229,6 +240,7 @@ function gerarMenuResidenciais() {
         li.style.borderRightColor = obterCorPorZona(info);
         li.onclick = (e) => {
             e.stopPropagation();
+            solicitarFullscreen(); // Amplia ao clicar no residencial pelo menu
             let p = document.getElementById(info.id);
             if (!p) { 
                 trocarMapas(); 
@@ -267,6 +279,7 @@ function exibirDadosResidencial(info) {
 }
 
 function toggleMenu() {
+    solicitarFullscreen(); // Amplia ao abrir o menu
     const menu = document.getElementById('menu-lateral');
     if(menu) { menu.classList.toggle('menu-aberto'); menu.classList.toggle('menu-oculto'); }
 }
