@@ -1,5 +1,6 @@
 /* ==========================================================================
-   v140.20 - CSS COMPLETO E CONSOLIDADO (DASHBOARD MRV MOBILE)
+   v140.25 - CSS CONSOLIDADO E CORRIGIDO (DASHBOARD MRV MOBILE)
+   Foco: Estabilização de Layout e Alinhamento de Dados
    ========================================================================== */
 
 /* 1. FUNDAÇÃO E RESET */
@@ -13,16 +14,15 @@ html, body {
     box-sizing: border-box; 
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
     -webkit-tap-highlight-color: transparent;
-    user-select: none;                       
 }
 
 :root {
-    --ft-font-size: 0.85rem; /* Fonte base dos botões residenciais */
+    --ft-font-size: 0.85rem;
     --cor-mrv: #00713a;
     --cor-alerta: #e74c3c;
 }
 
-/* 2. FAIXA VERDE LATERAL */
+/* 2. FAIXA VERDE E MENU LATERAL (ESQUERDA) */
 .faixa-verde-vertical {
     position: absolute; left: 0; top: 0;
     width: 60px; height: 100%;
@@ -30,72 +30,59 @@ html, body {
     display: flex; flex-direction: column;
     align-items: center; justify-content: space-between;
     padding: 15px 0; z-index: 4000;
-    box-shadow: 2px 0 10px rgba(0,0,0,0.3);
 }
 
 .titulo-vertical {
-    writing-mode: vertical-rl;
-    transform: rotate(180deg);
-    font-weight: bold; font-size: 1.1rem;
-    letter-spacing: 2px; color: white !important;
-    white-space: nowrap; flex-grow: 1;
-    display: flex; align-items: center; justify-content: center;
+    writing-mode: vertical-rl; transform: rotate(180deg);
+    font-weight: bold; font-size: 1.1rem; color: white !important;
 }
 
-/* 3. MENU LATERAL (ESQUERDA) */
+/* Correção da "explosão" do menu esquerdo */
 #menu-lateral {
-    position: fixed; left: 55px; top: 0;
-    width: calc(100% - 80px); max-width: 330px; height: 100%;
-    z-index: 3000; transition: transform 0.4s ease;
+    position: fixed; left: 60px; top: 0;
+    width: 250px; /* Largura fixa para não invadir o mapa */
+    height: 100%; background: white;
+    z-index: 3000; overflow-y: auto;
+    box-shadow: 2px 0 10px rgba(0,0,0,0.1);
 }
 
-/* 4. FICHA TÉCNICA (PAINEL DIREITO) */
+/* 3. FICHA TÉCNICA (DIREITA) */
 .ficha-tecnica {
     position: absolute; right: 0; top: 0;
     width: 44%; height: 100%;
     background: rgba(30, 30, 30, 0.96);
     backdrop-filter: blur(12px); color: white;
-    padding: 15px 12px 40px 12px; z-index: 1000;
-    box-shadow: -10px 0 30px rgba(0,0,0,0.5);
-    border-left: 1px solid rgba(255,255,255,0.1);
-    overflow-y: auto;
+    padding: 15px 12px; z-index: 1000;
+    overflow-y: auto; border-left: 1px solid rgba(255,255,255,0.1);
 }
 
 #nome-imovel {
-    color: #50c878; margin: 15px 0 5px 0;
-    font-weight: 700; font-size: var(--ft-font-size);
-    border-bottom: 2px solid var(--cor-mrv); 
-    padding-bottom: 8px; text-transform: uppercase;
+    color: #50c878; font-weight: 700;
+    font-size: var(--ft-font-size);
+    border-bottom: 2px solid var(--cor-mrv);
+    padding-bottom: 8px; margin-bottom: 10px;
+    text-transform: uppercase;
 }
 
-/* 5. BOTÕES MAPS E LINK (50% de largura) */
+/* 4. BOTÕES MAPS E LINK (LADO A LADO) */
 .container-acoes-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 6px;
-    margin-bottom: 8px;
+    gap: 6px; margin-bottom: 8px;
 }
 
 .btn-acao {
-    justify-content: center;
-    font-weight: 800;
-    color: white;
-    text-transform: uppercase;
-    border: none;
-    cursor: pointer;
-    background: #ffffff;
-    padding: 12px 12px;
-    border-radius: 4px;
+    height: 42px; border-radius: 4px;
     font-size: var(--ft-font-size) !important;
-    display: flex;
-    align-items: center;
-    min-height: 42px;
+    font-weight: 800; color: white; border: none;
+    display: flex; align-items: center; justify-content: center;
+    text-transform: uppercase; cursor: pointer;
 }
 
 .btn-maps { background-color: #4285F4; }
 .btn-link { background-color: #444444; }
 
-/* 6. GRID DE DADOS (Caixas Brancas) */
+/* 5. GRID DE DADOS (CAIXAS BRANCAS) */
 .grid-dados-imovel {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -104,65 +91,43 @@ html, body {
 
 .caixa-dado-mrv {
     background: #ffffff;
-    padding: 12px 12px;
-    border-radius: 4px;
-    font-size: var(--ft-font-size) !important;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
     border: 1px solid #d1d1d1;
-    min-height: 42px;
-    color: #333;
+    border-radius: 4px;
+    min-height: 42px; padding: 0 10px;
+    display: flex; align-items: center;
+    justify-content: space-between; /* Título esquerda, Valor direita */
 }
 
 .caixa-dado-mrv span {
-    color: var(--cor-mrv);
-    font-weight: 800;
-    font-size: 0.65rem;
-    text-transform: uppercase;
+    color: var(--cor-mrv); font-weight: 800;
+    font-size: 0.65rem; text-transform: uppercase;
 }
 
 .caixa-dado-mrv b {
-    color: #333;
-    font-weight: 700;
-    text-align: right;
+    color: #333; font-weight: 700;
+    font-size: var(--ft-font-size);
 }
 
+/* Status de Estoque */
 .estoque-alerta { color: var(--cor-alerta) !important; }
 .estoque-vendido { color: #888 !important; text-decoration: line-through; }
 
-/* 7. INDICADOR CIDADE (TOPO) - VOLTOU AO CÓDIGO */
+/* 6. VITRINE SUPERIOR (LISTA NA FICHA TÉCNICA) */
+#container-vitrine-botoes .menu-item-mrv {
+    background: #ffffff; border: 1px solid #d1d1d1;
+    border-right: 18px solid var(--cor-mrv);
+    padding: 12px !important; margin-bottom: 4px;
+    font-size: var(--ft-font-size) !important;
+    border-radius: 2px 6px 6px 2px;
+    color: #333; font-weight: 600; text-transform: uppercase;
+}
+
+/* 7. INDICADOR CIDADE */
 #identificador-cidade {
-    position: absolute; top: 10px; left: 28%;
+    position: absolute; top: 10px; left: 50%;
     transform: translateX(-50%);
-    font-size: 0.9rem; font-weight: bold;
-    color: var(--cor-mrv); z-index: 1500;
     background: rgba(255,255,255,0.9);
     padding: 5px 15px; border-radius: 20px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-    text-transform: uppercase;
-}
-
-/* 8. VITRINE SUPERIOR - VOLTOU AO CÓDIGO */
-#container-vitrine-botoes {
-    display: flex; flex-direction: column;
-    gap: 3px; margin-bottom: 15px;
-}
-
-#container-vitrine-botoes .menu-item-mrv {
-    background: #ffffff;
-    border: 1px solid #d1d1d1;
-    border-right: 18px solid var(--cor-mrv);
-    padding: 12px 12px !important;
-    font-size: var(--ft-font-size) !important;
-    margin: 0 !important;
-    border-radius: 2px 6px 6px 2px;
-    text-transform: uppercase;
-    font-weight: 600;
-    display: block;
-}
-
-#texto-descricao {
-    color: #efefef; margin-top: 15px;
-    font-size: var(--ft-font-size); text-align: justify;
+    color: var(--cor-mrv); font-weight: bold;
+    z-index: 2000; box-shadow: 0 2px 5px rgba(0,0,0,0.2);
 }
