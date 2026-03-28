@@ -166,6 +166,7 @@ function desenharMapa(dados, targetId, ehMinimizado) {
     const svg = document.createElementNS(svgNS, "svg");
     svg.setAttribute("viewBox", dados.viewBox);
     
+    // Agrupamos as configurações do SVG principal aqui
     if (!ehMinimizado) {
         const conf = AJUSTES_MAPA[mapaAtivo];
         svg.style.marginRight = conf.marginRight;
@@ -191,44 +192,51 @@ function desenharMapa(dados, targetId, ehMinimizado) {
         path.style.strokeWidth = (ehMinimizado || !ehMRV) ? "0" : "1.2";
         path.setAttribute('data-cor-base', corBase);
 
+        // UNIFICADO: Todas as interações do mapa principal em um único bloco
         if (!ehMinimizado) {
+            
+            // 1. Ao encostar (Dedo pressionado ou Mouse em cima)
             path.onpointerdown = (e) => {
                 e.stopPropagation();
                 solicitarFullscreen();
-                
-                if (!ehMRV) {
-                    // SE FOR CINZA: Limpa tudo PRIMEIRO, depois escreve o nome
-                    limparSelecaoAnterior();
-                    atualizarTextoTopo(pData.name);
-                } else {
-                    atualizarTextoTopo(pData.name);
-                }
+                atualizarTextoTopo(pData.name); // Apenas mostra o nome no topo
             };
 
+            // 2. Ao retirar o dedo/mouse
             path.onpointerleave = () => {
+                // Se houver um residencial selecionado, volta o nome dele. 
+                // Se não, volta o nome do mapa (GSP ou ESTADO).
                 const nomeVolta = cidadeClicadaAtiva ? cidadeClicadaAtiva.name : null;
                 atualizarTextoTopo(nomeVolta);
             };
 
+            // 3. Ao clicar (Toque rápido)
             path.onclick = (e) => { 
                 e.stopPropagation();
+                
+                // Botão especial GSP no mapa do Interior
                 if (pData.id === "grandesaopaulo") { trocarMapas(); return; } 
+
                 if (ehMRV) {
                     clicarNoMapa(path, null, pData);
                 } else {
-                    // Reforço ao soltar o dedo do cinza
-                    limparSelecaoAnterior();
+                    // SE FOR CINZA: Apenas mantém o nome no topo por 2 segundos 
+                    // SEM rodar o limparSelecaoAnterior(). Assim a ficha técnica não some!
                     atualizarTextoTopo(pData.name);
+                    setTimeout(() => {
+                        const nomeVolta = cidadeClicadaAtiva ? cidadeClicadaAtiva.name : null;
+                        atualizarTextoTopo(nomeVolta);
+                    }, 2000);
                 }
             };
         }
         g.appendChild(path);
     });
+    
     svg.appendChild(g);
     container.appendChild(svg);
     if (!cidadeClicadaAtiva) atualizarTextoTopo(null);
 }
-
 // --- 4. NAVEGAÇÃO E MENUS ---
 function trocarMapas() {
     solicitarFullscreen();
