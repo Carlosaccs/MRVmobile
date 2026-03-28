@@ -47,7 +47,7 @@ function alternarFullscreen() {
 }
 
 /* ==========================================================================
-   BLOCO 3: GESTÃO DE DADOS (PLANILHA) - ADICIONADO BOOK CLIENTE (COLUNA T)
+   BLOCO 3: GESTÃO DE DADOS (PLANILHA) - MAPEANDO COLUNA T
    ========================================================================== */
 async function carregarPlanilha() {
     try {
@@ -58,7 +58,7 @@ async function carregarPlanilha() {
 
         linhas.slice(1).forEach((linha) => {
             const c = linha.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
-            if (c.length >= 20) { // Garante que lê até a coluna T (índice 19)
+            if (c.length >= 18) { 
                 const limpar = (t) => t ? t.replace(/"/g, '').trim() : "";
                 window.dadosGerais.push({
                     id: limpar(c[0]).toLowerCase(),
@@ -77,7 +77,7 @@ async function carregarPlanilha() {
                     cPaulista: limpar(c[15]),
                     link: limpar(c[16]),
                     descLonga: limpar(c[18]),
-                    bookCliente: limpar(c[19]) // NOVA COLUNA T (ÍNDICE 19)
+                    bookCliente: limpar(c[19]) // Capturando Coluna T (índice 19)
                 });
             }
         });
@@ -227,8 +227,22 @@ function desenharMapa(dados, targetId, ehMinimizado) {
 }
 
 /* ==========================================================================
-   BLOCO 7: FICHA TÉCNICA - LAYOUT IGUAL À IMAGEM DE REFERÊNCIA
-   ========================================================================== */
+   BLOCO 7: NAVEGAÇÃO E FICHA TÉCNICA
+   ========================================================================= */
+function trocarMapas() {
+    solicitarFullscreen();
+    limparSelecaoAnterior();
+    mapaAtivo = (mapaAtivo === "GSP") ? "INTERIOR" : "GSP";
+    atualizarVisualizacao();
+}
+
+function atualizarVisualizacao() {
+    if (typeof MAPA_GSP !== 'undefined' && typeof MAPA_INTERIOR !== 'undefined') {
+        desenharMapa(mapaAtivo === "GSP" ? MAPA_GSP : MAPA_INTERIOR, "mapa-container", false);
+        desenharMapa(mapaAtivo === "GSP" ? MAPA_INTERIOR : MAPA_GSP, "mapa-minimizado", true);
+    }
+}
+
 function exibirDadosResidencial(info) {
     const elNome = document.getElementById('nome-imovel');
     const elDetalhes = document.getElementById('detalhes-imovel');
@@ -239,77 +253,9 @@ function exibirDadosResidencial(info) {
     
     if (elDetalhes) {
         const linkMaps = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(info.endereco)}`;
-        const linkPrincipal = info.link || "#";
-        const linkBook = info.bookCliente || "";
-
-        // HTML do Card de Material (conforme sua imagem)
-        let htmlBook = "";
-        if (linkBook && linkBook !== "#") {
-            htmlBook = `
-                <div style="color: #bbb; font-size: 0.6rem; margin: 15px 0 5px 0; text-transform: uppercase; font-weight: bold;">Materiais de Apoio</div>
-                <div style="display: flex; align-items: center; background: #fff; border-radius: 8px; padding: 10px; margin-bottom: 8px; border: 1px solid #ddd; gap: 10px;">
-                    <span style="font-size: 1.2rem;">📄</span>
-                    <span style="flex: 1; font-size: 0.75rem; color: #333; font-weight: bold;">Book Cliente</span>
-                    <div style="display: flex; gap: 5px;">
-                        <button onclick="window.open('${linkBook}', '_blank')" 
-                                style="background: #00713a; color: white; border: none; border-radius: 5px; padding: 6px 12px; font-size: 0.65rem; font-weight: bold; cursor: pointer;">
-                            Abrir
-                        </button>
-                        <button onclick="copyToClipboard('${linkBook}')" 
-                                style="background: #ff8c00; color: white; border: none; border-radius: 5px; padding: 6px 12px; font-size: 0.65rem; font-weight: bold; cursor: pointer;">
-                            Copiar
-                        </button>
-                    </div>
-                </div>`;
-        }
-
+        const linkCopia = info.link || "#";
+        
+        // HTML da descrição (Coluna S)
         const eComplexo = info.categoria === "COMPLEXO";
         let htmlDescricao = (eComplexo && info.descLonga) ? `
-            <div style="margin-top: 15px; border-top: 1px solid #444; padding-top: 10px; font-size: 0.68rem; color: #bbb; line-height: 1.4; text-align: justify;">
-                ${info.descLonga}
-            </div>` : "";
-
-        elDetalhes.innerHTML = `
-            <div style="margin-top: 10px; border-top: 1px solid #00713a; padding-top: 8px;">
-                <div style="font-size: 0.68rem; color: #cccccc; margin-bottom: 12px; line-height: 1.2;">
-                    📍 ${info.endereco || "Endereço não informado"}
-                </div>
-                
-                <div style="display: flex; gap: 6px; width: 100%; margin-bottom: 10px;">
-                    <button onclick="window.open('${linkMaps}', '_blank')" 
-                            style="flex: 1; height: 35px; background: #4285F4; color: white; border: none; border-radius: 6px; font-size: 0.65rem; font-weight: bold; cursor: pointer;">
-                        MAPS
-                    </button>
-                    <button onclick="copyToClipboard('${linkPrincipal}')" 
-                            style="flex: 1; height: 35px; background: #444; color: white; border: none; border-radius: 6px; font-size: 0.65rem; font-weight: bold; cursor: pointer;">
-                        COPIAR LINK
-                    </button>
-                </div>
-
-                ${htmlBook}
-                ${htmlDescricao}
-            </div>
-        `;
-    }
-}
-/* ==========================================================================
-   BLOCO 8: SISTEMA (MENU, CLIPBOARD E EVENTOS)
-   ========================================================================== */
-function toggleMenu() {
-    solicitarFullscreen();
-    const menu = document.getElementById('menu-lateral');
-    if(menu) { menu.classList.toggle('menu-aberto'); menu.classList.toggle('menu-oculto'); }
-}
-
-function copyToClipboard(text) {
-    if(!text || text === "#") return alert("Link não disponível");
-    navigator.clipboard.writeText(text).then(() => alert("Copiado!"));
-}
-
-window.onload = carregarPlanilha;
-
-document.addEventListener('click', (e) => {
-    if (e.target.closest('#btn-menu')) { e.stopPropagation(); toggleMenu(); }
-    if (e.target.closest('#btn-fullscreen')) { e.stopPropagation(); alternarFullscreen(); }
-    if (e.target.closest('#mapa-minimizado')) { e.stopPropagation(); trocarMapas(); }
-});
+            <div
