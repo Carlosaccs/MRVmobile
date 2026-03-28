@@ -200,8 +200,9 @@ function desenharMapa(dados, targetId, ehMinimizado) {
 }
 
 /* ==========================================================================
-   BLOCO 5: MENUS, FICHA TÉCNICA E EVENTOS
+   BLOCO 5: MENUS, FICHA TÉCNICA E EVENTOS DE SISTEMA
    ========================================================================== */
+
 function exibirDadosResidencial(info) {
     const elNome = document.getElementById('nome-imovel');
     const elDetalhes = document.getElementById('detalhes-imovel');
@@ -226,10 +227,62 @@ function exibirDadosResidencial(info) {
     }
 }
 
-// Funções de Sistema
-function trocarMapas() { solicitarFullscreen(); limparSelecaoAnterior(); mapaAtivo = (mapaAtivo === "GSP") ? "INTERIOR" : "GSP"; atualizarVisualizacao(); }
-function atualizarVisualizacao() { if (typeof MAPA_GSP !== 'undefined' && typeof MAPA_INTERIOR !== 'undefined') { desenharMapa(mapaAtivo === "GSP" ? MAPA_GSP : MAPA_INTERIOR, "mapa-container", false); desenharMapa(mapaAtivo === "GSP" ? MAPA_INTERIOR : MAPA_GSP, "mapa-minimizado", true); } }
-function solicitarFullscreen() { const elem = document.documentElement; if (!document.fullscreenElement && !document.webkitFullscreenElement) { if (elem.requestFullscreen) elem.requestFullscreen(); else if (elem.webkitRequestFullscreen) elem.webkitRequestFullscreen(); } }
-function copyToClipboard(text) { if(!text || text === "#") return alert("Link não disponível"); navigator.clipboard.writeText(text).then(() => alert("Copiado!")); }
+// --- FUNÇÕES DOS BOTÕES DA FAIXA VERDE ---
+
+function toggleMenu() {
+    solicitarFullscreen();
+    const menu = document.getElementById('menu-lateral');
+    if(menu) { 
+        menu.classList.toggle('menu-aberto'); 
+        menu.classList.toggle('menu-oculto'); 
+    }
+}
+
+function alternarFullscreen() {
+    if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+        if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen();
+        else if (document.documentElement.webkitRequestFullscreen) document.documentElement.webkitRequestFullscreen();
+    } else {
+        if (document.exitFullscreen) document.exitFullscreen();
+        else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+    }
+}
+
+function trocarMapas() { 
+    solicitarFullscreen(); 
+    limparSelecaoAnterior(); 
+    mapaAtivo = (mapaAtivo === "GSP") ? "INTERIOR" : "GSP"; 
+    atualizarVisualizacao(); 
+}
+
+function solicitarFullscreen() { 
+    if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+        if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen();
+    }
+}
+
+function copyToClipboard(text) { 
+    if(!text || text === "#") return alert("Link não disponível"); 
+    navigator.clipboard.writeText(text).then(() => alert("Copiado!")); 
+}
+
+// --- ESCUTADOR DE CLIQUES (O QUE FAZ FUNCIONAR) ---
+
+document.addEventListener('click', (e) => {
+    // 1. Clique no botão de Menu (Topo da faixa verde)
+    if (e.target.closest('#btn-menu') || e.target.closest('.faixa-verde-vertical img:first-child')) {
+        toggleMenu();
+    }
+    
+    // 2. Clique no botão Fullscreen (Base da faixa verde)
+    if (e.target.closest('#btn-fullscreen') || e.target.closest('.faixa-verde-vertical img:last-child')) {
+        alternarFullscreen();
+    }
+
+    // 3. Clique no Mapa Minimizado
+    if (e.target.closest('#mapa-minimizado')) {
+        trocarMapas();
+    }
+});
+
 window.onload = carregarPlanilha;
-document.addEventListener('click', (e) => { if (e.target.closest('#mapa-minimizado')) trocarMapas(); });
