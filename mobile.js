@@ -123,14 +123,14 @@ function clicarNoMapa(pathElement, infoSelecionado, pDataRaw = null) {
     solicitarFullscreen();
     const idRegiao = pathElement.id.replace('mini-', '').toLowerCase();
     
-    // Limpa destaque anterior antes de marcar o novo
+    // 1. Limpa destaque anterior antes de marcar o novo
     document.querySelectorAll('#mapa-container path').forEach(p => { 
         p.setAttribute('data-selecionado', 'false'); 
         p.style.fill = p.getAttribute('data-cor-base'); 
     });
     
     pathElement.setAttribute('data-selecionado', 'true');
-    pathElement.style.fill = "#FF4500"; 
+    pathElement.style.fill = "#FF4500"; // Cor de seleção (laranja vivo)
     
     const nomeDaCidade = pDataRaw ? pDataRaw.name : pathElement.getAttribute('data-name');
     cidadeClicadaAtiva = { name: (nomeDaCidade || "").toUpperCase() }; 
@@ -145,20 +145,40 @@ function clicarNoMapa(pathElement, infoSelecionado, pDataRaw = null) {
     
     if(containerBotoes) {
         containerBotoes.innerHTML = "";
+        
+        // --- NOVO: Lógica para renderizar os botões da Vitrine com cor de fundo (Complexo) ---
         todosDestaRegiao.forEach(item => {
             if (item.nomeCurto && item.nomeCurto !== "Sem Nome" && item.nomeCurto !== ativo.nomeCurto) {
                 const btn = document.createElement('div');
-                btn.className = 'menu-item-mrv';
+                btn.className = 'menu-item-mrv'; // Mesma classe base
                 btn.innerText = item.nomeCurto.toUpperCase();
-                btn.style.borderRightColor = obterCorPorZona(item);
-                btn.onclick = (e) => { e.stopPropagation(); clicarNoMapa(pathElement, item, pDataRaw); };
+                
+                const corZona = obterCorPorZona(item);
+
+                // --- LÓGICA DO COMPLEXO PARA OS BOTÕES DA VITRINE (DIREITA) ---
+                if (item.categoria === "COMPLEXO") {
+                    btn.classList.add('estilo-complexo'); // Negrito e sombra
+                    btn.style.backgroundColor = corZona;  // Pinta o fundo
+                    btn.style.color = "#ffffff";          // Texto branco
+                    btn.style.borderRightColor = "rgba(0,0,0,0.2)"; // Borda sutil
+                } else {
+                    // Estilo padrão na vitrine
+                    btn.style.borderRightColor = corZona;
+                    btn.style.backgroundColor = "#ffffff"; // Fundo branco padrão
+                    btn.style.color = "#333";
+                }
+
+                btn.onclick = (e) => { 
+                    e.stopPropagation(); 
+                    clicarNoMapa(pathElement, item, pDataRaw); // Re-renderiza a vitrine para o novo item
+                };
                 containerBotoes.appendChild(btn);
             }
         });
     }
+    
     if (ativo) exibirDadosResidencial(ativo);
 }
-
 function desenharMapa(dados, targetId, ehMinimizado) {
     const container = document.getElementById(targetId);
     if (!container || !dados) return;
