@@ -47,7 +47,7 @@ function alternarFullscreen() {
 }
 
 /* ==========================================================================
-   BLOCO 3: GESTÃO DE DADOS (PLANILHA)
+   BLOCO 3: GESTÃO DE DADOS (PLANILHA) - CORREÇÃO COLUNA S
    ========================================================================== */
 async function carregarPlanilha() {
     try {
@@ -76,7 +76,7 @@ async function carregarPlanilha() {
                     regional: limpar(c[14]),
                     cPaulista: limpar(c[15]),
                     link: limpar(c[16]),
-                    descricao: limpar(c[17])
+                    descLonga: limpar(c[18]) // CORRIGIDO: Agora usando Coluna S (índice 18) como descLonga
                 });
             }
         });
@@ -226,7 +226,7 @@ function desenharMapa(dados, targetId, ehMinimizado) {
 }
 
 /* ==========================================================================
-   BLOCO 7: NAVEGAÇÃO E FICHA TÉCNICA - CORREÇÃO COLUNA S
+   BLOCO 7: NAVEGAÇÃO E FICHA TÉCNICA - FINALIZADO
    ========================================================================== */
 function trocarMapas() {
     solicitarFullscreen();
@@ -251,13 +251,16 @@ function exibirDadosResidencial(info) {
     }
     
     if (elDetalhes) {
+        // Gera o link do Google Maps usando o endereço
         const linkMaps = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(info.endereco)}`;
-        const linkCopia = info.linkCorretor || info.linkCliente || "";
+        // Usa o link da coluna 16 da planilha
+        const linkCopia = info.link || "#";
         
         // Validação da Coluna S (descLonga) para COMPLEXO
-        const eComplexo = String(info.categoria).toUpperCase() === "COMPLEXO" || info.tipo === "N";
+        const eComplexo = info.categoria === "COMPLEXO";
         let htmlDescricao = "";
 
+        // Só exibe o texto se for complexo e houver texto na descLonga
         if (eComplexo && info.descLonga) {
             htmlDescricao = `
                 <div style="margin-top: 15px; border-top: 1px solid #444; padding-top: 10px; font-size: 0.68rem; color: #bbb; line-height: 1.4; text-align: justify;">
