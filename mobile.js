@@ -226,7 +226,7 @@ function desenharMapa(dados, targetId, ehMinimizado) {
 }
 
 /* ==========================================================================
-   BLOCO 7: NAVEGAÇÃO E FICHA TÉCNICA - BOTÕES REDUZIDOS
+   BLOCO 7: NAVEGAÇÃO E FICHA TÉCNICA - COM DESCRIÇÃO PARA COMPLEXOS
    ========================================================================== */
 function trocarMapas() {
     solicitarFullscreen();
@@ -252,8 +252,13 @@ function exibirDadosResidencial(info) {
     
     if (elDetalhes) {
         const linkMaps = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(info.endereco)}`;
-        // No mobile, usamos info.linkCorretor ou info.linkCliente como base para o botão LINK
         const linkCopia = info.linkCorretor || info.linkCliente || "";
+        
+        // Verifica se é um COMPLEXO para exibir a descrição (Coluna S / descLonga)
+        const eComplexo = info.categoria === "COMPLEXO" || info.tipo === "N";
+        const htmlDescricao = (eComplexo && info.descLonga) 
+            ? `<div style="margin-top: 15px; font-size: 0.68rem; color: #bbb; line-height: 1.4; text-align: justify;">${info.descLonga}</div>` 
+            : "";
 
         elDetalhes.innerHTML = `
             <div style="margin-top: 10px; border-top: 1px solid #00713a; padding-top: 8px;">
@@ -274,6 +279,8 @@ function exibirDadosResidencial(info) {
                         LINK
                     </button>
                 </div>
+
+                ${htmlDescricao}
             </div>
         `;
     }
@@ -315,7 +322,6 @@ function gerarMenuResidenciais() {
         lista.appendChild(li);
     });
 }
-
 /* ==========================================================================
    BLOCO 8: SISTEMA (MENU, CLIPBOARD E EVENTOS)
    ========================================================================== */
