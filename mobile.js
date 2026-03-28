@@ -1,5 +1,5 @@
 /* ==========================================================================
-   v140.60 - FULLSCREEN AMPLIADO + CIDADES CINZAS INFORMATIVAS
+   v140.70 - FIX: LIMPEZA TOTAL DA FICHA + FEEDBACK CIDADE CINZA
    ========================================================================== */
 
 const svgNS = "http://www.w3.org/2000/svg";
@@ -26,7 +26,6 @@ function obterCorPorZona(info) {
     }
 }
 
-// Função para apenas ampliar (sem alternar) quando clicar em elementos do mapa
 function solicitarFullscreen() {
     const elem = document.documentElement;
     if (!document.fullscreenElement && !document.webkitFullscreenElement) {
@@ -35,7 +34,6 @@ function solicitarFullscreen() {
     }
 }
 
-// Função do botão específico da faixa verde (que alterna)
 function alternarFullscreen() {
     const elem = document.documentElement;
     if (!document.fullscreenElement && !document.webkitFullscreenElement) {
@@ -96,23 +94,36 @@ function atualizarTextoTopo(nome) {
     }
 }
 
+// LIMPEZA COMPLETA (Mapa + Ficha Técnica)
 function limparSelecaoAnterior() {
     cidadeClicadaAtiva = null;
+    
+    // 1. Reseta as cores do mapa
     document.querySelectorAll('#mapa-container path').forEach(p => {
         p.setAttribute('data-selecionado', 'false');
         p.style.fill = p.getAttribute('data-cor-base');
     });
+
+    // 2. Limpa a Vitrine de Botões
     const containerBotoes = document.getElementById('container-vitrine-botoes');
     if (containerBotoes) containerBotoes.innerHTML = "";
+
+    // 3. Limpa a Ficha Técnica (A "Caixa Escura")
     const elNome = document.getElementById('nome-imovel');
     if (elNome) elNome.innerText = "";
+    
+    const elDetalhes = document.getElementById('detalhes-imovel');
+    if (elDetalhes) elDetalhes.innerHTML = ""; // Remove botões Maps/Link e dados
+
+    // 4. Reseta o Título do Topo
     atualizarTextoTopo(null);
 }
 
 function clicarNoMapa(pathElement, infoSelecionado, pDataRaw = null) {
-    solicitarFullscreen(); // Amplia ao selecionar um residencial
+    solicitarFullscreen();
     const idRegiao = pathElement.id.replace('mini-', '').toLowerCase();
     
+    // Limpa destaque anterior antes de marcar o novo
     document.querySelectorAll('#mapa-container path').forEach(p => { 
         p.setAttribute('data-selecionado', 'false'); 
         p.style.fill = p.getAttribute('data-cor-base'); 
@@ -183,11 +194,14 @@ function desenharMapa(dados, targetId, ehMinimizado) {
         if (!ehMinimizado) {
             path.onpointerdown = (e) => {
                 e.stopPropagation();
-                solicitarFullscreen(); // Amplia ao tocar em qualquer cidade
-                atualizarTextoTopo(pData.name); // Agora informa o nome mesmo se for cinza
+                solicitarFullscreen();
                 
                 if (!ehMRV) {
-                    limparSelecaoAnterior(); // Toque no cinza reseta o verde/laranja
+                    // SE FOR CINZA: Limpa tudo PRIMEIRO, depois escreve o nome
+                    limparSelecaoAnterior();
+                    atualizarTextoTopo(pData.name);
+                } else {
+                    atualizarTextoTopo(pData.name);
                 }
             };
 
@@ -202,7 +216,9 @@ function desenharMapa(dados, targetId, ehMinimizado) {
                 if (ehMRV) {
                     clicarNoMapa(path, null, pData);
                 } else {
+                    // Reforço ao soltar o dedo do cinza
                     limparSelecaoAnterior();
+                    atualizarTextoTopo(pData.name);
                 }
             };
         }
@@ -215,9 +231,9 @@ function desenharMapa(dados, targetId, ehMinimizado) {
 
 // --- 4. NAVEGAÇÃO E MENUS ---
 function trocarMapas() {
-    solicitarFullscreen(); // Amplia ao trocar de mapa
+    solicitarFullscreen();
+    limparSelecaoAnterior(); // Agora limpa o mapa E a caixa escura da direita
     mapaAtivo = (mapaAtivo === "GSP") ? "INTERIOR" : "GSP";
-    limparSelecaoAnterior();
     atualizarVisualizacao();
 }
 
@@ -240,7 +256,7 @@ function gerarMenuResidenciais() {
         li.style.borderRightColor = obterCorPorZona(info);
         li.onclick = (e) => {
             e.stopPropagation();
-            solicitarFullscreen(); // Amplia ao clicar no residencial pelo menu
+            solicitarFullscreen();
             let p = document.getElementById(info.id);
             if (!p) { 
                 trocarMapas(); 
@@ -279,7 +295,7 @@ function exibirDadosResidencial(info) {
 }
 
 function toggleMenu() {
-    solicitarFullscreen(); // Amplia ao abrir o menu
+    solicitarFullscreen();
     const menu = document.getElementById('menu-lateral');
     if(menu) { menu.classList.toggle('menu-aberto'); menu.classList.toggle('menu-oculto'); }
 }
