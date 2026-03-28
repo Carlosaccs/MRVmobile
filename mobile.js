@@ -1,6 +1,7 @@
 /* ==========================================================================
-   BLOCO 1: CONFIGURAÇÕES INICIAIS E VARIÁVEIS
+   v140.75 - FIX DEFINITIVO: LIMPEZA DE COMPLEXO (Bases Notebook & Mobile)
    ========================================================================== */
+
 const svgNS = "http://www.w3.org/2000/svg";
 const URL_PLANILHA = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSRKdJctOPQjKAtOZSDHyArD_H8SgKIouelAS1vF1d_-13pu7u_ic6J8nP3r0Ijd56WA-mbUmHjb4Me/pub?output=csv';
 
@@ -13,9 +14,7 @@ const AJUSTES_MAPA = {
     INTERIOR: { marginRight: "50%", marginLeft: "-100px", scale: "1.15" }
 };
 
-/* ==========================================================================
-   BLOCO 2: AUXILIARES E FULLSCREEN
-   ========================================================================== */
+// --- 1. AUXILIARES E FULLSCREEN ---
 function obterCorPorZona(info) {
     const z = info.zona ? info.zona.trim().toUpperCase() : "";
     switch(z) {
@@ -46,9 +45,7 @@ function alternarFullscreen() {
     }
 }
 
-/* ==========================================================================
-   BLOCO 3: GESTÃO DE DADOS (PLANILHA)
-   ========================================================================== */
+// --- 2. GESTÃO DE DADOS ---
 async function carregarPlanilha() {
     try {
         const res = await fetch(URL_PLANILHA);
@@ -76,7 +73,8 @@ async function carregarPlanilha() {
                     regional: limpar(c[14]),
                     cPaulista: limpar(c[15]),
                     link: limpar(c[16]),
-                    descricao: limpar(c[17])
+                    descricao: limpar(c[17]),
+                    textoColunaR: limpar(c[18])
                 });
             }
         });
@@ -85,13 +83,15 @@ async function carregarPlanilha() {
     } catch (e) { console.error("Erro na planilha:", e); }
 }
 
-/* ==========================================================================
-   BLOCO 4: INTERFACE E LIMPEZA
-   ========================================================================== */
+// --- 3. LÓGICA DE INTERFACE E MAPA ---
 function atualizarTextoTopo(nome) {
     const indicador = document.getElementById('identificador-cidade');
     if (!indicador) return;
-    indicador.innerText = nome ? nome.toUpperCase() : (mapaAtivo === "GSP" ? "GRANDE SP" : "ESTADO DE SP");
+    if (nome) {
+        indicador.innerText = nome.toUpperCase();
+    } else {
+        indicador.innerText = (mapaAtivo === "GSP" ? "GRANDE SP" : "ESTADO DE SP");
+    }
 }
 
 function limparSelecaoAnterior() {
@@ -105,13 +105,10 @@ function limparSelecaoAnterior() {
     const elNome = document.getElementById('nome-imovel');
     if (elNome) elNome.innerText = "";
     const elDetalhes = document.getElementById('detalhes-imovel');
-    if (elDetalhes) elDetalhes.innerHTML = "";
+    if (elDetalhes) elDetalhes.innerHTML = ""; 
     atualizarTextoTopo(null);
 }
 
-/* ==========================================================================
-   BLOCO 5: CLIQUE NO MAPA E VITRINE
-   ========================================================================== */
 function clicarNoMapa(pathElement, infoSelecionado, pDataRaw = null) {
     solicitarFullscreen();
     const idRegiao = pathElement.id.replace('mini-', '').toLowerCase();
@@ -138,9 +135,9 @@ function clicarNoMapa(pathElement, infoSelecionado, pDataRaw = null) {
     if(containerBotoes) {
         containerBotoes.innerHTML = "";
         todosDestaRegiao.forEach(item => {
-            if (item.nomeCurto && item.nomeCurto !== ativo.nomeCurto) {
+            if (item.nomeCurto && item.nomeCurto !== "Sem Nome" && item.nomeCurto !== ativo.nomeCurto) {
                 const btn = document.createElement('div');
-                btn.className = 'menu-item-mrv';
+                btn.className = 'menu-item-mrv'; 
                 btn.innerText = item.nomeCurto.toUpperCase();
                 const corZona = obterCorPorZona(item);
 
@@ -166,9 +163,6 @@ function clicarNoMapa(pathElement, infoSelecionado, pDataRaw = null) {
     if (ativo) exibirDadosResidencial(ativo);
 }
 
-/* ==========================================================================
-   BLOCO 6: DESENHO DO SVG (MAPA)
-   ========================================================================== */
 function desenharMapa(dados, targetId, ehMinimizado) {
     const container = document.getElementById(targetId);
     if (!container || !dados) return;
@@ -207,16 +201,22 @@ function desenharMapa(dados, targetId, ehMinimizado) {
                 solicitarFullscreen();
                 atualizarTextoTopo(pData.name);
             };
-
             path.onpointerleave = () => {
                 const nomeVolta = cidadeClicadaAtiva ? cidadeClicadaAtiva.name : null;
                 atualizarTextoTopo(nomeVolta);
             };
-
             path.onclick = (e) => { 
                 e.stopPropagation();
                 if (pData.id === "grandesaopaulo") { trocarMapas(); return; } 
-                if (ehMRV) clicarNoMapa(path, null, pData);
+                if (ehMRV) {
+                    clicarNoMapa(path, null, pData);
+                } else {
+                    atualizarTextoTopo(pData.name);
+                    setTimeout(() => {
+                        const nomeVolta = cidadeClicadaAtiva ? cidadeClicadaAtiva.name : null;
+                        atualizarTextoTopo(nomeVolta);
+                    }, 2000);
+                }
             };
         }
         g.appendChild(path);
@@ -225,20 +225,66 @@ function desenharMapa(dados, targetId, ehMinimizado) {
     container.appendChild(svg);
 }
 
-/* ==========================================================================
-   BLOCO 7: FICHA TÉCNICA (LIMPEZA TOTAL PARA COMPLEXO)
-   ========================================================================== */
+function trocarMapas() {
+    solicitarFullscreen();
+    limparSelecaoAnterior();
+    mapaAtivo = (mapaAtivo === "GSP") ? "INTERIOR" : "GSP";
+    atualizarVisualizacao();
+}
+
+function atualizarVisualizacao() {
+    if (typeof MAPA_GSP !== 'undefined' && typeof MAPA_INTERIOR !== 'undefined') {
+        desenharMapa(mapaAtivo === "GSP" ? MAPA_GSP : MAPA_INTERIOR, "mapa-container", false);
+        desenharMapa(mapaAtivo === "GSP" ? MAPA_INTERIOR : MAPA_GSP, "mapa-minimizado", true);
+    }
+}
+
+function gerarMenuResidenciais() {
+    const lista = document.getElementById('lista-residenciais');
+    if (!lista) return;
+    lista.innerHTML = ""; 
+    [...window.dadosGerais].sort((a, b) => a.ordem - b.ordem).forEach(info => {
+        if (!info.nomeCurto || info.nomeCurto === "Sem Nome") return;
+        const li = document.createElement('li');
+        li.className = 'menu-item-mrv'; 
+        li.innerText = info.nomeCurto.toUpperCase();
+        const corZona = obterCorPorZona(info);
+        if (info.categoria === "COMPLEXO") {
+            li.classList.add('estilo-complexo');
+            li.style.backgroundColor = corZona;
+            li.style.color = "#ffffff";
+            li.style.borderRightColor = "rgba(0,0,0,0.2)";
+        } else {
+            li.style.borderRightColor = corZona;
+            li.style.backgroundColor = "#ffffff";
+            li.style.color = "#333";
+        }
+        li.onclick = (e) => {
+            e.stopPropagation();
+            solicitarFullscreen();
+            let p = document.getElementById(info.id);
+            if (!p) { 
+                trocarMapas(); 
+                setTimeout(() => { 
+                    let np = document.getElementById(info.id); 
+                    if (np) clicarNoMapa(np, info); 
+                }, 300); 
+            } else { 
+                clicarNoMapa(p, info); 
+            }
+        };
+        lista.appendChild(li);
+    });
+}
+
 function exibirDadosResidencial(info) {
     const elNome = document.getElementById('nome-imovel');
     const elDetalhes = document.getElementById('detalhes-imovel');
-    
-    if(elNome) { 
-        elNome.innerText = info.nomeCurto.toUpperCase(); 
-    }
+    if(elNome) { elNome.innerText = info.nomeCurto.toUpperCase(); }
 
     if(elDetalhes) {
-        // 1. Criamos o HTML base com Endereço e Botões (IGUAL PARA TODOS)
-        let htmlPrincipal = `
+        // PARTE 1: Cabeçalho (Sempre aparece)
+        let htmlBase = `
             <div class="endereco-texto" style="margin-bottom: 8px; font-size: 0.72rem; color: #ccc;">
                 📍 ${info.endereco || "Endereço não disponível"}
             </div>
@@ -248,14 +294,10 @@ function exibirDadosResidencial(info) {
             </div>
         `;
 
-        // 2. Lógica de decisão RADICAL
-        if (info.categoria === "COMPLEXO") {
-            // SE FOR COMPLEXO: Só o que definimos acima entra na tela.
-            elDetalhes.innerHTML = htmlPrincipal;
-            console.log("Limpeza de Complexo aplicada: Caixas removidas.");
-        } else {
-            // SE FOR RESIDENCIAL: Adicionamos as caixas e a descrição
-            let htmlDadosResidencial = `
+        // PARTE 2: Dados Técnicos (Somente se NÃO for COMPLEXO)
+        let htmlTecnico = "";
+        if (info.categoria !== "COMPLEXO") {
+            htmlTecnico = `
                 <div class="grid-dados-imovel">
                     <div class="caixa-dado-mrv"><span>ENTREGA</span><b>${info.entrega}</b></div>
                     <div class="caixa-dado-mrv"><span>OBRA</span><b>${info.obra}%</b></div>
@@ -264,17 +306,15 @@ function exibirDadosResidencial(info) {
                     <div class="caixa-dado-mrv"><span>PLANTAS</span><b>${info.plantaMin}</b></div>
                     <div class="caixa-dado-mrv"><span>LIMIT.</span><b>${info.limitador}</b></div>
                 </div>
-                <div id="texto-descricao" style="margin-top: 12px; color: #efefef; font-size: 0.8rem;">
+                <div id="texto-descricao" style="margin-top: 12px; font-size: 0.8rem; color: #efefef;">
                     ${info.descricao || info.textoColunaR || ""}
                 </div>
             `;
-            elDetalhes.innerHTML = htmlPrincipal + htmlDadosResidencial;
         }
+        elDetalhes.innerHTML = htmlBase + htmlTecnico;
     }
 }
-/* ==========================================================================
-   BLOCO 8: SISTEMA (MENU, CLIPBOARD E EVENTOS)
-   ========================================================================== */
+
 function toggleMenu() {
     solicitarFullscreen();
     const menu = document.getElementById('menu-lateral');
@@ -289,7 +329,7 @@ function copyToClipboard(text) {
 window.onload = carregarPlanilha;
 
 document.addEventListener('click', (e) => {
-    if (e.target.closest('#btn-menu')) { e.stopPropagation(); toggleMenu(); }
-    if (e.target.closest('#btn-fullscreen')) { e.stopPropagation(); alternarFullscreen(); }
-    if (e.target.closest('#mapa-minimizado')) { e.stopPropagation(); trocarMapas(); }
+    if (e.target.closest('#btn-menu')) toggleMenu();
+    if (e.target.closest('#mapa-minimizado')) trocarMapas();
+    if (e.target.closest('#btn-fullscreen')) alternarFullscreen();
 });
