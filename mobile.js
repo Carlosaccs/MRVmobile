@@ -320,25 +320,36 @@ function gerarMenuResidenciais() {
 function exibirDadosResidencial(info) {
     const elNome = document.getElementById('nome-imovel');
     const elDetalhes = document.getElementById('detalhes-imovel');
-    if(elNome) elNome.innerText = info.nomeCurto.toUpperCase();
+    
+    if(elNome) {
+        elNome.innerText = info.nomeCurto.toUpperCase();
+        elNome.style.fontSize = "0.85rem"; // Padronizando o título também
+    }
+
     if(elDetalhes) {
         elDetalhes.innerHTML = `
-            <div style="display: flex; gap: 8px; margin-bottom: 10px;">
-                <button onclick="window.open('https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(info.endereco)}','_blank')" class="btn-acao btn-maps">MAPS</button>
-                <button onclick="copyToClipboard('${info.link}')" class="btn-acao btn-link">LINK</button>
+            <div class="container-acoes" style="display: flex; gap: 8px; margin-bottom: 12px;">
+                <button onclick="window.open('https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(info.endereco)}','_blank')" class="btn-acao btn-maps" style="flex:1; font-size: 0.85rem;">MAPS</button>
+                <button onclick="copyToClipboard('${info.link}')" class="btn-acao btn-link" style="flex:1; font-size: 0.85rem;">LINK</button>
             </div>
-            <div style="grid-template-columns: 1fr 1fr; display: grid; gap: 5px;">
-                <div class="texto-coluna-r">ENTREGA: <b>${info.entrega}</b></div>
-                <div class="texto-coluna-r">OBRA: <b>${info.obra}%</b></div>
-                <div class="texto-coluna-r">PLANTAS: <b>${info.plantaMin} a ${info.plantaMax}</b></div>
-                <div class="texto-coluna-r">ESTOQUE: <b>${info.estoque}</b></div>
-                <div class="texto-coluna-r">LIMITADOR: <b>${info.limitador}</b></div>
-                <div class="texto-coluna-r">C. PAULISTA: <b>${info.cPaulista}</b></div>
+
+            <div class="grid-dados-imovel">
+                <div class="caixa-dado-mrv"><span>ENTREGA</span><b>${info.entrega}</b></div>
+                <div class="caixa-dado-mrv"><span>OBRA</span><b>${info.obra}%</b></div>
+                <div class="caixa-dado-mrv"><span>ESTOQUE</span><b>${info.estoque}</b></div>
+                <div class="caixa-dado-mrv"><span>C. PAUL.</span><b>${info.cPaulista}</b></div>
+            </div>
+            
+            <div class="caixa-dado-mrv" style="margin-top: 4px; width: 100%;">
+                <span>PLANTAS</span><b>${info.plantaMin} a ${info.plantaMax}</b>
+            </div>
+
+            <div class="caixa-dado-mrv" style="margin-top: 4px; width: 100%;">
+                <span>LIMITADOR</span><b>${info.limitador}</b>
             </div>
         `;
     }
 }
-
 function toggleMenu() {
     solicitarFullscreen();
     const menu = document.getElementById('menu-lateral');
