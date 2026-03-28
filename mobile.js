@@ -232,11 +232,13 @@ function exibirDadosResidencial(info) {
     const elNome = document.getElementById('nome-imovel');
     const elDetalhes = document.getElementById('detalhes-imovel');
     
-    if(elNome) { elNome.innerText = info.nomeCurto.toUpperCase(); }
+    if(elNome) { 
+        elNome.innerText = info.nomeCurto.toUpperCase(); 
+    }
 
     if(elDetalhes) {
-        // 1. Parte Comum: Endereço e Botões (Sempre aparecem)
-        let htmlContent = `
+        // 1. Criamos o HTML base com Endereço e Botões (IGUAL PARA TODOS)
+        let htmlPrincipal = `
             <div class="endereco-texto" style="margin-bottom: 8px; font-size: 0.72rem; color: #ccc;">
                 📍 ${info.endereco || "Endereço não disponível"}
             </div>
@@ -246,10 +248,14 @@ function exibirDadosResidencial(info) {
             </div>
         `;
 
-        // 2. Lógica de Exibição Condicional
-        if (info.categoria !== "COMPLEXO") {
-            // SE FOR RESIDENCIAL: Mostra as caixas brancas E a descrição
-            htmlContent += `
+        // 2. Lógica de decisão RADICAL
+        if (info.categoria === "COMPLEXO") {
+            // SE FOR COMPLEXO: Só o que definimos acima entra na tela.
+            elDetalhes.innerHTML = htmlPrincipal;
+            console.log("Limpeza de Complexo aplicada: Caixas removidas.");
+        } else {
+            // SE FOR RESIDENCIAL: Adicionamos as caixas e a descrição
+            let htmlDadosResidencial = `
                 <div class="grid-dados-imovel">
                     <div class="caixa-dado-mrv"><span>ENTREGA</span><b>${info.entrega}</b></div>
                     <div class="caixa-dado-mrv"><span>OBRA</span><b>${info.obra}%</b></div>
@@ -262,13 +268,8 @@ function exibirDadosResidencial(info) {
                     ${info.descricao || info.textoColunaR || ""}
                 </div>
             `;
-        } else {
-            // SE FOR COMPLEXO: Não adiciona mais nada. 
-            // A ficha técnica morrerá logo após os botões MAPS e LINK.
-            console.log("Registro COMPLEXO detectado: Limpando dados técnicos.");
+            elDetalhes.innerHTML = htmlPrincipal + htmlDadosResidencial;
         }
-
-        elDetalhes.innerHTML = htmlContent;
     }
 }
 /* ==========================================================================
