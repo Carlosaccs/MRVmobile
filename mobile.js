@@ -226,78 +226,51 @@ function desenharMapa(dados, targetId, ehMinimizado) {
 }
 
 /* ==========================================================================
-   BLOCO 7: NAVEGAÇÃO E FICHA TÉCNICA
+   BLOCO 7: FICHA TÉCNICA (LIMPEZA TOTAL PARA COMPLEXO)
    ========================================================================== */
-function trocarMapas() {
-    solicitarFullscreen();
-    limparSelecaoAnterior();
-    mapaAtivo = (mapaAtivo === "GSP") ? "INTERIOR" : "GSP";
-    atualizarVisualizacao();
-}
-
-function atualizarVisualizacao() {
-    if (typeof MAPA_GSP !== 'undefined' && typeof MAPA_INTERIOR !== 'undefined') {
-        desenharMapa(mapaAtivo === "GSP" ? MAPA_GSP : MAPA_INTERIOR, "mapa-container", false);
-        desenharMapa(mapaAtivo === "GSP" ? MAPA_INTERIOR : MAPA_GSP, "mapa-minimizado", true);
-    }
-}
-
 function exibirDadosResidencial(info) {
     const elNome = document.getElementById('nome-imovel');
     const elDetalhes = document.getElementById('detalhes-imovel');
-    if(elNome) elNome.innerText = info.nomeCurto.toUpperCase();
+    
+    if(elNome) { elNome.innerText = info.nomeCurto.toUpperCase(); }
+
     if(elDetalhes) {
-        elDetalhes.innerHTML = `
-            <div style="margin-bottom: 8px; font-size: 0.72rem; color: #ccc;">📍 ${info.endereco || ""}</div>
+        // 1. Parte Comum: Endereço e Botões (Sempre aparecem)
+        let htmlContent = `
+            <div class="endereco-texto" style="margin-bottom: 8px; font-size: 0.72rem; color: #ccc;">
+                📍 ${info.endereco || "Endereço não disponível"}
+            </div>
             <div class="container-acoes-grid">
                 <button onclick="window.open('https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(info.endereco)}','_blank')" class="btn-acao btn-maps">MAPS</button>
                 <button onclick="copyToClipboard('${info.link}')" class="btn-acao btn-link">LINK</button>
             </div>
-            <div class="grid-dados-imovel">
-                <div class="caixa-dado-mrv"><span>ENTREGA</span><b>${info.entrega}</b></div>
-                <div class="caixa-dado-mrv"><span>OBRA</span><b>${info.obra}%</b></div>
-                <div class="caixa-dado-mrv"><span>ESTOQUE</span><b>${info.estoque}</b></div>
-                <div class="caixa-dado-mrv"><span>C. PAUL.</span><b>${info.cPaulista}</b></div>
-                <div class="caixa-dado-mrv"><span>PLANTAS</span><b>${info.plantaMin}</b></div>
-                <div class="caixa-dado-mrv"><span>LIMIT.</span><b>${info.limitador}</b></div>
-            </div>
-            <div id="texto-descricao" style="margin-top: 12px;">${info.descricao || ""}</div>
         `;
-    }
-}
 
-function gerarMenuResidenciais() {
-    const lista = document.getElementById('lista-residenciais');
-    if (!lista) return;
-    lista.innerHTML = ""; 
-    [...window.dadosGerais].sort((a, b) => a.ordem - b.ordem).forEach(info => {
-        if (!info.nomeCurto || info.nomeCurto === "Sem Nome") return;
-        const li = document.createElement('li');
-        li.className = 'menu-item-mrv'; 
-        li.innerText = info.nomeCurto.toUpperCase();
-        const corZona = obterCorPorZona(info);
-
-        if (info.categoria === "COMPLEXO") {
-            li.classList.add('estilo-complexo');
-            li.style.backgroundColor = corZona;
-            li.style.color = "#ffffff";
+        // 2. Lógica de Exibição Condicional
+        if (info.categoria !== "COMPLEXO") {
+            // SE FOR RESIDENCIAL: Mostra as caixas brancas E a descrição
+            htmlContent += `
+                <div class="grid-dados-imovel">
+                    <div class="caixa-dado-mrv"><span>ENTREGA</span><b>${info.entrega}</b></div>
+                    <div class="caixa-dado-mrv"><span>OBRA</span><b>${info.obra}%</b></div>
+                    <div class="caixa-dado-mrv"><span>ESTOQUE</span><b>${info.estoque}</b></div>
+                    <div class="caixa-dado-mrv"><span>C. PAUL.</span><b>${info.cPaulista}</b></div>
+                    <div class="caixa-dado-mrv"><span>PLANTAS</span><b>${info.plantaMin}</b></div>
+                    <div class="caixa-dado-mrv"><span>LIMIT.</span><b>${info.limitador}</b></div>
+                </div>
+                <div id="texto-descricao" style="margin-top: 12px; color: #efefef; font-size: 0.8rem;">
+                    ${info.descricao || info.textoColunaR || ""}
+                </div>
+            `;
         } else {
-            li.style.borderRightColor = corZona;
+            // SE FOR COMPLEXO: Não adiciona mais nada. 
+            // A ficha técnica morrerá logo após os botões MAPS e LINK.
+            console.log("Registro COMPLEXO detectado: Limpando dados técnicos.");
         }
 
-        li.onclick = (e) => {
-            e.stopPropagation();
-            toggleMenu();
-            let p = document.getElementById(info.id);
-            if (!p) { 
-                trocarMapas(); 
-                setTimeout(() => { let np = document.getElementById(info.id); if (np) clicarNoMapa(np, info); }, 300); 
-            } else { clicarNoMapa(p, info); }
-        };
-        lista.appendChild(li);
-    });
+        elDetalhes.innerHTML = htmlContent;
+    }
 }
-
 /* ==========================================================================
    BLOCO 8: SISTEMA (MENU, CLIPBOARD E EVENTOS)
    ========================================================================== */
