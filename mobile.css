@@ -1,6 +1,5 @@
 /* ==========================================================================
-   v140.90 - CSS CONSOLIDADO (DASHBOARD MRV MOBILE)
-   Foco: Grid de Dados, Botões Lado a Lado e Altura Padronizada (35px)
+   v140.20 - CSS COMPLETO E CONSOLIDADO (DASHBOARD MRV MOBILE)
    ========================================================================== */
 
 /* 1. FUNDAÇÃO E RESET */
@@ -14,31 +13,20 @@ html, body {
     box-sizing: border-box; 
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
     -webkit-tap-highlight-color: transparent;
-    -webkit-touch-callout: none;             
     user-select: none;                       
 }
 
-#identificador-cidade, .menu-item-mrv, path, .btn-acao {
-    user-select: none;
-    -webkit-user-select: none;
-}
-
 :root {
-    --ft-font-size: 0.85rem; 
-    --ft-font-dados: 0.72rem; /* Tamanho padronizado para dados e vitrine */
-}
-
-.mobile-wrapper {
-    display: flex; width: 100vw; height: 100%;
-    position: relative; overflow: hidden;
+    --ft-font-size: 0.85rem; /* Fonte base dos botões residenciais */
+    --cor-mrv: #00713a;
+    --cor-alerta: #e74c3c;
 }
 
 /* 2. FAIXA VERDE LATERAL */
 .faixa-verde-vertical {
-    position: absolute;
-    left: 0; top: 0;
+    position: absolute; left: 0; top: 0;
     width: 60px; height: 100%;
-    background-color: #00713a;
+    background-color: var(--cor-mrv);
     display: flex; flex-direction: column;
     align-items: center; justify-content: space-between;
     padding: 15px 0; z-index: 4000;
@@ -58,55 +46,10 @@ html, body {
 #menu-lateral {
     position: fixed; left: 55px; top: 0;
     width: calc(100% - 80px); max-width: 330px; height: 100%;
-    background: transparent; backdrop-filter: blur(15px);
-    -webkit-backdrop-filter: blur(15px); z-index: 3000; 
-    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    pointer-events: none; 
-}
-#menu-lateral.menu-aberto { transform: translateX(0); pointer-events: auto; }
-#menu-lateral.menu-oculto { transform: translateX(-120%); }
-
-.menu-lista {
-    list-style: none; padding: 10px 0; margin: 0;
-    height: 100vh; overflow-y: auto;
+    z-index: 3000; transition: transform 0.4s ease;
 }
 
-/* 4. ESTILO DOS BOTÕES (BASE) */
-.menu-item-mrv {
-    background: #ffffff; border: 1px solid #d1d1d1;
-    border-right: 18px solid #00713a; 
-    margin: 8px 10px 8px 5px; padding: 12px 12px 12px 25px; 
-    border-radius: 2px 12px 12px 2px;
-    color: #333; font-weight: 600; font-size: var(--ft-font-size);
-    display: block; box-shadow: 4px 4px 10px rgba(0,0,0,0.1);
-    cursor: pointer; transition: all 0.2s ease;
-    text-transform: uppercase;
-}
-
-.estilo-complexo {
-    border-right-width: 4px !important;
-    font-weight: 800 !important;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2) !important;
-}
-
-/* 5. MAPA E INTERAÇÃO */
-#mapa-container {
-    position: absolute; left: 0; top: 0;
-    width: 100%; height: 100%; z-index: 10;
-    display: flex; align-items: center; justify-content: center;
-    padding-left: 60px;
-}
-
-#mapa-minimizado {
-    position: absolute; bottom: 25px;
-    right: calc(44% + 15px); 
-    width: 85px; height: 65px;
-    background: white; border: 2px solid #00713a;
-    border-radius: 10px; z-index: 2000;
-    box-shadow: -5px 5px 15px rgba(0,0,0,0.3);
-}
-
-/* 6. FICHA TÉCNICA (DIREITA) */
+/* 4. FICHA TÉCNICA (PAINEL DIREITO) */
 .ficha-tecnica {
     position: absolute; right: 0; top: 0;
     width: 44%; height: 100%;
@@ -121,11 +64,11 @@ html, body {
 #nome-imovel {
     color: #50c878; margin: 15px 0 5px 0;
     font-weight: 700; font-size: var(--ft-font-size);
-    border-bottom: 2px solid #00713a; 
+    border-bottom: 2px solid var(--cor-mrv); 
     padding-bottom: 8px; text-transform: uppercase;
 }
 
-/* Container para MAPS e LINK lado a lado */
+/* 5. BOTÕES MAPS E LINK (50% de largura) */
 .container-acoes-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -133,70 +76,93 @@ html, body {
     margin-bottom: 8px;
 }
 
-/* Botões MAPS e LINK */
 .btn-acao {
     justify-content: center;
-    border: none;
     font-weight: 800;
     color: white;
-    cursor: pointer;
     text-transform: uppercase;
+    border: none;
+    cursor: pointer;
+    background: #ffffff;
+    padding: 12px 12px;
+    border-radius: 4px;
+    font-size: var(--ft-font-size) !important;
+    display: flex;
+    align-items: center;
+    min-height: 42px;
 }
+
 .btn-maps { background-color: #4285F4; }
 .btn-link { background-color: #444444; }
 
-/* Grid de Dados (2 colunas) */
+/* 6. GRID DE DADOS (Caixas Brancas) */
 .grid-dados-imovel {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 4px;
 }
 
-/* Caixas Brancas de Dados */
 .caixa-dado-mrv {
     background: #ffffff;
-    padding: 0 6px;
+    padding: 12px 12px;
+    border-radius: 4px;
+    font-size: var(--ft-font-size) !important;
+    display: flex;
+    align-items: center;
     justify-content: space-between;
+    border: 1px solid #d1d1d1;
+    min-height: 42px;
+    color: #333;
 }
 
 .caixa-dado-mrv span {
-    color: #00713a;
+    color: var(--cor-mrv);
     font-weight: 800;
-    font-size: 0.62rem; /* Rótulo compacto */
+    font-size: 0.65rem;
+    text-transform: uppercase;
 }
 
 .caixa-dado-mrv b {
     color: #333;
     font-weight: 700;
+    text-align: right;
 }
 
-#texto-descricao {
-    color: #efefef; margin-top: 15px;
-    font-size: var(--ft-font-size); text-align: justify;
-}
+.estoque-alerta { color: var(--cor-alerta) !important; }
+.estoque-vendido { color: #888 !important; text-decoration: line-through; }
 
-/* 7. INDICADOR CIDADE (TOPO) */
+/* 7. INDICADOR CIDADE (TOPO) - VOLTOU AO CÓDIGO */
 #identificador-cidade {
     position: absolute; top: 10px; left: 28%;
     transform: translateX(-50%);
     font-size: 0.9rem; font-weight: bold;
-    color: #00713a; z-index: 1500;
+    color: var(--cor-mrv); z-index: 1500;
     background: rgba(255,255,255,0.9);
     padding: 5px 15px; border-radius: 20px;
     box-shadow: 0 2px 5px rgba(0,0,0,0.2);
     text-transform: uppercase;
 }
 
-/* 8. VITRINE (LISTA SUPERIOR) */
+/* 8. VITRINE SUPERIOR - VOLTOU AO CÓDIGO */
 #container-vitrine-botoes {
     display: flex; flex-direction: column;
     gap: 3px; margin-bottom: 15px;
 }
 
 #container-vitrine-botoes .menu-item-mrv {
-    min-height: auto !important; 
-    padding: 6px 8px 6px 12px !important; 
-    margin: 0 !important; 
-    font-size: 0.72rem !important; 
+    background: #ffffff;
+    border: 1px solid #d1d1d1;
+    border-right: 18px solid var(--cor-mrv);
+    padding: 12px 12px !important;
+    font-size: var(--ft-font-size) !important;
+    margin: 0 !important;
     border-radius: 2px 6px 6px 2px;
+    text-transform: uppercase;
+    font-weight: 600;
+    display: block;
+}
+
+#texto-descricao {
+    color: #efefef; margin-top: 15px;
+    font-size: var(--ft-font-size); text-align: justify;
 }
