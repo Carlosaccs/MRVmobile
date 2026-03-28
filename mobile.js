@@ -234,14 +234,14 @@ function exibirDadosResidencial(info) {
         const cssValor = `font-weight: 800; font-size: 11px; text-align: right;`;
 
         elDetalhes.innerHTML = `
-            <div class="divisor-verde"></div>
-            <div class="container-acoes">
-                <span class="endereco-texto">📍 ${info.endereco || ""}</span>
-                <div style="display: flex; gap: 8px; margin-top: 5px;">
-                    <a href="${linkMaps}" target="_blank" class="btn-acao btn-maps">MAPS</a>
-                    <button onclick="copyToClipboard('${linkBook}')" class="btn-acao btn-link">LINK</button>
-                </div>
-            </div>
+            <div class="divisor-verde"></div>
+                <div class="container-acoes">
+                    <span class="endereco-texto">📍 ${info.endereco || ""}</span>
+                    <div style="display: flex; gap: 8px; margin-top: 8px; justify-content: flex-start;">
+                        <a href="${linkMaps}" target="_blank" class="btn-acao btn-maps" style="flex: 0 1 auto; min-width: 80px;">MAPS</a>
+                        <button onclick="copyToClipboard('${linkBook}')" class="btn-acao btn-link" style="flex: 0 1 auto; min-width: 80px;">LINK</button>
+                    </div>
+            </div>
 
             <div class="grid-caixas-mobile" style="display: flex; flex-wrap: wrap; gap: 4px; margin-top: 10px; width: 100%;">
                 <div class="caixa-dado" style="${cssCaixa}">
