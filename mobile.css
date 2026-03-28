@@ -1,256 +1,236 @@
 /* ==========================================================================
-   v140.11 - CSS CONSOLIDADO (DASHBOARD MRV MOBILE)
-   Foco: Diferenciação COMPLEXO vs RESIDENCIAL e Zoneamento
-   ========================================================================== */
+   v140.10 - CSS CONSOLIDADO (DASHBOARD MRV MOBILE)
+   Foco: Padronização de Fontes, Botões Desktop e Coluna R
+   ========================================================================== */
 
 /* 1. FUNDAÇÃO E RESET */
 html, body {
-    margin: 0; 
-    padding: 0; 
-    width: 100%; 
-    height: 100%;
-    overflow: hidden; 
-    background: #fff;
+    margin: 0; 
+    padding: 0; 
+    width: 100%; 
+    height: 100%;
+    overflow: hidden; 
+    background: #fff;
 }
 
-* { 
-    box-sizing: border-box; 
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+* { 
+    box-sizing: border-box; 
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
 }
 
 :root {
-    --ft-font-size: 0.85rem; /* Fonte padrão para alinhar com os botões */
+    --ft-font-size: 0.85rem; /* Fonte padrão para alinhar com os botões */
 }
 
 .mobile-wrapper {
-    display: flex; 
-    width: 100vw; 
-    height: 100%;
-    position: relative; 
-    overflow: hidden;
+    display: flex; 
+    width: 100vw; 
+    height: 100%;
+    position: relative; 
+    overflow: hidden;
 }
 
 /* 2. FAIXA VERDE LATERAL (FIXA) */
 .faixa-verde-vertical {
-    position: absolute;
-    left: 0; top: 0;
-    width: 60px;
-    height: 100%;
-    background-color: #00713a;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: space-between;
-    padding: 15px 0;
-    z-index: 4000;
-    box-shadow: 2px 0 10px rgba(0,0,0,0.3);
+    position: absolute;
+    left: 0; top: 0;
+    width: 60px;
+    height: 100%;
+    background-color: #00713a;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px 0;
+    z-index: 4000;
+    box-shadow: 2px 0 10px rgba(0,0,0,0.3);
 }
 
 .titulo-vertical {
-    writing-mode: vertical-rl;
-    transform: rotate(180deg);
-    font-weight: bold;
-    font-size: 1.1rem;
-    letter-spacing: 2px;
-    color: white !important;
-    white-space: nowrap;
-    flex-grow: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    font-weight: bold;
+    font-size: 1.1rem;
+    letter-spacing: 2px;
+    color: white !important;
+    white-space: nowrap;
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 /* 3. MENU LATERAL (ESQUERDA) */
 #menu-lateral {
-    position: fixed;
-    left: 55px; 
-    top: 0;
-    width: calc(100% - 80px);
-    max-width: 330px;
-    height: 100%;
-    background: transparent; 
-    backdrop-filter: blur(15px);
-    -webkit-backdrop-filter: blur(15px);
-    z-index: 3000; 
-    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    pointer-events: none; 
+    position: fixed;
+    left: 55px; 
+    top: 0;
+    width: calc(100% - 80px);
+    max-width: 330px;
+    height: 100%;
+    background: transparent; 
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    z-index: 3000; 
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    pointer-events: none; 
 }
 
 #menu-lateral.menu-aberto { transform: translateX(0); pointer-events: auto; }
 #menu-lateral.menu-oculto { transform: translateX(-120%); }
 
 .menu-lista {
-    list-style: none;
-    padding: 10px 0;
-    margin: 0;
-    height: 100vh;
-    overflow-y: auto;
+    list-style: none;
+    padding: 10px 0;
+    margin: 0;
+    height: 100vh;
+    overflow-y: auto;
 }
 
 /* 4. ESTILO DOS BOTÕES (BASE) */
 .menu-item-mrv {
-    background: #ffffff;
-    border: 1px solid #d1d1d1;
-    border-right: 18px solid #00713a; 
-    margin: 8px 10px 8px 5px;  
-    padding: 12px 12px 12px 25px; 
-    border-radius: 2px 12px 12px 2px;
-    color: #333;
-    font-weight: 600;
-    font-size: 0.85rem;
-    display: block;
-    box-shadow: 4px 4px 10px rgba(0,0,0,0.1);
-    cursor: pointer;
-    transition: all 0.2s ease;
-    text-transform: uppercase;
+    background: #ffffff;
+    border: 1px solid #d1d1d1;
+    border-right: 18px solid #00713a; 
+    margin: 8px 10px 8px 5px;  
+    padding: 12px 12px 12px 25px; 
+    border-radius: 2px 12px 12px 2px;
+    color: #333;
+    font-weight: 600;
+    font-size: 0.85rem;
+    display: block;
+    box-shadow: 4px 4px 10px rgba(0,0,0,0.1);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-transform: uppercase;
 }
 
 .estilo-complexo {
-    border-right-width: 4px !important;
-    font-weight: 800 !important;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2) !important;
+    border-right-width: 4px !important;
+    font-weight: 800 !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2) !important;
 }
 
 /* 5. MAPA E INTERAÇÃO */
 #mapa-container {
-    position: absolute;
-    left: 0; top: 0;
-    width: 100%; height: 100%;
-    z-index: 10;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding-left: 60px;
+    position: absolute;
+    left: 0; top: 0;
+    width: 100%; height: 100%;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-left: 60px;
 }
 
 #mapa-minimizado {
-    position: absolute;
-    bottom: 25px;
-    right: calc(44% + 15px); 
-    width: 85px; height: 65px;
-    background: white;
-    border: 2px solid #00713a;
-    border-radius: 10px;
-    z-index: 2000;
-    box-shadow: -5px 5px 15px rgba(0,0,0,0.3);
+    position: absolute;
+    bottom: 25px;
+    right: calc(44% + 15px); 
+    width: 85px; height: 65px;
+    background: white;
+    border: 2px solid #00713a;
+    border-radius: 10px;
+    z-index: 2000;
+    box-shadow: -5px 5px 15px rgba(0,0,0,0.3);
 }
 
 /* 6. FICHA TÉCNICA (DIREITA) */
 .ficha-tecnica {
-    position: absolute; 
-    right: 0; top: 0;
-    width: 44%; height: 100%;
-    background: rgba(30, 30, 30, 0.96);
-    backdrop-filter: blur(12px); 
-    color: white;
-    padding: 15px 12px 40px 12px; 
-    z-index: 1000;
-    box-shadow: -10px 0 30px rgba(0,0,0,0.5);
-    border-left: 1px solid rgba(255,255,255,0.1);
-    overflow-y: auto;
+    position: absolute; 
+    right: 0; top: 0;
+    width: 44%; height: 100%;
+    background: rgba(30, 30, 30, 0.96);
+    backdrop-filter: blur(12px); 
+    color: white;
+    padding: 15px 12px 40px 12px; 
+    z-index: 1000;
+    box-shadow: -10px 0 30px rgba(0,0,0,0.5);
+    border-left: 1px solid rgba(255,255,255,0.1);
+    overflow-y: auto;
 }
 
 /* Padronização de Fontes na Ficha */
 #nome-imovel, .endereco-texto, .texto-coluna-r, #texto-descricao, .btn-acao {
-    font-size: var(--ft-font-size) !important;
-    line-height: 1.4;
+    font-size: var(--ft-font-size) !important;
+    line-height: 1.4;
 }
 
 #nome-imovel {
-    color: #50c878; 
-    margin: 15px 0 5px 0;
-    font-weight: 700;
-    border-bottom: 2px solid #00713a; 
-    padding-bottom: 8px;
-    text-transform: uppercase;
-}
-
-/* Ajuste para o texto do COMPLEXO (Tabulado e Branco) */
-.texto-complexo-estilo {
-    color: #ffffff !important;
-    text-align: justify;
-    white-space: pre-line; /* Mantém as quebras de linha e tabulação da planilha */
-    margin-top: 15px;
+    color: #50c878; 
+    margin: 15px 0 5px 0;
+    font-weight: 700;
+    border-bottom: 2px solid #00713a; 
+    padding-bottom: 8px;
+    text-transform: uppercase;
 }
 
 .container-acoes {
     display: flex;
     flex-direction: column;
-    gap: 4px;
-    margin: 10px 0;
+    gap: 8px;
+    margin: 12px 0;
 }
 
 .endereco-texto { color: #ddd; }
 
 .texto-coluna-r {
-    color: #ffffff;
-    margin-top: 5px;
-    font-weight: 500;
+    color: #ffffff;
+    margin-top: 5px;
+    font-weight: 500;
 }
 
 /* Botões MAPS e LINK - Estilo Desktop */
 .btn-acao {
-    padding: 6px 12px; /* Reduzi o padding lateral */
+    padding: 6px 15px;
     border-radius: 4px;
     font-weight: 800;
     text-decoration: none;
     text-transform: uppercase;
     color: white;
     border: none;
-    display: inline-flex; /* Mudado de inline-block para alinhar melhor o texto */
-    align-items: center;
-    justify-content: center;
+    display: inline-block;
     text-align: center;
-    font-size: 0.75rem !important; /* Fonte um pouco menor para caber no botão compacto */
-    cursor: pointer;
 }
 
 .btn-maps { background-color: #4285F4; }
 .btn-link { background-color: #444444; }
 
 #texto-descricao {
-    color: #efefef; 
-    margin-top: 15px;
-    text-align: justify;
+    color: #efefef; 
+    margin-top: 15px;
+    text-align: justify;
 }
 
 /* 7. INDICADOR CIDADE (TOPO) */
 #identificador-cidade {
-    position: absolute;
-    top: 10px;
-    left: 28%;
-    transform: translateX(-50%);
-    font-size: 0.9rem;
-    font-weight: bold;
-    color: #00713a;
-    z-index: 1500;
-    background: rgba(255,255,255,0.9);
-    padding: 5px 15px;
-    border-radius: 20px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-    text-transform: uppercase;
+    position: absolute;
+    top: 10px;
+    left: 28%;
+    transform: translateX(-50%);
+    font-size: 0.9rem;
+    font-weight: bold;
+    color: #00713a;
+    z-index: 1500;
+    background: rgba(255,255,255,0.9);
+    padding: 5px 15px;
+    border-radius: 20px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    text-transform: uppercase;
 }
 
 /* 8. VITRINE (LISTA SUPERIOR) */
 #container-vitrine-botoes {
-    display: flex;
-    flex-direction: column;
-    gap: 3px; 
-    margin-bottom: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px; 
+    margin-bottom: 15px;
 }
 
 #container-vitrine-botoes .menu-item-mrv {
-    min-height: auto !important; 
-    padding: 6px 8px 6px 12px !important; 
-    margin: 0 !important; 
-    font-size: 0.72rem !important; 
-    border-radius: 2px 6px 6px 2px;
+    min-height: auto !important; 
+    padding: 6px 8px 6px 12px !important; 
+    margin: 0 !important; 
+    font-size: 0.72rem !important; 
+    border-radius: 2px 6px 6px 2px;
 }
-
-/* 9. CORES POR ZONEAMENTO (PARA BOTÃO COMPLEXO NA VITRINE) */
-/* Essas classes devem ser aplicadas via JS baseadas na Coluna de Zoneamento */
-.zona-sul { background-color: #0056b3 !important; color: white !important; border-right-color: #003d7a !important; }
-.zona-leste { background-color: #d9534f !important; color: white !important; border-right-color: #b52b27 !important; }
-.zona-norte { background-color: #f0ad4e !important; color: white !important; border-right-color: #d58512 !important; }
-.zona-oeste { background-color: #5bc0de !important; color: white !important; border-right-color: #2aabd2 !important; }
-.zona-centro { background-color: #555555 !important; color: white !important; border-right-color: #333333 !important; }
