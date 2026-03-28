@@ -226,7 +226,7 @@ function desenharMapa(dados, targetId, ehMinimizado) {
 }
 
 /* ==========================================================================
-   BLOCO 7: NAVEGAÇÃO E FICHA TÉCNICA - ORGANIZAÇÃO E BOTÕES
+   BLOCO 7: NAVEGAÇÃO E FICHA TÉCNICA - BOTÕES REDUZIDOS
    ========================================================================== */
 function trocarMapas() {
     solicitarFullscreen();
@@ -251,28 +251,26 @@ function exibirDadosResidencial(info) {
     }
     
     if (elDetalhes) {
-        // Criamos o link do Maps e garantimos que o link de cópia exista
         const linkMaps = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(info.endereco)}`;
-        const linkCopia = info.link || "#";
+        // No mobile, usamos info.linkCorretor ou info.linkCliente como base para o botão LINK
+        const linkCopia = info.linkCorretor || info.linkCliente || "";
 
-        // Montagem do HTML: Endereço + Container de Botões
-        // Os botões usam a classe 'menu-item-mrv' para herdar a altura e estilo dos botões da lista
         elDetalhes.innerHTML = `
-            <div style="margin-top: 15px; border-top: 1px solid #00713a; padding-top: 10px;">
-                <div style="font-size: 0.68rem; color: #cccccc; margin-bottom: 12px; line-height: 1.2;">
+            <div style="margin-top: 10px; border-top: 1px solid #00713a; padding-top: 8px;">
+                <div style="font-size: 0.68rem; color: #cccccc; margin-bottom: 8px; line-height: 1.2;">
                     📍 ${info.endereco || "Endereço não informado"}
                 </div>
                 
-                <div style="display: flex; gap: 8px;">
+                <div style="display: flex; gap: 5px; width: 100%;">
                     <button onclick="window.open('${linkMaps}', '_blank')" 
                             class="menu-item-mrv" 
-                            style="flex: 1; justify-content: center; margin: 0; padding: 0; min-height: 32px; background: #4285F4; color: white; border: none; font-size: 0.68rem;">
+                            style="width: 70px; justify-content: center; margin: 0; height: 32px; background: #4285F4; color: white; border: none; font-size: 0.6rem; padding: 0;">
                         MAPS
                     </button>
                     
                     <button onclick="copyToClipboard('${linkCopia}')" 
                             class="menu-item-mrv" 
-                            style="flex: 1; justify-content: center; margin: 0; padding: 0; min-height: 32px; background: #444; color: white; border: none; font-size: 0.68rem;">
+                            style="width: 70px; justify-content: center; margin: 0; height: 32px; background: #444; color: white; border: none; font-size: 0.6rem; padding: 0;">
                         LINK
                     </button>
                 </div>
@@ -317,6 +315,7 @@ function gerarMenuResidenciais() {
         lista.appendChild(li);
     });
 }
+
 /* ==========================================================================
    BLOCO 8: SISTEMA (MENU, CLIPBOARD E EVENTOS)
    ========================================================================== */
