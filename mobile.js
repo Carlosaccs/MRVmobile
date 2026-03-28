@@ -226,7 +226,7 @@ function desenharMapa(dados, targetId, ehMinimizado) {
 }
 
 /* ==========================================================================
-   BLOCO 7: NAVEGAÇÃO E FICHA TÉCNICA
+   BLOCO 7: NAVEGAÇÃO E FICHA TÉCNICA (LIMPEZA TOTAL SOLICITADA)
    ========================================================================== */
 function trocarMapas() {
     solicitarFullscreen();
@@ -245,23 +245,16 @@ function atualizarVisualizacao() {
 function exibirDadosResidencial(info) {
     const elNome = document.getElementById('nome-imovel');
     const elDetalhes = document.getElementById('detalhes-imovel');
+    
     if(elNome) elNome.innerText = info.nomeCurto.toUpperCase();
+    
     if(elDetalhes) {
+        // Limpeza Total: Mantém apenas o endereço. 
+        // Remove botões, caixas e descrição de qualquer registro.
         elDetalhes.innerHTML = `
-            <div style="margin-bottom: 8px; font-size: 0.72rem; color: #ccc;">📍 ${info.endereco || ""}</div>
-            <div class="container-acoes-grid">
-                <button onclick="window.open('https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(info.endereco)}','_blank')" class="btn-acao btn-maps">MAPS</button>
-                <button onclick="copyToClipboard('${info.link}')" class="btn-acao btn-link">LINK</button>
+            <div style="margin-bottom: 8px; font-size: 0.72rem; color: #ccc;">
+                📍 ${info.endereco || "Endereço não disponível"}
             </div>
-            <div class="grid-dados-imovel">
-                <div class="caixa-dado-mrv"><span>ENTREGA</span><b>${info.entrega}</b></div>
-                <div class="caixa-dado-mrv"><span>OBRA</span><b>${info.obra}%</b></div>
-                <div class="caixa-dado-mrv"><span>ESTOQUE</span><b>${info.estoque}</b></div>
-                <div class="caixa-dado-mrv"><span>C. PAUL.</span><b>${info.cPaulista}</b></div>
-                <div class="caixa-dado-mrv"><span>PLANTAS</span><b>${info.plantaMin}</b></div>
-                <div class="caixa-dado-mrv"><span>LIMIT.</span><b>${info.limitador}</b></div>
-            </div>
-            <div id="texto-descricao" style="margin-top: 12px;">${info.descricao || ""}</div>
         `;
     }
 }
