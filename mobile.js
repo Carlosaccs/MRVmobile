@@ -1,5 +1,5 @@
 /* ==========================================================================
-   v140.28 - DASHBOARD MOBILE: COLUNA D (ZONA) + LIMPEZA DE DADOS
+   v140.3 - DASHBOARD MOBILE: COLUNA D (ZONA) + LIMPEZA DE DADOS
    ========================================================================== */
 
 const svgNS = "http://www.w3.org/2000/svg";
@@ -195,6 +195,7 @@ function desenharMapa(dados, targetId, ehMinimizado) {
     const svg = document.createElementNS(svgNS, "svg");
     svg.setAttribute("viewBox", dados.viewBox);
     
+    // Ajustes de escala conforme o mapa ativo
     if (!ehMinimizado) {
         const conf = AJUSTES_MAPA[mapaAtivo];
         svg.style.marginRight = conf.marginRight;
@@ -208,6 +209,8 @@ function desenharMapa(dados, targetId, ehMinimizado) {
     dados.paths.forEach(pData => {
         const path = document.createElementNS(svgNS, "path");
         const idLimpo = pData.id.toLowerCase();
+        
+        // Identifica se é MRV pela classe do SVG ou pela presença na planilha
         const ehMRV = pData.class === "commrv" || window.dadosGerais.some(d => d.id === idLimpo);
         
         path.setAttribute("d", pData.d);
@@ -217,27 +220,58 @@ function desenharMapa(dados, targetId, ehMinimizado) {
         const corBase = ehMRV ? "#00713a" : "#cccccc";
         path.style.fill = corBase;
         path.style.stroke = "#ffffff";
-        path.style.strokeWidth = ehMinimizado ? "6" : "1.2";
+        // Paths cinzas (semmrv) não têm borda conforme sua solicitação
+        path.style.strokeWidth = (ehMinimizado || !ehMRV) ? "0" : "1.2";
         path.setAttribute('data-cor-base', corBase);
 
         if (!ehMinimizado) {
+            // --- COMPORTAMENTO DE TOQUE (HOVER) ---
+            path.onmouseenter = () => {
+                atualizarTextoTopo(pData.name || pData.id);
+                if (!ehMRV) path.style.fill = "#bbbbbb"; // Brilho leve no cinza ao tocar
+            };
+
+            path.onmouseleave = () => {
+                // Se houver um residencial selecionado (laranja), volta o nome dele.
+                // Se não, volta o nome do mapa atual.
+                const nomeParaVoltar = cidadeClicadaAtiva ? cidadeClicadaAtiva.name : (mapaAtivo === "GSP" ? "Grande SP" : "Estado de SP");
+                atualizarTextoTopo(nomeParaVoltar);
+                
+                if (path.getAttribute('data-selecionado') !== 'true') {
+                    path.style.fill = corBase;
+                }
+            };
+
+            // --- COMPORTAMENTO DE CLIQUE (FIXAR) ---
             path.onclick = (e) => { 
                 e.stopPropagation();
+                
                 if (pData.id === "grandesaopaulo") { trocarMapas(); return; } 
-                if (ehMRV) clicarNoMapa(path, null, pData); 
-                else atualizarTextoTopo(pData.name);
+
+                if (ehMRV) {
+                    // Fixa o destaque apenas se for MRV
+                    clicarNoMapa(path, null, pData); 
+                } else {
+                    // Se for cinza, apenas limpa qualquer seleção anterior (opcional) ou não faz nada fixo
+                    // O texto já foi atualizado no mouseenter e voltará no mouseleave
+                }
             };
         }
         g.appendChild(path);
     });
     svg.appendChild(g);
     container.appendChild(svg);
+    
+    // Inicializa o texto do topo com o nome do mapa
+    if (!cidadeClicadaAtiva) {
+        atualizarTextoTopo(mapaAtivo === "GSP" ? "Grande SP" : "Estado de SP");
+    }
 }
-
 function trocarMapas() {
     mapaAtivo = (mapaAtivo === "GSP") ? "INTERIOR" : "GSP";
     cidadeClicadaAtiva = null; 
-    atualizarTextoTopo(null);
+    // Atualiza para o nome do novo mapa ativo
+    atualizarTextoTopo(mapaAtivo === "GSP" ? "Grande SP" : "Estado de SP");
     atualizarVisualizacao();
 }
 
