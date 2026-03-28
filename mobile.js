@@ -226,71 +226,81 @@ function desenharMapa(dados, targetId, ehMinimizado) {
 }
 
 /* ==========================================================================
-   BLOCO 7: NAVEGAÇÃO E FICHA TÉCNICA (LIMPEZA TOTAL SOLICITADA)
-   ========================================================================== */
+   BLOCO 7: NAVEGAÇÃO E FICHA TÉCNICA - LÓGICA DE INJEÇÃO LIMPA
+   ========================================================================== */
 function trocarMapas() {
-    solicitarFullscreen();
-    limparSelecaoAnterior();
-    mapaAtivo = (mapaAtivo === "GSP") ? "INTERIOR" : "GSP";
-    atualizarVisualizacao();
+    solicitarFullscreen();
+    limparSelecaoAnterior();
+    mapaAtivo = (mapaAtivo === "GSP") ? "INTERIOR" : "GSP";
+    atualizarVisualizacao();
 }
 
 function atualizarVisualizacao() {
-    if (typeof MAPA_GSP !== 'undefined' && typeof MAPA_INTERIOR !== 'undefined') {
-        desenharMapa(mapaAtivo === "GSP" ? MAPA_GSP : MAPA_INTERIOR, "mapa-container", false);
-        desenharMapa(mapaAtivo === "GSP" ? MAPA_INTERIOR : MAPA_GSP, "mapa-minimizado", true);
-    }
+    if (typeof MAPA_GSP !== 'undefined' && typeof MAPA_INTERIOR !== 'undefined') {
+        desenharMapa(mapaAtivo === "GSP" ? MAPA_GSP : MAPA_INTERIOR, "mapa-container", false);
+        desenharMapa(mapaAtivo === "GSP" ? MAPA_INTERIOR : MAPA_GSP, "mapa-minimizado", true);
+    }
 }
 
 function exibirDadosResidencial(info) {
-    const elNome = document.getElementById('nome-imovel');
-    const elDetalhes = document.getElementById('detalhes-imovel');
-    
-    if(elNome) elNome.innerText = info.nomeCurto.toUpperCase();
-    
-    if(elDetalhes) {
-        // Limpeza Total: Mantém apenas o endereço. 
-        // Remove botões, caixas e descrição de qualquer registro.
-        elDetalhes.innerHTML = `
-            <div style="margin-bottom: 8px; font-size: 0.72rem; color: #ccc;">
-                📍 ${info.endereco || "Endereço não disponível"}
-            </div>
-        `;
-    }
+    const elNome = document.getElementById('nome-imovel');
+    const elDetalhes = document.getElementById('detalhes-imovel');
+    
+    // 1. Atualiza o título (Nome do Imóvel)
+    if (elNome) {
+        elNome.innerText = (info.nomeCurto || "").toUpperCase();
+    }
+    
+    // 2. Lógica de Montagem (Injeção Direta):
+    // Criamos uma variável HTML que contém APENAS o endereço.
+    // Ao atribuir ao innerHTML, deletamos qualquer botão ou dado que existia antes.
+    if (elDetalhes) {
+        let htmlLimpo = `
+            <div style="margin-top: 10px; font-size: 0.75rem; color: #cccccc; line-height: 1.4;">
+                📍 ${info.endereco || "Endereço não informado"}
+            </div>
+        `;
+        
+        elDetalhes.innerHTML = htmlLimpo;
+    }
 }
 
 function gerarMenuResidenciais() {
-    const lista = document.getElementById('lista-residenciais');
-    if (!lista) return;
-    lista.innerHTML = ""; 
-    [...window.dadosGerais].sort((a, b) => a.ordem - b.ordem).forEach(info => {
-        if (!info.nomeCurto || info.nomeCurto === "Sem Nome") return;
-        const li = document.createElement('li');
-        li.className = 'menu-item-mrv'; 
-        li.innerText = info.nomeCurto.toUpperCase();
-        const corZona = obterCorPorZona(info);
+    const lista = document.getElementById('lista-residenciais');
+    if (!lista) return;
+    lista.innerHTML = ""; 
+    [...window.dadosGerais].sort((a, b) => a.ordem - b.ordem).forEach(info => {
+        if (!info.nomeCurto || info.nomeCurto === "Sem Nome") return;
+        const li = document.createElement('li');
+        li.className = 'menu-item-mrv'; 
+        li.innerText = info.nomeCurto.toUpperCase();
+        const corZona = obterCorPorZona(info);
 
-        if (info.categoria === "COMPLEXO") {
-            li.classList.add('estilo-complexo');
-            li.style.backgroundColor = corZona;
-            li.style.color = "#ffffff";
-        } else {
-            li.style.borderRightColor = corZona;
-        }
+        if (info.categoria === "COMPLEXO") {
+            li.classList.add('estilo-complexo');
+            li.style.backgroundColor = corZona;
+            li.style.color = "#ffffff";
+        } else {
+            li.style.borderRightColor = corZona;
+        }
 
-        li.onclick = (e) => {
-            e.stopPropagation();
-            toggleMenu();
-            let p = document.getElementById(info.id);
-            if (!p) { 
-                trocarMapas(); 
-                setTimeout(() => { let np = document.getElementById(info.id); if (np) clicarNoMapa(np, info); }, 300); 
-            } else { clicarNoMapa(p, info); }
-        };
-        lista.appendChild(li);
-    });
+        li.onclick = (e) => {
+            e.stopPropagation();
+            toggleMenu();
+            let p = document.getElementById(info.id);
+            if (!p) { 
+                trocarMapas(); 
+                setTimeout(() => { 
+                    let np = document.getElementById(info.id); 
+                    if (np) clicarNoMapa(np, info); 
+                }, 300); 
+            } else { 
+                clicarNoMapa(p, info); 
+            }
+        };
+        lista.appendChild(li);
+    });
 }
-
 /* ==========================================================================
    BLOCO 8: SISTEMA (MENU, CLIPBOARD E EVENTOS)
    ========================================================================== */
