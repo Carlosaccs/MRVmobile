@@ -47,7 +47,7 @@ function alternarFullscreen() {
 }
 
 /* ==========================================================================
-   BLOCO 3: GESTÃO DE DADOS (PLANILHA)
+   BLOCO 3: GESTÃO DE DADOS (PLANILHA) - v140.72
    ========================================================================== */
 async function carregarPlanilha() {
     try {
@@ -76,13 +76,17 @@ async function carregarPlanilha() {
                     regional: limpar(c[14]),
                     cPaulista: limpar(c[15]),
                     link: limpar(c[16]),
-                    descricao: limpar(c[17])
+                    descricao: limpar(c[17]) || limpar(c[18]) // Tenta coluna R ou S
                 });
             }
         });
+        console.log("Dados carregados:", window.dadosGerais.length);
         atualizarVisualizacao();
         gerarMenuResidenciais(); 
-    } catch (e) { console.error("Erro na planilha:", e); }
+    } catch (e) { 
+        console.error("Erro na planilha:", e);
+        document.getElementById('mapa-container').innerHTML = "Erro ao carregar dados.";
+    }
 }
 
 /* ==========================================================================
