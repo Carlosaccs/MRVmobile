@@ -323,11 +323,14 @@ function exibirDadosResidencial(info) {
     
     if(elNome) {
         elNome.innerText = info.nomeCurto.toUpperCase();
-        elNome.style.fontSize = "0.85rem"; 
     }
 
     if(elDetalhes) {
         elDetalhes.innerHTML = `
+            <div class="endereco-texto" style="margin-bottom: 8px; font-size: 0.72rem; color: #ccc;">
+                📍 ${info.endereco || "Endereço não disponível"}
+            </div>
+
             <div class="container-acoes-grid">
                 <button onclick="window.open('https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(info.endereco)}','_blank')" class="btn-acao btn-maps">MAPS</button>
                 <button onclick="copyToClipboard('${info.link}')" class="btn-acao btn-link">LINK</button>
@@ -344,7 +347,7 @@ function exibirDadosResidencial(info) {
                 <div class="caixa-dado-mrv"><span>LIMIT.</span><b>${info.limitador}</b></div>
             </div>
             
-            <div id="texto-descricao">${info.descricao || ""}</div>
+            <div id="texto-descricao" style="margin-top: 12px;">${info.descricao || ""}</div>
         `;
     }
 }
