@@ -1,6 +1,6 @@
 /* ==========================================================================
-   v140.10 - CSS CONSOLIDADO (DASHBOARD MRV MOBILE)
-   Foco: Padronização de Fontes, Botões Desktop e Coluna R
+   v140.80 - CSS CONSOLIDADO (DASHBOARD MRV MOBILE)
+   Foco: Caixas de Dados Brancas (Ficha Técnica) e Padronização de Fontes
    ========================================================================== */
 
 /* 1. FUNDAÇÃO E RESET */
@@ -16,17 +16,12 @@ html, body {
 * { 
     box-sizing: border-box; 
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-    /* --- ADICIONE AS 3 LINHAS ABAIXO --- */
-    -webkit-tap-highlight-color: transparent; /* Remove o flash azul ao tocar */
-    -webkit-touch-callout: none;              /* Impede menu de contexto (copiar/colar) */
-    user-select: none;                        /* Impede seleção de texto geral */
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;             
+    user-select: none;                       
 }
 
-/* Garante que campos de texto ou botões específicos sigam a regra */
-#identificador-cidade, 
-.menu-item-mrv, 
-path, 
-.btn-acao {
+#identificador-cidade, .menu-item-mrv, path, .btn-acao {
     user-select: none;
     -webkit-user-select: none;
 }
@@ -43,7 +38,7 @@ path,
     overflow: hidden;
 }
 
-/* 2. FAIXA VERDE LATERAL (FIXA) */
+/* 2. FAIXA VERDE LATERAL */
 .faixa-verde-vertical {
     position: absolute;
     left: 0; top: 0;
@@ -110,7 +105,7 @@ path,
     border-radius: 2px 12px 12px 2px;
     color: #333;
     font-weight: 600;
-    font-size: 0.85rem;
+    font-size: var(--ft-font-size);
     display: block;
     box-shadow: 4px 4px 10px rgba(0,0,0,0.1);
     cursor: pointer;
@@ -163,16 +158,11 @@ path,
     overflow-y: auto;
 }
 
-/* Padronização de Fontes na Ficha */
-#nome-imovel, .endereco-texto, .texto-coluna-r, #texto-descricao, .btn-acao {
-    font-size: var(--ft-font-size) !important;
-    line-height: 1.4;
-}
-
 #nome-imovel {
     color: #50c878; 
     margin: 15px 0 5px 0;
     font-weight: 700;
+    font-size: var(--ft-font-size);
     border-bottom: 2px solid #00713a; 
     padding-bottom: 8px;
     text-transform: uppercase;
@@ -185,19 +175,43 @@ path,
     margin: 12px 0;
 }
 
-.endereco-texto { color: #ddd; }
-
-.texto-coluna-r {
-    color: #ffffff;
-    margin-top: 5px;
-    font-weight: 500;
+/* NOVAS CAIXAS BRANCAS DE DADOS */
+.grid-dados-imovel {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px;
+    margin-top: 10px;
 }
 
-/* Botões MAPS e LINK - Estilo Desktop */
+.caixa-dado-mrv {
+    background: #ffffff;
+    padding: 6px 8px;
+    border-radius: 4px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    min-height: 35px;
+}
+
+.caixa-dado-mrv span {
+    color: #00713a;
+    font-weight: 800;
+    font-size: 0.72rem; /* Rótulo sutilmente menor para destaque */
+    text-transform: uppercase;
+}
+
+.caixa-dado-mrv b {
+    color: #333;
+    font-size: var(--ft-font-size);
+    font-weight: 700;
+}
+
+/* Botões MAPS e LINK */
 .btn-acao {
     padding: 6px 15px;
     border-radius: 4px;
     font-weight: 800;
+    font-size: var(--ft-font-size);
     text-decoration: none;
     text-transform: uppercase;
     color: white;
@@ -212,6 +226,7 @@ path,
 #texto-descricao {
     color: #efefef; 
     margin-top: 15px;
+    font-size: var(--ft-font-size);
     text-align: justify;
 }
 
