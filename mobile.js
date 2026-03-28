@@ -256,12 +256,29 @@ function gerarMenuResidenciais() {
     const lista = document.getElementById('lista-residenciais');
     if (!lista) return;
     lista.innerHTML = ""; 
+    
     [...window.dadosGerais].sort((a, b) => a.ordem - b.ordem).forEach(info => {
         if (!info.nomeCurto || info.nomeCurto === "Sem Nome") return;
+        
         const li = document.createElement('li');
         li.className = 'menu-item-mrv'; 
         li.innerText = info.nomeCurto.toUpperCase();
-        li.style.borderRightColor = obterCorPorZona(info);
+        
+        const corZona = obterCorPorZona(info);
+
+        // --- LÓGICA PARA CATEGORIA COMPLEXO ---
+        if (info.categoria === "COMPLEXO") {
+            li.classList.add('estilo-complexo'); // Aplica o negrito e sombra extra do seu CSS
+            li.style.backgroundColor = corZona;  // Pinta o fundo com a cor da zona
+            li.style.color = "#ffffff";          // Garante que o texto fique branco para ler no fundo colorido
+            li.style.borderRightColor = "rgba(0,0,0,0.2)"; // Borda sutil para não sumir
+        } else {
+            // Estilo padrão para os demais
+            li.style.borderRightColor = corZona;
+            li.style.backgroundColor = "#ffffff";
+            li.style.color = "#333";
+        }
+
         li.onclick = (e) => {
             e.stopPropagation();
             solicitarFullscreen();
