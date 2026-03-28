@@ -47,7 +47,7 @@ function alternarFullscreen() {
 }
 
 /* ==========================================================================
-   BLOCO 3: GESTÃO DE DADOS (PLANILHA) - CORREÇÃO COLUNA S
+   BLOCO 3: GESTÃO DE DADOS (PLANILHA) - ADICIONADO BOOK CLIENTE (COLUNA T)
    ========================================================================== */
 async function carregarPlanilha() {
     try {
@@ -58,7 +58,7 @@ async function carregarPlanilha() {
 
         linhas.slice(1).forEach((linha) => {
             const c = linha.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
-            if (c.length >= 18) { 
+            if (c.length >= 20) { // Garante que lê até a coluna T (índice 19)
                 const limpar = (t) => t ? t.replace(/"/g, '').trim() : "";
                 window.dadosGerais.push({
                     id: limpar(c[0]).toLowerCase(),
@@ -76,7 +76,8 @@ async function carregarPlanilha() {
                     regional: limpar(c[14]),
                     cPaulista: limpar(c[15]),
                     link: limpar(c[16]),
-                    descLonga: limpar(c[18]) // CORRIGIDO: Agora usando Coluna S (índice 18) como descLonga
+                    descLonga: limpar(c[18]),
+                    bookCliente: limpar(c[19]) // NOVA COLUNA T (ÍNDICE 19)
                 });
             }
         });
@@ -226,22 +227,8 @@ function desenharMapa(dados, targetId, ehMinimizado) {
 }
 
 /* ==========================================================================
-   BLOCO 7: NAVEGAÇÃO E FICHA TÉCNICA - FINALIZADO
+   BLOCO 7: FICHA TÉCNICA - LAYOUT IGUAL À IMAGEM DE REFERÊNCIA
    ========================================================================== */
-function trocarMapas() {
-    solicitarFullscreen();
-    limparSelecaoAnterior();
-    mapaAtivo = (mapaAtivo === "GSP") ? "INTERIOR" : "GSP";
-    atualizarVisualizacao();
-}
-
-function atualizarVisualizacao() {
-    if (typeof MAPA_GSP !== 'undefined' && typeof MAPA_INTERIOR !== 'undefined') {
-        desenharMapa(mapaAtivo === "GSP" ? MAPA_GSP : MAPA_INTERIOR, "mapa-container", false);
-        desenharMapa(mapaAtivo === "GSP" ? MAPA_INTERIOR : MAPA_GSP, "mapa-minimizado", true);
-    }
-}
-
 function exibirDadosResidencial(info) {
     const elNome = document.getElementById('nome-imovel');
     const elDetalhes = document.getElementById('detalhes-imovel');
@@ -251,84 +238,59 @@ function exibirDadosResidencial(info) {
     }
     
     if (elDetalhes) {
-        // Gera o link do Google Maps usando o endereço
         const linkMaps = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(info.endereco)}`;
-        // Usa o link da coluna 16 da planilha
-        const linkCopia = info.link || "#";
-        
-        // Validação da Coluna S (descLonga) para COMPLEXO
-        const eComplexo = info.categoria === "COMPLEXO";
-        let htmlDescricao = "";
+        const linkPrincipal = info.link || "#";
+        const linkBook = info.bookCliente || "";
 
-        // Só exibe o texto se for complexo e houver texto na descLonga
-        if (eComplexo && info.descLonga) {
-            htmlDescricao = `
-                <div style="margin-top: 15px; border-top: 1px solid #444; padding-top: 10px; font-size: 0.68rem; color: #bbb; line-height: 1.4; text-align: justify;">
-                    ${info.descLonga}
+        // HTML do Card de Material (conforme sua imagem)
+        let htmlBook = "";
+        if (linkBook && linkBook !== "#") {
+            htmlBook = `
+                <div style="color: #bbb; font-size: 0.6rem; margin: 15px 0 5px 0; text-transform: uppercase; font-weight: bold;">Materiais de Apoio</div>
+                <div style="display: flex; align-items: center; background: #fff; border-radius: 8px; padding: 10px; margin-bottom: 8px; border: 1px solid #ddd; gap: 10px;">
+                    <span style="font-size: 1.2rem;">📄</span>
+                    <span style="flex: 1; font-size: 0.75rem; color: #333; font-weight: bold;">Book Cliente</span>
+                    <div style="display: flex; gap: 5px;">
+                        <button onclick="window.open('${linkBook}', '_blank')" 
+                                style="background: #00713a; color: white; border: none; border-radius: 5px; padding: 6px 12px; font-size: 0.65rem; font-weight: bold; cursor: pointer;">
+                            Abrir
+                        </button>
+                        <button onclick="copyToClipboard('${linkBook}')" 
+                                style="background: #ff8c00; color: white; border: none; border-radius: 5px; padding: 6px 12px; font-size: 0.65rem; font-weight: bold; cursor: pointer;">
+                            Copiar
+                        </button>
+                    </div>
                 </div>`;
         }
 
+        const eComplexo = info.categoria === "COMPLEXO";
+        let htmlDescricao = (eComplexo && info.descLonga) ? `
+            <div style="margin-top: 15px; border-top: 1px solid #444; padding-top: 10px; font-size: 0.68rem; color: #bbb; line-height: 1.4; text-align: justify;">
+                ${info.descLonga}
+            </div>` : "";
+
         elDetalhes.innerHTML = `
             <div style="margin-top: 10px; border-top: 1px solid #00713a; padding-top: 8px;">
-                <div style="font-size: 0.68rem; color: #cccccc; margin-bottom: 8px; line-height: 1.2;">
+                <div style="font-size: 0.68rem; color: #cccccc; margin-bottom: 12px; line-height: 1.2;">
                     📍 ${info.endereco || "Endereço não informado"}
                 </div>
                 
-                <div style="display: flex; gap: 5px; width: 100%; margin-bottom: 10px;">
+                <div style="display: flex; gap: 6px; width: 100%; margin-bottom: 10px;">
                     <button onclick="window.open('${linkMaps}', '_blank')" 
-                            class="menu-item-mrv" 
-                            style="width: 70px; justify-content: center; margin: 0; height: 32px; background: #4285F4; color: white; border: none; font-size: 0.6rem; padding: 0;">
+                            style="flex: 1; height: 35px; background: #4285F4; color: white; border: none; border-radius: 6px; font-size: 0.65rem; font-weight: bold; cursor: pointer;">
                         MAPS
                     </button>
-                    
-                    <button onclick="copyToClipboard('${linkCopia}')" 
-                            class="menu-item-mrv" 
-                            style="width: 70px; justify-content: center; margin: 0; height: 32px; background: #444; color: white; border: none; font-size: 0.6rem; padding: 0;">
-                        LINK
+                    <button onclick="copyToClipboard('${linkPrincipal}')" 
+                            style="flex: 1; height: 35px; background: #444; color: white; border: none; border-radius: 6px; font-size: 0.65rem; font-weight: bold; cursor: pointer;">
+                        COPIAR LINK
                     </button>
                 </div>
 
+                ${htmlBook}
                 ${htmlDescricao}
             </div>
         `;
     }
-}
-
-function gerarMenuResidenciais() {
-    const lista = document.getElementById('lista-residenciais');
-    if (!lista) return;
-    lista.innerHTML = ""; 
-    [...window.dadosGerais].sort((a, b) => a.ordem - b.ordem).forEach(info => {
-        if (!info.nomeCurto || info.nomeCurto === "Sem Nome") return;
-        const li = document.createElement('li');
-        li.className = 'menu-item-mrv'; 
-        li.innerText = info.nomeCurto.toUpperCase();
-        const corZona = obterCorPorZona(info);
-
-        if (String(info.categoria).toUpperCase() === "COMPLEXO") {
-            li.classList.add('estilo-complexo');
-            li.style.backgroundColor = corZona;
-            li.style.color = "#ffffff";
-        } else {
-            li.style.borderRightColor = corZona;
-        }
-
-        li.onclick = (e) => {
-            e.stopPropagation();
-            toggleMenu();
-            let p = document.getElementById(info.id);
-            if (!p) { 
-                trocarMapas(); 
-                setTimeout(() => { 
-                    let np = document.getElementById(info.id); 
-                    if (np) clicarNoMapa(np, info); 
-                }, 300); 
-            } else { 
-                clicarNoMapa(p, info); 
-            }
-        };
-        lista.appendChild(li);
-    });
 }
 /* ==========================================================================
    BLOCO 8: SISTEMA (MENU, CLIPBOARD E EVENTOS)
