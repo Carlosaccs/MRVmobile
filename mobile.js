@@ -47,7 +47,7 @@ function alternarFullscreen() {
 }
 
 /* ==========================================================================
-   BLOCO 3: GESTÃO DE DADOS (PLANILHA) - CORREÇÃO COLUNA S
+   BLOCO 3: GESTÃO DE DADOS (PLANILHA)
    ========================================================================== */
 async function carregarPlanilha() {
     try {
@@ -76,10 +76,10 @@ async function carregarPlanilha() {
                     regional: limpar(c[14]),
                     cPaulista: limpar(c[15]),
                     link: limpar(c[16]),
-                    descLonga: limpar(c[18]) // CORRIGIDO: Agora usando Coluna S (índice 18) como descLonga
-                   linkBookCliente: limpar(c[19]),  // Coluna T
-                   linkBookCorretor: limpar(c[21]), // Coluna V
-                   materiaisExtras: limpar(c[28])   // Coluna AC
+                    descLonga: limpar(c[18]), // ADICIONADA VÍRGULA AQUI
+                    linkBookCliente: limpar(c[19]),  
+                    linkBookCorretor: limpar(c[21]), 
+                    materiaisExtras: limpar(c[28])   
                 });
             }
         });
@@ -237,28 +237,25 @@ function exibirDadosResidencial(info) {
     if (elNome) elNome.innerText = (info.nomeCurto || "").toUpperCase();
     if (!elDetalhes) return;
 
-    // Função interna para criar as linhas de materiais (Estilo Print)
     const criarLinhaMaterial = (titulo, url, icone = "📄") => {
-        if (!url || url === "#" || url === "") return "";
-        // Força o modo preview do Drive para segurança
+        if (!url || url === "#" || url === "" || url === "---") return "";
         const urlSegura = url.includes('drive.google.com') ? url.replace(/\/view.*|\/edit.*/, '/preview') : url;
 
         return `
-            <div style="background: #fff; border-radius: 8px; padding: 8px 12px; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between; border: 1px solid #ddd;">
+            <div style="background: #fff; border-radius: 8px; padding: 8px 12px; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between; border: 1px solid #ddd; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
                 <div style="display: flex; align-items: center; gap: 10px; flex: 1; overflow: hidden;">
-                    <span style="font-size: 1.2rem;">${icone}</span>
-                    <span style="font-size: 0.75rem; color: #333; font-weight: bold; white-space: nowrap; overflow: hidden; text-edge: ellipsis;">${titulo}</span>
+                    <span style="font-size: 1.1rem;">${icone}</span>
+                    <span style="font-size: 0.72rem; color: #333; font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${titulo}</span>
                 </div>
                 <div style="display: flex; gap: 5px;">
-                    <button onclick="window.open('${urlSegura}', '_blank')" style="background: #00713a; color: white; border: none; padding: 5px 10px; border-radius: 4px; font-size: 0.7rem; font-weight: bold;">ABRIR</button>
-                    <button onclick="copyToClipboard('${urlSegura}')" style="background: #ff8c00; color: white; border: none; padding: 5px 10px; border-radius: 4px; font-size: 0.7rem; font-weight: bold;">COPIAR</button>
+                    <button onclick="window.open('${urlSegura}', '_blank')" style="background: #00713a; color: white; border: none; padding: 6px 10px; border-radius: 4px; font-size: 0.65rem; font-weight: bold; cursor: pointer;">ABRIR</button>
+                    <button onclick="copyToClipboard('${urlSegura}')" style="background: #ff8c00; color: white; border: none; padding: 6px 10px; border-radius: 4px; font-size: 0.65rem; font-weight: bold; cursor: pointer;">COPIAR</button>
                 </div>
             </div>`;
     };
 
-    // Processa materiais extras da Coluna AC (Título, Arquivo; Título, Arquivo;)
     let htmlMateriaisExtras = "";
-    if (info.materiaisExtras) {
+    if (info.materiaisExtras && info.materiaisExtras !== "---") {
         info.materiaisExtras.split(';').forEach(par => {
             const dados = par.split(',');
             if (dados.length === 2) {
@@ -267,7 +264,7 @@ function exibirDadosResidencial(info) {
         });
     }
 
-    const linkMaps = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(info.endereco)}`;
+    const linkMaps = `http://maps.google.com/?q=${encodeURIComponent(info.endereco)}`;
     const eComplexo = info.categoria === "COMPLEXO";
 
     elDetalhes.innerHTML = `
@@ -275,16 +272,16 @@ function exibirDadosResidencial(info) {
             <div style="font-size: 0.68rem; color: #cccccc; margin-bottom: 10px;">📍 ${info.endereco || ""}</div>
             
             <div style="display: flex; gap: 8px; margin-bottom: 15px;">
-                <button onclick="window.open('${linkMaps}', '_blank')" class="menu-item-mrv" style="width: 70px; height: 32px; background: #4285F4; color: white; border: none; font-size: 0.6rem;">MAPS</button>
-                <button onclick="copyToClipboard('${info.link || ""}')" class="menu-item-mrv" style="width: 70px; height: 32px; background: #444; color: white; border: none; font-size: 0.6rem;">LINK</button>
+                <button onclick="window.open('${linkMaps}', '_blank')" class="menu-item-mrv" style="width: 70px; height: 32px; background: #4285F4; color: white; border: none; font-size: 0.6rem; display: flex; align-items: center; justify-content: center;">MAPS</button>
+                <button onclick="copyToClipboard('${info.link || ""}')" class="menu-item-mrv" style="width: 70px; height: 32px; background: #444; color: white; border: none; font-size: 0.6rem; display: flex; align-items: center; justify-content: center;">LINK</button>
             </div>
 
-            ${eComplexo && info.descLonga ? `<div style="font-size: 0.68rem; color: #bbb; margin-bottom: 15px; text-align: justify;">${info.descLonga}</div>` : ""}
+            ${eComplexo && info.descLonga ? `<div style="font-size: 0.68rem; color: #bbb; margin-bottom: 15px; text-align: justify; line-height: 1.3;">${info.descLonga}</div>` : ""}
 
-            <div style="margin-top: 10px;">
-                <div style="font-size: 0.6rem; color: #aaa; margin-bottom: 8px; font-weight: bold; letter-spacing: 1px;">MATERIAIS DE APOIO</div>
-                ${criarLinhaMaterial("Book Cliente", info.linkBookCliente)}
-                ${criarLinhaMaterial("Book Corretor", info.linkBookCorretor)}
+            <div style="margin-top: 15px;">
+                <div style="font-size: 0.6rem; color: #aaa; margin-bottom: 8px; font-weight: bold; letter-spacing: 1px; text-transform: uppercase;">Materiais de Apoio</div>
+                ${criarLinhaMaterial("Book Cliente", info.linkBookCliente, "📄")}
+                ${criarLinhaMaterial("Book Corretor", info.linkBookCorretor, "💼")}
                 ${htmlMateriaisExtras}
             </div>
         </div>
@@ -338,7 +335,7 @@ function toggleMenu() {
 }
 
 function copyToClipboard(text) {
-    if(!text || text === "#") return alert("Link não disponível");
+    if(!text || text === "#" || text === "") return alert("Link não disponível");
     navigator.clipboard.writeText(text).then(() => alert("Copiado!"));
 }
 
