@@ -323,30 +323,28 @@ function exibirDadosResidencial(info) {
     
     if(elNome) {
         elNome.innerText = info.nomeCurto.toUpperCase();
-        elNome.style.fontSize = "0.85rem"; // Padronizando o título também
+        elNome.style.fontSize = "0.85rem"; 
     }
 
     if(elDetalhes) {
         elDetalhes.innerHTML = `
-            <div class="container-acoes" style="display: flex; gap: 8px; margin-bottom: 12px;">
-                <button onclick="window.open('https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(info.endereco)}','_blank')" class="btn-acao btn-maps" style="flex:1; font-size: 0.85rem;">MAPS</button>
-                <button onclick="copyToClipboard('${info.link}')" class="btn-acao btn-link" style="flex:1; font-size: 0.85rem;">LINK</button>
+            <div class="container-acoes-grid">
+                <button onclick="window.open('https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(info.endereco)}','_blank')" class="btn-acao btn-maps">MAPS</button>
+                <button onclick="copyToClipboard('${info.link}')" class="btn-acao btn-link">LINK</button>
             </div>
 
             <div class="grid-dados-imovel">
                 <div class="caixa-dado-mrv"><span>ENTREGA</span><b>${info.entrega}</b></div>
                 <div class="caixa-dado-mrv"><span>OBRA</span><b>${info.obra}%</b></div>
+                
                 <div class="caixa-dado-mrv"><span>ESTOQUE</span><b>${info.estoque}</b></div>
                 <div class="caixa-dado-mrv"><span>C. PAUL.</span><b>${info.cPaulista}</b></div>
+                
+                <div class="caixa-dado-mrv"><span>PLANTAS</span><b>${info.plantaMin}</b></div>
+                <div class="caixa-dado-mrv"><span>LIMIT.</span><b>${info.limitador}</b></div>
             </div>
             
-            <div class="caixa-dado-mrv" style="margin-top: 4px; width: 100%;">
-                <span>PLANTAS</span><b>${info.plantaMin} a ${info.plantaMax}</b>
-            </div>
-
-            <div class="caixa-dado-mrv" style="margin-top: 4px; width: 100%;">
-                <span>LIMITADOR</span><b>${info.limitador}</b>
-            </div>
+            <div id="texto-descricao">${info.descricao || ""}</div>
         `;
     }
 }
