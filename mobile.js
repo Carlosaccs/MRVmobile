@@ -229,23 +229,10 @@ function desenharMapa(dados, targetId, ehMinimizado) {
     container.appendChild(svg);
 }
 
+
 /* ==========================================================================
-   BLOCO 7: NAVEGAÇÃO E FICHA TÉCNICA - COM NOVOS BOTÕES
+   BLOCO 7: FICHA TÉCNICA - AJUSTADO PARA O PADRÃO VISUAL MRV
    ========================================================================== */
-function trocarMapas() {
-    solicitarFullscreen();
-    limparSelecaoAnterior();
-    mapaAtivo = (mapaAtivo === "GSP") ? "INTERIOR" : "GSP";
-    atualizarVisualizacao();
-}
-
-function atualizarVisualizacao() {
-    if (typeof MAPA_GSP !== 'undefined' && typeof MAPA_INTERIOR !== 'undefined') {
-        desenharMapa(mapaAtivo === "GSP" ? MAPA_GSP : MAPA_INTERIOR, "mapa-container", false);
-        desenharMapa(mapaAtivo === "GSP" ? MAPA_INTERIOR : MAPA_GSP, "mapa-minimizado", true);
-    }
-}
-
 function exibirDadosResidencial(info) {
     const elNome = document.getElementById('nome-imovel');
     const elDetalhes = document.getElementById('detalhes-imovel');
@@ -257,15 +244,24 @@ function exibirDadosResidencial(info) {
     if (elDetalhes) {
         const linkMaps = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(info.endereco)}`;
         
-        // Função auxiliar para criar botões apenas se houver link
-        const criarBotao = (label, link, cor) => {
+        // Função para criar as linhas de materiais de apoio (igual à sua imagem de referência)
+        const criarLinhaMaterial = (label, icon, link) => {
             if(!link || link === "#" || link === "") return "";
             return `
-                <button onclick="window.open('${link}', '_blank')" 
-                        class="menu-item-mrv" 
-                        style="flex: 1; justify-content: center; margin: 0; height: 32px; background: ${cor}; color: white; border: none; font-size: 0.55rem; padding: 0 4px; font-weight: bold;">
-                    ${label}
-                </button>`;
+                <div style="display: flex; align-items: center; background: #fff; border: 1px solid #ddd; border-radius: 8px; padding: 8px; margin-bottom: 8px; gap: 10px;">
+                    <span style="font-size: 1.2rem;">${icon}</span>
+                    <span style="flex: 1; font-size: 0.75rem; color: #333; font-weight: bold;">${label}</span>
+                    <div style="display: flex; gap: 5px;">
+                        <button onclick="window.open('${link}', '_blank')" 
+                                style="background: #00713a; color: #fff; border: none; border-radius: 4px; padding: 5px 10px; font-size: 0.65rem; font-weight: bold; cursor: pointer;">
+                            Abrir
+                        </button>
+                        <button onclick="copyToClipboard('${link}')" 
+                                style="background: #ff8c00; color: #fff; border: none; border-radius: 4px; padding: 5px 10px; font-size: 0.65rem; font-weight: bold; cursor: pointer;">
+                            Copiar
+                        </button>
+                    </div>
+                </div>`;
         };
 
         const eComplexo = info.categoria === "COMPLEXO";
@@ -279,66 +275,30 @@ function exibirDadosResidencial(info) {
 
         elDetalhes.innerHTML = `
             <div style="margin-top: 10px; border-top: 1px solid #00713a; padding-top: 8px;">
-                <div style="font-size: 0.68rem; color: #cccccc; margin-bottom: 8px; line-height: 1.2;">
-                    📍 ${info.endereco || "Endereço não informado"}
+                <div style="font-size: 0.7rem; color: #ccc; margin-bottom: 12px; display: flex; align-items: flex-start; gap: 5px;">
+                    <span>📍</span> <span>${info.endereco || "Endereço não informado"}</span>
                 </div>
                 
-                <div style="display: flex; gap: 4px; width: 100%; margin-bottom: 4px;">
-                    ${criarBotao("MAPS", linkMaps, "#4285F4")}
-                    <button onclick="copyToClipboard('${info.link}')" 
-                            class="menu-item-mrv" 
-                            style="flex: 1; justify-content: center; margin: 0; height: 32px; background: #444; color: white; border: none; font-size: 0.55rem; padding: 0;">
-                        COPIAR LINK
+                <div style="margin-bottom: 15px;">
+                    <button onclick="window.open('${linkMaps}', '_blank')" 
+                            style="width: 100%; background: #4285F4; color: white; border: none; border-radius: 6px; height: 35px; font-size: 0.7rem; font-weight: bold; margin-bottom: 15px; cursor: pointer;">
+                        VER LOCALIZAÇÃO NO MAPA
                     </button>
                 </div>
 
-                <div style="display: flex; gap: 4px; width: 100%; margin-bottom: 10px;">
-                    ${criarBotao("BOOK CLI", info.bookCliente, "#00713a")}
-                    ${criarBotao("BOOK COR", info.bookCorretor, "#d1147e")}
-                    ${criarBotao("EXTRAS", info.materiais, "#ff8c00")}
+                <div style="color: #fff; font-size: 0.65rem; margin-bottom: 10px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">
+                    Materiais de Apoio
                 </div>
+
+                ${criarLinhaMaterial("Link do Imóvel", "🔗", info.link)}
+                ${criarLinhaMaterial("Book Cliente", "📄", info.bookCliente)}
+                ${criarLinhaMaterial("Book Corretor", "💼", info.bookCorretor)}
+                ${criarLinhaMaterial("Materiais Extras", "🎬", info.materiais)}
 
                 ${htmlDescricao}
             </div>
         `;
     }
-}
-
-function gerarMenuResidenciais() {
-    const lista = document.getElementById('lista-residenciais');
-    if (!lista) return;
-    lista.innerHTML = ""; 
-    [...window.dadosGerais].sort((a, b) => a.ordem - b.ordem).forEach(info => {
-        if (!info.nomeCurto || info.nomeCurto === "Sem Nome") return;
-        const li = document.createElement('li');
-        li.className = 'menu-item-mrv'; 
-        li.innerText = info.nomeCurto.toUpperCase();
-        const corZona = obterCorPorZona(info);
-
-        if (String(info.categoria).toUpperCase() === "COMPLEXO") {
-            li.classList.add('estilo-complexo');
-            li.style.backgroundColor = corZona;
-            li.style.color = "#ffffff";
-        } else {
-            li.style.borderRightColor = corZona;
-        }
-
-        li.onclick = (e) => {
-            e.stopPropagation();
-            toggleMenu();
-            let p = document.getElementById(info.id);
-            if (!p) { 
-                trocarMapas(); 
-                setTimeout(() => { 
-                    let np = document.getElementById(info.id); 
-                    if (np) clicarNoMapa(np, info); 
-                }, 300); 
-            } else { 
-                clicarNoMapa(p, info); 
-            }
-        };
-        lista.appendChild(li);
-    });
 }
 /* ==========================================================================
    BLOCO 8: SISTEMA (MENU, CLIPBOARD E EVENTOS)
