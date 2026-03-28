@@ -120,60 +120,30 @@ html, body {
 #nome-imovel {
     color: #50c878; font-weight: 700; font-size: var(--ft-font-size);
     border-bottom: 2px solid #00713a; padding-bottom: 8px;
-    text-transform: uppercase;
 }
 
-/* Vitrine de Botões (Lista Superior na Ficha) */
-#container-vitrine-botoes { 
-    display: flex; flex-direction: column; 
-    gap: 3px; margin-bottom: 15px; 
-}
-
-#container-vitrine-botoes .menu-item-mrv {
-    padding: 6px 8px 6px 12px !important; 
-    margin: 0 !important; 
-    font-size: 0.72rem !important; 
-    min-height: auto !important;
-}
-
-/* Botões MAPS e LINK */
-.container-acoes-grid { 
-    display: grid; 
-    grid-template-columns: 1fr 1fr; 
-    gap: 8px; margin-bottom: 10px; 
-}
+.container-acoes-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
 
 .btn-acao {
     height: 35px; border-radius: 4px; color: white; border: none;
     font-weight: 800; font-size: var(--ft-font-dados);
     display: flex; align-items: center; justify-content: center;
-    cursor: pointer; text-transform: uppercase;
 }
 .btn-maps { background-color: #4285F4; }
 .btn-link { background-color: #444444; }
 
-/* Grid de Dados (Caixas Brancas - Ocultadas no JS para Complexos) */
-.grid-dados-imovel { 
-    display: grid; 
-    grid-template-columns: 1fr 1fr; 
-    gap: 4px; 
-}
+.grid-dados-imovel { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; }
 
 .caixa-dado-mrv {
     background: #ffffff; height: 35px; padding: 0 8px;
-    border-radius: 4px; display: flex; 
-    justify-content: space-between; align-items: center;
+    border-radius: 4px; display: flex; justify-content: space-between; align-items: center;
 }
 
 .caixa-dado-mrv span { color: #00713a; font-weight: 800; font-size: 0.65rem; }
 .caixa-dado-mrv b { color: #333; font-size: var(--ft-font-dados); }
 
-/* Texto de Descrição (Coluna S / R) - Importante para Complexos */
-#texto-descricao {
-    color: #efefef; 
-    margin-top: 15px;
-    font-size: 0.80rem; 
-    line-height: 1.4;
-    text-align: justify;
-    padding-bottom: 30px; /* Respiro no final do scroll */
+#container-vitrine-botoes { display: flex; flex-direction: column; gap: 3px; margin-bottom: 15px; }
+
+#container-vitrine-botoes .menu-item-mrv {
+    padding: 6px 8px 6px 12px !important; margin: 0 !important; font-size: 0.72rem !important; 
 }
