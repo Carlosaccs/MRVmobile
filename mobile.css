@@ -129,19 +129,18 @@ html, body {
 .container-acoes-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 8px;
-    margin-bottom: 10px;
+    gap: 6px;
+    margin-bottom: 8px;
 }
 
 /* Botões MAPS e LINK */
 .btn-acao {
-    height: 35px;
-    border-radius: 4px;
+    justify-content: center;
+    border: none;
     font-weight: 800;
-    font-size: var(--ft-font-dados) !important;
-    color: white; border: none;
-    display: flex; align-items: center; justify-content: center;
-    text-transform: uppercase; cursor: pointer;
+    color: white;
+    cursor: pointer;
+    text-transform: uppercase;
 }
 .btn-maps { background-color: #4285F4; }
 .btn-link { background-color: #444444; }
@@ -156,24 +155,18 @@ html, body {
 /* Caixas Brancas de Dados */
 .caixa-dado-mrv {
     background: #ffffff;
-    height: 35px; /* Altura igual aos botões */
-    padding: 0 8px;
-    border-radius: 4px;
-    display: flex;
+    padding: 0 6px;
     justify-content: space-between;
-    align-items: center;
 }
 
 .caixa-dado-mrv span {
     color: #00713a;
     font-weight: 800;
-    font-size: 0.65rem; /* Rótulo menor para não apertar */
-    text-transform: uppercase;
+    font-size: 0.62rem; /* Rótulo compacto */
 }
 
 .caixa-dado-mrv b {
     color: #333;
-    font-size: var(--ft-font-dados);
     font-weight: 700;
 }
 
