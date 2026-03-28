@@ -1,5 +1,5 @@
 /* ==========================================================================
-   BLOCO 1: RESET E CONFIGURAÇÕES GERAIS
+   BLOCO 1: RESET E FUNDAÇÃO
    ========================================================================== */
 html, body {
     margin: 0; padding: 0; 
@@ -20,7 +20,7 @@ html, body {
 }
 
 /* ==========================================================================
-   BLOCO 2: FAIXA VERDE E MENUS
+   BLOCO 2: FAIXA VERDE E BOTÕES LATERAIS
    ========================================================================== */
 .faixa-verde-vertical {
     position: absolute; left: 0; top: 0;
@@ -36,27 +36,41 @@ html, body {
     writing-mode: vertical-rl; transform: rotate(180deg);
     font-weight: bold; font-size: 1.1rem;
     letter-spacing: 2px; color: white !important;
+    white-space: nowrap; flex-grow: 1;
+    display: flex; align-items: center; justify-content: center;
 }
 
+/* Feedback de clique nos botões da faixa verde */
+#btn-menu:active, #btn-fullscreen:active {
+    opacity: 0.5;
+    transform: scale(0.9);
+}
+
+/* ==========================================================================
+   BLOCO 3: MENU LATERAL
+   ========================================================================== */
 #menu-lateral {
     position: fixed; left: 55px; top: 0;
     width: calc(100% - 80px); max-width: 330px; height: 100%;
-    background: rgba(255,255,255,0.1); backdrop-filter: blur(15px);
-    z-index: 3000; transition: transform 0.4s ease;
+    background: transparent; backdrop-filter: blur(15px);
+    z-index: 3000; transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
-#menu-lateral.menu-oculto { transform: translateX(-120%); }
 #menu-lateral.menu-aberto { transform: translateX(0); }
+#menu-lateral.menu-oculto { transform: translateX(-120%); }
+
+.menu-lista { list-style: none; padding: 10px 0; margin: 0; height: 100vh; overflow-y: auto; }
 
 /* ==========================================================================
-   BLOCO 3: BOTÕES (ITEM MRV E COMPLEXO)
+   BLOCO 4: ESTILO DOS BOTÕES (MRV E COMPLEXO)
    ========================================================================== */
 .menu-item-mrv {
     background: #ffffff; border: 1px solid #d1d1d1;
     border-right: 18px solid #00713a; 
-    margin: 8px 10px; padding: 12px; 
+    margin: 8px 10px 8px 5px; padding: 12px 12px 12px 25px; 
     border-radius: 2px 12px 12px 2px;
     color: #333; font-weight: 600; font-size: var(--ft-font-size);
-    display: block; text-transform: uppercase;
+    display: block; box-shadow: 4px 4px 10px rgba(0,0,0,0.1);
+    text-transform: uppercase;
 }
 
 .estilo-complexo {
@@ -66,7 +80,7 @@ html, body {
 }
 
 /* ==========================================================================
-   BLOCO 4: MAPA E INDICADORES
+   BLOCO 5: MAPA E INDICADORES
    ========================================================================== */
 #mapa-container {
     position: absolute; left: 0; top: 0;
@@ -80,6 +94,7 @@ html, body {
     width: 85px; height: 65px;
     background: white; border: 2px solid #00713a;
     border-radius: 10px; z-index: 2000;
+    box-shadow: -5px 5px 15px rgba(0,0,0,0.3);
 }
 
 #identificador-cidade {
@@ -92,13 +107,13 @@ html, body {
 }
 
 /* ==========================================================================
-   BLOCO 5: FICHA TÉCNICA E GRIDS
+   BLOCO 6: FICHA TÉCNICA (DIREITA)
    ========================================================================== */
 .ficha-tecnica {
     position: absolute; right: 0; top: 0;
     width: 44%; height: 100%;
-    background: rgba(30, 30, 30, 0.96); color: white;
-    padding: 15px 12px; z-index: 1000;
+    background: rgba(30, 30, 30, 0.96); backdrop-filter: blur(12px);
+    color: white; padding: 15px 12px; z-index: 1000;
     overflow-y: auto;
 }
 
@@ -107,20 +122,17 @@ html, body {
     border-bottom: 2px solid #00713a; padding-bottom: 8px;
 }
 
-.container-acoes-grid {
-    display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px;
-}
+.container-acoes-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
 
 .btn-acao {
     height: 35px; border-radius: 4px; color: white; border: none;
     font-weight: 800; font-size: var(--ft-font-dados);
+    display: flex; align-items: center; justify-content: center;
 }
 .btn-maps { background-color: #4285F4; }
 .btn-link { background-color: #444444; }
 
-.grid-dados-imovel {
-    display: grid; grid-template-columns: 1fr 1fr; gap: 4px;
-}
+.grid-dados-imovel { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; }
 
 .caixa-dado-mrv {
     background: #ffffff; height: 35px; padding: 0 8px;
@@ -129,3 +141,9 @@ html, body {
 
 .caixa-dado-mrv span { color: #00713a; font-weight: 800; font-size: 0.65rem; }
 .caixa-dado-mrv b { color: #333; font-size: var(--ft-font-dados); }
+
+#container-vitrine-botoes { display: flex; flex-direction: column; gap: 3px; margin-bottom: 15px; }
+
+#container-vitrine-botoes .menu-item-mrv {
+    padding: 6px 8px 6px 12px !important; margin: 0 !important; font-size: 0.72rem !important; 
+}
