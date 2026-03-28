@@ -1,5 +1,5 @@
 /* ==========================================================================
-   BLOCO 1: CONFIGURAÇÕES, VARIÁVEIS E PLANILHA
+   BLOCO 1: VARIÁVEIS E CARREGAMENTO DA PLANILHA
    ========================================================================== */
 const svgNS = "http://www.w3.org/2000/svg";
 const URL_PLANILHA = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSRKdJctOPQjKAtOZSDHyArD_H8SgKIouelAS1vF1d_-13pu7u_ic6J8nP3r0Ijd56WA-mbUmHjb4Me/pub?output=csv';
@@ -13,7 +13,6 @@ const AJUSTES_MAPA = {
     INTERIOR: { marginRight: "50%", marginLeft: "-100px", scale: "1.15" }
 };
 
-// Carregamento de Dados
 async function carregarPlanilha() {
     try {
         const res = await fetch(URL_PLANILHA);
@@ -38,11 +37,9 @@ async function carregarPlanilha() {
                     plantaMax: limpar(c[11]),
                     obra: limpar(c[12]),
                     limitador: limpar(c[13]),
-                    regional: limpar(c[14]),
                     cPaulista: limpar(c[15]),
                     link: limpar(c[16]),
-                    descricao: limpar(c[17]),
-                    textoColunaR: limpar(c[18])
+                    descricao: limpar(c[17])
                 });
             }
         });
@@ -52,55 +49,47 @@ async function carregarPlanilha() {
 }
 
 /* ==========================================================================
-   BLOCO 2: AUXILIARES E INTERAÇÃO COM MAPA
+   BLOCO 2: AUXILIARES E TEXTOS
    ========================================================================== */
 function obterCorPorZona(info) {
     const z = info.zona ? info.zona.trim().toUpperCase() : "";
     switch(z) {
-        case "ZO": return "#ff8c00";
-        case "ZL": return "#e31c19";
-        case "ZN": return "#0054a6";
-        case "ZS": return "#d1147e";
+        case "ZO": return "#ff8c00"; case "ZL": return "#e31c19";
+        case "ZN": return "#0054a6"; case "ZS": return "#d1147e";
         default: return "#00713a";
     }
 }
 
 function atualizarTextoTopo(nome) {
     const indicador = document.getElementById('identificador-cidade');
-    if (!indicador) return;
-    indicador.innerText = nome ? nome.toUpperCase() : (mapaAtivo === "GSP" ? "GRANDE SP" : "ESTADO DE SP");
+    if (indicador) indicador.innerText = nome ? nome.toUpperCase() : (mapaAtivo === "GSP" ? "GRANDE SP" : "ESTADO DE SP");
 }
 
 function limparSelecaoAnterior() {
     cidadeClicadaAtiva = null;
     document.querySelectorAll('#mapa-container path').forEach(p => {
-        p.setAttribute('data-selecionado', 'false');
         p.style.fill = p.getAttribute('data-cor-base');
     });
-    const containerBotoes = document.getElementById('container-vitrine-botoes');
-    if (containerBotoes) containerBotoes.innerHTML = "";
+    const vitrine = document.getElementById('container-vitrine-botoes');
+    if (vitrine) vitrine.innerHTML = "";
     const elNome = document.getElementById('nome-imovel');
     if (elNome) elNome.innerText = "";
     const elDetalhes = document.getElementById('detalhes-imovel');
-    if (elDetalhes) elDetalhes.innerHTML = "";
+    if (elDetalhes) elDetalhes.innerHTML = "<p>Toque em uma cidade para ver os detalhes.</p>";
     atualizarTextoTopo(null);
 }
 
 /* ==========================================================================
-   BLOCO 3: LÓGICA DE CLIQUE E VITRINE
+   BLOCO 3: INTERAÇÃO (MAPA -> FICHA TÉCNICA)
    ========================================================================== */
 function clicarNoMapa(pathElement, infoSelecionado, pDataRaw = null) {
-    solicitarFullscreen();
     const idRegiao = pathElement.id.replace('mini-', '').toLowerCase();
     
     document.querySelectorAll('#mapa-container path').forEach(p => { 
-        p.setAttribute('data-selecionado', 'false'); 
         p.style.fill = p.getAttribute('data-cor-base'); 
     });
     
-    pathElement.setAttribute('data-selecionado', 'true');
     pathElement.style.fill = "#FF4500"; 
-    
     const nomeDaCidade = pDataRaw ? pDataRaw.name : pathElement.getAttribute('data-name');
     cidadeClicadaAtiva = { name: (nomeDaCidade || "").toUpperCase() }; 
     atualizarTextoTopo(cidadeClicadaAtiva.name);
@@ -110,40 +99,53 @@ function clicarNoMapa(pathElement, infoSelecionado, pDataRaw = null) {
         .sort((a, b) => a.ordem - b.ordem);
 
     const ativo = infoSelecionado || todosDestaRegiao[0];
-    const containerBotoes = document.getElementById('container-vitrine-botoes');
     
-    if(containerBotoes) {
-        containerBotoes.innerHTML = "";
+    // Gerar botões da Vitrine (os outros residenciais da cidade)
+    const vitrine = document.getElementById('container-vitrine-botoes');
+    if (vitrine) {
+        vitrine.innerHTML = "";
         todosDestaRegiao.forEach(item => {
-            if (item.nomeCurto && item.nomeCurto !== "Sem Nome" && item.nomeCurto !== ativo.nomeCurto) {
+            if (item.nomeCurto !== ativo.nomeCurto) {
                 const btn = document.createElement('div');
                 btn.className = 'menu-item-mrv';
+                if (item.categoria === "COMPLEXO") btn.classList.add('estilo-complexo');
                 btn.innerText = item.nomeCurto.toUpperCase();
-                const corZona = obterCorPorZona(item);
-
-                if (item.categoria === "COMPLEXO") {
-                    btn.classList.add('estilo-complexo');
-                    btn.style.backgroundColor = corZona;
-                    btn.style.color = "#ffffff";
-                    btn.style.borderRightColor = "rgba(0,0,0,0.2)";
-                } else {
-                    btn.style.borderRightColor = corZona;
-                    btn.style.backgroundColor = "#ffffff";
-                    btn.style.color = "#333";
-                }
-                btn.onclick = (e) => { 
-                    e.stopPropagation(); 
-                    clicarNoMapa(pathElement, item, pDataRaw); 
-                };
-                containerBotoes.appendChild(btn);
+                btn.style.borderRightColor = obterCorPorZona(item);
+                btn.onclick = (e) => { e.stopPropagation(); clicarNoMapa(pathElement, item, pDataRaw); };
+                vitrine.appendChild(btn);
             }
         });
     }
+
     if (ativo) exibirDadosResidencial(ativo);
 }
 
+function exibirDadosResidencial(info) {
+    const elNome = document.getElementById('nome-imovel');
+    const elDetalhes = document.getElementById('detalhes-imovel');
+    if(elNome) elNome.innerText = info.nomeCurto.toUpperCase();
+    if(elDetalhes) {
+        elDetalhes.innerHTML = `
+            <div style="margin-bottom: 8px; font-size: 0.72rem; color: #ccc;">📍 ${info.endereco || ""}</div>
+            <div class="container-acoes-grid">
+                <button onclick="window.open('https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(info.endereco)}','_blank')" class="btn-acao btn-maps">MAPS</button>
+                <button onclick="copyToClipboard('${info.link}')" class="btn-acao btn-link">LINK</button>
+            </div>
+            <div class="grid-dados-imovel">
+                <div class="caixa-dado-mrv"><span>ENTREGA</span><b>${info.entrega}</b></div>
+                <div class="caixa-dado-mrv"><span>OBRA</span><b>${info.obra}%</b></div>
+                <div class="caixa-dado-mrv"><span>ESTOQUE</span><b>${info.estoque}</b></div>
+                <div class="caixa-dado-mrv"><span>C. PAUL.</span><b>${info.cPaulista}</b></div>
+                <div class="caixa-dado-mrv"><span>PLANTAS</span><b>${info.plantaMin}</b></div>
+                <div class="caixa-dado-mrv"><span>LIMIT.</span><b>${info.limitador}</b></div>
+            </div>
+            <div id="texto-descricao" style="margin-top: 12px; font-size: 0.8rem;">${info.descricao || ""}</div>
+        `;
+    }
+}
+
 /* ==========================================================================
-   BLOCO 4: RENDERIZAÇÃO DO MAPA SVG
+   BLOCO 4: RENDERIZAÇÃO E NAVEGAÇÃO DO MAPA
    ========================================================================== */
 function desenharMapa(dados, targetId, ehMinimizado) {
     const container = document.getElementById(targetId);
@@ -165,31 +167,20 @@ function desenharMapa(dados, targetId, ehMinimizado) {
     dados.paths.forEach(pData => {
         const path = document.createElementNS(svgNS, "path");
         const idLimpo = pData.id.toLowerCase();
-        const ehMRV = pData.class === "commrv" || window.dadosGerais.some(d => d.id === idLimpo);
+        const ehMRV = window.dadosGerais.some(d => d.id === idLimpo);
         
         path.setAttribute("d", pData.d);
         path.setAttribute("id", (ehMinimizado ? 'mini-' : '') + pData.id);
-        path.setAttribute('data-name', pData.name || pData.id);
         
         const corBase = ehMRV ? "#00713a" : "#cccccc";
         path.style.fill = corBase;
-        path.style.stroke = "#ffffff";
-        path.style.strokeWidth = (ehMinimizado || !ehMRV) ? "0" : "1.2";
         path.setAttribute('data-cor-base', corBase);
+        path.style.stroke = "#fff";
+        path.style.strokeWidth = "1";
 
         if (!ehMinimizado) {
-            path.onpointerdown = (e) => {
-                e.stopPropagation();
-                solicitarFullscreen();
-                atualizarTextoTopo(pData.name);
-            };
-            path.onpointerleave = () => {
-                const nomeVolta = cidadeClicadaAtiva ? cidadeClicadaAtiva.name : null;
-                atualizarTextoTopo(nomeVolta);
-            };
             path.onclick = (e) => { 
                 e.stopPropagation();
-                if (pData.id === "grandesaopaulo") { trocarMapas(); return; } 
                 if (ehMRV) clicarNoMapa(path, null, pData);
             };
         }
@@ -199,65 +190,50 @@ function desenharMapa(dados, targetId, ehMinimizado) {
     container.appendChild(svg);
 }
 
-/* ==========================================================================
-   BLOCO 5: MENUS, FICHA TÉCNICA E EVENTOS DE SISTEMA
-   ========================================================================== */
-
-function exibirDadosResidencial(info) {
-    const elNome = document.getElementById('nome-imovel');
-    const elDetalhes = document.getElementById('detalhes-imovel');
-    if(elNome) elNome.innerText = info.nomeCurto.toUpperCase();
-    if(elDetalhes) {
-        elDetalhes.innerHTML = `
-            <div class="endereco-texto" style="margin-bottom: 8px; font-size: 0.72rem; color: #ccc;">📍 ${info.endereco || "Endereço não disponível"}</div>
-            <div class="container-acoes-grid">
-                <button onclick="window.open('https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(info.endereco)}','_blank')" class="btn-acao btn-maps">MAPS</button>
-                <button onclick="copyToClipboard('${info.link}')" class="btn-acao btn-link">LINK</button>
-            </div>
-            <div class="grid-dados-imovel">
-                <div class="caixa-dado-mrv"><span>ENTREGA</span><b>${info.entrega}</b></div>
-                <div class="caixa-dado-mrv"><span>OBRA</span><b>${info.obra}%</b></div>
-                <div class="caixa-dado-mrv"><span>ESTOQUE</span><b>${info.estoque}</b></div>
-                <div class="caixa-dado-mrv"><span>C. PAUL.</span><b>${info.cPaulista}</b></div>
-                <div class="caixa-dado-mrv"><span>PLANTAS</span><b>${info.plantaMin}</b></div>
-                <div class="caixa-dado-mrv"><span>LIMIT.</span><b>${info.limitador}</b></div>
-            </div>
-            <div id="texto-descricao" style="margin-top: 12px;">${info.descricao || ""}</div>
-        `;
-    }
-}
-
-// --- FUNÇÕES DOS BOTÕES DA FAIXA VERDE ---
-
-function toggleMenu() {
-    solicitarFullscreen();
-    const menu = document.getElementById('menu-lateral');
-    if(menu) { 
-        menu.classList.toggle('menu-aberto'); 
-        menu.classList.toggle('menu-oculto'); 
-    }
-}
-
-function alternarFullscreen() {
-    if (!document.fullscreenElement && !document.webkitFullscreenElement) {
-        if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen();
-        else if (document.documentElement.webkitRequestFullscreen) document.documentElement.webkitRequestFullscreen();
-    } else {
-        if (document.exitFullscreen) document.exitFullscreen();
-        else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
-    }
-}
-
 function trocarMapas() { 
-    solicitarFullscreen(); 
     limparSelecaoAnterior(); 
     mapaAtivo = (mapaAtivo === "GSP") ? "INTERIOR" : "GSP"; 
     atualizarVisualizacao(); 
 }
 
-function solicitarFullscreen() { 
-    if (!document.fullscreenElement && !document.webkitFullscreenElement) {
-        if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen();
+function atualizarVisualizacao() { 
+    if (typeof MAPA_GSP !== 'undefined' && typeof MAPA_INTERIOR !== 'undefined') {
+        desenharMapa(mapaAtivo === "GSP" ? MAPA_GSP : MAPA_INTERIOR, "mapa-container", false);
+        desenharMapa(mapaAtivo === "GSP" ? MAPA_INTERIOR : MAPA_GSP, "mapa-minimizado", true);
+    }
+}
+
+function gerarMenuResidenciais() {
+    const lista = document.getElementById('lista-residenciais');
+    if (!lista) return;
+    lista.innerHTML = "";
+    window.dadosGerais.sort((a,b) => a.ordem - b.ordem).forEach(info => {
+        const li = document.createElement('li');
+        li.className = 'menu-item-mrv';
+        if (info.categoria === "COMPLEXO") li.classList.add('estilo-complexo');
+        li.innerText = info.nomeCurto.toUpperCase();
+        li.style.borderRightColor = obterCorPorZona(info);
+        li.onclick = () => { toggleMenu(); /* Aqui você chamaria a função de clique no mapa se necessário */ };
+        lista.appendChild(li);
+    });
+}
+
+/* ==========================================================================
+   BLOCO 5: SISTEMA (MENU, FULLSCREEN E CLIQUES)
+   ========================================================================== */
+function toggleMenu() {
+    const menu = document.getElementById('menu-lateral');
+    if(menu) {
+        menu.classList.toggle('menu-aberto');
+        menu.classList.toggle('menu-oculto');
+    }
+}
+
+function alternarFullscreen() {
+    if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(err => console.log(err));
+    } else {
+        document.exitFullscreen();
     }
 }
 
@@ -266,21 +242,21 @@ function copyToClipboard(text) {
     navigator.clipboard.writeText(text).then(() => alert("Copiado!")); 
 }
 
-// --- ESCUTADOR DE CLIQUES (O QUE FAZ FUNCIONAR) ---
-
+// Escutador de Cliques Unificado
 document.addEventListener('click', (e) => {
-    // 1. Clique no botão de Menu (Topo da faixa verde)
-    if (e.target.closest('#btn-menu') || e.target.closest('.faixa-verde-vertical img:first-child')) {
-        toggleMenu();
-    }
-    
-    // 2. Clique no botão Fullscreen (Base da faixa verde)
-    if (e.target.closest('#btn-fullscreen') || e.target.closest('.faixa-verde-vertical img:last-child')) {
-        alternarFullscreen();
-    }
+    // Busca o elemento clicado ou seus pais que tenham os IDs
+    const btnMenu = e.target.closest('#btn-menu');
+    const btnFull = e.target.closest('#btn-fullscreen');
+    const btnMinimapa = e.target.closest('#mapa-minimizado');
 
-    // 3. Clique no Mapa Minimizado
-    if (e.target.closest('#mapa-minimizado')) {
+    if (btnMenu) {
+        e.stopPropagation();
+        toggleMenu();
+    } else if (btnFull) {
+        e.stopPropagation();
+        alternarFullscreen();
+    } else if (btnMinimapa) {
+        e.stopPropagation();
         trocarMapas();
     }
 });
