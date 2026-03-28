@@ -226,80 +226,96 @@ function desenharMapa(dados, targetId, ehMinimizado) {
 }
 
 /* ==========================================================================
-   BLOCO 7: NAVEGAÇÃO E FICHA TÉCNICA - LÓGICA DE INJEÇÃO LIMPA
-   ========================================================================== */
+   BLOCO 7: NAVEGAÇÃO E FICHA TÉCNICA - ORGANIZAÇÃO E BOTÕES
+   ========================================================================== */
 function trocarMapas() {
-    solicitarFullscreen();
-    limparSelecaoAnterior();
-    mapaAtivo = (mapaAtivo === "GSP") ? "INTERIOR" : "GSP";
-    atualizarVisualizacao();
+    solicitarFullscreen();
+    limparSelecaoAnterior();
+    mapaAtivo = (mapaAtivo === "GSP") ? "INTERIOR" : "GSP";
+    atualizarVisualizacao();
 }
 
 function atualizarVisualizacao() {
-    if (typeof MAPA_GSP !== 'undefined' && typeof MAPA_INTERIOR !== 'undefined') {
-        desenharMapa(mapaAtivo === "GSP" ? MAPA_GSP : MAPA_INTERIOR, "mapa-container", false);
-        desenharMapa(mapaAtivo === "GSP" ? MAPA_INTERIOR : MAPA_GSP, "mapa-minimizado", true);
-    }
+    if (typeof MAPA_GSP !== 'undefined' && typeof MAPA_INTERIOR !== 'undefined') {
+        desenharMapa(mapaAtivo === "GSP" ? MAPA_GSP : MAPA_INTERIOR, "mapa-container", false);
+        desenharMapa(mapaAtivo === "GSP" ? MAPA_INTERIOR : MAPA_GSP, "mapa-minimizado", true);
+    }
 }
 
 function exibirDadosResidencial(info) {
-    const elNome = document.getElementById('nome-imovel');
-    const elDetalhes = document.getElementById('detalhes-imovel');
-    
-    // 1. Atualiza o título (Nome do Imóvel)
-    if (elNome) {
-        elNome.innerText = (info.nomeCurto || "").toUpperCase();
-    }
-    
-    // 2. Lógica de Montagem (Injeção Direta):
-    // Criamos uma variável HTML que contém APENAS o endereço.
-    // Ao atribuir ao innerHTML, deletamos qualquer botão ou dado que existia antes.
-    if (elDetalhes) {
-        let htmlLimpo = `
-            <div style="margin-top: 10px; font-size: 0.75rem; color: #cccccc; line-height: 1.4;">
-                📍 ${info.endereco || "Endereço não informado"}
-            </div>
-        `;
-        
-        elDetalhes.innerHTML = htmlLimpo;
-    }
+    const elNome = document.getElementById('nome-imovel');
+    const elDetalhes = document.getElementById('detalhes-imovel');
+    
+    if (elNome) {
+        elNome.innerText = (info.nomeCurto || "").toUpperCase();
+    }
+    
+    if (elDetalhes) {
+        // Criamos o link do Maps e garantimos que o link de cópia exista
+        const linkMaps = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(info.endereco)}`;
+        const linkCopia = info.link || "#";
+
+        // Montagem do HTML: Endereço + Container de Botões
+        // Os botões usam a classe 'menu-item-mrv' para herdar a altura e estilo dos botões da lista
+        elDetalhes.innerHTML = `
+            <div style="margin-top: 15px; border-top: 1px solid #00713a; padding-top: 10px;">
+                <div style="font-size: 0.68rem; color: #cccccc; margin-bottom: 12px; line-height: 1.2;">
+                    📍 ${info.endereco || "Endereço não informado"}
+                </div>
+                
+                <div style="display: flex; gap: 8px;">
+                    <button onclick="window.open('${linkMaps}', '_blank')" 
+                            class="menu-item-mrv" 
+                            style="flex: 1; justify-content: center; margin: 0; padding: 0; min-height: 32px; background: #4285F4; color: white; border: none; font-size: 0.68rem;">
+                        MAPS
+                    </button>
+                    
+                    <button onclick="copyToClipboard('${linkCopia}')" 
+                            class="menu-item-mrv" 
+                            style="flex: 1; justify-content: center; margin: 0; padding: 0; min-height: 32px; background: #444; color: white; border: none; font-size: 0.68rem;">
+                        LINK
+                    </button>
+                </div>
+            </div>
+        `;
+    }
 }
 
 function gerarMenuResidenciais() {
-    const lista = document.getElementById('lista-residenciais');
-    if (!lista) return;
-    lista.innerHTML = ""; 
-    [...window.dadosGerais].sort((a, b) => a.ordem - b.ordem).forEach(info => {
-        if (!info.nomeCurto || info.nomeCurto === "Sem Nome") return;
-        const li = document.createElement('li');
-        li.className = 'menu-item-mrv'; 
-        li.innerText = info.nomeCurto.toUpperCase();
-        const corZona = obterCorPorZona(info);
+    const lista = document.getElementById('lista-residenciais');
+    if (!lista) return;
+    lista.innerHTML = ""; 
+    [...window.dadosGerais].sort((a, b) => a.ordem - b.ordem).forEach(info => {
+        if (!info.nomeCurto || info.nomeCurto === "Sem Nome") return;
+        const li = document.createElement('li');
+        li.className = 'menu-item-mrv'; 
+        li.innerText = info.nomeCurto.toUpperCase();
+        const corZona = obterCorPorZona(info);
 
-        if (info.categoria === "COMPLEXO") {
-            li.classList.add('estilo-complexo');
-            li.style.backgroundColor = corZona;
-            li.style.color = "#ffffff";
-        } else {
-            li.style.borderRightColor = corZona;
-        }
+        if (info.categoria === "COMPLEXO") {
+            li.classList.add('estilo-complexo');
+            li.style.backgroundColor = corZona;
+            li.style.color = "#ffffff";
+        } else {
+            li.style.borderRightColor = corZona;
+        }
 
-        li.onclick = (e) => {
-            e.stopPropagation();
-            toggleMenu();
-            let p = document.getElementById(info.id);
-            if (!p) { 
-                trocarMapas(); 
-                setTimeout(() => { 
-                    let np = document.getElementById(info.id); 
-                    if (np) clicarNoMapa(np, info); 
-                }, 300); 
-            } else { 
-                clicarNoMapa(p, info); 
-            }
-        };
-        lista.appendChild(li);
-    });
+        li.onclick = (e) => {
+            e.stopPropagation();
+            toggleMenu();
+            let p = document.getElementById(info.id);
+            if (!p) { 
+                trocarMapas(); 
+                setTimeout(() => { 
+                    let np = document.getElementById(info.id); 
+                    if (np) clicarNoMapa(np, info); 
+                }, 300); 
+            } else { 
+                clicarNoMapa(p, info); 
+            }
+        };
+        lista.appendChild(li);
+    });
 }
 /* ==========================================================================
    BLOCO 8: SISTEMA (MENU, CLIPBOARD E EVENTOS)
