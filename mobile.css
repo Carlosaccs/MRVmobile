@@ -16,10 +16,23 @@ html, body {
 * { 
     box-sizing: border-box; 
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+    /* --- ADICIONE AS 3 LINHAS ABAIXO --- */
+    -webkit-tap-highlight-color: transparent; /* Remove o flash azul ao tocar */
+    -webkit-touch-callout: none;              /* Impede menu de contexto (copiar/colar) */
+    user-select: none;                        /* Impede seleção de texto geral */
+}
+
+/* Garante que campos de texto ou botões específicos sigam a regra */
+#identificador-cidade, 
+.menu-item-mrv, 
+path, 
+.btn-acao {
+    user-select: none;
+    -webkit-user-select: none;
 }
 
 :root {
-    --ft-font-size: 0.85rem; /* Fonte padrão para alinhar com os botões */
+    --ft-font-size: 0.85rem; 
 }
 
 .mobile-wrapper {
