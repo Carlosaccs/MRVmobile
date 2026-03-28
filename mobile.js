@@ -1,5 +1,5 @@
 /* ==========================================================================
-   v140.35 - REPARO FINAL: TEXTO DINÂMICO + FULLSCREEN + COLUNA D
+   v140.40 - ESTADO VOLÁTIL + RESET DE DESTAQUE + NO-SELECT
    ========================================================================== */
 
 const svgNS = "http://www.w3.org/2000/svg";
@@ -14,7 +14,6 @@ const AJUSTES_MAPA = {
     INTERIOR: { marginRight: "50%", marginLeft: "-100px", scale: "1.15" }
 };
 
-// --- 1. CORES E TELA CHEIA ---
 function obterCorPorZona(info) {
     const z = info.zona ? info.zona.trim().toUpperCase() : "";
     switch(z) {
@@ -26,19 +25,19 @@ function obterCorPorZona(info) {
     }
 }
 
+// --- CONTROLE DE TELA CHEIA ---
 function alternarFullscreen() {
+    const elem = document.documentElement;
     if (!document.fullscreenElement) {
-        document.documentElement.requestFullscreen().catch(err => {
-            console.log(`Erro ao entrar em tela cheia: ${err.message}`);
-        });
+        if (elem.requestFullscreen) elem.requestFullscreen();
+        else if (elem.webkitRequestFullscreen) elem.webkitRequestFullscreen();
     } else {
-        if (document.exitFullscreen) {
-            document.exitFullscreen();
-        }
+        if (document.exitFullscreen) document.exitFullscreen();
+        else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
     }
 }
 
-// --- 2. CARREGAMENTO (COLUNA D) ---
+// --- CARREGAMENTO DE DADOS ---
 async function carregarPlanilha() {
     try {
         const res = await fetch(URL_PLANILHA);
@@ -77,22 +76,31 @@ async function carregarPlanilha() {
     } catch (e) { console.error("Erro na planilha:", e); }
 }
 
-// --- 3. LOGICA DO MAPA E TEXTO ---
+// --- ATUALIZAÇÃO DO TOPO ---
 function atualizarTextoTopo(nome) {
     const indicador = document.getElementById('identificador-cidade');
     if (!indicador) return;
-
     if (nome) {
         indicador.innerText = nome.toUpperCase();
     } else {
-        // Se não houver nome para mostrar, volta para o nome do Mapa
         indicador.innerText = (mapaAtivo === "GSP" ? "GRANDE SP" : "ESTADO DE SP");
     }
+}
+
+// --- LÓGICA DE LIMPEZA DE SELEÇÃO ---
+function limparSelecaoAnterior() {
+    cidadeClicadaAtiva = null;
+    document.querySelectorAll('#mapa-container path').forEach(p => {
+        p.setAttribute('data-selecionado', 'false');
+        p.style.fill = p.getAttribute('data-cor-base');
+    });
+    atualizarTextoTopo(null);
 }
 
 function clicarNoMapa(pathElement, infoSelecionado, pDataRaw = null) {
     const idRegiao = pathElement.id.replace('mini-', '').toLowerCase();
     
+    // Limpa o laranja de qualquer outro antes de marcar o novo
     document.querySelectorAll('#mapa-container path').forEach(p => { 
         p.setAttribute('data-selecionado', 'false'); 
         p.style.fill = p.getAttribute('data-cor-base'); 
@@ -161,24 +169,26 @@ function desenharMapa(dados, targetId, ehMinimizado) {
         path.setAttribute('data-cor-base', corBase);
 
         if (!ehMinimizado) {
-            // No Mobile, usamos eventos de Pointer para garantir que o texto limpe
-            path.onpointerdown = () => {
+            // Evento de toque/hover volátil
+            path.onpointerenter = () => {
                 atualizarTextoTopo(pData.name);
+            };
+
+            path.onpointerleave = () => {
+                // Se não há nada fixado (laranja), volta pro nome do mapa
+                const nomeVolta = cidadeClicadaAtiva ? cidadeClicadaAtiva.name : null;
+                atualizarTextoTopo(nomeVolta);
             };
 
             path.onclick = (e) => { 
                 e.stopPropagation();
                 if (pData.id === "grandesaopaulo") { trocarMapas(); return; } 
+                
                 if (ehMRV) {
                     clicarNoMapa(path, null, pData);
                 } else {
-                    // Se clicar num cinza, remove destaque laranja anterior e reseta título
-                    cidadeClicadaAtiva = null;
-                    document.querySelectorAll('#mapa-container path').forEach(p => {
-                        p.setAttribute('data-selecionado', 'false');
-                        p.style.fill = p.getAttribute('data-cor-base');
-                    });
-                    atualizarTextoTopo(null);
+                    // Clique em path CINZA: Limpa qualquer destaque laranja ativo
+                    limparSelecaoAnterior();
                 }
             };
         }
@@ -186,14 +196,12 @@ function desenharMapa(dados, targetId, ehMinimizado) {
     });
     svg.appendChild(g);
     container.appendChild(svg);
-    
     if (!cidadeClicadaAtiva) atualizarTextoTopo(null);
 }
 
-// --- 4. FUNÇÕES DE APOIO ---
 function trocarMapas() {
     mapaAtivo = (mapaAtivo === "GSP") ? "INTERIOR" : "GSP";
-    cidadeClicadaAtiva = null; 
+    limparSelecaoAnterior();
     atualizarVisualizacao();
 }
 
@@ -231,7 +239,7 @@ function exibirDadosResidencial(info) {
     if(elDetalhes) {
         elDetalhes.innerHTML = `
             <div style="display: flex; gap: 8px; margin-bottom: 10px;">
-                <button onclick="window.open('https://www.google.com/maps/search/${encodeURIComponent(info.endereco)}','_blank')" class="btn-acao btn-maps">MAPS</button>
+                <button onclick="window.open('https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(info.endereco)}','_blank')" class="btn-acao btn-maps">MAPS</button>
                 <button onclick="copyToClipboard('${info.link}')" class="btn-acao btn-link">LINK</button>
             </div>
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px;">
@@ -260,6 +268,5 @@ window.onload = carregarPlanilha;
 document.addEventListener('click', (e) => {
     if (e.target.closest('#btn-menu')) toggleMenu();
     if (e.target.closest('#mapa-minimizado')) trocarMapas();
-    // ESSA É A LINHA QUE ATIVA O BOTÃO DE AMPLIAR/REDUZIR:
-    if (e.target.closest('#btn-fullscreen') || e.target.closest('.icon-fullscreen')) alternarFullscreen();
+    if (e.target.closest('#btn-fullscreen')) alternarFullscreen();
 });
