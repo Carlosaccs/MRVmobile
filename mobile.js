@@ -76,7 +76,7 @@ async function carregarPlanilha() {
                     regional: limpar(c[14]),
                     cPaulista: limpar(c[15]),
                     link: limpar(c[16]),
-                    descLonga: limpar(c[18]), // ADICIONADA VÍRGULA AQUI
+                    descLonga: limpar(c[18]), // CORRIGIDO: Parentese fechado aqui
                     linkBookCliente: limpar(c[19]),  
                     linkBookCorretor: limpar(c[21]), 
                     materiaisExtras: limpar(c[28])   
@@ -264,7 +264,7 @@ function exibirDadosResidencial(info) {
         });
     }
 
-    const linkMaps = `http://maps.google.com/?q=${encodeURIComponent(info.endereco)}`;
+    const linkMaps = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(info.endereco)}`;
     const eComplexo = info.categoria === "COMPLEXO";
 
     elDetalhes.innerHTML = `
