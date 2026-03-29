@@ -168,3 +168,17 @@ html, body {
     border-right: none; /* Remove qualquer linha fina à direita da faixa */
     box-shadow: none;
 }
+
+/* Caixa de Texto Longa (aparece condicionalmente) */
+.caixa-texto-longa-placeholder {
+    width: 100%; /* Ocupa toda a largura disponível da ficha técnica */
+    background: rgba(255, 255, 255, 0.05); /* Fundo sutil */
+    border: 1px dashed rgba(255, 255, 255, 0.2); /* Borda pontilhada para visualização */
+    border-radius: 4px;
+    padding: 10px;
+    margin-bottom: 15px; /* Respiro para o grid abaixo */
+    min-height: 80px; /* Altura mínima inicial */
+    color: #eee;
+    font-size: 0.75rem;
+    text-align: justify;
+}
