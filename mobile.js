@@ -214,7 +214,7 @@ function exibirDadosResidencial(info) {
         const isComplexo = info.categoria === "COMPLEXO";
 
         let htmlDesc = (isComplexo && info.descLonga) ? `
-            <div style="margin-top: 8px; font-size: 0.72rem; color: #eee; line-height: 1.4; text-align: justify; font-weight: 400;">
+            <div style="margin-top: 10px; font-size: 0.82rem; color: #eee; line-height: 1.5; text-align: justify; font-weight: 400;">
                 ${info.descLonga}
             </div>` : "";
 
@@ -248,7 +248,7 @@ function exibirDadosResidencial(info) {
 
            elDetalhes.innerHTML = `
                <div style="margin-top: 0px; border-top: none; padding-top: 0px;">
-                   <div style="font-size: 0.72rem; color: #ffffff; margin-bottom: 10px; font-weight: bold; line-height: 1.2;">
+                   <div style="font-size: 0.82rem; color: #ffffff; margin-bottom: 12px; font-weight: bold; line-height: 1.3;">
                        📍 ${info.endereco || "Não informado"}
                    </div>
                    
