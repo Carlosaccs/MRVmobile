@@ -208,59 +208,61 @@ function atualizarVisualizacao() {
 function exibirDadosResidencial(info) {
     const elNome = document.getElementById('nome-imovel');
     const elDetalhes = document.getElementById('detalhes-imovel');
+    
     if (elNome) elNome.innerText = (info.nomeCurto || "").toUpperCase();
-    if (elDetalhes) {
-        const linkMaps = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(info.endereco)}`;
-        const isComplexo = info.categoria === "COMPLEXO";
+    if (!elDetalhes) return;
 
-        let htmlDesc = (isComplexo && info.descLonga) ? `
-            <div style="margin-top: 10px; font-size: 0.82rem; color: #eee; line-height: 1.5; text-align: justify; font-weight: 400;">
-                ${info.descLonga}
-            </div>` : "";
+    const linkMaps = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(info.endereco)}`;
+    const isComplexo = info.categoria === "COMPLEXO";
 
+    // 1. Parte Comum (Aparece para todos: Endereço + Botões MAPS/LINK)
+    let htmlBase = `
+        <div style="margin-top: 0px;">
+            <div style="font-size: 0.82rem; color: #ffffff; margin-bottom: 12px; font-weight: bold; line-height: 1.3;">
+                📍 ${info.endereco || "Não informado"}
+            </div>
+            <div style="display: flex; gap: 8px; margin-bottom: 15px;">
+                <button onclick="window.open('${linkMaps}', '_blank')" style="width: 70px; height: 28px; background: #4285F4; color: white; border: none; border-radius: 4px; font-size: 0.72rem; font-weight: 800; cursor: pointer;">MAPS</button>
+                <button onclick="copyToClipboard('${info.link}')" style="width: 70px; height: 28px; background: #444; color: white; border: none; border-radius: 4px; font-size: 0.72rem; font-weight: 800; cursor: pointer;">LINK</button>
+            </div>
+        </div>`;
+
+    // 2. Parte Condicional (APENAS se for COMPLEXO)
+    let htmlAdicional = "";
+    if (isComplexo) {
         const criarCard = (titulo, link, icone) => {
             if (!link || link.length < 5) return "";
             return `
-                <div style="display: flex; align-items: center; background: #fff; border: 1px solid #ddd; border-radius: 8px; padding: 6px 10px; gap: 8px; margin-top: 6px;">
-                    <span style="font-size: 0.9rem;">${icone}</span>
-                    <div style="flex-grow: 1; font-size: 0.72rem; font-weight: bold; color: #333;">${titulo}</div>
+                <div style="display: flex; align-items: center; background: #fff; border: 1px solid #ddd; border-radius: 8px; padding: 8px 10px; gap: 8px; margin-top: 8px;">
+                    <span style="font-size: 1rem;">${icone}</span>
+                    <div style="flex-grow: 1; font-size: 0.82rem; font-weight: bold; color: #333;">${titulo}</div>
                     <div style="display: flex; gap: 4px;">
-                        <button onclick="window.open('${link}', '_blank')" style="background: #00713a; color: white; border: none; border-radius: 4px; padding: 3px 8px; font-size: 0.65rem; font-weight: bold; cursor: pointer;">Abrir</button>
-                        <button onclick="copyToClipboard('${link}')" style="background: #ff8c00; color: white; border: none; border-radius: 4px; padding: 3px 8px; font-size: 0.65rem; font-weight: bold; cursor: pointer;">Copiar</button>
+                        <button onclick="window.open('${link}', '_blank')" style="background: #00713a; color: white; border: none; border-radius: 4px; padding: 4px 10px; font-size: 0.65rem; font-weight: bold; cursor: pointer;">Abrir</button>
+                        <button onclick="copyToClipboard('${link}')" style="background: #ff8c00; color: white; border: none; border-radius: 4px; padding: 4px 10px; font-size: 0.65rem; font-weight: bold; cursor: pointer;">Copiar</button>
                     </div>
                 </div>`;
         };
 
-        let htmlMateriais = "";
-        if (isComplexo) {
-            const cardBook = criarCard("Book Cliente", info.bookCliente, "📄");
-            const cardCorretor = criarCard("Book Corretor", info.bookCorretor, "💼");
-            const cardVideo = criarCard("Vídeo do Decorado", info.videoDecorado, "🎬");
+        let htmlDesc = info.descLonga ? `
+            <div style="margin-top: 10px; font-size: 0.82rem; color: #eee; line-height: 1.5; text-align: justify; font-weight: 400;">
+                ${info.descLonga}
+            </div>` : "";
 
-            htmlMateriais = (cardBook || cardCorretor || cardVideo) ? `
-                <div style="margin-top: 12px; border-top: 1px solid #555; padding-top: 8px;">
-                    <div style="font-size: 0.6rem; color: #888; font-weight: bold; margin-bottom: 4px; text-transform: uppercase;">Materiais de Apoio</div>
-                    ${cardBook}
-                    ${cardCorretor}
-                    ${cardVideo}
-                </div>` : "";
-        }
+        let cardBook = criarCard("Book Cliente", info.bookCliente, "📄");
+        let cardCorretor = criarCard("Book Corretor", info.bookCorretor, "💼");
+        let cardVideo = criarCard("Vídeo do Decorado", info.videoDecorado, "🎬");
 
-           elDetalhes.innerHTML = `
-               <div style="margin-top: 0px; border-top: none; padding-top: 0px;">
-                   <div style="font-size: 0.82rem; color: #ffffff; margin-bottom: 12px; font-weight: bold; line-height: 1.3;">
-                       📍 ${info.endereco || "Não informado"}
-                   </div>
-                   
-                   <div style="display: flex; gap: 6px; margin-bottom: 12px;">
-                       <button onclick="window.open('${linkMaps}', '_blank')" style="width: 65px; height: 26px; padding: 0; background: #4285F4; color: white; border: none; border-radius: 4px; font-size: 0.72rem; font-weight: 800; cursor: pointer;">MAPS</button>
-                       <button onclick="copyToClipboard('${info.link}')" style="width: 65px; height: 24px; padding: 0; background: #444; color: white; border: none; border-radius: 4px; font-size: 0.72rem; font-weight: 800; cursor: pointer;">LINK</button>
-                   </div>
-                   
-                   ${htmlDesc}
-                   ${htmlMateriais}
-               </div>`;
+        let htmlMateriais = (cardBook || cardCorretor || cardVideo) ? `
+            <div style="margin-top: 15px;">
+                <div style="font-size: 0.6rem; color: #fff; font-weight: bold; margin-bottom: 4px; text-transform: uppercase;">Materiais de Apoio</div>
+                ${cardBook} ${cardCorretor} ${cardVideo}
+            </div>` : "";
+
+        htmlAdicional = htmlDesc + htmlMateriais;
     }
+
+    // Montagem final: Se for Residencial, htmlAdicional estará vazio.
+    elDetalhes.innerHTML = htmlBase + htmlAdicional;
 }
 
 /* ==========================================================================
