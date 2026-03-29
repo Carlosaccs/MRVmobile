@@ -47,7 +47,7 @@ function alternarFullscreen() {
 }
 
 /* ==========================================================================
-   BLOCO 3: GESTÃO DE DADOS (COLUNAS T e U)
+   BLOCO 3: GESTÃO DE DADOS (COLUNAS Z e AA)
    ========================================================================== */
 async function carregarPlanilha() {
     try {
@@ -58,6 +58,7 @@ async function carregarPlanilha() {
 
         linhas.slice(1).forEach((linha) => {
             const c = linha.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+            // Verificamos se a linha tem colunas suficientes para chegar na Z (índice 25)
             if (c.length >= 18) { 
                 const limpar = (t) => t ? t.replace(/"/g, '').trim() : "";
                 window.dadosGerais.push({
@@ -69,8 +70,8 @@ async function carregarPlanilha() {
                     endereco: limpar(c[7]),
                     link: limpar(c[16]),
                     descLonga: limpar(c[18]),
-                    bookCliente: c[19] ? limpar(c[19]) : "", // Coluna T
-                    videoDecorado: c[20] ? limpar(c[20]) : "" // Coluna U
+                    bookCliente: c[25] ? limpar(c[25]) : "", // Coluna Z (índice 25)
+                    videoDecorado: c[26] ? limpar(c[26]) : "" // Coluna AA (índice 26)
                 });
             }
         });
@@ -172,7 +173,7 @@ function desenharMapa(dados, targetId, ehMinimizado) {
 }
 
 /* ==========================================================================
-   BLOCO 5: FICHA TÉCNICA (COM NOVOS CARDS)
+   BLOCO 5: FICHA TÉCNICA (COM CARDS DINÂMICOS)
    ========================================================================== */
 function trocarMapas() { solicitarFullscreen(); limparSelecaoAnterior(); mapaAtivo = (mapaAtivo === "GSP") ? "INTERIOR" : "GSP"; atualizarVisualizacao(); }
 
@@ -195,7 +196,6 @@ function exibirDadosResidencial(info) {
                 ${info.descLonga}
             </div>` : "";
 
-        // Função interna para gerar o card de material
         const criarCard = (titulo, link, icone) => {
             if (!link || link.length < 5) return "";
             return `
