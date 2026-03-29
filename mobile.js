@@ -47,7 +47,7 @@ function alternarFullscreen() {
 }
 
 /* ==========================================================================
-   BLOCO 3: GESTÃO DE DADOS (COLUNAS Z e AA)
+   BLOCO 3: GESTÃO DE DADOS (Z, AA e AB)
    ========================================================================== */
 async function carregarPlanilha() {
     try {
@@ -58,7 +58,6 @@ async function carregarPlanilha() {
 
         linhas.slice(1).forEach((linha) => {
             const c = linha.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
-            // Verificamos se a linha tem colunas suficientes para chegar na Z (índice 25)
             if (c.length >= 18) { 
                 const limpar = (t) => t ? t.replace(/"/g, '').trim() : "";
                 window.dadosGerais.push({
@@ -70,8 +69,9 @@ async function carregarPlanilha() {
                     endereco: limpar(c[7]),
                     link: limpar(c[16]),
                     descLonga: limpar(c[18]),
-                    bookCliente: c[25] ? limpar(c[25]) : "", // Coluna Z (índice 25)
-                    videoDecorado: c[26] ? limpar(c[26]) : "" // Coluna AA (índice 26)
+                    bookCliente: c[25] ? limpar(c[25]) : "", // Coluna Z
+                    bookCorretor: c[26] ? limpar(c[26]) : "", // Coluna AA
+                    videoDecorado: c[27] ? limpar(c[27]) : "" // Coluna AB
                 });
             }
         });
@@ -100,6 +100,9 @@ function limparSelecaoAnterior() {
     atualizarTextoTopo(null);
 }
 
+/* ==========================================================================
+   BLOCO 5: CLIQUE NO MAPA E VITRINE
+   ========================================================================== */
 function clicarNoMapa(pathElement, infoSelecionado, pDataRaw = null) {
     solicitarFullscreen();
     const idRegiao = pathElement.id.replace('mini-', '').toLowerCase();
@@ -140,6 +143,9 @@ function clicarNoMapa(pathElement, infoSelecionado, pDataRaw = null) {
     if (ativo) exibirDadosResidencial(ativo);
 }
 
+/* ==========================================================================
+   BLOCO 6: DESENHO DO SVG (MAPA)
+   ========================================================================== */
 function desenharMapa(dados, targetId, ehMinimizado) {
     const container = document.getElementById(targetId);
     if (!container || !dados) return;
@@ -173,8 +179,8 @@ function desenharMapa(dados, targetId, ehMinimizado) {
 }
 
 /* ==========================================================================
-   BLOCO 5: FICHA TÉCNICA (COM CARDS DINÂMICOS)
-   ========================================================================== */
+   BLOCO 7: FICHA TÉCNICA E MATERIAIS (Z, AA e AB)
+   ========================================================================= */
 function trocarMapas() { solicitarFullscreen(); limparSelecaoAnterior(); mapaAtivo = (mapaAtivo === "GSP") ? "INTERIOR" : "GSP"; atualizarVisualizacao(); }
 
 function atualizarVisualizacao() {
@@ -190,8 +196,9 @@ function exibirDadosResidencial(info) {
     if (elNome) elNome.innerText = (info.nomeCurto || "").toUpperCase();
     if (elDetalhes) {
         const linkMaps = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(info.endereco)}`;
-        
-        let htmlDesc = (info.categoria === "COMPLEXO" && info.descLonga) ? `
+        const isComplexo = info.categoria === "COMPLEXO";
+
+        let htmlDesc = (isComplexo && info.descLonga) ? `
             <div style="margin-top: 15px; border-top: 1px solid #444; padding-top: 10px; font-size: 0.68rem; color: #bbb; line-height: 1.4; text-align: justify;">
                 ${info.descLonga}
             </div>` : "";
@@ -209,15 +216,20 @@ function exibirDadosResidencial(info) {
                 </div>`;
         };
 
-        const cardBook = criarCard("Book Cliente", info.bookCliente, "📄");
-        const cardVideo = criarCard("Vídeo do Decorado", info.videoDecorado, "🎬");
+        let htmlMateriais = "";
+        if (isComplexo) {
+            const cardBook = criarCard("Book Cliente", info.bookCliente, "📄");
+            const cardCorretor = criarCard("Book Corretor", info.bookCorretor, "💼");
+            const cardVideo = criarCard("Vídeo do Decorado", info.videoDecorado, "🎬");
 
-        let htmlMateriais = (cardBook || cardVideo) ? `
-            <div style="margin-top: 20px; border-top: 1px solid #555; padding-top: 12px;">
-                <div style="font-size: 0.65rem; color: #888; font-weight: bold; margin-bottom: 5px; text-transform: uppercase;">Materiais de Apoio</div>
-                ${cardBook}
-                ${cardVideo}
-            </div>` : "";
+            htmlMateriais = (cardBook || cardCorretor || cardVideo) ? `
+                <div style="margin-top: 20px; border-top: 1px solid #555; padding-top: 12px;">
+                    <div style="font-size: 0.65rem; color: #888; font-weight: bold; margin-bottom: 5px; text-transform: uppercase;">Materiais de Apoio</div>
+                    ${cardBook}
+                    ${cardCorretor}
+                    ${cardVideo}
+                </div>` : "";
+        }
 
         elDetalhes.innerHTML = `
             <div style="margin-top: 10px; border-top: 1px solid #00713a; padding-top: 8px;">
@@ -232,6 +244,9 @@ function exibirDadosResidencial(info) {
     }
 }
 
+/* ==========================================================================
+   BLOCO 8: SISTEMA E EVENTOS
+   ========================================================================== */
 function gerarMenuResidenciais() {
     const lista = document.getElementById('lista-residenciais');
     if (!lista) return;
