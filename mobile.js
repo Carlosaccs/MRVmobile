@@ -258,4 +258,97 @@ function exibirDadosResidencial(info) {
         // HTML da descrição (Coluna S)
         const eComplexo = info.categoria === "COMPLEXO";
         let htmlDescricao = (eComplexo && info.descLonga) ? `
-            <div
+            <div style="margin-top: 15px; border-top: 1px solid #444; padding-top: 10px; font-size: 0.68rem; color: #bbb; line-height: 1.4; text-align: justify;">
+                ${info.descLonga}
+            </div>` : "";
+
+        // HTML do novo campo (Aparecerá no final)
+        let htmlMateriais = `
+            <div style="margin-top: 15px; border-top: 1px dashed #555; padding-top: 10px; color: yellow; font-size: 0.65rem; font-weight: bold;">
+                MATERIAIS DE APOIO (TESTE)
+            </div>`;
+
+        elDetalhes.innerHTML = `
+            <div style="margin-top: 10px; border-top: 1px solid #00713a; padding-top: 8px;">
+                <div style="font-size: 0.68rem; color: #cccccc; margin-bottom: 8px; line-height: 1.2;">
+                    📍 ${info.endereco || "Endereço não informado"}
+                </div>
+                
+                <div style="display: flex; gap: 5px; width: 100%; margin-bottom: 10px;">
+                    <button onclick="window.open('${linkMaps}', '_blank')" 
+                            class="menu-item-mrv" 
+                            style="width: 70px; justify-content: center; margin: 0; height: 32px; background: #4285F4; color: white; border: none; font-size: 0.6rem; padding: 0;">
+                        MAPS
+                    </button>
+                    
+                    <button onclick="copyToClipboard('${linkCopia}')" 
+                            class="menu-item-mrv" 
+                            style="width: 70px; justify-content: center; margin: 0; height: 32px; background: #444; color: white; border: none; font-size: 0.6rem; padding: 0;">
+                        LINK
+                    </button>
+                </div>
+
+                ${htmlDescricao}
+                ${htmlMateriais}
+            </div>
+        `;
+    }
+}
+
+function gerarMenuResidenciais() {
+    const lista = document.getElementById('lista-residenciais');
+    if (!lista) return;
+    lista.innerHTML = ""; 
+    [...window.dadosGerais].sort((a, b) => a.ordem - b.ordem).forEach(info => {
+        if (!info.nomeCurto || info.nomeCurto === "Sem Nome") return;
+        const li = document.createElement('li');
+        li.className = 'menu-item-mrv'; 
+        li.innerText = info.nomeCurto.toUpperCase();
+        const corZona = obterCorPorZona(info);
+
+        if (String(info.categoria).toUpperCase() === "COMPLEXO") {
+            li.classList.add('estilo-complexo');
+            li.style.backgroundColor = corZona;
+            li.style.color = "#ffffff";
+        } else {
+            li.style.borderRightColor = corZona;
+        }
+
+        li.onclick = (e) => {
+            e.stopPropagation();
+            toggleMenu();
+            let p = document.getElementById(info.id);
+            if (!p) { 
+                trocarMapas(); 
+                setTimeout(() => { 
+                    let np = document.getElementById(info.id); 
+                    if (np) clicarNoMapa(np, info); 
+                }, 300); 
+            } else { 
+                clicarNoMapa(p, info); 
+            }
+        };
+        lista.appendChild(li);
+    });
+}
+/* ==========================================================================
+   BLOCO 8: SISTEMA (MENU, CLIPBOARD E EVENTOS)
+   ========================================================================== */
+function toggleMenu() {
+    solicitarFullscreen();
+    const menu = document.getElementById('menu-lateral');
+    if(menu) { menu.classList.toggle('menu-aberto'); menu.classList.toggle('menu-oculto'); }
+}
+
+function copyToClipboard(text) {
+    if(!text || text === "#") return alert("Link não disponível");
+    navigator.clipboard.writeText(text).then(() => alert("Copiado!"));
+}
+
+window.onload = carregarPlanilha;
+
+document.addEventListener('click', (e) => {
+    if (e.target.closest('#btn-menu')) { e.stopPropagation(); toggleMenu(); }
+    if (e.target.closest('#btn-fullscreen')) { e.stopPropagation(); alternarFullscreen(); }
+    if (e.target.closest('#mapa-minimizado')) { e.stopPropagation(); trocarMapas(); }
+});
