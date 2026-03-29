@@ -213,20 +213,20 @@ function exibirDadosResidencial(info) {
         const linkMaps = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(info.endereco)}`;
         const isComplexo = info.categoria === "COMPLEXO";
 
-         let htmlDesc = (isComplexo && info.descLonga) ? `
-             <div style="margin-top: 8px; border-top: none; padding-top: 0px; font-size: 0.68rem; color: #eee; line-height: 1.3; text-align: justify;">
-                 ${info.descLonga}
-             </div>` : "";
+        let htmlDesc = (isComplexo && info.descLonga) ? `
+            <div style="margin-top: 8px; font-size: 0.72rem; color: #eee; line-height: 1.4; text-align: justify; font-weight: 400;">
+                ${info.descLonga}
+            </div>` : "";
 
         const criarCard = (titulo, link, icone) => {
             if (!link || link.length < 5) return "";
             return `
                 <div style="display: flex; align-items: center; background: #fff; border: 1px solid #ddd; border-radius: 8px; padding: 6px 10px; gap: 8px; margin-top: 6px;">
                     <span style="font-size: 0.9rem;">${icone}</span>
-                    <div style="flex-grow: 1; font-size: 0.68rem; font-weight: bold; color: #333;">${titulo}</div>
+                    <div style="flex-grow: 1; font-size: 0.72rem; font-weight: bold; color: #333;">${titulo}</div>
                     <div style="display: flex; gap: 4px;">
-                        <button onclick="window.open('${link}', '_blank')" style="background: #00713a; color: white; border: none; border-radius: 4px; padding: 3px 8px; font-size: 0.6rem; font-weight: bold; cursor: pointer;">Abrir</button>
-                        <button onclick="copyToClipboard('${link}')" style="background: #ff8c00; color: white; border: none; border-radius: 4px; padding: 3px 8px; font-size: 0.6rem; font-weight: bold; cursor: pointer;">Copiar</button>
+                        <button onclick="window.open('${link}', '_blank')" style="background: #00713a; color: white; border: none; border-radius: 4px; padding: 3px 8px; font-size: 0.65rem; font-weight: bold; cursor: pointer;">Abrir</button>
+                        <button onclick="copyToClipboard('${link}')" style="background: #ff8c00; color: white; border: none; border-radius: 4px; padding: 3px 8px; font-size: 0.65rem; font-weight: bold; cursor: pointer;">Copiar</button>
                     </div>
                 </div>`;
         };
