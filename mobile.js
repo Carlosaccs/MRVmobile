@@ -1,7 +1,10 @@
 /* ==========================================================================
-   js v140.7.5 - FIX SINTAXE E PADRONIZAÇÃO 28px
+   js v140.7.6 - PADRONIZAÇÃO TOTAL 28px (Ficha, Vitrine e Menu)
    ========================================================================== */
 
+/* ==========================================================================
+   BLOCO 1: CONFIGURAÇÕES E VARIÁVEIS
+   ========================================================================== */
 const svgNS = "http://www.w3.org/2000/svg";
 const URL_PLANILHA = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSRKdJctOPQjKAtOZSDHyArD_H8SgKIouelAS1vF1d_-13pu7u_ic6J8nP3r0Ijd56WA-mbUmHjb4Me/pub?output=csv';
 
@@ -14,9 +17,12 @@ const AJUSTES_MAPA = {
     INTERIOR: { marginRight: "50%", marginLeft: "-100px", scale: "1.15" }
 };
 
+// ALTURA PADRÃO UNIFICADA PARA TODO O PROJETO
 const ALTURA_PADRAO = "28px";
 
-/* --- AUXILIARES --- */
+/* ==========================================================================
+   BLOCO 2: AUXILIARES E FULLSCREEN
+   ========================================================================== */
 function obterCorPorZona(info) {
     const z = info.zona ? info.zona.trim().toUpperCase() : "";
     switch(z) {
@@ -45,7 +51,9 @@ function alternarFullscreen() {
     }
 }
 
-/* --- CARREGAMENTO --- */
+/* ==========================================================================
+   BLOCO 3: GESTÃO DE DADOS (COLUNA Q = ÍNDICE 16)
+   ========================================================================== */
 async function carregarPlanilha() {
     try {
         const res = await fetch(`${URL_PLANILHA}&cache_buster=${Date.now()}`);
@@ -78,7 +86,9 @@ async function carregarPlanilha() {
     } catch (e) { console.error("Erro na planilha:", e); }
 }
 
-/* --- INTERFACE --- */
+/* ==========================================================================
+   BLOCO 4: INTERFACE E TEXTOS
+   ========================================================================== */
 function atualizarTextoTopo(nome) {
     const indicador = document.getElementById('identificador-cidade');
     if (indicador) indicador.innerText = nome ? nome.toUpperCase() : (mapaAtivo === "GSP" ? "GRANDE SP" : "ESTADO DE SP");
@@ -97,6 +107,9 @@ function limparSelecaoAnterior() {
     atualizarTextoTopo(null);
 }
 
+/* ==========================================================================
+   BLOCO 5: CLIQUE NO MAPA E VITRINE (28px)
+   ========================================================================== */
 function clicarNoMapa(pathElement, infoSelecionado, pDataRaw = null) {
     solicitarFullscreen();
     const idRegiao = pathElement.id.replace('mini-', '').toLowerCase();
@@ -122,12 +135,24 @@ function clicarNoMapa(pathElement, infoSelecionado, pDataRaw = null) {
                 const btn = document.createElement('div');
                 btn.className = 'menu-item-mrv';
                 btn.innerText = item.nomeCurto.toUpperCase();
+                
+                // Forçando altura padrão de 28px
+                btn.style.height = ALTURA_PADRAO;
+                btn.style.display = "flex";
+                btn.style.alignItems = "center";
+                btn.style.padding = "0 10px";
+                btn.style.fontSize = "0.7rem";
+                btn.style.marginBottom = "4px";
+                
                 const corZona = obterCorPorZona(item);
                 if (item.categoria === "COMPLEXO") {
                     btn.classList.add('estilo-complexo');
                     btn.style.backgroundColor = corZona;
+                    btn.style.color = "#ffffff";
                 } else {
-                    btn.style.borderRightColor = corZona;
+                    btn.style.borderRight = `4px solid ${corZona}`;
+                    btn.style.backgroundColor = "#ffffff";
+                    btn.style.color = "#333";
                 }
                 btn.onclick = (e) => { e.stopPropagation(); clicarNoMapa(pathElement, item, pDataRaw); };
                 containerBotoes.appendChild(btn);
@@ -137,7 +162,9 @@ function clicarNoMapa(pathElement, infoSelecionado, pDataRaw = null) {
     if (ativo) exibirDadosResidencial(ativo);
 }
 
-/* --- MAPA --- */
+/* ==========================================================================
+   BLOCO 6: DESENHO DO SVG (MAPA)
+   ========================================================================== */
 function desenharMapa(dados, targetId, ehMinimizado) {
     const container = document.getElementById(targetId);
     if (!container || !dados) return;
@@ -177,7 +204,9 @@ function atualizarVisualizacao() {
     }
 }
 
-/* --- FICHA TÉCNICA --- */
+/* ==========================================================================
+   BLOCO 7: FICHA TÉCNICA (PADRONIZAÇÃO 28px)
+   ========================================================================= */
 function exibirDadosResidencial(info) {
     const elNome = document.getElementById('nome-imovel');
     const elDetalhes = document.getElementById('detalhes-imovel');
@@ -216,7 +245,7 @@ function exibirDadosResidencial(info) {
         htmlContent += htmlDesc + (cards ? `<div style="margin-top: 5px;">${cards}</div>` : "");
     } else {
         let htmlCaixaQ = (info.destaqueCampanha && info.destaqueCampanha.trim() !== "") ? `
-            <div style="background: #fff; color: #e31c19; height: ${ALTURA_PADRAO}; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 0.75rem; border-radius: 4px; margin-bottom: 8px; border: 1px solid #ddd; text-transform: uppercase; padding: 0 5px; text-align: center;">
+            <div style="background: #fff; color: #e31c19; height: ${ALTURA_PADRAO}; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 0.75rem; border-radius: 4px; margin-bottom: 8px; text-transform: uppercase; padding: 0 5px; text-align: center;">
                 ${info.destaqueCampanha}
             </div>` : "";
         let htmlGrid6 = `
@@ -228,7 +257,9 @@ function exibirDadosResidencial(info) {
     elDetalhes.innerHTML = htmlContent;
 }
 
-/* --- EVENTOS --- */
+/* ==========================================================================
+   BLOCO 8: MENU LATERAL E EVENTOS (28px)
+   ========================================================================== */
 function gerarMenuResidenciais() {
     const lista = document.getElementById('lista-residenciais');
     if (!lista) return;
@@ -236,11 +267,40 @@ function gerarMenuResidenciais() {
     [...window.dadosGerais].sort((a, b) => a.ordem - b.ordem).forEach(info => {
         if (!info.nomeCurto) return;
         const li = document.createElement('li');
-        li.className = 'menu-item-mrv'; li.innerText = info.nomeCurto.toUpperCase();
+        li.className = 'menu-item-mrv';
+        li.innerText = info.nomeCurto.toUpperCase();
+        
+        // Padronização de altura no Menu Lateral
+        li.style.height = ALTURA_PADRAO;
+        li.style.display = "flex";
+        li.style.alignItems = "center";
+        li.style.padding = "0 10px";
+        li.style.fontSize = "0.75rem";
+        li.style.marginBottom = "4px";
+        li.style.borderRadius = "4px";
+
         const corZona = obterCorPorZona(info);
-        if (info.categoria === "COMPLEXO") { li.classList.add('estilo-complexo'); li.style.backgroundColor = corZona; }
-        else { li.style.borderRightColor = corZona; }
-        li.onclick = (e) => { e.stopPropagation(); toggleMenu(); let p = document.getElementById(info.id); if (!p) { trocarMapas(); setTimeout(() => { let np = document.getElementById(info.id); if (np) clicarNoMapa(np, info); }, 300); } else { clicarNoMapa(p, info); } };
+        if (info.categoria === "COMPLEXO") { 
+            li.classList.add('estilo-complexo'); 
+            li.style.backgroundColor = corZona; 
+            li.style.color = "#ffffff";
+        } else { 
+            li.style.backgroundColor = "#ffffff";
+            li.style.color = "#333";
+            li.style.borderRight = `5px solid ${corZona}`; 
+        }
+        
+        li.onclick = (e) => { 
+            e.stopPropagation(); 
+            toggleMenu(); 
+            let p = document.getElementById(info.id); 
+            if (!p) { 
+                trocarMapas(); 
+                setTimeout(() => { let np = document.getElementById(info.id); if (np) clicarNoMapa(np, info); }, 300); 
+            } else { 
+                clicarNoMapa(p, info); 
+            } 
+        };
         lista.appendChild(li);
     });
 }
