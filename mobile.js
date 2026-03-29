@@ -61,7 +61,7 @@ function alternarFullscreen() {
 }
 
 /* ==========================================================================
-   BLOCO 3: GESTÃO DE DADOS
+   BLOCO 3: GESTÃO DE DADOS (REVISADO - MAPEAMENTO COLUNA Q)
    ========================================================================== */
 async function carregarPlanilha() {
     try {
@@ -81,6 +81,8 @@ async function carregarPlanilha() {
                     zona: limpar(c[3]).toUpperCase(),
                     nomeCurto: limpar(c[4]),
                     endereco: limpar(c[7]),
+                    // NOVO: Mapeando a Coluna Q (índice 17 no array c)
+                    destaqueCampanha: limpar(c[17]), 
                     link: limpar(c[16]),
                     descLonga: limpar(c[18]),
                     bookCliente: c[25] ? limpar(c[25]) : "",
@@ -193,20 +195,11 @@ function desenharMapa(dados, targetId, ehMinimizado) {
     svg.appendChild(g); container.appendChild(svg);
 }
 
+
+
 /* ==========================================================================
-   BLOCO 7: FICHA TÉCNICA E MAQUIAGEM
+   BLOCO 7: FICHA TÉCNICA (REVISADO - CAIXA BRANCA E GRID)
    ========================================================================= */
-function trocarMapas() { solicitarFullscreen(); limparSelecaoAnterior(); mapaAtivo = (mapaAtivo === "GSP") ? "INTERIOR" : "GSP"; atualizarVisualizacao(); }
-
-function atualizarVisualizacao() {
-    if (typeof MAPA_GSP !== 'undefined' && typeof MAPA_INTERIOR !== 'undefined') {
-        desenharMapa(mapaAtivo === "GSP" ? MAPA_GSP : MAPA_INTERIOR, "mapa-container", false);
-        desenharMapa(mapaAtivo === "GSP" ? MAPA_INTERIOR : MAPA_GSP, "mapa-minimizado", true);
-    }
-}
-
-
-
 function exibirDadosResidencial(info) {
     const elNome = document.getElementById('nome-imovel');
     const elDetalhes = document.getElementById('detalhes-imovel');
@@ -217,21 +210,21 @@ function exibirDadosResidencial(info) {
     const linkMaps = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(info.endereco)}`;
     const isComplexo = info.categoria === "COMPLEXO";
 
-    // 1. PARTE COMUM (Sempre aparece: Endereço + MAPS + LINK)
+    // 1. PARTE COMUM (Endereço + MAPS + LINK)
     let htmlContent = `
         <div style="margin-top: 0px;">
             <div style="font-size: 0.82rem; color: #ffffff; margin-bottom: 12px; font-weight: bold; line-height: 1.3;">
                 📍 ${info.endereco || "Não informado"}
             </div>
             <div style="display: flex; gap: 8px; margin-bottom: 15px;">
-                <button onclick="window.open('${linkMaps}', '_blank')" style="width: 70px; height: 28px; background: #4285F4; color: white; border: none; border-radius: 4px; font-size: 0.72rem; font-weight: 800; cursor: pointer;">MAPS</button>
-                <button onclick="copyToClipboard('${info.link}')" style="width: 70px; height: 28px; background: #444; color: white; border: none; border-radius: 4px; font-size: 0.72rem; font-weight: 800; cursor: pointer;">LINK</button>
+                <button onclick="window.open('${linkMaps}', '_blank')" class="btn-acao btn-maps" style="width: 70px; height: 28px;">MAPS</button>
+                <button onclick="copyToClipboard('${info.link}')" class="btn-acao btn-link" style="width: 70px; height: 28px;">LINK</button>
             </div>
         </div>`;
 
     // 2. BIFURCAÇÃO: COMPLEXO vs RESIDENCIAL
     if (isComplexo) {
-        // --- BLOCO PARA COMPLEXOS (Texto Longo + Materiais) ---
+        // --- LÓGICA DE COMPLEXO (MATERIAIS) ---
         const criarCard = (titulo, link, icone) => {
             if (!link || link.length < 5) return "";
             return `
@@ -245,45 +238,37 @@ function exibirDadosResidencial(info) {
                 </div>`;
         };
 
-        let htmlDesc = info.descLonga ? `
-            <div style="margin-top: 10px; font-size: 0.82rem; color: #eee; line-height: 1.5; text-align: justify; font-weight: 400;">
-                ${info.descLonga}
-            </div>` : "";
+        let htmlDesc = info.descLonga ? `<div style="margin-top: 10px; font-size: 0.82rem; color: #eee; line-height: 1.5; text-align: justify;">${info.descLonga}</div>` : "";
+        let cards = criarCard("Book Cliente", info.bookCliente, "📄") + 
+                    criarCard("Book Corretor", info.bookCorretor, "💼") + 
+                    criarCard("Vídeo do Decorado", info.videoDecorado, "🎬");
 
-        let cardBook = criarCard("Book Cliente", info.bookCliente, "📄");
-        let cardCorretor = criarCard("Book Corretor", info.bookCorretor, "💼");
-        let cardVideo = criarCard("Vídeo do Decorado", info.videoDecorado, "🎬");
-
-        let htmlMateriais = (cardBook || cardCorretor || cardVideo) ? `
-            <div style="margin-top: 15px;">
-                <div style="font-size: 0.6rem; color: #fff; font-weight: bold; margin-bottom: 4px; text-transform: uppercase;">Materiais de Apoio</div>
-                ${cardBook} ${cardCorretor} ${cardVideo}
-            </div>` : "";
-
-        htmlContent += htmlDesc + htmlMateriais;
+        htmlContent += htmlDesc + (cards ? `<div style="margin-top: 15px;"><div style="font-size: 0.6rem; color: #fff; font-weight: bold; text-transform: uppercase;">Materiais de Apoio</div>${cards}</div>` : "");
 
     } else {
-       // A caixa só aparece se houver dados na Coluna Q (info.destaqueCampanha)
-       // Se estiver vazia, ela não ocupa espaço nenhum
-       let htmlCaixaQ = (info.destaqueCampanha && info.destaqueCampanha.trim() !== "") ? `
-           <div class="caixa-destaque-coluna-q">
-               <span>${info.destaqueCampanha}</span>
-           </div>` : "";
-   
-       let htmlGrid6 = `
-           <div class="grid-6-caixas-placeholder">
-               <div class="caixa-pequena-placeholder">Dado 1</div>
-               <div class="caixa-pequena-placeholder">Dado 2</div>
-               <div class="caixa-pequena-placeholder">Dado 3</div>
-               <div class="caixa-pequena-placeholder">Dado 4</div>
-               <div class="caixa-pequena-placeholder">Dado 5</div>
-               <div class="caixa-pequena-placeholder">Dado 6</div>
-           </div>`;
-   
-       htmlContent += htmlCaixaQ + htmlGrid6;
-   }
-       // Aplica o resultado final
-       elDetalhes.innerHTML = htmlContent;
+        // --- LÓGICA DE RESIDENCIAL (CAIXA Q + GRID) ---
+        
+        // A CAIXA BRANCA (Coluna Q)
+        let htmlCaixaQ = (info.destaqueCampanha && info.destaqueCampanha.length > 2) ? `
+            <div class="caixa-destaque-coluna-q">
+                <span>${info.destaqueCampanha}</span>
+            </div>` : "";
+
+        // O GRID DE 6 CAIXAS
+        let htmlGrid6 = `
+            <div class="grid-6-caixas-placeholder">
+                <div class="caixa-pequena-placeholder">Dado 1</div>
+                <div class="caixa-pequena-placeholder">Dado 2</div>
+                <div class="caixa-pequena-placeholder">Dado 3</div>
+                <div class="caixa-pequena-placeholder">Dado 4</div>
+                <div class="caixa-pequena-placeholder">Dado 5</div>
+                <div class="caixa-pequena-placeholder">Dado 6</div>
+            </div>`;
+
+        htmlContent += htmlCaixaQ + htmlGrid6;
+    }
+
+    elDetalhes.innerHTML = htmlContent;
 }
 
 
