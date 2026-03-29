@@ -1,10 +1,7 @@
 /* ==========================================================================
-   js v140.7.3 - CORREÇÃO ÍNDICE COLUNA Q
+   js v140.7.5 - FIX SINTAXE E PADRONIZAÇÃO 28px
    ========================================================================== */
 
-/* ==========================================================================
-   BLOCO 1: CONFIGURAÇÕES E VARIÁVEIS
-   ========================================================================== */
 const svgNS = "http://www.w3.org/2000/svg";
 const URL_PLANILHA = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSRKdJctOPQjKAtOZSDHyArD_H8SgKIouelAS1vF1d_-13pu7u_ic6J8nP3r0Ijd56WA-mbUmHjb4Me/pub?output=csv';
 
@@ -17,9 +14,9 @@ const AJUSTES_MAPA = {
     INTERIOR: { marginRight: "50%", marginLeft: "-100px", scale: "1.15" }
 };
 
-/* ==========================================================================
-   BLOCO 2: AUXILIARES E FULLSCREEN
-   ========================================================================== */
+const ALTURA_PADRAO = "28px";
+
+/* --- AUXILIARES --- */
 function obterCorPorZona(info) {
     const z = info.zona ? info.zona.trim().toUpperCase() : "";
     switch(z) {
@@ -41,25 +38,14 @@ function solicitarFullscreen() {
 
 function alternarFullscreen() {
     const elem = document.documentElement;
-    const svgExp = document.getElementById('svg-expandir');
-    const svgRec = document.getElementById('svg-recolher');
-
     if (!document.fullscreenElement && !document.webkitFullscreenElement) {
         if (elem.requestFullscreen) elem.requestFullscreen();
-        else if (elem.webkitRequestFullscreen) elem.webkitRequestFullscreen();
-        if(svgExp) svgExp.style.display = 'none';
-        if(svgRec) svgRec.style.display = 'block';
     } else {
         if (document.exitFullscreen) document.exitFullscreen();
-        else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
-        if(svgExp) svgExp.style.display = 'block';
-        if(svgRec) svgRec.style.display = 'none';
     }
 }
 
-/* ==========================================================================
-   BLOCO 3: GESTÃO DE DADOS (COLUNA Q = ÍNDICE 16)
-   ========================================================================== */
+/* --- CARREGAMENTO --- */
 async function carregarPlanilha() {
     try {
         const res = await fetch(`${URL_PLANILHA}&cache_buster=${Date.now()}`);
@@ -78,9 +64,8 @@ async function carregarPlanilha() {
                     zona: limpar(c[3]).toUpperCase(),
                     nomeCurto: limpar(c[4]),
                     endereco: limpar(c[7]),
-                    // CORREÇÃO: Coluna Q é o índice 16 (A=0, B=1... Q=16)
                     destaqueCampanha: limpar(c[16]), 
-                    link: limpar(c[16]), // Mantido conforme seu original, ajuste se necessário
+                    link: limpar(c[16]), 
                     descLonga: limpar(c[18]),
                     bookCliente: c[25] ? limpar(c[25]) : "",
                     bookCorretor: c[26] ? limpar(c[26]) : "",
@@ -93,9 +78,7 @@ async function carregarPlanilha() {
     } catch (e) { console.error("Erro na planilha:", e); }
 }
 
-/* ==========================================================================
-   BLOCO 4: INTERFACE E MAPA
-   ========================================================================== */
+/* --- INTERFACE --- */
 function atualizarTextoTopo(nome) {
     const indicador = document.getElementById('identificador-cidade');
     if (indicador) indicador.innerText = nome ? nome.toUpperCase() : (mapaAtivo === "GSP" ? "GRANDE SP" : "ESTADO DE SP");
@@ -114,9 +97,6 @@ function limparSelecaoAnterior() {
     atualizarTextoTopo(null);
 }
 
-/* ==========================================================================
-   BLOCO 5: CLIQUE NO MAPA E VITRINE
-   ========================================================================== */
 function clicarNoMapa(pathElement, infoSelecionado, pDataRaw = null) {
     solicitarFullscreen();
     const idRegiao = pathElement.id.replace('mini-', '').toLowerCase();
@@ -126,6 +106,7 @@ function clicarNoMapa(pathElement, infoSelecionado, pDataRaw = null) {
     });
     pathElement.setAttribute('data-selecionado', 'true');
     pathElement.style.fill = "#FF4500"; 
+    
     const nomeDaCidade = pDataRaw ? pDataRaw.name : pathElement.getAttribute('data-name');
     cidadeClicadaAtiva = { name: (nomeDaCidade || "").toUpperCase() }; 
     atualizarTextoTopo(cidadeClicadaAtiva.name);
@@ -145,11 +126,8 @@ function clicarNoMapa(pathElement, infoSelecionado, pDataRaw = null) {
                 if (item.categoria === "COMPLEXO") {
                     btn.classList.add('estilo-complexo');
                     btn.style.backgroundColor = corZona;
-                    btn.style.color = "#ffffff";
                 } else {
                     btn.style.borderRightColor = corZona;
-                    btn.style.backgroundColor = "#ffffff";
-                    btn.style.color = "#333";
                 }
                 btn.onclick = (e) => { e.stopPropagation(); clicarNoMapa(pathElement, item, pDataRaw); };
                 containerBotoes.appendChild(btn);
@@ -159,9 +137,7 @@ function clicarNoMapa(pathElement, infoSelecionado, pDataRaw = null) {
     if (ativo) exibirDadosResidencial(ativo);
 }
 
-/* ==========================================================================
-   BLOCO 6: DESENHO DO SVG (MAPA)
-   ========================================================================== */
+/* --- MAPA --- */
 function desenharMapa(dados, targetId, ehMinimizado) {
     const container = document.getElementById(targetId);
     if (!container || !dados) return;
@@ -185,8 +161,6 @@ function desenharMapa(dados, targetId, ehMinimizado) {
         path.style.fill = corBase; path.style.stroke = "#ffffff"; path.style.strokeWidth = (ehMinimizado || !ehMRV) ? "0" : "1.2";
         path.setAttribute('data-cor-base', corBase);
         if (!ehMinimizado) {
-            path.onpointerdown = (e) => { e.stopPropagation(); solicitarFullscreen(); atualizarTextoTopo(pData.name); };
-            path.onpointerleave = () => { atualizarTextoTopo(cidadeClicadaAtiva ? cidadeClicadaAtiva.name : null); };
             path.onclick = (e) => { e.stopPropagation(); if (pData.id === "grandesaopaulo") { trocarMapas(); } else if (ehMRV) clicarNoMapa(path, null, pData); };
         }
         g.appendChild(path);
@@ -194,21 +168,24 @@ function desenharMapa(dados, targetId, ehMinimizado) {
     svg.appendChild(g); container.appendChild(svg);
 }
 
-/* ==========================================================================
-   BLOCO 7: FICHA TÉCNICA PADRONIZADA (ALTURA 28px)
-   ========================================================================= */
+function trocarMapas() { solicitarFullscreen(); limparSelecaoAnterior(); mapaAtivo = (mapaAtivo === "GSP") ? "INTERIOR" : "GSP"; atualizarVisualizacao(); }
+
+function atualizarVisualizacao() {
+    if (typeof MAPA_GSP !== 'undefined' && typeof MAPA_INTERIOR !== 'undefined') {
+        desenharMapa(mapaAtivo === "GSP" ? MAPA_GSP : MAPA_INTERIOR, "mapa-container", false);
+        desenharMapa(mapaAtivo === "GSP" ? MAPA_INTERIOR : MAPA_GSP, "mapa-minimizado", true);
+    }
+}
+
+/* --- FICHA TÉCNICA --- */
 function exibirDadosResidencial(info) {
     const elNome = document.getElementById('nome-imovel');
     const elDetalhes = document.getElementById('detalhes-imovel');
-    
     if (elNome) elNome.innerText = (info.nomeCurto || "").toUpperCase();
     if (!elDetalhes) return;
 
     const linkMaps = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(info.endereco)}`;
     const isComplexo = info.categoria === "COMPLEXO";
-    
-    // Altura padrão para todos os elementos interativos
-    const ALTURA_PADRAO = "28px";
 
     let htmlContent = `
         <div style="margin-top: 0px;">
@@ -234,50 +211,34 @@ function exibirDadosResidencial(info) {
                     </div>
                 </div>`;
         };
-
         let htmlDesc = info.descLonga ? `<div style="margin-top: 10px; font-size: 0.82rem; color: #eee; line-height: 1.4; text-align: justify; margin-bottom: 10px;">${info.descLonga}</div>` : "";
-        let cards = criarCard("Book Cliente", info.bookCliente, "📄") + 
-                    criarCard("Book Corretor", info.bookCorretor, "💼") + 
-                    criarCard("Vídeo Decorado", info.videoDecorado, "🎬");
-
+        let cards = criarCard("Book Cliente", info.bookCliente, "📄") + criarCard("Book Corretor", info.bookCorretor, "💼") + criarCard("Vídeo Decorado", info.videoDecorado, "🎬");
         htmlContent += htmlDesc + (cards ? `<div style="margin-top: 5px;">${cards}</div>` : "");
-
     } else {
-        // RESIDENCIAL: Caixa Q e Grid Cinza com altura de 28px
         let htmlCaixaQ = (info.destaqueCampanha && info.destaqueCampanha.trim() !== "") ? `
             <div style="background: #fff; color: #e31c19; height: ${ALTURA_PADRAO}; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 0.75rem; border-radius: 4px; margin-bottom: 8px; border: 1px solid #ddd; text-transform: uppercase; padding: 0 5px; text-align: center;">
                 ${info.destaqueCampanha}
             </div>` : "";
-
         let htmlGrid6 = `
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
-                <div style="background: #444; color: #bbb; height: ${ALTURA_PADRAO}; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 0.65rem; font-weight: bold; text-transform: uppercase;">Dado 1</div>
-                <div style="background: #444; color: #bbb; height: ${ALTURA_PADRAO}; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 0.65rem; font-weight: bold; text-transform: uppercase;">Dado 2</div>
-                <div style="background: #444; color: #bbb; height: ${ALTURA_PADRAO}; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 0.65rem; font-weight: bold; text-transform: uppercase;">Dado 3</div>
-                <div style="background: #444; color: #bbb; height: ${ALTURA_PADRAO}; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 0.65rem; font-weight: bold; text-transform: uppercase;">Dado 4</div>
-                <div style="background: #444; color: #bbb; height: ${ALTURA_PADRAO}; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 0.65rem; font-weight: bold; text-transform: uppercase;">Dado 5</div>
-                <div style="background: #444; color: #bbb; height: ${ALTURA_PADRAO}; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 0.65rem; font-weight: bold; text-transform: uppercase;">Dado 6</div>
+                ${Array(6).fill(0).map((_, i) => `<div style="background: #444; color: #bbb; height: ${ALTURA_PADRAO}; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 0.65rem; font-weight: bold; text-transform: uppercase;">Dado ${i+1}</div>`).join('')}
             </div>`;
-
         htmlContent += htmlCaixaQ + htmlGrid6;
     }
-
     elDetalhes.innerHTML = htmlContent;
 }
 
-/* ==========================================================================
-   BLOCO 8: SISTEMA E EVENTOS
-   ========================================================================== */
+/* --- EVENTOS --- */
 function gerarMenuResidenciais() {
     const lista = document.getElementById('lista-residenciais');
     if (!lista) return;
     lista.innerHTML = ""; 
     [...window.dadosGerais].sort((a, b) => a.ordem - b.ordem).forEach(info => {
-        if (!info.nomeCurto || info.nomeCurto === "Sem Nome") return;
+        if (!info.nomeCurto) return;
         const li = document.createElement('li');
         li.className = 'menu-item-mrv'; li.innerText = info.nomeCurto.toUpperCase();
         const corZona = obterCorPorZona(info);
-        if (info.categoria === "COMPLEXO") { li.classList.add('estilo-complexo'); li.style.backgroundColor = corZona; li.style.color = "#ffffff"; }
+        if (info.categoria === "COMPLEXO") { li.classList.add('estilo-complexo'); li.style.backgroundColor = corZona; }
         else { li.style.borderRightColor = corZona; }
         li.onclick = (e) => { e.stopPropagation(); toggleMenu(); let p = document.getElementById(info.id); if (!p) { trocarMapas(); setTimeout(() => { let np = document.getElementById(info.id); if (np) clicarNoMapa(np, info); }, 300); } else { clicarNoMapa(p, info); } };
         lista.appendChild(li);
