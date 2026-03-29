@@ -205,7 +205,7 @@ function atualizarVisualizacao() {
 }
 
 /* ==========================================================================
-   BLOCO 7: FICHA TÉCNICA (PADRONIZAÇÃO 28px)
+   BLOCO 7: FICHA TÉCNICA (PADRONIZAÇÃO 28px E GRID DE DADOS)
    ========================================================================= */
 function exibirDadosResidencial(info) {
     const elNome = document.getElementById('nome-imovel');
@@ -244,14 +244,29 @@ function exibirDadosResidencial(info) {
         let cards = criarCard("Book Cliente", info.bookCliente, "📄") + criarCard("Book Corretor", info.bookCorretor, "💼") + criarCard("Vídeo Decorado", info.videoDecorado, "🎬");
         htmlContent += htmlDesc + (cards ? `<div style="margin-top: 5px;">${cards}</div>` : "");
     } else {
+        // RESIDENCIAL: Caixa de Campanha (Coluna Q)
         let htmlCaixaQ = (info.destaqueCampanha && info.destaqueCampanha.trim() !== "") ? `
             <div style="background: #fff; color: #e31c19; height: ${ALTURA_PADRAO}; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 0.75rem; border-radius: 4px; margin-bottom: 8px; text-transform: uppercase; padding: 0 5px; text-align: center;">
                 ${info.destaqueCampanha}
             </div>` : "";
+
+        // GRID DE 6 CAIXAS COM TÍTULOS E ESPAÇO PARA DADOS
+        const criarCaixaDado = (label, valor) => `
+            <div style="background: #444; height: ${ALTURA_PADRAO}; border-radius: 4px; display: flex; align-items: center; justify-content: space-between; padding: 0 8px; box-sizing: border-box;">
+                <span style="color: #bbb; font-size: 0.55rem; font-weight: bold; text-transform: uppercase;">${label}</span>
+                <span style="color: #fff; font-size: 0.7rem; font-weight: bold;">${valor || "---"}</span>
+            </div>`;
+
         let htmlGrid6 = `
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
-                ${Array(6).fill(0).map((_, i) => `<div style="background: #444; color: #bbb; height: ${ALTURA_PADRAO}; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 0.65rem; font-weight: bold; text-transform: uppercase;">Dado ${i+1}</div>`).join('')}
+                ${criarCaixaDado("ENTREGA", info.entrega)}
+                ${criarCaixaDado("OBRA", info.obra)}
+                ${criarCaixaDado("PLANTAS", info.plantas)}
+                ${criarCaixaDado("ESTOQUE", info.estoque)}
+                ${criarCaixaDado("LIMITADOR", info.limitador)}
+                ${criarCaixaDado("C. PAULISTA", info.cPaulista)}
             </div>`;
+
         htmlContent += htmlCaixaQ + htmlGrid6;
     }
     elDetalhes.innerHTML = htmlContent;
