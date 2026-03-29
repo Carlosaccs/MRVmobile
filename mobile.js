@@ -210,10 +210,10 @@ function exibirDadosResidencial(info) {
         const linkMaps = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(info.endereco)}`;
         const isComplexo = info.categoria === "COMPLEXO";
 
-        let htmlDesc = (isComplexo && info.descLonga) ? `
-            <div style="margin-top: 5px; border-top: 1px solid #444; padding-top: 8px; font-size: 0.68rem; color: #bbb; line-height: 1.3; text-align: justify;">
-                ${info.descLonga}
-            </div>` : "";
+         let htmlDesc = (isComplexo && info.descLonga) ? `
+             <div style="margin-top: 8px; border-top: none; padding-top: 0px; font-size: 0.68rem; color: #eee; line-height: 1.3; text-align: justify;">
+                 ${info.descLonga}
+             </div>` : "";
 
         const criarCard = (titulo, link, icone) => {
             if (!link || link.length < 5) return "";
@@ -243,16 +243,18 @@ function exibirDadosResidencial(info) {
                 </div>` : "";
         }
 
-        elDetalhes.innerHTML = `
-            <div style="margin-top: 0px; border-top: 1px solid #00713a; padding-top: 6px;">
-                <div style="font-size: 0.65rem; color: #aaa; margin-bottom: 6px;">📍 ${info.endereco || "Não informado"}</div>
-                <div style="display: flex; gap: 6px; margin-bottom: 6px;">
-                    <button onclick="window.open('${linkMaps}', '_blank')" style="width: 65px; height: 24px; padding: 0; background: #4285F4; color: white; border: none; border-radius: 4px; font-size: 0.58rem; font-weight: bold; cursor: pointer;">MAPS</button>
-                    <button onclick="copyToClipboard('${info.link}')" style="width: 65px; height: 24px; padding: 0; background: #444; color: white; border: none; border-radius: 4px; font-size: 0.58rem; font-weight: bold; cursor: pointer;">LINK</button>
-                </div>
-                ${htmlDesc}
-                ${htmlMateriais}
-            </div>`;
+       elDetalhes.innerHTML = `
+          <div style="margin-top: 0px; border-top: none; padding-top: 0px;">
+              <div style="font-size: 0.65rem; color: #ffffff; margin-bottom: 10px; font-weight: bold;">📍 ${info.endereco || "Não informado"}</div>
+              
+              <div style="display: flex; gap: 6px; margin-bottom: 12px;">
+                  <button onclick="window.open('${linkMaps}', '_blank')" style="width: 65px; height: 24px; padding: 0; background: #4285F4; color: white; border: none; border-radius: 4px; font-size: 0.58rem; font-weight: bold; cursor: pointer;">MAPS</button>
+                  <button onclick="copyToClipboard('${info.link}')" style="width: 65px; height: 24px; padding: 0; background: #444; color: white; border: none; border-radius: 4px; font-size: 0.58rem; font-weight: bold; cursor: pointer;">LINK</button>
+              </div>
+              
+              ${htmlDesc}
+              ${htmlMateriais}
+          </div>`;
     }
 }
 
