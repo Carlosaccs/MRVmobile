@@ -69,9 +69,9 @@ async function carregarPlanilha() {
                     endereco: limpar(c[7]),
                     link: limpar(c[16]),
                     descLonga: limpar(c[18]),
-                    bookCliente: c[25] ? limpar(c[25]) : "", // Coluna Z
-                    bookCorretor: c[26] ? limpar(c[26]) : "", // Coluna AA
-                    videoDecorado: c[27] ? limpar(c[27]) : "" // Coluna AB
+                    bookCliente: c[25] ? limpar(c[25]) : "",
+                    bookCorretor: c[26] ? limpar(c[26]) : "",
+                    videoDecorado: c[27] ? limpar(c[27]) : ""
                 });
             }
         });
@@ -94,7 +94,8 @@ function limparSelecaoAnterior() {
         p.setAttribute('data-selecionado', 'false');
         p.style.fill = p.getAttribute('data-cor-base');
     });
-    if (document.getElementById('container-vitrine-botoes')) document.getElementById('container-vitrine-botoes').innerHTML = "";
+    const vitrine = document.getElementById('container-vitrine-botoes');
+    if (vitrine) vitrine.innerHTML = "";
     if (document.getElementById('nome-imovel')) document.getElementById('nome-imovel').innerText = "";
     if (document.getElementById('detalhes-imovel')) document.getElementById('detalhes-imovel').innerHTML = "";
     atualizarTextoTopo(null);
@@ -179,7 +180,7 @@ function desenharMapa(dados, targetId, ehMinimizado) {
 }
 
 /* ==========================================================================
-   BLOCO 7: FICHA TÉCNICA E MATERIAIS (Z, AA e AB)
+   BLOCO 7: FICHA TÉCNICA E MAQUIAGEM (Z, AA e AB)
    ========================================================================= */
 function trocarMapas() { solicitarFullscreen(); limparSelecaoAnterior(); mapaAtivo = (mapaAtivo === "GSP") ? "INTERIOR" : "GSP"; atualizarVisualizacao(); }
 
@@ -198,20 +199,21 @@ function exibirDadosResidencial(info) {
         const linkMaps = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(info.endereco)}`;
         const isComplexo = info.categoria === "COMPLEXO";
 
+        // Ajuste de Maquiagem: Linha única e botões menores
         let htmlDesc = (isComplexo && info.descLonga) ? `
-            <div style="margin-top: 15px; border-top: 1px solid #444; padding-top: 10px; font-size: 0.68rem; color: #bbb; line-height: 1.4; text-align: justify;">
+            <div style="margin-top: 5px; border-top: 1px solid #444; padding-top: 8px; font-size: 0.68rem; color: #bbb; line-height: 1.3; text-align: justify;">
                 ${info.descLonga}
             </div>` : "";
 
         const criarCard = (titulo, link, icone) => {
             if (!link || link.length < 5) return "";
             return `
-                <div style="display: flex; align-items: center; background: #fff; border: 1px solid #ddd; border-radius: 8px; padding: 6px 10px; gap: 8px; margin-top: 8px;">
-                    <span style="font-size: 1rem;">${icone}</span>
-                    <div style="flex-grow: 1; font-size: 0.7rem; font-weight: bold; color: #333;">${titulo}</div>
+                <div style="display: flex; align-items: center; background: #fff; border: 1px solid #ddd; border-radius: 8px; padding: 6px 10px; gap: 8px; margin-top: 6px;">
+                    <span style="font-size: 0.9rem;">${icone}</span>
+                    <div style="flex-grow: 1; font-size: 0.68rem; font-weight: bold; color: #333;">${titulo}</div>
                     <div style="display: flex; gap: 4px;">
-                        <button onclick="window.open('${link}', '_blank')" style="background: #00713a; color: white; border: none; border-radius: 4px; padding: 4px 10px; font-size: 0.6rem; font-weight: bold; cursor: pointer;">Abrir</button>
-                        <button onclick="copyToClipboard('${link}')" style="background: #ff8c00; color: white; border: none; border-radius: 4px; padding: 4px 10px; font-size: 0.6rem; font-weight: bold; cursor: pointer;">Copiar</button>
+                        <button onclick="window.open('${link}', '_blank')" style="background: #00713a; color: white; border: none; border-radius: 4px; padding: 3px 8px; font-size: 0.6rem; font-weight: bold; cursor: pointer;">Abrir</button>
+                        <button onclick="copyToClipboard('${link}')" style="background: #ff8c00; color: white; border: none; border-radius: 4px; padding: 3px 8px; font-size: 0.6rem; font-weight: bold; cursor: pointer;">Copiar</button>
                     </div>
                 </div>`;
         };
@@ -223,20 +225,21 @@ function exibirDadosResidencial(info) {
             const cardVideo = criarCard("Vídeo do Decorado", info.videoDecorado, "🎬");
 
             htmlMateriais = (cardBook || cardCorretor || cardVideo) ? `
-                <div style="margin-top: 20px; border-top: 1px solid #555; padding-top: 12px;">
-                    <div style="font-size: 0.65rem; color: #888; font-weight: bold; margin-bottom: 5px; text-transform: uppercase;">Materiais de Apoio</div>
+                <div style="margin-top: 12px; border-top: 1px solid #555; padding-top: 8px;">
+                    <div style="font-size: 0.6rem; color: #888; font-weight: bold; margin-bottom: 4px; text-transform: uppercase;">Materiais de Apoio</div>
                     ${cardBook}
                     ${cardCorretor}
                     ${cardVideo}
                 </div>` : "";
         }
 
+        // Maquiagem: Botões Maps e Link menores e linha cinza mais próxima
         elDetalhes.innerHTML = `
-            <div style="margin-top: 10px; border-top: 1px solid #00713a; padding-top: 8px;">
-                <div style="font-size: 0.68rem; color: #cccccc; margin-bottom: 8px;">📍 ${info.endereco || "Não informado"}</div>
-                <div style="display: flex; gap: 5px; margin-bottom: 10px;">
-                    <button onclick="window.open('${linkMaps}', '_blank')" class="menu-item-mrv" style="width: 70px; background: #4285F4; color: white; border: none; font-size: 0.6rem;">MAPS</button>
-                    <button onclick="copyToClipboard('${info.link}')" class="menu-item-mrv" style="width: 70px; background: #444; color: white; border: none; font-size: 0.6rem;">LINK</button>
+            <div style="margin-top: 0px; border-top: 1px solid #00713a; padding-top: 6px;">
+                <div style="font-size: 0.65rem; color: #aaa; margin-bottom: 6px;">📍 ${info.endereco || "Não informado"}</div>
+                <div style="display: flex; gap: 6px; margin-bottom: 6px;">
+                    <button onclick="window.open('${linkMaps}', '_blank')" style="width: 65px; height: 24px; padding: 0; background: #4285F4; color: white; border: none; border-radius: 4px; font-size: 0.58rem; font-weight: bold; cursor: pointer;">MAPS</button>
+                    <button onclick="copyToClipboard('${info.link}')" style="width: 65px; height: 24px; padding: 0; background: #444; color: white; border: none; border-radius: 4px; font-size: 0.58rem; font-weight: bold; cursor: pointer;">LINK</button>
                 </div>
                 ${htmlDesc}
                 ${htmlMateriais}
