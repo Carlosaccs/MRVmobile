@@ -205,6 +205,8 @@ function atualizarVisualizacao() {
     }
 }
 
+
+
 function exibirDadosResidencial(info) {
     const elNome = document.getElementById('nome-imovel');
     const elDetalhes = document.getElementById('detalhes-imovel');
@@ -215,8 +217,8 @@ function exibirDadosResidencial(info) {
     const linkMaps = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(info.endereco)}`;
     const isComplexo = info.categoria === "COMPLEXO";
 
-    // 1. Parte Comum (Aparece para todos: Endereço + Botões MAPS/LINK)
-    let htmlBase = `
+    // 1. PARTE COMUM (Sempre aparece: Endereço + MAPS + LINK)
+    let htmlContent = `
         <div style="margin-top: 0px;">
             <div style="font-size: 0.82rem; color: #ffffff; margin-bottom: 12px; font-weight: bold; line-height: 1.3;">
                 📍 ${info.endereco || "Não informado"}
@@ -227,36 +229,65 @@ function exibirDadosResidencial(info) {
             </div>
         </div>`;
 
-    // ==========================================================================
-    // NOVO: ESTRUTURA DE CAIXAS (PLACEHOLDERS)
-    // ==========================================================================
-    
-    // Simulação: Vamos assumir que "Cidade Sete Sóis" tem dados na caixa longa
-    // No futuro, isso será: const temDadosCaixaLonga = info.colunaDaTabela !== "";
-    const temDadosCaixaLonga = info.nomeCurto && info.nomeCurto.toUpperCase().includes("SETE SÓIS");
+    // 2. BIFURCAÇÃO: COMPLEXO vs RESIDENCIAL
+    if (isComplexo) {
+        // --- BLOCO PARA COMPLEXOS (Texto Longo + Materiais) ---
+        const criarCard = (titulo, link, icone) => {
+            if (!link || link.length < 5) return "";
+            return `
+                <div style="display: flex; align-items: center; background: #fff; border: 1px solid #ddd; border-radius: 8px; padding: 8px 10px; gap: 8px; margin-top: 8px;">
+                    <span style="font-size: 1rem;">${icone}</span>
+                    <div style="flex-grow: 1; font-size: 0.82rem; font-weight: bold; color: #333;">${titulo}</div>
+                    <div style="display: flex; gap: 4px;">
+                        <button onclick="window.open('${link}', '_blank')" style="background: #00713a; color: white; border: none; border-radius: 4px; padding: 4px 10px; font-size: 0.65rem; font-weight: bold; cursor: pointer;">Abrir</button>
+                        <button onclick="copyToClipboard('${link}')" style="background: #ff8c00; color: white; border: none; border-radius: 4px; padding: 4px 10px; font-size: 0.65rem; font-weight: bold; cursor: pointer;">Copiar</button>
+                    </div>
+                </div>`;
+        };
 
-    // A) Caixa de Texto Longa (Aparece condicionalmente)
-    let htmlCaixaLonga = temDadosCaixaLonga ? `
-        <div class="caixa-texto-longa-placeholder">
-            [Espaço reservado para o texto longo descritivo do empreendimento. Esta caixa só aparece quando há dados.]
-        </div>
-    ` : "";
+        let htmlDesc = info.descLonga ? `
+            <div style="margin-top: 10px; font-size: 0.82rem; color: #eee; line-height: 1.5; text-align: justify; font-weight: 400;">
+                ${info.descLonga}
+            </div>` : "";
 
-    // B) Grid de 6 Caixas Pequenas (Aparece para todos)
-    let htmlGrid6 = `
-        <div class="grid-6-caixas-placeholder">
-            <div class="caixa-pequena-placeholder">Dado 1</div>
-            <div class="caixa-pequena-placeholder">Dado 2</div>
-            <div class="caixa-pequena-placeholder">Dado 3</div>
-            <div class="caixa-pequena-placeholder">Dado 4</div>
-            <div class="caixa-pequena-placeholder">Dado 5</div>
-            <div class="caixa-pequena-placeholder">Dado 6</div>
-        </div>
-    `;
+        let cardBook = criarCard("Book Cliente", info.bookCliente, "📄");
+        let cardCorretor = criarCard("Book Corretor", info.bookCorretor, "💼");
+        let cardVideo = criarCard("Vídeo do Decorado", info.videoDecorado, "🎬");
 
-    // Montagem final combinando a base + placeholders
-    elDetalhes.innerHTML = htmlBase + htmlCaixaLonga + htmlGrid6;
+        let htmlMateriais = (cardBook || cardCorretor || cardVideo) ? `
+            <div style="margin-top: 15px;">
+                <div style="font-size: 0.6rem; color: #fff; font-weight: bold; margin-bottom: 4px; text-transform: uppercase;">Materiais de Apoio</div>
+                ${cardBook} ${cardCorretor} ${cardVideo}
+            </div>` : "";
+
+        htmlContent += htmlDesc + htmlMateriais;
+
+    } else {
+        // --- BLOCO PARA RESIDENCIAIS (Os novos espaços de dados) ---
+        // A Caixa Longa só aparece se houver dados (por enquanto simulando com Sete Sóis ou algum campo)
+        let htmlCaixaLonga = info.descLonga ? `
+            <div class="caixa-texto-longa-placeholder">
+                ${info.descLonga}
+            </div>` : "";
+
+        let htmlGrid6 = `
+            <div class="grid-6-caixas-placeholder">
+                <div class="caixa-pequena-placeholder">Dado 1</div>
+                <div class="caixa-pequena-placeholder">Dado 2</div>
+                <div class="caixa-pequena-placeholder">Dado 3</div>
+                <div class="caixa-pequena-placeholder">Dado 4</div>
+                <div class="caixa-pequena-placeholder">Dado 5</div>
+                <div class="caixa-pequena-placeholder">Dado 6</div>
+            </div>`;
+
+        htmlContent += htmlCaixaLonga + htmlGrid6;
+    }
+
+    // Aplica o resultado final
+    elDetalhes.innerHTML = htmlContent;
 }
+
+
 
 /* ==========================================================================
    BLOCO 8: SISTEMA E EVENTOS
