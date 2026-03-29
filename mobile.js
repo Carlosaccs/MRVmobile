@@ -195,17 +195,8 @@ function desenharMapa(dados, targetId, ehMinimizado) {
 }
 
 /* ==========================================================================
-   BLOCO 7: FICHA TÉCNICA
+   BLOCO 7: FICHA TÉCNICA PADRONIZADA (ALTURA 28px)
    ========================================================================= */
-function trocarMapas() { solicitarFullscreen(); limparSelecaoAnterior(); mapaAtivo = (mapaAtivo === "GSP") ? "INTERIOR" : "GSP"; atualizarVisualizacao(); }
-
-function atualizarVisualizacao() {
-    if (typeof MAPA_GSP !== 'undefined' && typeof MAPA_INTERIOR !== 'undefined') {
-        desenharMapa(mapaAtivo === "GSP" ? MAPA_GSP : MAPA_INTERIOR, "mapa-container", false);
-        desenharMapa(mapaAtivo === "GSP" ? MAPA_INTERIOR : MAPA_GSP, "mapa-minimizado", true);
-    }
-}
-
 function exibirDadosResidencial(info) {
     const elNome = document.getElementById('nome-imovel');
     const elDetalhes = document.getElementById('detalhes-imovel');
@@ -215,6 +206,9 @@ function exibirDadosResidencial(info) {
 
     const linkMaps = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(info.endereco)}`;
     const isComplexo = info.categoria === "COMPLEXO";
+    
+    // Altura padrão para todos os elementos interativos
+    const ALTURA_PADRAO = "28px";
 
     let htmlContent = `
         <div style="margin-top: 0px;">
@@ -222,8 +216,8 @@ function exibirDadosResidencial(info) {
                 📍 ${info.endereco || "Não informado"}
             </div>
             <div style="display: flex; gap: 8px; margin-bottom: 15px;">
-                <button onclick="window.open('${linkMaps}', '_blank')" style="width: 70px; height: 28px; background: #4285F4; color: white; border: none; border-radius: 4px; font-size: 0.72rem; font-weight: 800; cursor: pointer;">MAPS</button>
-                <button onclick="copyToClipboard('${info.link}')" style="width: 70px; height: 28px; background: #444; color: white; border: none; border-radius: 4px; font-size: 0.72rem; font-weight: 800; cursor: pointer;">LINK</button>
+                <button onclick="window.open('${linkMaps}', '_blank')" style="width: 70px; height: ${ALTURA_PADRAO}; background: #4285F4; color: white; border: none; border-radius: 4px; font-size: 0.72rem; font-weight: 800; cursor: pointer;">MAPS</button>
+                <button onclick="copyToClipboard('${info.link}')" style="width: 70px; height: ${ALTURA_PADRAO}; background: #444; color: white; border: none; border-radius: 4px; font-size: 0.72rem; font-weight: 800; cursor: pointer;">LINK</button>
             </div>
         </div>`;
 
@@ -231,37 +225,38 @@ function exibirDadosResidencial(info) {
         const criarCard = (titulo, link, icone) => {
             if (!link || link.length < 5) return "";
             return `
-                <div style="display: flex; align-items: center; background: #fff; border: 1px solid #ddd; border-radius: 8px; padding: 8px 10px; gap: 8px; margin-top: 8px;">
-                    <span style="font-size: 1rem;">${icone}</span>
-                    <div style="flex-grow: 1; font-size: 0.82rem; font-weight: bold; color: #333;">${titulo}</div>
+                <div style="display: flex; align-items: center; background: #fff; border-radius: 4px; padding: 0 10px; gap: 8px; margin-top: 6px; height: ${ALTURA_PADRAO};">
+                    <span style="font-size: 0.9rem;">${icone}</span>
+                    <div style="flex-grow: 1; font-size: 0.75rem; font-weight: bold; color: #333; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${titulo.toUpperCase()}</div>
                     <div style="display: flex; gap: 4px;">
-                        <button onclick="window.open('${link}', '_blank')" style="background: #00713a; color: white; border: none; border-radius: 4px; padding: 4px 10px; font-size: 0.65rem; font-weight: bold; cursor: pointer;">Abrir</button>
-                        <button onclick="copyToClipboard('${link}')" style="background: #ff8c00; color: white; border: none; border-radius: 4px; padding: 4px 10px; font-size: 0.65rem; font-weight: bold; cursor: pointer;">Copiar</button>
+                        <button onclick="window.open('${link}', '_blank')" style="background: #00713a; color: white; border: none; border-radius: 4px; padding: 0 8px; height: 20px; font-size: 0.6rem; font-weight: bold; cursor: pointer;">ABRIR</button>
+                        <button onclick="copyToClipboard('${link}')" style="background: #ff8c00; color: white; border: none; border-radius: 4px; padding: 0 8px; height: 20px; font-size: 0.6rem; font-weight: bold; cursor: pointer;">COPIAR</button>
                     </div>
                 </div>`;
         };
 
-        let htmlDesc = info.descLonga ? `<div style="margin-top: 10px; font-size: 0.82rem; color: #eee; line-height: 1.5; text-align: justify;">${info.descLonga}</div>` : "";
+        let htmlDesc = info.descLonga ? `<div style="margin-top: 10px; font-size: 0.82rem; color: #eee; line-height: 1.4; text-align: justify; margin-bottom: 10px;">${info.descLonga}</div>` : "";
         let cards = criarCard("Book Cliente", info.bookCliente, "📄") + 
                     criarCard("Book Corretor", info.bookCorretor, "💼") + 
-                    criarCard("Vídeo do Decorado", info.videoDecorado, "🎬");
+                    criarCard("Vídeo Decorado", info.videoDecorado, "🎬");
 
-        htmlContent += htmlDesc + (cards ? `<div style="margin-top: 15px;"><div style="font-size: 0.6rem; color: #fff; font-weight: bold; text-transform: uppercase;">Materiais de Apoio</div>${cards}</div>` : "");
+        htmlContent += htmlDesc + (cards ? `<div style="margin-top: 5px;">${cards}</div>` : "");
 
     } else {
+        // RESIDENCIAL: Caixa Q e Grid Cinza com altura de 28px
         let htmlCaixaQ = (info.destaqueCampanha && info.destaqueCampanha.trim() !== "") ? `
-            <div class="caixa-destaque-coluna-q">
-                <span>${info.destaqueCampanha}</span>
+            <div style="background: #fff; color: #e31c19; height: ${ALTURA_PADRAO}; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 0.75rem; border-radius: 4px; margin-bottom: 8px; border: 1px solid #ddd; text-transform: uppercase; padding: 0 5px; text-align: center;">
+                ${info.destaqueCampanha}
             </div>` : "";
 
         let htmlGrid6 = `
-            <div class="grid-6-caixas-placeholder">
-                <div class="caixa-pequena-placeholder">Dado 1</div>
-                <div class="caixa-pequena-placeholder">Dado 2</div>
-                <div class="caixa-pequena-placeholder">Dado 3</div>
-                <div class="caixa-pequena-placeholder">Dado 4</div>
-                <div class="caixa-pequena-placeholder">Dado 5</div>
-                <div class="caixa-pequena-placeholder">Dado 6</div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
+                <div style="background: #444; color: #bbb; height: ${ALTURA_PADRAO}; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 0.65rem; font-weight: bold; text-transform: uppercase;">Dado 1</div>
+                <div style="background: #444; color: #bbb; height: ${ALTURA_PADRAO}; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 0.65rem; font-weight: bold; text-transform: uppercase;">Dado 2</div>
+                <div style="background: #444; color: #bbb; height: ${ALTURA_PADRAO}; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 0.65rem; font-weight: bold; text-transform: uppercase;">Dado 3</div>
+                <div style="background: #444; color: #bbb; height: ${ALTURA_PADRAO}; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 0.65rem; font-weight: bold; text-transform: uppercase;">Dado 4</div>
+                <div style="background: #444; color: #bbb; height: ${ALTURA_PADRAO}; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 0.65rem; font-weight: bold; text-transform: uppercase;">Dado 5</div>
+                <div style="background: #444; color: #bbb; height: ${ALTURA_PADRAO}; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 0.65rem; font-weight: bold; text-transform: uppercase;">Dado 6</div>
             </div>`;
 
         htmlContent += htmlCaixaQ + htmlGrid6;
