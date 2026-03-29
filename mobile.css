@@ -121,9 +121,11 @@ html, body {
 }
 
 #nome-imovel {
-    color: #50c878; font-weight: 700; font-size: 0.85rem;
-    border-bottom: 2px solid #ffffff; /* LINHA BRANCA abaixo do título */
-    padding-bottom: 8px;
+    color: #50c878; 
+    font-weight: 700; 
+    font-size: 0.85rem;
+    border-bottom: none; /* LINHA REMOVIDA */
+    padding-bottom: 4px;
     margin-bottom: 10px;
 }
 
@@ -154,6 +156,11 @@ html, body {
 }
 .divisor-materiais {
     margin-top: 12px; 
-    border-top: 1px solid #ffffff; /* LINHA BRANCA acima dos materiais */
-    padding-top: 8px;
+    border-top: none; /* LINHA REMOVIDA */
+    padding-top: 0px;
+    margin-bottom: 5px;
+}
+.faixa-verde-vertical {
+    border-right: none; /* Remove qualquer linha fina à direita da faixa */
+    box-shadow: none;
 }
