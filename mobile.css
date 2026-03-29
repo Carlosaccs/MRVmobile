@@ -1,5 +1,5 @@
 /* ==========================================================================
-   css v140.7
+   css v140.7.1 - REVISADO (Ficha Técnica Inteligente)
    ========================================================================== */
 
 /* ==========================================================================
@@ -9,7 +9,7 @@ html, body {
     margin: 0; padding: 0; 
     width: 100%; height: 100%;
     overflow: hidden; 
-    background: #00713a; /* Agora o fundo é verde, eliminando a linha intrusa */
+    background: #00713a; 
 }
 
 * { 
@@ -35,7 +35,8 @@ html, body {
     display: flex; flex-direction: column;
     align-items: center; justify-content: space-between;
     padding: 15px 0; z-index: 4000;
-    box-shadow: none; /* Sem sombra para não criar linhas falsas */
+    box-shadow: none;
+    border-right: none;
 }
 
 .titulo-vertical {
@@ -92,7 +93,7 @@ html, body {
     width: 100%; height: 100%; z-index: 10;
     display: flex; align-items: center; justify-content: center;
     padding-left: 60px;
-    background: #fff; /* O mapa em si continua branco */
+    background: #fff;
 }
 
 #mapa-minimizado {
@@ -113,7 +114,7 @@ html, body {
 }
 
 /* ==========================================================================
-   BLOCO 6: FICHA TÉCNICA (DIREITA)
+   BLOCO 6: FICHA TÉCNICA (LIMPEZA E NOVAS CAIXAS)
    ========================================================================== */
 .ficha-tecnica {
     position: absolute; right: 0; top: 0;
@@ -128,57 +129,57 @@ html, body {
     color: #50c878; 
     font-weight: 700; 
     font-size: 0.85rem;
-    border-bottom: none; /* LINHA REMOVIDA */
+    border: none;
     padding-bottom: 4px;
     margin-bottom: 10px;
 }
 
-.container-acoes-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
-
-.btn-acao {
-    height: 35px; border-radius: 4px; color: white; border: none;
-    font-weight: 800; font-size: var(--ft-font-dados);
-    display: flex; align-items: center; justify-content: center;
-}
-.btn-maps { background-color: #4285F4; }
-.btn-link { background-color: #444444; }
-
-.grid-dados-imovel { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; }
-
-.caixa-dado-mrv {
-    background: #ffffff; height: 35px; padding: 0 8px;
-    border-radius: 4px; display: flex; justify-content: space-between; align-items: center;
+/* --- NOVO: CAIXA DE DESTAQUE (COLUNA Q) --- */
+.caixa-destaque-coluna-q {
+    width: 100%;
+    background-color: #ffffff; /* Fundo branco solicitado */
+    border-radius: 4px;
+    padding: 8px 5px;
+    margin-bottom: 15px;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.caixa-dado-mrv span { color: var(--mrv-verde); font-weight: 800; font-size: 0.65rem; }
-.caixa-dado-mrv b { color: #333; font-size: var(--ft-font-dados); }
-
-#container-vitrine-botoes { display: flex; flex-direction: column; gap: 3px; margin-bottom: 15px; }
-
-#container-vitrine-botoes .menu-item-mrv {
-    padding: 6px 8px 6px 12px !important; margin: 0 !important; font-size: 0.72rem !important; 
+.caixa-destaque-coluna-q span {
+    color: #ff0000; /* Texto Vermelho solicitado */
+    font-size: 0.85rem;
+    font-weight: 900;
+    text-transform: uppercase;
 }
+
+/* --- NOVO: GRID DE 6 CAIXAS --- */
+.grid-6-caixas-placeholder {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); 
+    gap: 8px;
+    width: 100%;
+}
+
+.caixa-pequena-placeholder {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 4px;
+    height: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #888;
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    font-weight: bold;
+}
+
+/* --- MATERIAIS DE APOIO (USADO EM COMPLEXO) --- */
 .divisor-materiais {
     margin-top: 12px; 
-    border-top: none; /* LINHA REMOVIDA */
+    border: none;
     padding-top: 0px;
     margin-bottom: 5px;
-}
-.faixa-verde-vertical {
-    border-right: none; /* Remove qualquer linha fina à direita da faixa */
-    box-shadow: none;
-}
-
-/* Caixa de Texto Longa (aparece condicionalmente) */
-.caixa-texto-longa-placeholder {
-    width: 100%; /* Ocupa toda a largura disponível da ficha técnica */
-    background: rgba(255, 255, 255, 0.05); /* Fundo sutil */
-    border: 1px dashed rgba(255, 255, 255, 0.2); /* Borda pontilhada para visualização */
-    border-radius: 4px;
-    padding: 10px;
-    margin-bottom: 15px; /* Respiro para o grid abaixo */
-    min-height: 80px; /* Altura mínima inicial */
-    color: #eee;
-    font-size: 0.75rem;
-    text-align: justify;
 }
