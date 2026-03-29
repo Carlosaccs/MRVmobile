@@ -1,6 +1,7 @@
 /* ==========================================================================
-js v140.7
- ========================================================================== */
+   js v140.7.2 - COMPLETO
+   ========================================================================== */
+
 /* ==========================================================================
    BLOCO 1: CONFIGURAÇÕES E VARIÁVEIS
    ========================================================================== */
@@ -46,22 +47,18 @@ function alternarFullscreen() {
     if (!document.fullscreenElement && !document.webkitFullscreenElement) {
         if (elem.requestFullscreen) elem.requestFullscreen();
         else if (elem.webkitRequestFullscreen) elem.webkitRequestFullscreen();
-        
-        // Troca os ícones
         if(svgExp) svgExp.style.display = 'none';
         if(svgRec) svgRec.style.display = 'block';
     } else {
         if (document.exitFullscreen) document.exitFullscreen();
         else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
-        
-        // Retorna ícones ao estado normal
         if(svgExp) svgExp.style.display = 'block';
         if(svgRec) svgRec.style.display = 'none';
     }
 }
 
 /* ==========================================================================
-   BLOCO 3: GESTÃO DE DADOS (REVISADO - MAPEAMENTO COLUNA Q)
+   BLOCO 3: GESTÃO DE DADOS (MAPEAMENTO COLUNA Q ATIVADO)
    ========================================================================== */
 async function carregarPlanilha() {
     try {
@@ -81,8 +78,7 @@ async function carregarPlanilha() {
                     zona: limpar(c[3]).toUpperCase(),
                     nomeCurto: limpar(c[4]),
                     endereco: limpar(c[7]),
-                    // NOVO: Mapeando a Coluna Q (índice 17 no array c)
-                    destaqueCampanha: limpar(c[17]), 
+                    destaqueCampanha: limpar(c[17]), // Coluna Q da planilha
                     link: limpar(c[16]),
                     descLonga: limpar(c[18]),
                     bookCliente: c[25] ? limpar(c[25]) : "",
@@ -132,13 +128,15 @@ function clicarNoMapa(pathElement, infoSelecionado, pDataRaw = null) {
     const nomeDaCidade = pDataRaw ? pDataRaw.name : pathElement.getAttribute('data-name');
     cidadeClicadaAtiva = { name: (nomeDaCidade || "").toUpperCase() }; 
     atualizarTextoTopo(cidadeClicadaAtiva.name);
+    
     const todosDestaRegiao = window.dadosGerais.filter(d => d.id === idRegiao).sort((a, b) => a.ordem - b.ordem);
     const ativo = infoSelecionado || todosDestaRegiao[0];
+    
     const containerBotoes = document.getElementById('container-vitrine-botoes');
     if(containerBotoes) {
         containerBotoes.innerHTML = "";
         todosDestaRegiao.forEach(item => {
-            if (item.nomeCurto && item.nomeCurto !== ativo.nomeCurto) {
+            if (item.nomeCurto && item.nomeCurto !== (ativo ? ativo.nomeCurto : "")) {
                 const btn = document.createElement('div');
                 btn.className = 'menu-item-mrv';
                 btn.innerText = item.nomeCurto.toUpperCase();
@@ -195,11 +193,18 @@ function desenharMapa(dados, targetId, ehMinimizado) {
     svg.appendChild(g); container.appendChild(svg);
 }
 
-
-
 /* ==========================================================================
-   BLOCO 7: FICHA TÉCNICA (REVISADO - CAIXA BRANCA E GRID)
+   BLOCO 7: FICHA TÉCNICA INTELIGENTE
    ========================================================================= */
+function trocarMapas() { solicitarFullscreen(); limparSelecaoAnterior(); mapaAtivo = (mapaAtivo === "GSP") ? "INTERIOR" : "GSP"; atualizarVisualizacao(); }
+
+function atualizarVisualizacao() {
+    if (typeof MAPA_GSP !== 'undefined' && typeof MAPA_INTERIOR !== 'undefined') {
+        desenharMapa(mapaAtivo === "GSP" ? MAPA_GSP : MAPA_INTERIOR, "mapa-container", false);
+        desenharMapa(mapaAtivo === "GSP" ? MAPA_INTERIOR : MAPA_GSP, "mapa-minimizado", true);
+    }
+}
+
 function exibirDadosResidencial(info) {
     const elNome = document.getElementById('nome-imovel');
     const elDetalhes = document.getElementById('detalhes-imovel');
@@ -210,21 +215,20 @@ function exibirDadosResidencial(info) {
     const linkMaps = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(info.endereco)}`;
     const isComplexo = info.categoria === "COMPLEXO";
 
-    // 1. PARTE COMUM (Endereço + MAPS + LINK)
+    // 1. PARTE COMUM
     let htmlContent = `
         <div style="margin-top: 0px;">
             <div style="font-size: 0.82rem; color: #ffffff; margin-bottom: 12px; font-weight: bold; line-height: 1.3;">
                 📍 ${info.endereco || "Não informado"}
             </div>
             <div style="display: flex; gap: 8px; margin-bottom: 15px;">
-                <button onclick="window.open('${linkMaps}', '_blank')" class="btn-acao btn-maps" style="width: 70px; height: 28px;">MAPS</button>
-                <button onclick="copyToClipboard('${info.link}')" class="btn-acao btn-link" style="width: 70px; height: 28px;">LINK</button>
+                <button onclick="window.open('${linkMaps}', '_blank')" style="width: 70px; height: 28px; background: #4285F4; color: white; border: none; border-radius: 4px; font-size: 0.72rem; font-weight: 800; cursor: pointer;">MAPS</button>
+                <button onclick="copyToClipboard('${info.link}')" style="width: 70px; height: 28px; background: #444; color: white; border: none; border-radius: 4px; font-size: 0.72rem; font-weight: 800; cursor: pointer;">LINK</button>
             </div>
         </div>`;
 
-    // 2. BIFURCAÇÃO: COMPLEXO vs RESIDENCIAL
     if (isComplexo) {
-        // --- LÓGICA DE COMPLEXO (MATERIAIS) ---
+        // --- LAYOUT COMPLEXO ---
         const criarCard = (titulo, link, icone) => {
             if (!link || link.length < 5) return "";
             return `
@@ -246,15 +250,12 @@ function exibirDadosResidencial(info) {
         htmlContent += htmlDesc + (cards ? `<div style="margin-top: 15px;"><div style="font-size: 0.6rem; color: #fff; font-weight: bold; text-transform: uppercase;">Materiais de Apoio</div>${cards}</div>` : "");
 
     } else {
-        // --- LÓGICA DE RESIDENCIAL (CAIXA Q + GRID) ---
-        
-        // A CAIXA BRANCA (Coluna Q)
-        let htmlCaixaQ = (info.destaqueCampanha && info.destaqueCampanha.length > 2) ? `
+        // --- LAYOUT RESIDENCIAL (Caixa Branca + Grid Cinza) ---
+        let htmlCaixaQ = (info.destaqueCampanha && info.destaqueCampanha.trim() !== "") ? `
             <div class="caixa-destaque-coluna-q">
                 <span>${info.destaqueCampanha}</span>
             </div>` : "";
 
-        // O GRID DE 6 CAIXAS
         let htmlGrid6 = `
             <div class="grid-6-caixas-placeholder">
                 <div class="caixa-pequena-placeholder">Dado 1</div>
@@ -270,8 +271,6 @@ function exibirDadosResidencial(info) {
 
     elDetalhes.innerHTML = htmlContent;
 }
-
-
 
 /* ==========================================================================
    BLOCO 8: SISTEMA E EVENTOS
