@@ -211,7 +211,7 @@ function atualizarVisualizacao() {
 }
 
 /* ==========================================================================
-   BLOCO 7: FICHA TÉCNICA (DADOS REAIS E FORMATAÇÃO)
+   BLOCO 7: FICHA TÉCNICA (LÓGICA DE ESTOQUE E EXIBIÇÃO)
    ========================================================================= */
 function exibirDadosResidencial(info) {
     const elNome = document.getElementById('nome-imovel');
@@ -219,7 +219,7 @@ function exibirDadosResidencial(info) {
     if (elNome) elNome.innerText = (info.nomeCurto || "").toUpperCase();
     if (!elDetalhes) return;
 
-    const linkMaps = `http://maps.google.com/?q=${encodeURIComponent(info.endereco)}`;
+    const linkMaps = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(info.endereco)}`;
     const isComplexo = info.categoria === "COMPLEXO";
 
     let htmlContent = `
@@ -255,25 +255,48 @@ function exibirDadosResidencial(info) {
                 ${info.destaqueCampanha}
             </div>` : "";
 
-        // Função interna para criar as caixas com dados alinhados à direita e brancos
-        const criarCaixaDado = (label, valor) => `
+        const criarCaixaDado = (label, valorHtml) => `
             <div style="background: #444; height: ${ALTURA_PADRAO}; border-radius: 4px; display: flex; align-items: center; justify-content: space-between; padding: 0 8px; box-sizing: border-box;">
                 <span style="color: #bbb; font-size: 0.55rem; font-weight: bold; text-transform: uppercase;">${label}</span>
-                <span style="color: #fff; font-size: 0.72rem; font-weight: bold; text-align: right; flex-grow: 1;">${valor || "---"}</span>
+                <div style="flex-grow: 1; text-align: right; display: flex; justify-content: flex-end;">${valorHtml}</div>
             </div>`;
 
-        // Formatações específicas pedidas
+        // --- LÓGICA DE TRATAMENTO DO ESTOQUE ---
+        let estoqueHtml = "";
+        const estValue = info.estoque ? info.estoque.toString().trim() : "";
+        const estNum = parseInt(estValue);
+
+        if (estValue === "" || estValue === null) {
+            estoqueHtml = ""; // Não escreve nada
+        } else if (estValue === "-") {
+            estoqueHtml = `<span style="color: #fff; font-size: 0.72rem; font-weight: bold;">CONSULTAR</span>`;
+        } else if (estNum === 0) {
+            estoqueHtml = `<span style="color: #bbb; font-size: 0.72rem; font-weight: bold; text-decoration: line-through;">VENDIDO</span>`;
+        } else if (estNum < 5) {
+            estoqueHtml = `<span style="color: #e31c19; font-size: 0.72rem; font-weight: bold;">APENAS ${estNum} UN.</span>`;
+        } else {
+            estoqueHtml = `<span style="color: #fff; font-size: 0.72rem; font-weight: bold;">RESTAM ${estNum} UN.</span>`;
+        }
+
+        // Outras formatações
         const textoObra = info.obra ? `${info.obra}%` : "---";
+        const valorObraHtml = `<span style="color: #fff; font-size: 0.72rem; font-weight: bold;">${textoObra}</span>`;
+        
         const textoPlantas = (info.plantaMin && info.plantaMax) ? `${info.plantaMin} ATÉ ${info.plantaMax}` : (info.plantaMin || "---");
+        const valorPlantasHtml = `<span style="color: #fff; font-size: 0.72rem; font-weight: bold;">${textoPlantas}</span>`;
+
+        const valorEntregaHtml = `<span style="color: #fff; font-size: 0.72rem; font-weight: bold;">${info.entrega || "---"}</span>`;
+        const valorLimitadorHtml = `<span style="color: #fff; font-size: 0.72rem; font-weight: bold;">${info.limitador || "---"}</span>`;
+        const valorCPaulistaHtml = `<span style="color: #fff; font-size: 0.72rem; font-weight: bold;">${info.cPaulista || "---"}</span>`;
 
         let htmlGrid6 = `
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
-                ${criarCaixaDado("ENTREGA", info.entrega)}
-                ${criarCaixaDado("OBRA", textoObra)}
-                ${criarCaixaDado("PLANTAS", textoPlantas)}
-                ${criarCaixaDado("ESTOQUE", info.estoque)}
-                ${criarCaixaDado("LIMITADOR", info.limitador)}
-                ${criarCaixaDado("C. PAULISTA", info.cPaulista)}
+                ${criarCaixaDado("ENTREGA", valorEntregaHtml)}
+                ${criarCaixaDado("OBRA", valorObraHtml)}
+                ${criarCaixaDado("PLANTAS", valorPlantasHtml)}
+                ${criarCaixaDado("ESTOQUE", estoqueHtml)}
+                ${criarCaixaDado("LIMITADOR", valorLimitadorHtml)}
+                ${criarCaixaDado("C. PAULISTA", valorCPaulistaHtml)}
             </div>`;
 
         htmlContent += htmlCaixaQ + htmlGrid6;
