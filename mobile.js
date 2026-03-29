@@ -14,7 +14,7 @@ const AJUSTES_MAPA = {
 };
 
 /* ==========================================================================
-   BLOCO 2: AUXILIARES
+   BLOCO 2: AUXILIARES E FULLSCREEN
    ========================================================================== */
 function obterCorPorZona(info) {
     const z = info.zona ? info.zona.trim().toUpperCase() : "";
@@ -37,17 +37,28 @@ function solicitarFullscreen() {
 
 function alternarFullscreen() {
     const elem = document.documentElement;
+    const svgExp = document.getElementById('svg-expandir');
+    const svgRec = document.getElementById('svg-recolher');
+
     if (!document.fullscreenElement && !document.webkitFullscreenElement) {
         if (elem.requestFullscreen) elem.requestFullscreen();
         else if (elem.webkitRequestFullscreen) elem.webkitRequestFullscreen();
+        
+        // Troca os ícones
+        if(svgExp) svgExp.style.display = 'none';
+        if(svgRec) svgRec.style.display = 'block';
     } else {
         if (document.exitFullscreen) document.exitFullscreen();
         else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+        
+        // Retorna ícones ao estado normal
+        if(svgExp) svgExp.style.display = 'block';
+        if(svgRec) svgRec.style.display = 'none';
     }
 }
 
 /* ==========================================================================
-   BLOCO 3: GESTÃO DE DADOS (Z, AA e AB)
+   BLOCO 3: GESTÃO DE DADOS
    ========================================================================== */
 async function carregarPlanilha() {
     try {
@@ -180,7 +191,7 @@ function desenharMapa(dados, targetId, ehMinimizado) {
 }
 
 /* ==========================================================================
-   BLOCO 7: FICHA TÉCNICA E MAQUIAGEM (Z, AA e AB)
+   BLOCO 7: FICHA TÉCNICA E MAQUIAGEM
    ========================================================================= */
 function trocarMapas() { solicitarFullscreen(); limparSelecaoAnterior(); mapaAtivo = (mapaAtivo === "GSP") ? "INTERIOR" : "GSP"; atualizarVisualizacao(); }
 
@@ -199,7 +210,6 @@ function exibirDadosResidencial(info) {
         const linkMaps = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(info.endereco)}`;
         const isComplexo = info.categoria === "COMPLEXO";
 
-        // Ajuste de Maquiagem: Linha única e botões menores
         let htmlDesc = (isComplexo && info.descLonga) ? `
             <div style="margin-top: 5px; border-top: 1px solid #444; padding-top: 8px; font-size: 0.68rem; color: #bbb; line-height: 1.3; text-align: justify;">
                 ${info.descLonga}
@@ -233,7 +243,6 @@ function exibirDadosResidencial(info) {
                 </div>` : "";
         }
 
-        // Maquiagem: Botões Maps e Link menores e linha cinza mais próxima
         elDetalhes.innerHTML = `
             <div style="margin-top: 0px; border-top: 1px solid #00713a; padding-top: 6px;">
                 <div style="font-size: 0.65rem; color: #aaa; margin-bottom: 6px;">📍 ${info.endereco || "Não informado"}</div>
