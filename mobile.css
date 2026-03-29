@@ -4,7 +4,9 @@
 html, body {
     margin: 0; padding: 0; 
     width: 100%; height: 100%;
-    overflow: hidden; background: #fff;
+    overflow: hidden; 
+    /* Mudança: Fundo verde para evitar que frestas brancas pareçam linhas */
+    background: #00713a; 
 }
 
 * { 
@@ -17,6 +19,7 @@ html, body {
 :root {
     --ft-font-size: 0.85rem; 
     --ft-font-dados: 0.72rem;
+    --mrv-verde: #00713a;
 }
 
 /* ==========================================================================
@@ -25,11 +28,13 @@ html, body {
 .faixa-verde-vertical {
     position: absolute; left: 0; top: 0;
     width: 60px; height: 100%;
-    background-color: #00713a;
+    background-color: var(--mrv-verde);
     display: flex; flex-direction: column;
     align-items: center; justify-content: space-between;
     padding: 15px 0; z-index: 4000;
-    box-shadow: 2px 0 10px rgba(0,0,0,0.3);
+    /* Correção: Removida a sombra que criava a "segunda linha" */
+    box-shadow: none;
+    border-right: 1px solid rgba(255,255,255,0.05);
 }
 
 .titulo-vertical {
@@ -40,7 +45,6 @@ html, body {
     display: flex; align-items: center; justify-content: center;
 }
 
-/* Feedback de clique nos botões da faixa verde */
 #btn-menu:active, #btn-fullscreen:active {
     opacity: 0.5;
     transform: scale(0.9);
@@ -50,7 +54,7 @@ html, body {
    BLOCO 3: MENU LATERAL
    ========================================================================== */
 #menu-lateral {
-    position: fixed; left: 55px; top: 0;
+    position: fixed; left: 60px; top: 0;
     width: calc(100% - 80px); max-width: 330px; height: 100%;
     background: transparent; backdrop-filter: blur(15px);
     z-index: 3000; transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
@@ -65,7 +69,7 @@ html, body {
    ========================================================================== */
 .menu-item-mrv {
     background: #ffffff; border: 1px solid #d1d1d1;
-    border-right: 18px solid #00713a; 
+    border-right: 18px solid var(--mrv-verde); 
     margin: 8px 10px 8px 5px; padding: 12px 12px 12px 25px; 
     border-radius: 2px 12px 12px 2px;
     color: #333; font-weight: 600; font-size: var(--ft-font-size);
@@ -87,12 +91,13 @@ html, body {
     width: 100%; height: 100%; z-index: 10;
     display: flex; align-items: center; justify-content: center;
     padding-left: 60px;
+    background: #fff; /* O mapa em si continua branco */
 }
 
 #mapa-minimizado {
     position: absolute; bottom: 25px; right: calc(44% + 15px); 
     width: 85px; height: 65px;
-    background: white; border: 2px solid #00713a;
+    background: white; border: 2px solid var(--mrv-verde);
     border-radius: 10px; z-index: 2000;
     box-shadow: -5px 5px 15px rgba(0,0,0,0.3);
 }
@@ -101,7 +106,7 @@ html, body {
     position: absolute; top: 10px; left: 28%;
     transform: translateX(-50%);
     font-size: 0.9rem; font-weight: bold;
-    color: #00713a; z-index: 1500;
+    color: var(--mrv-verde); z-index: 1500;
     background: rgba(255,255,255,0.9);
     padding: 5px 15px; border-radius: 20px;
 }
@@ -115,11 +120,12 @@ html, body {
     background: rgba(30, 30, 30, 0.96); backdrop-filter: blur(12px);
     color: white; padding: 15px 12px; z-index: 1000;
     overflow-y: auto;
+    border-left: 1px solid rgba(255,255,255,0.1);
 }
 
 #nome-imovel {
     color: #50c878; font-weight: 700; font-size: var(--ft-font-size);
-    border-bottom: 2px solid #00713a; padding-bottom: 8px;
+    border-bottom: 2px solid var(--mrv-verde); padding-bottom: 8px;
 }
 
 .container-acoes-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
@@ -139,7 +145,7 @@ html, body {
     border-radius: 4px; display: flex; justify-content: space-between; align-items: center;
 }
 
-.caixa-dado-mrv span { color: #00713a; font-weight: 800; font-size: 0.65rem; }
+.caixa-dado-mrv span { color: var(--mrv-verde); font-weight: 800; font-size: 0.65rem; }
 .caixa-dado-mrv b { color: #333; font-size: var(--ft-font-dados); }
 
 #container-vitrine-botoes { display: flex; flex-direction: column; gap: 3px; margin-bottom: 15px; }
