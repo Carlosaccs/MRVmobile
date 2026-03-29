@@ -246,18 +246,20 @@ function exibirDadosResidencial(info) {
                 </div>` : "";
         }
 
-       elDetalhes.innerHTML = `
-          <div style="margin-top: 0px; border-top: none; padding-top: 0px;">
-              <div style="font-size: 0.65rem; color: #ffffff; margin-bottom: 10px; font-weight: bold;">📍 ${info.endereco || "Não informado"}</div>
-              
-              <div style="display: flex; gap: 6px; margin-bottom: 12px;">
-                  <button onclick="window.open('${linkMaps}', '_blank')" style="width: 65px; height: 24px; padding: 0; background: #4285F4; color: white; border: none; border-radius: 4px; font-size: 0.58rem; font-weight: bold; cursor: pointer;">MAPS</button>
-                  <button onclick="copyToClipboard('${info.link}')" style="width: 65px; height: 24px; padding: 0; background: #444; color: white; border: none; border-radius: 4px; font-size: 0.58rem; font-weight: bold; cursor: pointer;">LINK</button>
-              </div>
-              
-              ${htmlDesc}
-              ${htmlMateriais}
-          </div>`;
+           elDetalhes.innerHTML = `
+               <div style="margin-top: 0px; border-top: none; padding-top: 0px;">
+                   <div style="font-size: 0.72rem; color: #ffffff; margin-bottom: 10px; font-weight: bold; line-height: 1.2;">
+                       📍 ${info.endereco || "Não informado"}
+                   </div>
+                   
+                   <div style="display: flex; gap: 6px; margin-bottom: 12px;">
+                       <button onclick="window.open('${linkMaps}', '_blank')" style="width: 65px; height: 26px; padding: 0; background: #4285F4; color: white; border: none; border-radius: 4px; font-size: 0.72rem; font-weight: 800; cursor: pointer;">MAPS</button>
+                       <button onclick="copyToClipboard('${info.link}')" style="width: 65px; height: 24px; padding: 0; background: #444; color: white; border: none; border-radius: 4px; font-size: 0.72rem; font-weight: 800; cursor: pointer;">LINK</button>
+                   </div>
+                   
+                   ${htmlDesc}
+                   ${htmlMateriais}
+               </div>`;
     }
 }
 
