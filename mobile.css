@@ -5,8 +5,7 @@ html, body {
     margin: 0; padding: 0; 
     width: 100%; height: 100%;
     overflow: hidden; 
-    /* Mudança: Fundo verde para evitar que frestas brancas pareçam linhas */
-    background: #00713a; 
+    background: #00713a; /* Agora o fundo é verde, eliminando a linha intrusa */
 }
 
 * { 
@@ -28,13 +27,11 @@ html, body {
 .faixa-verde-vertical {
     position: absolute; left: 0; top: 0;
     width: 60px; height: 100%;
-    background-color: var(--mrv-verde);
+    background-color: #00713a;
     display: flex; flex-direction: column;
     align-items: center; justify-content: space-between;
     padding: 15px 0; z-index: 4000;
-    /* Correção: Removida a sombra que criava a "segunda linha" */
-    box-shadow: none;
-    border-right: 1px solid rgba(255,255,255,0.05);
+    box-shadow: none; /* Sem sombra para não criar linhas falsas */
 }
 
 .titulo-vertical {
@@ -124,8 +121,10 @@ html, body {
 }
 
 #nome-imovel {
-    color: #50c878; font-weight: 700; font-size: var(--ft-font-size);
-    border-bottom: 2px solid var(--mrv-verde); padding-bottom: 8px;
+    color: #50c878; font-weight: 700; font-size: 0.85rem;
+    border-bottom: 2px solid #ffffff; /* LINHA BRANCA abaixo do título */
+    padding-bottom: 8px;
+    margin-bottom: 10px;
 }
 
 .container-acoes-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
@@ -152,4 +151,9 @@ html, body {
 
 #container-vitrine-botoes .menu-item-mrv {
     padding: 6px 8px 6px 12px !important; margin: 0 !important; font-size: 0.72rem !important; 
+}
+.divisor-materiais {
+    margin-top: 12px; 
+    border-top: 1px solid #ffffff; /* LINHA BRANCA acima dos materiais */
+    padding-top: 8px;
 }
