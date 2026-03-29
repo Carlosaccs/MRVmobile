@@ -1,5 +1,5 @@
 /* ==========================================================================
-   js v140.7.2 - COMPLETO
+   js v140.7.3 - CORREÇÃO ÍNDICE COLUNA Q
    ========================================================================== */
 
 /* ==========================================================================
@@ -58,7 +58,7 @@ function alternarFullscreen() {
 }
 
 /* ==========================================================================
-   BLOCO 3: GESTÃO DE DADOS (MAPEAMENTO COLUNA Q ATIVADO)
+   BLOCO 3: GESTÃO DE DADOS (COLUNA Q = ÍNDICE 16)
    ========================================================================== */
 async function carregarPlanilha() {
     try {
@@ -69,7 +69,7 @@ async function carregarPlanilha() {
 
         linhas.slice(1).forEach((linha) => {
             const c = linha.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
-            if (c.length >= 18) { 
+            if (c.length >= 17) { 
                 const limpar = (t) => t ? t.replace(/"/g, '').trim() : "";
                 window.dadosGerais.push({
                     id: limpar(c[0]).toLowerCase(),
@@ -78,8 +78,9 @@ async function carregarPlanilha() {
                     zona: limpar(c[3]).toUpperCase(),
                     nomeCurto: limpar(c[4]),
                     endereco: limpar(c[7]),
-                    destaqueCampanha: limpar(c[17]), // Coluna Q da planilha
-                    link: limpar(c[16]),
+                    // CORREÇÃO: Coluna Q é o índice 16 (A=0, B=1... Q=16)
+                    destaqueCampanha: limpar(c[16]), 
+                    link: limpar(c[16]), // Mantido conforme seu original, ajuste se necessário
                     descLonga: limpar(c[18]),
                     bookCliente: c[25] ? limpar(c[25]) : "",
                     bookCorretor: c[26] ? limpar(c[26]) : "",
@@ -194,7 +195,7 @@ function desenharMapa(dados, targetId, ehMinimizado) {
 }
 
 /* ==========================================================================
-   BLOCO 7: FICHA TÉCNICA INTELIGENTE
+   BLOCO 7: FICHA TÉCNICA
    ========================================================================= */
 function trocarMapas() { solicitarFullscreen(); limparSelecaoAnterior(); mapaAtivo = (mapaAtivo === "GSP") ? "INTERIOR" : "GSP"; atualizarVisualizacao(); }
 
@@ -215,7 +216,6 @@ function exibirDadosResidencial(info) {
     const linkMaps = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(info.endereco)}`;
     const isComplexo = info.categoria === "COMPLEXO";
 
-    // 1. PARTE COMUM
     let htmlContent = `
         <div style="margin-top: 0px;">
             <div style="font-size: 0.82rem; color: #ffffff; margin-bottom: 12px; font-weight: bold; line-height: 1.3;">
@@ -228,7 +228,6 @@ function exibirDadosResidencial(info) {
         </div>`;
 
     if (isComplexo) {
-        // --- LAYOUT COMPLEXO ---
         const criarCard = (titulo, link, icone) => {
             if (!link || link.length < 5) return "";
             return `
@@ -250,7 +249,6 @@ function exibirDadosResidencial(info) {
         htmlContent += htmlDesc + (cards ? `<div style="margin-top: 15px;"><div style="font-size: 0.6rem; color: #fff; font-weight: bold; text-transform: uppercase;">Materiais de Apoio</div>${cards}</div>` : "");
 
     } else {
-        // --- LAYOUT RESIDENCIAL (Caixa Branca + Grid Cinza) ---
         let htmlCaixaQ = (info.destaqueCampanha && info.destaqueCampanha.trim() !== "") ? `
             <div class="caixa-destaque-coluna-q">
                 <span>${info.destaqueCampanha}</span>
