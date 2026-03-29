@@ -47,7 +47,7 @@ function alternarFullscreen() {
 }
 
 /* ==========================================================================
-   BLOCO 3: GESTÃO DE DADOS (PLANILHA) - MAPEANDO COLUNA T
+   BLOCO 3: GESTÃO DE DADOS (PLANILHA) - ATUALIZADO PARA COLUNA T
    ========================================================================== */
 async function carregarPlanilha() {
     try {
@@ -77,7 +77,7 @@ async function carregarPlanilha() {
                     cPaulista: limpar(c[15]),
                     link: limpar(c[16]),
                     descLonga: limpar(c[18]),
-                    bookCliente: limpar(c[19]) // Capturando Coluna T (índice 19)
+                    bookCliente: c[19] ? limpar(c[19]) : "" // Coluna T (índice 19)
                 });
             }
         });
@@ -227,7 +227,7 @@ function desenharMapa(dados, targetId, ehMinimizado) {
 }
 
 /* ==========================================================================
-   BLOCO 7: NAVEGAÇÃO E FICHA TÉCNICA
+   BLOCO 7: NAVEGAÇÃO E FICHA TÉCNICA - COM MATERIAIS DE APOIO
    ========================================================================= */
 function trocarMapas() {
     solicitarFullscreen();
@@ -247,26 +247,42 @@ function exibirDadosResidencial(info) {
     const elNome = document.getElementById('nome-imovel');
     const elDetalhes = document.getElementById('detalhes-imovel');
     
-    if (elNome) {
-        elNome.innerText = (info.nomeCurto || "").toUpperCase();
-    }
+    if (elNome) elNome.innerText = (info.nomeCurto || "").toUpperCase();
     
     if (elDetalhes) {
         const linkMaps = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(info.endereco)}`;
         const linkCopia = info.link || "#";
         
-        // HTML da descrição (Coluna S)
-        const eComplexo = info.categoria === "COMPLEXO";
-        let htmlDescricao = (eComplexo && info.descLonga) ? `
+        // Descrição (Coluna S)
+        let htmlDescricao = (info.categoria === "COMPLEXO" && info.descLonga) ? `
             <div style="margin-top: 15px; border-top: 1px solid #444; padding-top: 10px; font-size: 0.68rem; color: #bbb; line-height: 1.4; text-align: justify;">
                 ${info.descLonga}
             </div>` : "";
 
-        // HTML do novo campo (Aparecerá no final)
-        let htmlMateriais = `
-            <div style="margin-top: 15px; border-top: 1px dashed #555; padding-top: 10px; color: yellow; font-size: 0.65rem; font-weight: bold;">
-                MATERIAIS DE APOIO (TESTE)
-            </div>`;
+        // Materiais de Apoio (Coluna T)
+        let htmlMateriais = "";
+        if (info.bookCliente && info.bookCliente !== "") {
+            htmlMateriais = `
+                <div style="margin-top: 20px; border-top: 1px solid #eee; padding-top: 12px;">
+                    <div style="font-size: 0.65rem; color: #888; font-weight: bold; margin-bottom: 8px; letter-spacing: 0.5px;">MATERIAIS DE APOIO</div>
+                    
+                    <div style="display: flex; align-items: center; background: #fff; border: 1px solid #ddd; border-radius: 8px; padding: 8px 12px; gap: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+                        <div style="font-size: 1.2rem;">📄</div>
+                        <div style="flex-grow: 1; font-size: 0.75rem; font-weight: 600; color: #444;">Book Cliente</div>
+                        
+                        <div style="display: flex; gap: 5px;">
+                            <button onclick="window.open('${info.bookCliente}', '_blank')" 
+                                    style="background: #00713a; color: white; border: none; border-radius: 4px; padding: 5px 12px; font-size: 0.65rem; font-weight: bold; cursor: pointer;">
+                                Abrir
+                            </button>
+                            <button onclick="copyToClipboard('${info.bookCliente}')" 
+                                    style="background: #ff8c00; color: white; border: none; border-radius: 4px; padding: 5px 12px; font-size: 0.65rem; font-weight: bold; cursor: pointer;">
+                                Copiar
+                            </button>
+                        </div>
+                    </div>
+                </div>`;
+        }
 
         elDetalhes.innerHTML = `
             <div style="margin-top: 10px; border-top: 1px solid #00713a; padding-top: 8px;">
@@ -331,6 +347,7 @@ function gerarMenuResidenciais() {
         lista.appendChild(li);
     });
 }
+
 /* ==========================================================================
    BLOCO 8: SISTEMA (MENU, CLIPBOARD E EVENTOS)
    ========================================================================== */
@@ -341,8 +358,8 @@ function toggleMenu() {
 }
 
 function copyToClipboard(text) {
-    if(!text || text === "#") return alert("Link não disponível");
-    navigator.clipboard.writeText(text).then(() => alert("Copiado!"));
+    if(!text || text === "#" || text === "") return alert("Link não disponível");
+    navigator.clipboard.writeText(text).then(() => alert("Copiado com sucesso!"));
 }
 
 window.onload = carregarPlanilha;
