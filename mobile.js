@@ -1,5 +1,5 @@
 /* ==========================================================================
-   js v140.7.6 - PADRONIZAÇÃO TOTAL 28px (Ficha, Vitrine e Menu)
+   js v140.7.8 - CONEXÃO REAL COM PLANILHA (COLUNAS J, M, K, L, G, N, P)
    ========================================================================== */
 
 /* ==========================================================================
@@ -17,7 +17,6 @@ const AJUSTES_MAPA = {
     INTERIOR: { marginRight: "50%", marginLeft: "-100px", scale: "1.15" }
 };
 
-// ALTURA PADRÃO UNIFICADA PARA TODO O PROJETO
 const ALTURA_PADRAO = "28px";
 
 /* ==========================================================================
@@ -52,7 +51,7 @@ function alternarFullscreen() {
 }
 
 /* ==========================================================================
-   BLOCO 3: GESTÃO DE DADOS (COLUNA Q = ÍNDICE 16)
+   BLOCO 3: GESTÃO DE DADOS (MAPEAMENTO DE COLUNAS)
    ========================================================================== */
 async function carregarPlanilha() {
     try {
@@ -77,7 +76,16 @@ async function carregarPlanilha() {
                     descLonga: limpar(c[18]),
                     bookCliente: c[25] ? limpar(c[25]) : "",
                     bookCorretor: c[26] ? limpar(c[26]) : "",
-                    videoDecorado: c[27] ? limpar(c[27]) : ""
+                    videoDecorado: c[27] ? limpar(c[27]) : "",
+                    
+                    // NOVOS CAMPOS CONECTADOS
+                    estoque: limpar(c[6]),     // Coluna G (índice 6)
+                    entrega: limpar(c[9]),     // Coluna J (índice 9)
+                    plantaMin: limpar(c[10]),  // Coluna K (índice 10)
+                    plantaMax: limpar(c[11]),  // Coluna L (índice 11)
+                    obra: limpar(c[12]),       // Coluna M (índice 12)
+                    limitador: limpar(c[13]),  // Coluna N (índice 13)
+                    cPaulista: limpar(c[15])   // Coluna P (índice 15)
                 });
             }
         });
@@ -135,8 +143,6 @@ function clicarNoMapa(pathElement, infoSelecionado, pDataRaw = null) {
                 const btn = document.createElement('div');
                 btn.className = 'menu-item-mrv';
                 btn.innerText = item.nomeCurto.toUpperCase();
-                
-                // Forçando altura padrão de 28px
                 btn.style.height = ALTURA_PADRAO;
                 btn.style.display = "flex";
                 btn.style.alignItems = "center";
@@ -205,7 +211,7 @@ function atualizarVisualizacao() {
 }
 
 /* ==========================================================================
-   BLOCO 7: FICHA TÉCNICA (PADRONIZAÇÃO 28px E GRID DE DADOS)
+   BLOCO 7: FICHA TÉCNICA (DADOS REAIS E FORMATAÇÃO)
    ========================================================================= */
 function exibirDadosResidencial(info) {
     const elNome = document.getElementById('nome-imovel');
@@ -213,7 +219,7 @@ function exibirDadosResidencial(info) {
     if (elNome) elNome.innerText = (info.nomeCurto || "").toUpperCase();
     if (!elDetalhes) return;
 
-    const linkMaps = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(info.endereco)}`;
+    const linkMaps = `http://maps.google.com/?q=${encodeURIComponent(info.endereco)}`;
     const isComplexo = info.categoria === "COMPLEXO";
 
     let htmlContent = `
@@ -244,24 +250,27 @@ function exibirDadosResidencial(info) {
         let cards = criarCard("Book Cliente", info.bookCliente, "📄") + criarCard("Book Corretor", info.bookCorretor, "💼") + criarCard("Vídeo Decorado", info.videoDecorado, "🎬");
         htmlContent += htmlDesc + (cards ? `<div style="margin-top: 5px;">${cards}</div>` : "");
     } else {
-        // RESIDENCIAL: Caixa de Campanha (Coluna Q)
         let htmlCaixaQ = (info.destaqueCampanha && info.destaqueCampanha.trim() !== "") ? `
             <div style="background: #fff; color: #e31c19; height: ${ALTURA_PADRAO}; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 0.75rem; border-radius: 4px; margin-bottom: 8px; text-transform: uppercase; padding: 0 5px; text-align: center;">
                 ${info.destaqueCampanha}
             </div>` : "";
 
-        // GRID DE 6 CAIXAS COM TÍTULOS E ESPAÇO PARA DADOS
+        // Função interna para criar as caixas com dados alinhados à direita e brancos
         const criarCaixaDado = (label, valor) => `
             <div style="background: #444; height: ${ALTURA_PADRAO}; border-radius: 4px; display: flex; align-items: center; justify-content: space-between; padding: 0 8px; box-sizing: border-box;">
                 <span style="color: #bbb; font-size: 0.55rem; font-weight: bold; text-transform: uppercase;">${label}</span>
-                <span style="color: #fff; font-size: 0.7rem; font-weight: bold;">${valor || "---"}</span>
+                <span style="color: #fff; font-size: 0.72rem; font-weight: bold; text-align: right; flex-grow: 1;">${valor || "---"}</span>
             </div>`;
+
+        // Formatações específicas pedidas
+        const textoObra = info.obra ? `${info.obra}%` : "---";
+        const textoPlantas = (info.plantaMin && info.plantaMax) ? `${info.plantaMin} ATÉ ${info.plantaMax}` : (info.plantaMin || "---");
 
         let htmlGrid6 = `
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
                 ${criarCaixaDado("ENTREGA", info.entrega)}
-                ${criarCaixaDado("OBRA", info.obra)}
-                ${criarCaixaDado("PLANTAS", info.plantas)}
+                ${criarCaixaDado("OBRA", textoObra)}
+                ${criarCaixaDado("PLANTAS", textoPlantas)}
                 ${criarCaixaDado("ESTOQUE", info.estoque)}
                 ${criarCaixaDado("LIMITADOR", info.limitador)}
                 ${criarCaixaDado("C. PAULISTA", info.cPaulista)}
@@ -285,7 +294,6 @@ function gerarMenuResidenciais() {
         li.className = 'menu-item-mrv';
         li.innerText = info.nomeCurto.toUpperCase();
         
-        // Padronização de altura no Menu Lateral
         li.style.height = ALTURA_PADRAO;
         li.style.display = "flex";
         li.style.alignItems = "center";
