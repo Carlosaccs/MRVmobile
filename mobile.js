@@ -263,28 +263,27 @@ function exibirDadosResidencial(info) {
         htmlContent += htmlDesc + htmlMateriais;
 
     } else {
-        // --- BLOCO PARA RESIDENCIAIS (Os novos espaços de dados) ---
-        // A Caixa Longa só aparece se houver dados (por enquanto simulando com Sete Sóis ou algum campo)
-        let htmlCaixaLonga = info.descLonga ? `
-            <div class="caixa-texto-longa-placeholder">
-                ${info.descLonga}
-            </div>` : "";
-
-        let htmlGrid6 = `
-            <div class="grid-6-caixas-placeholder">
-                <div class="caixa-pequena-placeholder">Dado 1</div>
-                <div class="caixa-pequena-placeholder">Dado 2</div>
-                <div class="caixa-pequena-placeholder">Dado 3</div>
-                <div class="caixa-pequena-placeholder">Dado 4</div>
-                <div class="caixa-pequena-placeholder">Dado 5</div>
-                <div class="caixa-pequena-placeholder">Dado 6</div>
-            </div>`;
-
-        htmlContent += htmlCaixaLonga + htmlGrid6;
-    }
-
-    // Aplica o resultado final
-    elDetalhes.innerHTML = htmlContent;
+       // A caixa só aparece se houver dados na Coluna Q (info.destaqueCampanha)
+       // Se estiver vazia, ela não ocupa espaço nenhum
+       let htmlCaixaQ = (info.destaqueCampanha && info.destaqueCampanha.trim() !== "") ? `
+           <div class="caixa-destaque-coluna-q">
+               <span>${info.destaqueCampanha}</span>
+           </div>` : "";
+   
+       let htmlGrid6 = `
+           <div class="grid-6-caixas-placeholder">
+               <div class="caixa-pequena-placeholder">Dado 1</div>
+               <div class="caixa-pequena-placeholder">Dado 2</div>
+               <div class="caixa-pequena-placeholder">Dado 3</div>
+               <div class="caixa-pequena-placeholder">Dado 4</div>
+               <div class="caixa-pequena-placeholder">Dado 5</div>
+               <div class="caixa-pequena-placeholder">Dado 6</div>
+           </div>`;
+   
+       htmlContent += htmlCaixaQ + htmlGrid6;
+   }
+       // Aplica o resultado final
+       elDetalhes.innerHTML = htmlContent;
 }
 
 
