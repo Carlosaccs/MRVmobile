@@ -116,7 +116,7 @@ function limparSelecaoAnterior() {
 }
 
 /* ==========================================================================
-   BLOCO 5: CLIQUE NO MAPA E VITRINE (28px)
+   BLOCO 5: CLIQUE NO MAPA E VITRINE (28px E ALINHAMENTO)
    ========================================================================== */
 function clicarNoMapa(pathElement, infoSelecionado, pDataRaw = null) {
     solicitarFullscreen();
@@ -143,22 +143,31 @@ function clicarNoMapa(pathElement, infoSelecionado, pDataRaw = null) {
                 const btn = document.createElement('div');
                 btn.className = 'menu-item-mrv';
                 btn.innerText = item.nomeCurto.toUpperCase();
+                
+                // NOVO DESIGN E ALINHAMENTO (4px e alinhamento total)
                 btn.style.height = ALTURA_PADRAO;
                 btn.style.display = "flex";
                 btn.style.alignItems = "center";
-                btn.style.padding = "0 10px";
+                btn.style.padding = "0 8px"; // Padding interno menor
                 btn.style.fontSize = "0.7rem";
+                btn.style.margin = "0"; // Zera as margens para alinhamento perfeito
                 btn.style.marginBottom = "4px";
+                btn.style.borderRadius = "4px"; // Mesmo arredondamento dos cinzas
+                btn.style.width = "100%"; // Ocupa todo o espaço para alinhar no fim
                 
                 const corZona = obterCorPorZona(item);
                 if (item.categoria === "COMPLEXO") {
                     btn.classList.add('estilo-complexo');
                     btn.style.backgroundColor = corZona;
                     btn.style.color = "#ffffff";
+                    btn.style.border = "none";
                 } else {
-                    btn.style.borderRight = `4px solid ${corZona}`;
                     btn.style.backgroundColor = "#ffffff";
                     btn.style.color = "#333";
+                    btn.style.border = "none";
+                    // TARJA LATERAL DIREITA (PRESERVADA)
+                    btn.style.borderRight = `4px solid ${corZona}`; 
+                    btn.style.borderRightColor = corZona; // Garante a cor
                 }
                 btn.onclick = (e) => { e.stopPropagation(); clicarNoMapa(pathElement, item, pDataRaw); };
                 containerBotoes.appendChild(btn);
@@ -305,7 +314,7 @@ function exibirDadosResidencial(info) {
 }
 
 /* ==========================================================================
-   BLOCO 8: MENU LATERAL E EVENTOS (28px)
+   BLOCO 8: MENU LATERAL E EVENTOS (PADRONIZAÇÃO DESIGN)
    ========================================================================== */
 function gerarMenuResidenciais() {
     const lista = document.getElementById('lista-residenciais');
@@ -317,13 +326,15 @@ function gerarMenuResidenciais() {
         li.className = 'menu-item-mrv';
         li.innerText = info.nomeCurto.toUpperCase();
         
+        // PADRONIZAÇÃO DESIGN NO MENU
         li.style.height = ALTURA_PADRAO;
         li.style.display = "flex";
         li.style.alignItems = "center";
-        li.style.padding = "0 10px";
+        li.style.padding = "0 8px";
         li.style.fontSize = "0.75rem";
         li.style.marginBottom = "4px";
-        li.style.borderRadius = "4px";
+        li.style.borderRadius = "4px"; // Mesmo arredondamento dos cinzas
+        li.style.border = "none"; // Remove bordas antigas
 
         const corZona = obterCorPorZona(info);
         if (info.categoria === "COMPLEXO") { 
@@ -333,6 +344,7 @@ function gerarMenuResidenciais() {
         } else { 
             li.style.backgroundColor = "#ffffff";
             li.style.color = "#333";
+            // TARJA LATERAL DIREITA (PRESERVADA)
             li.style.borderRight = `5px solid ${corZona}`; 
         }
         
