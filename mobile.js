@@ -65,7 +65,7 @@ async function carregarPlanilha() {
         const linhas = csv.split(/\r?\n/).filter(l => l.trim() !== "");
         window.dadosGerais = []; 
         linhas.slice(1).forEach((linha) => {
-            const c = linha.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+            const c = linha.split(/,(?=(?:(?:[^"]*"){2})*[^**"]*$)/);
             if (c.length >= 32) { 
                 const limpar = (t) => t ? t.replace(/"/g, '').trim() : "";
                 if (limpar(c[4]) !== "") {
@@ -80,15 +80,20 @@ async function carregarPlanilha() {
                         destaqueCampanha: limpar(c[16]), 
                         link: limpar(c[16]), 
                         descLonga: limpar(c[18]),
-                        bookCliente: limpar(c[25] || ""),
-                        bookCorretor: limpar(c[26] || ""),
-                        estandeVendas: limpar(c[31] || ""), 
                         obsImportante: limpar(c[19] || ""), 
                         localizacao: limpar(c[20] || ""),   
                         mobilidade: limpar(c[21] || ""),    
                         culturaLazer: limpar(c[22] || ""),  
                         comercio: limpar(c[23] || ""),      
-                        saudeEducacao: limpar(c[24] || ""), 
+                        saudeEducacao: limpar(c[24] || ""),
+                        bookCliente: limpar(c[25] || ""),
+                        bookCorretor: limpar(c[26] || ""),
+                        // NOVAS COLUNAS DE LISTAS DE LINKS:
+                        videosRaw: limpar(c[27] || ""),      // Coluna AB
+                        plantasRaw: limpar(c[28] || ""),     // Coluna AC
+                        locImplantaRaw: limpar(c[29] || ""), // Coluna AD
+                        diversosRaw: limpar(c[30] || ""),    // Coluna AE
+                        estandeVendas: limpar(c[31] || ""), 
                         estoque: limpar(c[6]), entrega: limpar(c[9]),     
                         plantaMin: limpar(c[10]), plantaMax: limpar(c[11]),  
                         obra: limpar(c[12]), limitador: limpar(c[13]), cPaulista: limpar(c[15])   
@@ -100,7 +105,6 @@ async function carregarPlanilha() {
         gerarMenuResidenciais(); 
     } catch (e) { console.error("Erro planilha:", e); }
 }
-
 /* --------------------------------------------------------------------------
    4. RENDERIZAÇÃO DA FICHA TÉCNICA (CONTEÚDO DINÂMICO)
    -------------------------------------------------------------------------- */
@@ -109,29 +113,41 @@ function exibirDadosResidencial(info) {
     const elDetalhes = document.getElementById('detalhes-imovel');
     if (elNome) elNome.innerText = info.nomeCurto.toUpperCase();
     
-    // FUNÇÃO DE SEGURANÇA: Limpa links do Google Drive para visualização protegida
     const tratarLinkDrive = (url) => {
         if (!url) return "#";
-        if (url.includes("drive.google.com")) {
-            // Substitui /view, /edit ou /usp=sharing por /preview (abre limpo)
-            return url.replace(/\/view.*|\/edit.*|\?usp=sharing/g, "") + "/preview";
+        const u = url.trim();
+        if (u.includes("drive.google.com")) {
+            return u.replace(/\/view.*|\/edit.*|\?usp=sharing/g, "") + "/preview";
         }
-        return url;
+        return u;
     };
 
-    // Função auxiliar para cards de links (Books, etc)
     const criarCardLink = (titulo, link, icone) => {
         if (!link || link.length < 5) return "";
         const linkSeguro = tratarLinkDrive(link);
         return `
         <div style="display:flex; align-items:center; background:#fff; border-radius:4px; padding:0 10px; gap:8px; margin-top:6px; height:${ALTURA_PADRAO};">
             <span style="font-size:0.9rem;">${icone}</span>
-            <div style="flex-grow:1; font-size:0.75rem; font-weight:bold; color:#333;">${titulo.toUpperCase()}</div>
+            <div style="flex-grow:1; font-size:0.75rem; font-weight:bold; color:#333; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${titulo.toUpperCase()}</div>
             <div style="display:flex; gap:4px;">
                 <button onclick="window.open('${linkSeguro}','_blank')" style="background:#00713a; color:#fff; border:none; border-radius:4px; padding:0 8px; height:20px; font-size:0.55rem; font-weight:bold; cursor:pointer;">ABRIR</button>
                 <button onclick="copyToClipboard('${linkSeguro}')" style="background:#666; color:#fff; border:none; border-radius:4px; padding:0 8px; height:20px; font-size:0.55rem; font-weight:bold; cursor:pointer;">COPIAR</button>
             </div>
         </div>`;
+    };
+
+    // Função para processar colunas com múltiplos links (Título, Link; Título, Link)
+    const processarListaLinks = (rawString, icone) => {
+        if (!rawString || !rawString.includes(",")) return "";
+        let cards = "";
+        const itens = rawString.split(";");
+        itens.forEach(item => {
+            const partes = item.split(",");
+            if (partes.length >= 2) {
+                cards += criarCardLink(partes[0].trim(), partes[1].trim(), icone);
+            }
+        });
+        return cards;
     };
 
     const linkM = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(info.endereco)}`;
@@ -147,7 +163,7 @@ function exibirDadosResidencial(info) {
         html += criarCardLink("Book Cliente", info.bookCliente, "📄");
         html += criarCardLink("Book Corretor", info.bookCorretor, "💼");
     } else {
-        // --- RESIDENCIAL COMUM ---
+        // --- RESIDENCIAL ---
         const camp = (info.destaqueCampanha) ? `<div style="background:#fff; color:#e31c19; height:${ALTURA_PADRAO}; display:flex; align-items:center; justify-content:center; font-weight:900; font-size:0.75rem; border-radius:4px; margin-bottom:8px;">${info.destaqueCampanha.toUpperCase()}</div>` : "";
         const pTxt = (info.plantaMin && info.plantaMax) ? `${info.plantaMin} até ${info.plantaMax} m²` : (info.plantaMin || "---");
         let eH = ""; const eN = parseInt(info.estoque);
@@ -177,7 +193,6 @@ function exibirDadosResidencial(info) {
             </div>`;
         }
 
-        // CARDS DE TEXTO
         const criarCardTexto = (titulo, texto, corBorda) => {
             if (!texto || texto.length < 3) return "";
             return `
@@ -194,7 +209,13 @@ function exibirDadosResidencial(info) {
         html += criarCardTexto("🛒 Comércio", info.comercio, "#7b1fa2");
         html += criarCardTexto("🏥 Saúde e Educação", info.saudeEducacao, "#0054a6");
 
-        // LINKS DE BOOKS (Com COPIAR e proteção de Drive)
+        // PROCESSAMENTO DAS NOVAS LISTAS DE LINKS
+        html += processarListaLinks(info.videosRaw, "🎬");
+        html += processarListaLinks(info.plantasRaw, "📐");
+        html += processarListaLinks(info.locImplantaRaw, "🏢");
+        html += processarListaLinks(info.diversosRaw, "🔗");
+
+        // BOOKS FINAIS
         html += criarCardLink("Book Cliente", info.bookCliente, "📄");
         html += criarCardLink("Book Corretor", info.bookCorretor, "💼");
     }
