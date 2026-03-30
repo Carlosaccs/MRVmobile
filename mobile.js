@@ -1,5 +1,5 @@
 /* ==========================================================================
-   js v140.8.2 - VERSÃO INTEGRAL: FIX FULLSCREEN E MERGULHO DO MENU
+   js v140.8.3 - LARGURA DO MENU -20% E NAVEGAÇÃO SEM RECOLHER
    ========================================================================== */
 
 /* ==========================================================================
@@ -20,7 +20,7 @@ const AJUSTES_MAPA = {
 const ALTURA_PADRAO = "28px";
 
 /* ==========================================================================
-   BLOCO 2: AUXILIARES E FULLSCREEN (COM CORREÇÃO DE ÍCONE DEFINITIVA)
+   BLOCO 2: AUXILIARES E FULLSCREEN (ÍCONE SINCRONIZADO)
    ========================================================================== */
 function obterCorPorZona(info) {
     const z = info.zona ? info.zona.trim().toUpperCase() : "";
@@ -36,7 +36,6 @@ function obterCorPorZona(info) {
 function atualizarIconeFullscreen() {
     const btn = document.getElementById('btn-fullscreen');
     if (!btn) return;
-    // Verifica todos os estados possíveis de tela cheia no navegador
     const isFull = !!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement);
     
     btn.innerHTML = isFull ? `
@@ -48,7 +47,6 @@ function atualizarIconeFullscreen() {
         </svg>`;
 }
 
-// Escutadores globais: O ícone muda sozinho sempre que a tela mudar de tamanho
 document.addEventListener('fullscreenchange', atualizarIconeFullscreen);
 document.addEventListener('webkitfullscreenchange', atualizarIconeFullscreen);
 
@@ -136,7 +134,7 @@ function limparSelecaoAnterior() {
 }
 
 /* ==========================================================================
-   BLOCO 5: CLIQUE NO MAPA E VITRINE (COM AJUSTE DE MERGULHO)
+   BLOCO 5: CLIQUE NO MAPA E VITRINE (MERGULHO AJUSTADO)
    ========================================================================== */
 function clicarNoMapa(pathElement, infoSelecionado, pDataRaw = null) {
     solicitarFullscreen();
@@ -166,8 +164,6 @@ function clicarNoMapa(pathElement, infoSelecionado, pDataRaw = null) {
                 btn.style.height = ALTURA_PADRAO;
                 btn.style.display = "flex";
                 btn.style.alignItems = "center";
-                
-                // AJUSTE DE MERGULHO
                 btn.style.marginLeft = "-10px"; 
                 btn.style.paddingLeft = "25px"; 
                 btn.style.width = "calc(100% + 10px)";
@@ -238,7 +234,7 @@ function atualizarVisualizacao() {
 }
 
 /* ==========================================================================
-   BLOCO 7: FICHA TÉCNICA (COMPLEXO + RESIDENCIAL + PREÇOS)
+   BLOCO 7: FICHA TÉCNICA
    ========================================================================= */
 function exibirDadosResidencial(info) {
     const elNome = document.getElementById('nome-imovel');
@@ -341,11 +337,16 @@ function exibirDadosResidencial(info) {
 }
 
 /* ==========================================================================
-   BLOCO 8: MENU LATERAL E EVENTOS
+   BLOCO 8: MENU LATERAL (LARGURA -20% E PERSISTÊNCIA NO CLIQUE)
    ========================================================================== */
 function gerarMenuResidenciais() {
+    const menuEl = document.getElementById('menu-lateral');
     const lista = document.getElementById('lista-residenciais');
     if (!lista) return;
+
+    // REDUÇÃO DE LARGURA DO MENU EM 20%
+    if(menuEl) menuEl.style.width = "200px"; // Ajuste o valor fixo conforme seu layout base era 250px
+
     lista.innerHTML = ""; 
     lista.style.overflowX = "hidden";
 
@@ -358,13 +359,12 @@ function gerarMenuResidenciais() {
         li.style.display = "flex";
         li.style.alignItems = "center";
         
-        // AJUSTE DE MERGULHO NO MENU
         li.style.marginLeft = "-10px";
         li.style.paddingLeft = "25px";
         li.style.width = "calc(100% + 10px)";
         li.style.boxSizing = "border-box";
 
-        li.style.fontSize = "0.75rem";
+        li.style.fontSize = "0.7rem"; // Fonte um pouco menor para caber na largura reduzida
         li.style.marginBottom = "4px";
         li.style.borderRadius = "4px";
 
@@ -381,7 +381,7 @@ function gerarMenuResidenciais() {
         
         li.onclick = (e) => { 
             e.stopPropagation(); 
-            toggleMenu(); 
+            // toggleMenu(); REMOVIDO PARA O MENU NÃO RECOLHER AO TOCAR NO BOTÃO
             let p = document.getElementById(info.id); 
             if (!p) { 
                 trocarMapas(); 
