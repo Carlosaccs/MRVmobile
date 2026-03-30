@@ -1,5 +1,5 @@
 /* ==========================================================================
-   js v140.9.9 - FIX: TOPO POR REGIÃO + ESTOQUE + PLANTAS (K até L)
+   js v141.0.1 - RESTAURAÇÃO COMPLETA: FIX COMPLEXOS, PREÇOS E FULLSCREEN
    ========================================================================== */
 
 const svgNS = "http://www.w3.org/2000/svg";
@@ -28,15 +28,6 @@ function obterNomeZona(sigla) {
     }
 }
 
-/* --- FULLSCREEN --- */
-function atualizarIconeFullscreen() {
-    const btn = document.getElementById('btn-fullscreen');
-    if (!btn) return;
-    const isFull = !!(document.fullscreenElement || document.webkitFullscreenElement);
-    btn.innerHTML = isFull ? `<svg viewBox="0 0 24 24" width="24" height="24" fill="white"><path d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z"/></svg>` : `<svg viewBox="0 0 24 24" width="24" height="24" fill="white"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>`;
-}
-document.addEventListener('fullscreenchange', atualizarIconeFullscreen);
-
 function solicitarFullscreen() {
     const elem = document.documentElement;
     if (!document.fullscreenElement && !document.webkitFullscreenElement) {
@@ -64,14 +55,13 @@ async function carregarPlanilha() {
             const c = linha.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
             if (c.length >= 17) { 
                 const limpar = (t) => t ? t.replace(/"/g, '').trim() : "";
-                const nomeRes = limpar(c[4]);
-                if (nomeRes !== "") {
+                if (limpar(c[4]) !== "") {
                     window.dadosGerais.push({
                         id: limpar(c[0]).toLowerCase(),
                         categoria: limpar(c[1]).toUpperCase(),
                         ordem: parseInt(limpar(c[2])) || 9999,
                         zona: limpar(c[3]).toUpperCase(),
-                        nomeCurto: nomeRes,
+                        nomeCurto: limpar(c[4]),
                         endereco: limpar(c[7]),
                         precosRaw: limpar(c[8]),
                         destaqueCampanha: limpar(c[16]), 
@@ -79,13 +69,9 @@ async function carregarPlanilha() {
                         descLonga: limpar(c[18]),
                         bookCliente: limpar(c[25] || ""),
                         bookCorretor: limpar(c[26] || ""),
-                        estoque: limpar(c[6]),     
-                        entrega: limpar(c[9]),     
-                        plantaMin: limpar(c[10]),  
-                        plantaMax: limpar(c[11]),  
-                        obra: limpar(c[12]),       
-                        limitador: limpar(c[13]),  
-                        cPaulista: limpar(c[15])   
+                        estoque: limpar(c[6]), entrega: limpar(c[9]),     
+                        plantaMin: limpar(c[10]), plantaMax: limpar(c[11]),  
+                        obra: limpar(c[12]), limitador: limpar(c[13]), cPaulista: limpar(c[15])   
                     });
                 }
             }
@@ -97,17 +83,26 @@ async function carregarPlanilha() {
 
 function atualizarTextoTopo(nome) {
     const indicador = document.getElementById('identificador-cidade');
-    if (indicador) {
-        indicador.innerText = nome ? nome.toUpperCase() : (mapaAtivo === "GSP" ? "GRANDE SP" : "ESTADO DE SP");
-    }
+    if (indicador) indicador.innerText = nome ? nome.toUpperCase() : (mapaAtivo === "GSP" ? "GRANDE SP" : "ESTADO DE SP");
 }
 
 /* --- CLIQUE MAPA --- */
 function clicarNoMapa(pathElement, infoSelecionado, pDataRaw = null) {
     solicitarFullscreen();
+    const ehVerde = pathElement.getAttribute('data-cor-base') === "#00713a";
     const nomePath = pDataRaw ? pDataRaw.name : pathElement.getAttribute('data-name');
-    
-    // Define o nome da Região/Cidade no topo (nunca o nome do residencial)
+
+    // Se clicar em cinza sem item selecionado, só mostra nome e volta
+    if (!ehVerde && !infoSelecionado) {
+        atualizarTextoTopo(nomePath);
+        pathElement.style.fill = "#FF4500";
+        setTimeout(() => { 
+            pathElement.style.fill = pathElement.getAttribute('data-cor-base');
+            atualizarTextoTopo(regiaoAtivaGeral); 
+        }, 1000);
+        return;
+    }
+
     regiaoAtivaGeral = nomePath;
     atualizarTextoTopo(regiaoAtivaGeral);
 
@@ -130,15 +125,10 @@ function clicarNoMapa(pathElement, infoSelecionado, pDataRaw = null) {
             if (item.nomeCurto !== (ativo ? ativo.nomeCurto : "")) {
                 const btn = document.createElement('div');
                 btn.className = 'menu-item-mrv';
-                const corZona = (item.zona === "ZO") ? "#ff8c00" : (item.zona === "ZL") ? "#e31c19" : (item.zona === "ZN") ? "#0054a6" : (item.zona === "ZS") ? "#d1147e" : "#00713a";
-                btn.innerHTML = `<span>${item.nomeCurto.toUpperCase()}</span><span style="opacity: 0.7; font-size: 0.6rem;">${obterNomeZona(item.zona)}</span>`;
-                btn.style.cssText = `height:${ALTURA_PADRAO}; display:flex; align-items:center; justify-content:space-between; padding:0 10px; font-size:0.7rem; margin-bottom:4px; border-radius:4px; cursor:pointer;`;
-                
-                if (item.categoria === "COMPLEXO") {
-                    btn.style.backgroundColor = corZona; btn.style.color = "#fff";
-                } else {
-                    btn.style.backgroundColor = "#fff"; btn.style.color = "#333"; btn.style.borderRight = `4px solid ${corZona}`;
-                }
+                const corZ = (item.zona === "ZO") ? "#ff8c00" : (item.zona === "ZL") ? "#e31c19" : (item.zona === "ZN") ? "#0054a6" : (item.zona === "ZS") ? "#d1147e" : "#00713a";
+                btn.innerHTML = `<span>${item.nomeCurto.toUpperCase()}</span><span style="opacity:0.7; font-size:0.6rem;">${obterNomeZona(item.zona)}</span>`;
+                btn.style.cssText = `height:${ALTURA_PADRAO}; display:flex; align-items:center; justify-content:space-between; padding:0 10px; font-size:0.7rem; margin-bottom:4px; border-radius:4px; cursor:pointer; background:#fff; color:#333; border-right:4px solid ${corZ};`;
+                if (item.categoria === "COMPLEXO") { btn.style.backgroundColor = corZ; btn.style.color = "#fff"; }
                 btn.onclick = (e) => { e.stopPropagation(); clicarNoMapa(pathElement, item, pDataRaw); };
                 containerBotoes.appendChild(btn);
             }
@@ -153,40 +143,32 @@ function exibirDadosResidencial(info) {
     const elDetalhes = document.getElementById('detalhes-imovel');
     if (elNome) elNome.innerText = info.nomeCurto.toUpperCase();
     
-    // Plantas K + L
-    const plantasTxt = (info.plantaMin && info.plantaMax) ? `${info.plantaMin} até ${info.plantaMax}` : (info.plantaMin || "---");
-    
-    // Lógica Estoque
-    let estHtml = "";
-    const eVal = info.estoque ? info.estoque.trim() : "";
-    const eNum = parseInt(eVal);
-    if (eVal === "" || eVal === null) estHtml = "---";
-    else if (eVal === "-") estHtml = "CONSULTAR";
-    else if (eNum === 0) estHtml = `<span style="text-decoration:line-through; color:#bbb;">VENDIDO</span>`;
-    else if (eNum < 5) estHtml = `<span style="color:#e31c19;">APENAS ${eNum} UN.</span>`;
-    else estHtml = `RESTAM ${eNum} UN.`;
-
-    const criarCaixa = (label, valor) => `<div style="background:#444; height:${ALTURA_PADRAO}; border-radius:4px; display:flex; align-items:center; justify-content:space-between; padding:0 8px;"><span style="color:#bbb; font-size:0.55rem; font-weight:bold;">${label}</span><span style="color:#fff; font-size:0.72rem; font-weight:bold;">${valor}</span></div>`;
-
-    let htmlMain = `
+    const linkM = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(info.endereco)}`;
+    let html = `
         <div style="font-size:0.82rem; color:#fff; margin-bottom:12px; font-weight:bold;">📍 ${info.endereco}</div>
         <div style="display:flex; gap:8px; margin-bottom:15px;">
-            <button onclick="window.open('https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(info.endereco)}','_blank')" style="width:70px; height:${ALTURA_PADRAO}; background:#4285F4; color:#fff; border:none; border-radius:4px; font-weight:800; cursor:pointer; font-size:0.7rem;">MAPS</button>
+            <button onclick="window.open('${linkM}','_blank')" style="width:70px; height:${ALTURA_PADRAO}; background:#4285F4; color:#fff; border:none; border-radius:4px; font-weight:800; cursor:pointer; font-size:0.7rem;">MAPS</button>
             <button onclick="copyToClipboard('${info.link}')" style="width:70px; height:${ALTURA_PADRAO}; background:#444; color:#fff; border:none; border-radius:4px; font-weight:800; cursor:pointer; font-size:0.7rem;">LINK</button>
         </div>`;
 
-    if (info.categoria !== "COMPLEXO") {
+    if (info.categoria === "COMPLEXO") {
+        const criarCard = (tit, lk, ico) => (!lk || lk.length < 5) ? "" : `<div style="display:flex; align-items:center; background:#fff; border-radius:4px; padding:0 10px; gap:8px; margin-top:6px; height:${ALTURA_PADRAO};"><span style="font-size:0.9rem;">${ico}</span><div style="flex-grow:1; font-size:0.75rem; font-weight:bold; color:#333;">${tit.toUpperCase()}</div><button onclick="window.open('${lk}','_blank')" style="background:#00713a; color:#fff; border:none; border-radius:4px; padding:0 8px; height:20px; font-size:0.6rem; font-weight:bold; cursor:pointer;">ABRIR</button></div>`;
+        html += (info.descLonga ? `<div style="font-size:0.82rem; color:#eee; margin-bottom:10px;">${info.descLonga}</div>` : "") + criarCard("Book Cliente", info.bookCliente, "📄") + criarCard("Book Corretor", info.bookCorretor, "💼");
+    } else {
         const camp = (info.destaqueCampanha) ? `<div style="background:#fff; color:#e31c19; height:${ALTURA_PADRAO}; display:flex; align-items:center; justify-content:center; font-weight:900; font-size:0.75rem; border-radius:4px; margin-bottom:8px;">${info.destaqueCampanha.toUpperCase()}</div>` : "";
-        htmlMain += camp + `<div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-bottom:8px;">
-            ${criarCaixa("ENTREGA", info.entrega || "---")}
-            ${criarCaixa("OBRA", info.obra ? info.obra+'%' : '---')}
-            ${criarCaixa("PLANTAS", plantasTxt)}
-            ${criarCaixa("ESTOQUE", estHtml)}
-            ${criarCaixa("LIMITADOR", info.limitador || "---")}
-            ${criarCaixa("C. PAULISTA", info.cPaulista || "---")}
-        </div>`;
+        const pTxt = (info.plantaMin && info.plantaMax) ? `${info.plantaMin} até ${info.plantaMax}` : (info.plantaMin || "---");
+        let eH = ""; const eN = parseInt(info.estoque);
+        if (!info.estoque) eH = "---"; else if (info.estoque === "-") eH = "CONSULTAR"; else if (eN === 0) eH = `<span style="text-decoration:line-through; color:#bbb;">VENDIDO</span>`; else if (eN < 5) eH = `<span style="color:#e31c19;">APENAS ${eN} UN.</span>`; else eH = `RESTAM ${eN} UN.`;
+
+        const cax = (l, v) => `<div style="background:#444; height:${ALTURA_PADRAO}; border-radius:4px; display:flex; align-items:center; justify-content:space-between; padding:0 8px;"><span style="color:#bbb; font-size:0.55rem; font-weight:bold;">${l}</span><span style="color:#fff; font-size:0.72rem; font-weight:bold;">${v}</span></div>`;
+        html += camp + `<div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-bottom:8px;">${cax("ENTREGA", info.entrega || "---")}${cax("OBRA", info.obra ? info.obra+'%' : '---')}${cax("PLANTAS", pTxt)}${cax("ESTOQUE", eH)}${cax("LIMITADOR", info.limitador || "---")}${cax("C. PAULISTA", info.cPaulista || "---")}</div>`;
+
+        if (info.precosRaw && info.precosRaw.includes(";")) {
+            let pL = ""; info.precosRaw.split(";").slice(1).forEach(l => { const d = l.split(","); if (d.length >= 4) pL += `<div style="display:grid; grid-template-columns:0.5fr 1.2fr 1fr 1fr; gap:4px; padding:6px 0; border-top:1px solid #555;"><span style="color:#fff; font-weight:800; font-size:0.7rem;">${d[0]}</span><span style="background:#ff8c00; color:#fff; font-weight:800; font-size:0.7rem; text-align:center; border-radius:2px;">${d[1]}</span><span style="color:#bbb; font-size:0.6rem; text-align:right;">${d[2]}</span><span style="color:#bbb; font-size:0.6rem; text-align:right;">${d[3]}</span></div>`; });
+            html += `<div style="background:#444; border-radius:4px; padding:8px;"><div style="display:grid; grid-template-columns:0.5fr 1.2fr 1fr 1fr; gap:4px; margin-bottom:4px; font-size:0.5rem; color:#bbb; font-weight:bold;"><span>TIPO</span><span style="text-align:center;">MENOR PREÇO</span><span style="text-align:right;">AVAL.</span><span style="text-align:right;">B. PAG.</span></div>${pL}</div>`;
+        }
     }
-    elDetalhes.innerHTML = htmlMain;
+    elDetalhes.innerHTML = html;
 }
 
 /* --- SISTEMA --- */
@@ -219,6 +201,7 @@ function desenharMapa(dados, targetId, ehMin) {
 }
 
 function trocarMapas() {
+    solicitarFullscreen();
     mapaAtivo = (mapaAtivo === "GSP") ? "INTERIOR" : "GSP";
     regiaoAtivaGeral = null;
     atualizarVisualizacao();
@@ -239,16 +222,15 @@ function gerarMenuResidenciais() {
     [...window.dadosGerais].sort((a,b)=>a.ordem-b.ordem).forEach(info => {
         const li = document.createElement('li');
         li.className = 'menu-item-mrv';
-        const corZona = (info.zona === "ZO") ? "#ff8c00" : (info.zona === "ZL") ? "#e31c19" : (info.zona === "ZN") ? "#0054a6" : (info.zona === "ZS") ? "#d1147e" : "#00713a";
+        const corZ = (info.zona === "ZO") ? "#ff8c00" : (info.zona === "ZL") ? "#e31c19" : (info.zona === "ZN") ? "#0054a6" : (info.zona === "ZS") ? "#d1147e" : "#00713a";
         li.innerHTML = `<span>${info.nomeCurto.toUpperCase()}</span><span style="opacity:0.7; font-size:0.6rem;">${obterNomeZona(info.zona)}</span>`;
-        li.style.cssText = `height:${ALTURA_PADRAO}; display:flex; align-items:center; justify-content:space-between; padding-left:25px; width:calc(100% + 10px); font-size:0.75rem; margin-bottom:4px; border-radius:4px; cursor:pointer; margin-left:-10px;`;
-        if (info.categoria === "COMPLEXO") { li.style.backgroundColor = corZona; li.style.color = "#fff"; }
-        else { li.style.backgroundColor = "#fff"; li.style.color = "#333"; li.style.borderRight = `5px solid ${corZona}`; }
-        
+        li.style.cssText = `height:${ALTURA_PADRAO}; display:flex; align-items:center; justify-content:space-between; padding-left:25px; width:calc(100% + 10px); font-size:0.75rem; margin-bottom:4px; border-radius:4px; cursor:pointer; margin-left:-10px; background:#fff; color:#333; border-right:5px solid ${corZ};`;
+        if (info.categoria === "COMPLEXO") { li.style.backgroundColor = corZ; li.style.color = "#fff"; }
         li.onclick = (e) => {
             e.stopPropagation();
+            solicitarFullscreen();
             let p = document.getElementById(info.id);
-            if (!p) { trocarMapas(); setTimeout(() => { let np = document.getElementById(info.id); if(np) clicarNoMapa(np, info); }, 350); }
+            if (!p) { trocarMapas(); setTimeout(() => { let np = document.getElementById(info.id); if(np) clicarNoMapa(np, info); }, 400); }
             else clicarNoMapa(p, info);
         };
         lista.appendChild(li);
@@ -256,6 +238,7 @@ function gerarMenuResidenciais() {
 }
 
 function toggleMenu() { 
+    solicitarFullscreen();
     const m = document.getElementById('menu-lateral'); 
     if(m) { m.classList.toggle('menu-aberto'); m.classList.toggle('menu-oculto'); } 
 }
