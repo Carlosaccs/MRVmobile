@@ -1,5 +1,5 @@
 /* ==========================================================================
-   js v140.9.2 - FIX: TEMPO 1s + RESTAURAÇÃO DO FORCED FULLSCREEN
+   js v140.9.3 - FIX: PRIORIDADE DO NOME DA REGIÃO NO TOQUE DO MAPA
    ========================================================================== */
 
 const svgNS = "http://www.w3.org/2000/svg";
@@ -16,7 +16,7 @@ const AJUSTES_MAPA = {
 
 const ALTURA_PADRAO = "28px";
 
-/* --- FULLSCREEN (RESTAURADO) --- */
+/* --- FULLSCREEN --- */
 function atualizarIconeFullscreen() {
     const btn = document.getElementById('btn-fullscreen');
     if (!btn) return;
@@ -109,18 +109,20 @@ function atualizarTextoTopo(nome) {
 
 /* --- CLIQUE MAPA --- */
 function clicarNoMapa(pathElement, infoSelecionado, pDataRaw = null) {
-    solicitarFullscreen(); // Força o fullscreen ao interagir com o mapa
+    solicitarFullscreen();
     const ehVerde = pathElement.getAttribute('data-cor-base') === "#00713a";
-    const nomeLocal = pDataRaw ? pDataRaw.name : pathElement.getAttribute('data-name');
+    const nomeRegiao = pDataRaw ? pDataRaw.name : pathElement.getAttribute('data-name');
 
+    // CASO CINZA (SEM LANÇAMENTO)
     if (!ehVerde && !infoSelecionado) {
-        atualizarTextoTopo(nomeLocal);
+        atualizarTextoTopo(nomeRegiao);
         setTimeout(() => {
             atualizarTextoTopo(residencialAtivoGeral ? residencialAtivoGeral.nomeCurto : null);
-        }, 1000); // Reduzido para 1 segundo
+        }, 1000); 
         return; 
     }
 
+    // CASO VERDE (COM LANÇAMENTO)
     document.querySelectorAll('#mapa-container path').forEach(p => { 
         p.setAttribute('data-selecionado', 'false'); 
         p.style.fill = p.getAttribute('data-cor-base'); 
@@ -131,15 +133,25 @@ function clicarNoMapa(pathElement, infoSelecionado, pDataRaw = null) {
     
     const idRegiao = pathElement.id.replace('mini-', '').toLowerCase();
     const todosDestaRegiao = window.dadosGerais.filter(d => d.id === idRegiao).sort((a, b) => a.ordem - b.ordem);
-    const ativo = infoSelecionado || todosDestaRegiao[0];
     
+    // Define o ativo: se veio de um clique em botão (infoSelecionado) ou se é o primeiro da lista
+    const ativo = infoSelecionado || todosDestaRegiao[0];
     residencialAtivoGeral = ativo;
-    atualizarTextoTopo(ativo ? ativo.nomeCurto : nomeLocal);
+
+    // LÓGICA DO TEXTO TOPO: 
+    // Se clicou direto no mapa (infoSelecionado é null), mostra nome da REGIÃO
+    // Se clicou num botão da vitrine ou menu (infoSelecionado existe), mostra nome do RESIDENCIAL
+    if (infoSelecionado) {
+        atualizarTextoTopo(ativo.nomeCurto);
+    } else {
+        atualizarTextoTopo(nomeRegiao);
+    }
 
     const containerBotoes = document.getElementById('container-vitrine-botoes');
     if(containerBotoes) {
         containerBotoes.innerHTML = "";
         todosDestaRegiao.forEach(item => {
+            // Só mostra na vitrine os que NÃO são o ativo atual
             if (item.nomeCurto && item.nomeCurto !== (ativo ? ativo.nomeCurto : "")) {
                 const btn = document.createElement('div');
                 btn.className = 'menu-item-mrv';
