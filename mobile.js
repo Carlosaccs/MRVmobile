@@ -1,5 +1,5 @@
 /* ==========================================================================
-   js v141.0.2 - FIX: DESTAQUE RÁPIDO (800ms) + CINZA ESCURO EM ÁREAS OFF
+   js v141.0.3 - VERSÃO ESTÁVEL: FIX ÍCONE FULLSCREEN + DESTAQUE RÁPIDO
    ========================================================================== */
 
 const svgNS = "http://www.w3.org/2000/svg";
@@ -28,6 +28,17 @@ function obterNomeZona(sigla) {
     }
 }
 
+/* --- FULLSCREEN LOGIC --- */
+function renderizarIconeFullscreen() {
+    const btn = document.getElementById('btn-fullscreen');
+    if (!btn) return;
+    const estaFull = document.fullscreenElement || document.webkitFullscreenElement;
+    // Troca o ícone: se estiver full, mostra o ícone de reduzir, se não, mostra o de ampliar
+    btn.innerHTML = estaFull 
+        ? '<svg viewBox="0 0 24 24" width="20" height="20" fill="white"><path d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z"/></svg>'
+        : '<svg viewBox="0 0 24 24" width="20" height="20" fill="white"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>';
+}
+
 function solicitarFullscreen() {
     const elem = document.documentElement;
     if (!document.fullscreenElement && !document.webkitFullscreenElement) {
@@ -43,6 +54,10 @@ function alternarFullscreen() {
         else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
     }
 }
+
+// Ouvinte de evento para capturar a mudança de estado da tela e atualizar o ícone
+document.addEventListener('fullscreenchange', renderizarIconeFullscreen);
+document.addEventListener('webkitfullscreenchange', renderizarIconeFullscreen);
 
 /* --- DADOS --- */
 async function carregarPlanilha() {
@@ -92,20 +107,17 @@ function clicarNoMapa(pathElement, infoSelecionado, pDataRaw = null) {
     const ehVerde = pathElement.getAttribute('data-cor-base') === "#00713a";
     const nomePath = pDataRaw ? pDataRaw.name : pathElement.getAttribute('data-name');
 
-    // REGRA PARA PATHS CINZA (SEM EMPREENDIMENTO)
     if (!ehVerde && !infoSelecionado) {
         atualizarTextoTopo(nomePath);
         const corOriginal = pathElement.getAttribute('data-cor-base');
-        pathElement.style.fill = "#666666"; // DESTAQUE CINZA ESCURO
-        
+        pathElement.style.fill = "#666666"; 
         setTimeout(() => { 
             pathElement.style.fill = corOriginal;
-            atualizarTextoTopo(regiaoAtivaGeral); // RETORNA PARA A REGIÃO VERDE ATIVA
-        }, 800); // 0.8 SEGUNDOS
+            atualizarTextoTopo(regiaoAtivaGeral); 
+        }, 800); 
         return;
     }
 
-    // REGRA PARA PATHS VERDE (COM EMPREENDIMENTO)
     regiaoAtivaGeral = nomePath;
     atualizarTextoTopo(regiaoAtivaGeral);
 
@@ -248,7 +260,11 @@ function toggleMenu() {
 
 function copyToClipboard(t) { if(!t || t==="#") return alert("Link indisponível"); navigator.clipboard.writeText(t).then(()=>alert("Copiado!")); }
 
-window.onload = carregarPlanilha;
+window.onload = () => {
+    carregarPlanilha();
+    renderizarIconeFullscreen();
+};
+
 document.addEventListener('click', (e) => {
     if (e.target.closest('#btn-menu')) toggleMenu();
     if (e.target.closest('#btn-fullscreen')) alternarFullscreen();
