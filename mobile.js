@@ -109,6 +109,20 @@ function exibirDadosResidencial(info) {
     const elDetalhes = document.getElementById('detalhes-imovel');
     if (elNome) elNome.innerText = info.nomeCurto.toUpperCase();
     
+    // Função auxiliar para cards de links (Books, etc)
+    const criarCardLink = (titulo, link, icone) => {
+        if (!link || link.length < 5) return "";
+        return `
+        <div style="display:flex; align-items:center; background:#fff; border-radius:4px; padding:0 10px; gap:8px; margin-top:6px; height:${ALTURA_PADRAO};">
+            <span style="font-size:0.9rem;">${icone}</span>
+            <div style="flex-grow:1; font-size:0.75rem; font-weight:bold; color:#333;">${titulo.toUpperCase()}</div>
+            <div style="display:flex; gap:4px;">
+                <button onclick="window.open('${link}','_blank')" style="background:#00713a; color:#fff; border:none; border-radius:4px; padding:0 8px; height:20px; font-size:0.55rem; font-weight:bold; cursor:pointer;">ABRIR</button>
+                <button onclick="copyToClipboard('${link}')" style="background:#666; color:#fff; border:none; border-radius:4px; padding:0 8px; height:20px; font-size:0.55rem; font-weight:bold; cursor:pointer;">URL</button>
+            </div>
+        </div>`;
+    };
+
     const linkM = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(info.endereco)}`;
     let html = `
         <div style="font-size:0.82rem; color:#fff; margin-bottom:12px; font-weight:bold;">📍 ${info.endereco}</div>
@@ -118,10 +132,11 @@ function exibirDadosResidencial(info) {
         </div>`;
 
     if (info.categoria === "COMPLEXO") {
-        const criarCardB = (tit, lk, ico) => (!lk || lk.length < 5) ? "" : `<div style="display:flex; align-items:center; background:#fff; border-radius:4px; padding:0 10px; gap:8px; margin-top:6px; height:${ALTURA_PADRAO};"><span style="font-size:0.9rem;">${ico}</span><div style="flex-grow:1; font-size:0.75rem; font-weight:bold; color:#333;">${tit.toUpperCase()}</div><button onclick="window.open('${lk}','_blank')" style="background:#00713a; color:#fff; border:none; border-radius:4px; padding:0 8px; height:20px; font-size:0.6rem; font-weight:bold; cursor:pointer;">ABRIR</button></div>`;
-        html += (info.descLonga ? `<div style="font-size:0.82rem; color:#eee; margin-bottom:10px;">${info.descLonga}</div>` : "") + criarCardB("Book Cliente", info.bookCliente, "📄") + criarCardB("Book Corretor", info.bookCorretor, "💼");
+        html += (info.descLonga ? `<div style="font-size:0.82rem; color:#eee; margin-bottom:10px;">${info.descLonga}</div>` : "");
+        html += criarCardLink("Book Cliente", info.bookCliente, "📄");
+        html += criarCardLink("Book Corretor", info.bookCorretor, "💼");
     } else {
-        // --- RESIDENCIAL ---
+        // --- RESIDENCIAL COMUM ---
         const camp = (info.destaqueCampanha) ? `<div style="background:#fff; color:#e31c19; height:${ALTURA_PADRAO}; display:flex; align-items:center; justify-content:center; font-weight:900; font-size:0.75rem; border-radius:4px; margin-bottom:8px;">${info.destaqueCampanha.toUpperCase()}</div>` : "";
         const pTxt = (info.plantaMin && info.plantaMax) ? `${info.plantaMin} até ${info.plantaMax} m²` : (info.plantaMin || "---");
         let eH = ""; const eN = parseInt(info.estoque);
@@ -135,7 +150,7 @@ function exibirDadosResidencial(info) {
             html += `<div style="background:#444; border-radius:4px; padding:8px;"><div style="display:grid; grid-template-columns:0.5fr 1.2fr 1fr 1fr; gap:4px; margin-bottom:4px; font-size:0.5rem; color:#bbb; font-weight:bold;"><span>TIPO</span><span style="text-align:center;">MENOR PREÇO</span><span style="text-align:right;">AVAL.</span><span style="text-align:right;">B. PAG.</span></div>${pL}</div>`;
         }
 
-        // 1º LUGAR: ESTANDE DE VENDAS
+        // ESTANDE DE VENDAS
         if (info.estandeVendas && info.estandeVendas.length > 5) {
             const linkE = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(info.estandeVendas)}`;
             html += `
@@ -151,6 +166,7 @@ function exibirDadosResidencial(info) {
             </div>`;
         }
 
+        // CARDS DE TEXTO
         const criarCardTexto = (titulo, texto, corBorda) => {
             if (!texto || texto.length < 3) return "";
             return `
@@ -160,13 +176,16 @@ function exibirDadosResidencial(info) {
             </div>`;
         };
 
-        // DEMAIS CARDS NA SEQUÊNCIA
         html += criarCardTexto("⚠️ Observação Importante", info.obsImportante, "#e31c19");
         html += criarCardTexto("📍 Localização", info.localizacao, "#4285F4");
         html += criarCardTexto("🚲 Mobilidade", info.mobilidade, "#ff8c00");
         html += criarCardTexto("🎭 Cultura e Lazer", info.culturaLazer, "#d1147e");
         html += criarCardTexto("🛒 Comércio", info.comercio, "#7b1fa2");
         html += criarCardTexto("🏥 Saúde e Educação", info.saudeEducacao, "#0054a6");
+
+        // NOVOS LINKS PADRONIZADOS (Aparecem no final do residencial)
+        html += criarCardLink("Book Cliente", info.bookCliente, "📄");
+        html += criarCardLink("Book Corretor", info.bookCorretor, "💼");
     }
     elDetalhes.innerHTML = html;
 }
