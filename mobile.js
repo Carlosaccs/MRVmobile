@@ -1,5 +1,5 @@
 /* ==========================================================================
-   js v140.9.5 - UPDATE: MENU COM NOME POR EXTENSO DA ZONA
+   js v140.9.6 - UPDATE: ALINHAMENTO DA ZONA À DIREITA (SPACE-BETWEEN)
    ========================================================================== */
 
 const svgNS = "http://www.w3.org/2000/svg";
@@ -16,7 +16,6 @@ const AJUSTES_MAPA = {
 
 const ALTURA_PADRAO = "28px";
 
-/* --- AUXILIAR: TRADUTOR DE ZONA --- */
 function obterNomeZona(sigla) {
     const s = sigla ? sigla.trim().toUpperCase() : "";
     switch(s) {
@@ -144,11 +143,8 @@ function clicarNoMapa(pathElement, infoSelecionado, pDataRaw = null) {
     const todosDestaRegiao = window.dadosGerais.filter(d => d.id === idRegiao).sort((a, b) => a.ordem - b.ordem);
     const ativo = infoSelecionado || todosDestaRegiao[0];
 
-    if (infoSelecionado) {
-        regiaoAtivaGeral = ativo.nomeCurto;
-    } else {
-        regiaoAtivaGeral = nomeDestaRegiao;
-    }
+    if (infoSelecionado) regiaoAtivaGeral = ativo.nomeCurto;
+    else regiaoAtivaGeral = nomeDestaRegiao;
     
     atualizarTextoTopo(regiaoAtivaGeral);
 
@@ -160,13 +156,14 @@ function clicarNoMapa(pathElement, infoSelecionado, pDataRaw = null) {
                 const btn = document.createElement('div');
                 btn.className = 'menu-item-mrv';
                 
-                // NOME + ZONA NO TÍTULO (VITRINE)
                 const nomeZona = obterNomeZona(item.zona);
-                btn.innerText = item.nomeCurto.toUpperCase() + (nomeZona ? ` - ${nomeZona}` : "");
+                // HTML INTERNO PARA ALINHAMENTO
+                btn.innerHTML = `<span>${item.nomeCurto.toUpperCase()}</span><span style="opacity: 0.7; font-size: 0.6rem; margin-right: 8px;">${nomeZona}</span>`;
                 
                 btn.style.height = ALTURA_PADRAO;
                 btn.style.display = "flex";
                 btn.style.alignItems = "center";
+                btn.style.justifyContent = "space-between"; // Mágica do alinhamento
                 btn.style.paddingLeft = "10px";
                 btn.style.width = "100%";
                 btn.style.fontSize = "0.7rem";
@@ -346,13 +343,14 @@ function gerarMenuResidenciais() {
         const li = document.createElement('li');
         li.className = 'menu-item-mrv';
         
-        // NOME + ZONA NO TÍTULO (MENU LATERAL)
         const nomeZona = obterNomeZona(info.zona);
-        li.innerText = info.nomeCurto.toUpperCase() + (nomeZona ? ` - ${nomeZona}` : "");
+        // HTML INTERNO PARA ALINHAMENTO
+        li.innerHTML = `<span>${info.nomeCurto.toUpperCase()}</span><span style="opacity: 0.7; font-size: 0.6rem; margin-right: 12px;">${nomeZona}</span>`;
 
         li.style.height = ALTURA_PADRAO;
         li.style.display = "flex";
         li.style.alignItems = "center";
+        li.style.justifyContent = "space-between"; // Mágica do alinhamento
         li.style.marginLeft = "-10px";
         li.style.paddingLeft = "25px";
         li.style.width = "calc(100% + 10px)";
