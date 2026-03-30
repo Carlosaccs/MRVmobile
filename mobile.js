@@ -1,5 +1,5 @@
 /* ==========================================================================
-   js v140.9.6 - UPDATE: ALINHAMENTO DA ZONA À DIREITA (SPACE-BETWEEN)
+   js v140.9.7 - FIX: REMOÇÃO DE REGISTROS VAZIOS NO MENU
    ========================================================================== */
 
 const svgNS = "http://www.w3.org/2000/svg";
@@ -74,28 +74,33 @@ async function carregarPlanilha() {
             const c = linha.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
             if (c.length >= 17) { 
                 const limpar = (t) => t ? t.replace(/"/g, '').trim() : "";
-                window.dadosGerais.push({
-                    id: limpar(c[0]).toLowerCase(),
-                    categoria: limpar(c[1]).toUpperCase(),
-                    ordem: parseInt(limpar(c[2])) || 9999,
-                    zona: limpar(c[3]).toUpperCase(),
-                    nomeCurto: limpar(c[4]),
-                    endereco: limpar(c[7]),
-                    precosRaw: limpar(c[8]),
-                    destaqueCampanha: limpar(c[16]), 
-                    link: limpar(c[16]), 
-                    descLonga: limpar(c[18]),
-                    bookCliente: c[25] ? limpar(c[25]) : "",
-                    bookCorretor: c[26] ? limpar(c[26]) : "",
-                    videoDecorado: c[27] ? limpar(c[27]) : "",
-                    estoque: limpar(c[6]),     
-                    entrega: limpar(c[9]),     
-                    plantaMin: limpar(c[10]),  
-                    plantaMax: limpar(c[11]),  
-                    obra: limpar(c[12]),       
-                    limitador: limpar(c[13]),  
-                    cPaulista: limpar(c[15])   
-                });
+                const nomeResidencial = limpar(c[4]);
+                
+                // Só adiciona se o nome do residencial não estiver vazio
+                if (nomeResidencial !== "") {
+                    window.dadosGerais.push({
+                        id: limpar(c[0]).toLowerCase(),
+                        categoria: limpar(c[1]).toUpperCase(),
+                        ordem: parseInt(limpar(c[2])) || 9999,
+                        zona: limpar(c[3]).toUpperCase(),
+                        nomeCurto: nomeResidencial,
+                        endereco: limpar(c[7]),
+                        precosRaw: limpar(c[8]),
+                        destaqueCampanha: limpar(c[16]), 
+                        link: limpar(c[16]), 
+                        descLonga: limpar(c[18]),
+                        bookCliente: c[25] ? limpar(c[25]) : "",
+                        bookCorretor: c[26] ? limpar(c[26]) : "",
+                        videoDecorado: c[27] ? limpar(c[27]) : "",
+                        estoque: limpar(c[6]),     
+                        entrega: limpar(c[9]),     
+                        plantaMin: limpar(c[10]),  
+                        plantaMax: limpar(c[11]),  
+                        obra: limpar(c[12]),       
+                        limitador: limpar(c[13]),  
+                        cPaulista: limpar(c[15])   
+                    });
+                }
             }
         });
         atualizarVisualizacao();
@@ -157,13 +162,12 @@ function clicarNoMapa(pathElement, infoSelecionado, pDataRaw = null) {
                 btn.className = 'menu-item-mrv';
                 
                 const nomeZona = obterNomeZona(item.zona);
-                // HTML INTERNO PARA ALINHAMENTO
                 btn.innerHTML = `<span>${item.nomeCurto.toUpperCase()}</span><span style="opacity: 0.7; font-size: 0.6rem; margin-right: 8px;">${nomeZona}</span>`;
                 
                 btn.style.height = ALTURA_PADRAO;
                 btn.style.display = "flex";
                 btn.style.alignItems = "center";
-                btn.style.justifyContent = "space-between"; // Mágica do alinhamento
+                btn.style.justifyContent = "space-between"; 
                 btn.style.paddingLeft = "10px";
                 btn.style.width = "100%";
                 btn.style.fontSize = "0.7rem";
@@ -340,17 +344,18 @@ function gerarMenuResidenciais() {
     if (!lista) return;
     lista.innerHTML = ""; 
     [...window.dadosGerais].sort((a, b) => a.ordem - b.ordem).forEach(info => {
+        if (!info.nomeCurto) return; // Segurança extra aqui também
+        
         const li = document.createElement('li');
         li.className = 'menu-item-mrv';
         
         const nomeZona = obterNomeZona(info.zona);
-        // HTML INTERNO PARA ALINHAMENTO
         li.innerHTML = `<span>${info.nomeCurto.toUpperCase()}</span><span style="opacity: 0.7; font-size: 0.6rem; margin-right: 12px;">${nomeZona}</span>`;
 
         li.style.height = ALTURA_PADRAO;
         li.style.display = "flex";
         li.style.alignItems = "center";
-        li.style.justifyContent = "space-between"; // Mágica do alinhamento
+        li.style.justifyContent = "space-between"; 
         li.style.marginLeft = "-10px";
         li.style.paddingLeft = "25px";
         li.style.width = "calc(100% + 10px)";
