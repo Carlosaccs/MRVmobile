@@ -66,7 +66,7 @@ async function carregarPlanilha() {
         window.dadosGerais = []; 
         linhas.slice(1).forEach((linha) => {
             const c = linha.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
-            if (c.length >= 32) { // AF é o índice 31
+            if (c.length >= 32) { 
                 const limpar = (t) => t ? t.replace(/"/g, '').trim() : "";
                 if (limpar(c[4]) !== "") {
                     window.dadosGerais.push({
@@ -83,6 +83,14 @@ async function carregarPlanilha() {
                         bookCliente: limpar(c[25] || ""),
                         bookCorretor: limpar(c[26] || ""),
                         estandeVendas: limpar(c[31] || ""), 
+                        // NOVOS CAMPOS ABAIXO:
+                        obsImportante: limpar(c[19] || ""), // Coluna T
+                        localizacao: limpar(c[20] || ""),   // Coluna U
+                        mobilidade: limpar(c[21] || ""),    // Coluna V
+                        culturaLazer: limpar(c[22] || ""),  // Coluna W
+                        comercio: limpar(c[23] || ""),      // Coluna X
+                        saudeEducacao: limpar(c[24] || ""), // Coluna Y
+                        
                         estoque: limpar(c[6]), entrega: limpar(c[9]),     
                         plantaMin: limpar(c[10]), plantaMax: limpar(c[11]),  
                         obra: limpar(c[12]), limitador: limpar(c[13]), cPaulista: limpar(c[15])   
@@ -112,31 +120,46 @@ function exibirDadosResidencial(info) {
         </div>`;
 
     if (info.categoria === "COMPLEXO") {
-        const criarCard = (tit, lk, ico) => (!lk || lk.length < 5) ? "" : `<div style="display:flex; align-items:center; background:#fff; border-radius:4px; padding:0 10px; gap:8px; margin-top:6px; height:${ALTURA_PADRAO};"><span style="font-size:0.9rem;">${ico}</span><div style="flex-grow:1; font-size:0.75rem; font-weight:bold; color:#333;">${tit.toUpperCase()}</div><button onclick="window.open('${lk}','_blank')" style="background:#00713a; color:#fff; border:none; border-radius:4px; padding:0 8px; height:20px; font-size:0.6rem; font-weight:bold; cursor:pointer;">ABRIR</button></div>`;
-        html += (info.descLonga ? `<div style="font-size:0.82rem; color:#eee; margin-bottom:10px;">${info.descLonga}</div>` : "") + criarCard("Book Cliente", info.bookCliente, "📄") + criarCard("Book Corretor", info.bookCorretor, "💼");
+        const criarCardB = (tit, lk, ico) => (!lk || lk.length < 5) ? "" : `<div style="display:flex; align-items:center; background:#fff; border-radius:4px; padding:0 10px; gap:8px; margin-top:6px; height:${ALTURA_PADRAO};"><span style="font-size:0.9rem;">${ico}</span><div style="flex-grow:1; font-size:0.75rem; font-weight:bold; color:#333;">${tit.toUpperCase()}</div><button onclick="window.open('${lk}','_blank')" style="background:#00713a; color:#fff; border:none; border-radius:4px; padding:0 8px; height:20px; font-size:0.6rem; font-weight:bold; cursor:pointer;">ABRIR</button></div>`;
+        html += (info.descLonga ? `<div style="font-size:0.82rem; color:#eee; margin-bottom:10px;">${info.descLonga}</div>` : "") + criarCardB("Book Cliente", info.bookCliente, "📄") + criarCardB("Book Corretor", info.bookCorretor, "💼");
     } else {
-        // --- PARTE RESIDENCIAL ---
+        // --- RESIDENCIAL ---
         const camp = (info.destaqueCampanha) ? `<div style="background:#fff; color:#e31c19; height:${ALTURA_PADRAO}; display:flex; align-items:center; justify-content:center; font-weight:900; font-size:0.75rem; border-radius:4px; margin-bottom:8px;">${info.destaqueCampanha.toUpperCase()}</div>` : "";
         const pTxt = (info.plantaMin && info.plantaMax) ? `${info.plantaMin} até ${info.plantaMax} m²` : (info.plantaMin || "---");
-        
         let eH = ""; const eN = parseInt(info.estoque);
         if (!info.estoque) eH = "---"; else if (info.estoque === "-") eH = "CONSULTAR"; else if (eN === 0) eH = `<span style="text-decoration:line-through; color:#bbb;">VENDIDO</span>`; else if (eN < 5) eH = `<span style="color:#e31c19;">APENAS ${eN} UN.</span>`; else eH = `RESTAM ${eN} UN.`;
 
         const cax = (l, v) => `<div style="background:#444; height:${ALTURA_PADRAO}; border-radius:4px; display:flex; align-items:center; justify-content:space-between; padding:0 8px;"><span style="color:#bbb; font-size:0.55rem; font-weight:bold;">${l}</span><span style="color:#fff; font-size:0.72rem; font-weight:bold;">${v}</span></div>`;
-        
         html += camp + `<div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-bottom:8px;">${cax("ENTREGA", info.entrega || "---")}${cax("OBRA", info.obra ? info.obra+'%' : '---')}${cax("PLANTAS", pTxt)}${cax("ESTOQUE", eH)}${cax("LIMITADOR", info.limitador || "---")}${cax("C. PAULISTA", info.cPaulista || "---")}</div>`;
 
-        // Tabela de Preços
         if (info.precosRaw && info.precosRaw.includes(";")) {
             let pL = ""; info.precosRaw.split(";").slice(1).forEach(l => { const d = l.split(","); if (d.length >= 4) pL += `<div style="display:grid; grid-template-columns:0.5fr 1.2fr 1fr 1fr; gap:4px; padding:6px 0; border-top:1px solid #555;"><span style="color:#fff; font-weight:800; font-size:0.7rem;">${d[0]}</span><span style="background:#ff8c00; color:#fff; font-weight:800; font-size:0.7rem; text-align:center; border-radius:2px;">${d[1]}</span><span style="color:#bbb; font-size:0.6rem; text-align:right;">${d[2]}</span><span style="color:#bbb; font-size:0.6rem; text-align:right;">${d[3]}</span></div>`; });
             html += `<div style="background:#444; border-radius:4px; padding:8px;"><div style="display:grid; grid-template-columns:0.5fr 1.2fr 1fr 1fr; gap:4px; margin-bottom:4px; font-size:0.5rem; color:#bbb; font-weight:bold;"><span>TIPO</span><span style="text-align:center;">MENOR PREÇO</span><span style="text-align:right;">AVAL.</span><span style="text-align:right;">B. PAG.</span></div>${pL}</div>`;
         }
 
-        // --- NOVO: CARD ESTANDE DE VENDAS COM BOTÃO COPIAR ---
+        // Função auxiliar para criar cards de texto simples
+        const criarCardTexto = (titulo, texto, corBorda) => {
+            if (!texto || texto.length < 3) return "";
+            return `
+            <div style="margin-top:10px; border-radius:6px; overflow:hidden; border-left:4px solid ${corBorda}; background:#333;">
+                <div style="background:#ddd; padding:4px 10px;"><span style="font-size:0.65rem; font-weight:900; color:#222;">${titulo.toUpperCase()}</span></div>
+                <div style="padding:10px; color:#fff; font-size:0.75rem; line-height:1.3;">${texto.toUpperCase()}</div>
+            </div>`;
+        };
+
+        // Renderizando os novos campos
+        html += criarCardTexto("⚠️ Observação Importante", info.obsImportante, "#e31c19");
+        html += criarCardTexto("📍 Localização", info.localizacao, "#4285F4");
+        html += criarCardTexto("🚲 Mobilidade", info.mobilidade, "#ff8c00");
+        html += criarCardTexto("🎭 Cultura e Lazer", info.culturaLazer, "#d1147e");
+        html += criarCardTexto("🛒 Comércio", info.comercio, "#7b1fa2");
+        html += criarCardTexto("🏥 Saúde e Educação", info.saudeEducacao, "#0054a6");
+
+        // Estande de Vendas (Mantendo com botões)
         if (info.estandeVendas && info.estandeVendas.length > 5) {
             const linkE = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(info.estandeVendas)}`;
             html += `
-            <div style="margin-top:15px; border-radius:6px; overflow:hidden; border-left:4px solid #00713a; background:#333;">
+            <div style="margin-top:10px; border-radius:6px; overflow:hidden; border-left:4px solid #00713a; background:#333;">
                 <div style="background:#ddd; padding:4px 10px;"><span style="font-size:0.65rem; font-weight:900; color:#222;">📍 ESTANDE DE VENDAS</span></div>
                 <div style="padding:10px; display:flex; align-items:flex-start; justify-content:space-between; gap:10px;">
                     <div style="color:#fff; font-size:0.75rem; line-height:1.2; flex-grow:1;">${info.estandeVendas.toUpperCase()}</div>
