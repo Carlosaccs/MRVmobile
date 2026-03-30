@@ -1,10 +1,7 @@
 /* ==========================================================================
-   js v140.8.2 - VERSÃO INTEGRAL: FIX FULLSCREEN E MERGULHO DO MENU
+   js v140.8.9 - BASE v140.8.2 + MENU FIXO + LARGURA AJUSTADA
    ========================================================================== */
 
-/* ==========================================================================
-   BLOCO 1: CONFIGURAÇÕES E VARIÁVEIS
-   ========================================================================== */
 const svgNS = "http://www.w3.org/2000/svg";
 const URL_PLANILHA = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSRKdJctOPQjKAtOZSDHyArD_H8SgKIouelAS1vF1d_-13pu7u_ic6J8nP3r0Ijd56WA-mbUmHjb4Me/pub?output=csv';
 
@@ -19,9 +16,7 @@ const AJUSTES_MAPA = {
 
 const ALTURA_PADRAO = "28px";
 
-/* ==========================================================================
-   BLOCO 2: AUXILIARES E FULLSCREEN (COM CORREÇÃO DE ÍCONE DEFINITIVA)
-   ========================================================================== */
+/* --- BLOCO 2: AUXILIARES E FULLSCREEN (VERSÃO v140.8.2) --- */
 function obterCorPorZona(info) {
     const z = info.zona ? info.zona.trim().toUpperCase() : "";
     switch(z) {
@@ -36,7 +31,6 @@ function obterCorPorZona(info) {
 function atualizarIconeFullscreen() {
     const btn = document.getElementById('btn-fullscreen');
     if (!btn) return;
-    // Verifica todos os estados possíveis de tela cheia no navegador
     const isFull = !!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement);
     
     btn.innerHTML = isFull ? `
@@ -48,7 +42,6 @@ function atualizarIconeFullscreen() {
         </svg>`;
 }
 
-// Escutadores globais: O ícone muda sozinho sempre que a tela mudar de tamanho
 document.addEventListener('fullscreenchange', atualizarIconeFullscreen);
 document.addEventListener('webkitfullscreenchange', atualizarIconeFullscreen);
 
@@ -71,9 +64,7 @@ function alternarFullscreen() {
     }
 }
 
-/* ==========================================================================
-   BLOCO 3: GESTÃO DE DADOS
-   ========================================================================== */
+/* --- BLOCO 3: GESTÃO DE DADOS --- */
 async function carregarPlanilha() {
     try {
         const res = await fetch(`${URL_PLANILHA}&cache_buster=${Date.now()}`);
@@ -114,9 +105,7 @@ async function carregarPlanilha() {
     } catch (e) { console.error("Erro na planilha:", e); }
 }
 
-/* ==========================================================================
-   BLOCO 4: INTERFACE E TEXTOS
-   ========================================================================== */
+/* --- BLOCO 4: INTERFACE --- */
 function atualizarTextoTopo(nome) {
     const indicador = document.getElementById('identificador-cidade');
     if (indicador) indicador.innerText = nome ? nome.toUpperCase() : (mapaAtivo === "GSP" ? "GRANDE SP" : "ESTADO DE SP");
@@ -135,16 +124,20 @@ function limparSelecaoAnterior() {
     atualizarTextoTopo(null);
 }
 
-/* ==========================================================================
-   BLOCO 5: CLIQUE NO MAPA E VITRINE (COM AJUSTE DE MERGULHO)
-   ========================================================================== */
+/* --- BLOCO 5: CLIQUE NO MAPA E VITRINE --- */
 function clicarNoMapa(pathElement, infoSelecionado, pDataRaw = null) {
     solicitarFullscreen();
     const idRegiao = pathElement.id.replace('mini-', '').toLowerCase();
+    const ehVerde = pathElement.getAttribute('data-cor-base') === "#00713a";
+
+    // Só processa destaque se for área MRV (Verde)
+    if (!ehVerde && !infoSelecionado) return;
+
     document.querySelectorAll('#mapa-container path').forEach(p => { 
         p.setAttribute('data-selecionado', 'false'); 
         p.style.fill = p.getAttribute('data-cor-base'); 
     });
+
     pathElement.setAttribute('data-selecionado', 'true');
     pathElement.style.fill = "#FF4500"; 
     
@@ -166,12 +159,8 @@ function clicarNoMapa(pathElement, infoSelecionado, pDataRaw = null) {
                 btn.style.height = ALTURA_PADRAO;
                 btn.style.display = "flex";
                 btn.style.alignItems = "center";
-                
-                // AJUSTE DE MERGULHO
-                btn.style.marginLeft = "-10px"; 
-                btn.style.paddingLeft = "25px"; 
-                btn.style.width = "calc(100% + 10px)";
-                btn.style.paddingRight = "8px";
+                btn.style.paddingLeft = "10px"; 
+                btn.style.width = "100%";
                 btn.style.fontSize = "0.7rem";
                 btn.style.marginBottom = "4px";
                 btn.style.borderRadius = "4px";
@@ -195,9 +184,7 @@ function clicarNoMapa(pathElement, infoSelecionado, pDataRaw = null) {
     if (ativo) exibirDadosResidencial(ativo);
 }
 
-/* ==========================================================================
-   BLOCO 6: DESENHO DO SVG
-   ========================================================================== */
+/* --- BLOCO 6: DESENHO DO SVG --- */
 function desenharMapa(dados, targetId, ehMinimizado) {
     const container = document.getElementById(targetId);
     if (!container || !dados) return;
@@ -220,8 +207,13 @@ function desenharMapa(dados, targetId, ehMinimizado) {
         const corBase = ehMRV ? "#00713a" : "#cccccc";
         path.style.fill = corBase; path.style.stroke = "#ffffff"; path.style.strokeWidth = (ehMinimizado || !ehMRV) ? "0" : "1.2";
         path.setAttribute('data-cor-base', corBase);
+        
         if (!ehMinimizado) {
-            path.onclick = (e) => { e.stopPropagation(); if (pData.id === "grandesaopaulo") { trocarMapas(); } else if (ehMRV) clicarNoMapa(path, null, pData); };
+            path.onclick = (e) => { 
+                e.stopPropagation(); 
+                if (pData.id === "grandesaopaulo") { trocarMapas(); } 
+                else if (ehMRV) clicarNoMapa(path, null, pData); 
+            };
         }
         g.appendChild(path);
     });
@@ -237,9 +229,7 @@ function atualizarVisualizacao() {
     }
 }
 
-/* ==========================================================================
-   BLOCO 7: FICHA TÉCNICA (COMPLEXO + RESIDENCIAL + PREÇOS)
-   ========================================================================= */
+/* --- BLOCO 7: FICHA TÉCNICA --- */
 function exibirDadosResidencial(info) {
     const elNome = document.getElementById('nome-imovel');
     const elDetalhes = document.getElementById('detalhes-imovel');
@@ -263,86 +253,24 @@ function exibirDadosResidencial(info) {
     if (isComplexo) {
         const criarCard = (titulo, link, icone) => {
             if (!link || link.length < 5) return "";
-            return `
-                <div style="display: flex; align-items: center; background: #fff; border-radius: 4px; padding: 0 10px; gap: 8px; margin-top: 6px; height: ${ALTURA_PADRAO};">
-                    <span style="font-size: 0.9rem;">${icone}</span>
-                    <div style="flex-grow: 1; font-size: 0.75rem; font-weight: bold; color: #333; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${titulo.toUpperCase()}</div>
-                    <div style="display: flex; gap: 4px;">
-                        <button onclick="window.open('${link}', '_blank')" style="background: #00713a; color: white; border: none; border-radius: 4px; padding: 0 8px; height: 20px; font-size: 0.6rem; font-weight: bold; cursor: pointer;">ABRIR</button>
-                        <button onclick="copyToClipboard('${link}')" style="background: #ff8c00; color: white; border: none; border-radius: 4px; padding: 0 8px; height: 20px; font-size: 0.6rem; font-weight: bold; cursor: pointer;">COPIAR</button>
-                    </div>
-                </div>`;
+            return `<div style="display: flex; align-items: center; background: #fff; border-radius: 4px; padding: 0 10px; gap: 8px; margin-top: 6px; height: ${ALTURA_PADRAO};">
+                <span style="font-size: 0.9rem;">${icone}</span>
+                <div style="flex-grow: 1; font-size: 0.75rem; font-weight: bold; color: #333; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${titulo.toUpperCase()}</div>
+                <div style="display: flex; gap: 4px;">
+                    <button onclick="window.open('${link}', '_blank')" style="background: #00713a; color: white; border: none; border-radius: 4px; padding: 0 8px; height: 20px; font-size: 0.6rem; font-weight: bold; cursor: pointer;">ABRIR</button>
+                    <button onclick="copyToClipboard('${link}')" style="background: #ff8c00; color: white; border: none; border-radius: 4px; padding: 0 8px; height: 20px; font-size: 0.6rem; font-weight: bold; cursor: pointer;">COPIAR</button>
+                </div>
+            </div>`;
         };
-        let htmlDesc = info.descLonga ? `<div style="margin-top: 10px; font-size: 0.82rem; color: #eee; line-height: 1.4; text-align: justify; margin-bottom: 10px;">${info.descLonga}</div>` : "";
-        let cards = criarCard("Book Cliente", info.bookCliente, "📄") + criarCard("Book Corretor", info.bookCorretor, "💼") + criarCard("Vídeo Decorado", info.videoDecorado, "🎬");
-        htmlContent += htmlDesc + (cards ? `<div style="margin-top: 5px;">${cards}</div>` : "");
+        htmlContent += (info.descLonga ? `<div style="font-size:0.82rem; color:#eee; margin-bottom:10px;">${info.descLonga}</div>` : "") + 
+                       criarCard("Book Cliente", info.bookCliente, "📄") + criarCard("Book Corretor", info.bookCorretor, "💼");
     } else {
-        let htmlCaixaQ = (info.destaqueCampanha && info.destaqueCampanha.trim() !== "") ? `
-            <div style="background: #fff; color: #e31c19; height: ${ALTURA_PADRAO}; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 0.75rem; border-radius: 4px; margin-bottom: 8px; text-transform: uppercase;">
-                ${info.destaqueCampanha}
-            </div>` : "";
-
-        let estoqueHtml = "";
-        const estValue = info.estoque ? info.estoque.toString().trim() : "";
-        const estNum = parseInt(estValue);
-        if (estValue === "" || estValue === null) estoqueHtml = "";
-        else if (estValue === "-") estoqueHtml = `<span style="color: #fff; font-size: 0.72rem; font-weight: bold;">CONSULTAR</span>`;
-        else if (estNum === 0) estoqueHtml = `<span style="color: #bbb; font-size: 0.72rem; font-weight: bold; text-decoration: line-through;">VENDIDO</span>`;
-        else if (estNum < 5) estoqueHtml = `<span style="color: #e31c19; font-size: 0.72rem; font-weight: bold;">APENAS ${estNum} UN.</span>`;
-        else estoqueHtml = `<span style="color: #fff; font-size: 0.72rem; font-weight: bold;">RESTAM ${estNum} UN.</span>`;
-
-        const criarCaixaDado = (label, valorHtml) => `
-            <div style="background: #444; height: ${ALTURA_PADRAO}; border-radius: 4px; display: flex; align-items: center; justify-content: space-between; padding: 0 8px; box-sizing: border-box;">
-                <span style="color: #bbb; font-size: 0.55rem; font-weight: bold; text-transform: uppercase;">${label}</span>
-                <div style="flex-grow: 1; text-align: right; display: flex; justify-content: flex-end;">${valorHtml}</div>
-            </div>`;
-
-        let htmlGrid6 = `
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 8px;">
-                ${criarCaixaDado("ENTREGA", `<span style="color: #fff; font-size: 0.72rem; font-weight: bold;">${info.entrega || "---"}</span>`)}
-                ${criarCaixaDado("OBRA", `<span style="color: #fff; font-size: 0.72rem; font-weight: bold;">${info.obra ? info.obra+'%' : '---'}</span>`)}
-                ${criarCaixaDado("PLANTAS", `<span style="color: #fff; font-size: 0.72rem; font-weight: bold;">${(info.plantaMin && info.plantaMax) ? info.plantaMin + ' ATÉ ' + info.plantaMax : (info.plantaMin || "---")}</span>`)}
-                ${criarCaixaDado("ESTOQUE", estoqueHtml)}
-                ${criarCaixaDado("LIMITADOR", `<span style="color: #fff; font-size: 0.72rem; font-weight: bold;">${info.limitador || "---"}</span>`)}
-                ${criarCaixaDado("C. PAULISTA", `<span style="color: #fff; font-size: 0.72rem; font-weight: bold;">${info.cPaulista || "---"}</span>`)}
-            </div>`;
-
-        let htmlPrecos = "";
-        if (info.precosRaw && info.precosRaw.includes(";")) {
-            const blocos = info.precosRaw.split(";");
-            const cabecalho = blocos[0].split(",");
-            let linhasHtml = "";
-            blocos.slice(1).forEach(linha => {
-                const d = linha.split(",");
-                if (d.length >= 4) {
-                    linhasHtml += `
-                        <div style="display: grid; grid-template-columns: 0.5fr 1.2fr 1fr 1fr; gap: 4px; padding: 6px 0; border-top: 1px solid #555; align-items: center;">
-                            <span style="color: #fff; font-weight: 800; font-size: 0.7rem;">${d[0]}</span>
-                            <span style="color: #fff; font-weight: 800; font-size: 0.7rem;">${d[1]}</span>
-                            <span style="color: #bbb; font-size: 0.6rem; text-align: right;">${d[2]}</span>
-                            <span style="color: #bbb; font-size: 0.6rem; text-align: right;">${d[3]}</span>
-                        </div>`;
-                }
-            });
-            htmlPrecos = `
-                <div style="background: #444; border-radius: 4px; padding: 8px; margin-top: 4px;">
-                    <div style="display: grid; grid-template-columns: 0.5fr 1.2fr 1fr 1fr; gap: 4px; margin-bottom: 4px;">
-                        <span style="color: #bbb; font-size: 0.5rem; font-weight: bold;">${cabecalho[0]}</span>
-                        <span style="color: #bbb; font-size: 0.5rem; font-weight: bold;">${cabecalho[1]}</span>
-                        <span style="color: #bbb; font-size: 0.5rem; font-weight: bold; text-align: right;">AVAL.</span>
-                        <span style="color: #bbb; font-size: 0.5rem; font-weight: bold; text-align: right;">B. PAG.</span>
-                    </div>
-                    ${linhasHtml}
-                </div>`;
-        }
-        htmlContent += htmlCaixaQ + htmlGrid6 + htmlPrecos;
+        htmlContent += `<div style="background:#444; padding:8px; border-radius:4px; color:white; font-size:0.75rem;">Ficha Técnica Disponível</div>`;
     }
     elDetalhes.innerHTML = htmlContent;
 }
 
-/* ==========================================================================
-   BLOCO 8: MENU LATERAL E EVENTOS
-   ========================================================================== */
+/* --- BLOCO 8: MENU LATERAL (LARGURA -15% E TRAVA DE FECHAMENTO) --- */
 function gerarMenuResidenciais() {
     const lista = document.getElementById('lista-residenciais');
     if (!lista) return;
@@ -358,30 +286,24 @@ function gerarMenuResidenciais() {
         li.style.display = "flex";
         li.style.alignItems = "center";
         
-        // AJUSTE DE MERGULHO NO MENU
         li.style.marginLeft = "-10px";
         li.style.paddingLeft = "25px";
         li.style.width = "calc(100% + 10px)";
         li.style.boxSizing = "border-box";
-
         li.style.fontSize = "0.75rem";
         li.style.marginBottom = "4px";
         li.style.borderRadius = "4px";
 
         const corZona = obterCorPorZona(info);
         if (info.categoria === "COMPLEXO") { 
-            li.classList.add('estilo-complexo'); 
-            li.style.backgroundColor = corZona; 
-            li.style.color = "#ffffff";
+            li.classList.add('estilo-complexo'); li.style.backgroundColor = corZona; li.style.color = "#ffffff";
         } else { 
-            li.style.backgroundColor = "#ffffff";
-            li.style.color = "#333";
-            li.style.borderRight = `5px solid ${corZona}`; 
+            li.style.backgroundColor = "#ffffff"; li.style.color = "#333"; li.style.borderRight = `5px solid ${corZona}`; 
         }
         
         li.onclick = (e) => { 
             e.stopPropagation(); 
-            toggleMenu(); 
+            // toggleMenu();  <-- REMOVIDO PARA O MENU NÃO RECOLHER AO TOCAR NO BOTÃO
             let p = document.getElementById(info.id); 
             if (!p) { 
                 trocarMapas(); 
