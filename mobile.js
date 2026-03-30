@@ -1,5 +1,5 @@
 /* ==========================================================================
-   js v140.8.3 - LARGURA DO MENU -20% E NAVEGAÇÃO SEM RECOLHER
+   js v140.8.4 - NOMES EM CINZA ATIVADOS + MENU ESTÁVEL + LARGURA -20%
    ========================================================================== */
 
 /* ==========================================================================
@@ -20,7 +20,7 @@ const AJUSTES_MAPA = {
 const ALTURA_PADRAO = "28px";
 
 /* ==========================================================================
-   BLOCO 2: AUXILIARES E FULLSCREEN (ÍCONE SINCRONIZADO)
+   BLOCO 2: AUXILIARES E FULLSCREEN
    ========================================================================== */
 function obterCorPorZona(info) {
     const z = info.zona ? info.zona.trim().toUpperCase() : "";
@@ -134,26 +134,42 @@ function limparSelecaoAnterior() {
 }
 
 /* ==========================================================================
-   BLOCO 5: CLIQUE NO MAPA E VITRINE (MERGULHO AJUSTADO)
+   BLOCO 5: CLIQUE NO MAPA (CORREÇÃO PARA PATHS CINZA)
    ========================================================================== */
 function clicarNoMapa(pathElement, infoSelecionado, pDataRaw = null) {
     solicitarFullscreen();
     const idRegiao = pathElement.id.replace('mini-', '').toLowerCase();
+    
+    // Limpa destaque anterior
     document.querySelectorAll('#mapa-container path').forEach(p => { 
         p.setAttribute('data-selecionado', 'false'); 
         p.style.fill = p.getAttribute('data-cor-base'); 
     });
+
+    // Destaca a região clicada (mesmo se for cinza)
     pathElement.setAttribute('data-selecionado', 'true');
     pathElement.style.fill = "#FF4500"; 
     
+    // Atualiza o nome da cidade no topo (Independente de ter MRV ou não)
     const nomeDaCidade = pDataRaw ? pDataRaw.name : pathElement.getAttribute('data-name');
     cidadeClicadaAtiva = { name: (nomeDaCidade || "").toUpperCase() }; 
     atualizarTextoTopo(cidadeClicadaAtiva.name);
     
+    // Filtra dados apenas se a região for da MRV
     const todosDestaRegiao = window.dadosGerais.filter(d => d.id === idRegiao).sort((a, b) => a.ordem - b.ordem);
-    const ativo = infoSelecionado || todosDestaRegiao[0];
     
+    // Se não houver dados (Cidade Cinza), limpa a vitrine e a ficha
+    if (todosDestaRegiao.length === 0 && !infoSelecionado) {
+        const vitrine = document.getElementById('container-vitrine-botoes');
+        if (vitrine) vitrine.innerHTML = "";
+        if (document.getElementById('nome-imovel')) document.getElementById('nome-imovel').innerText = "SEM LANÇAMENTOS";
+        if (document.getElementById('detalhes-imovel')) document.getElementById('detalhes-imovel').innerHTML = "";
+        return;
+    }
+
+    const ativo = infoSelecionado || todosDestaRegiao[0];
     const containerBotoes = document.getElementById('container-vitrine-botoes');
+    
     if(containerBotoes) {
         containerBotoes.innerHTML = "";
         todosDestaRegiao.forEach(item => {
@@ -192,7 +208,7 @@ function clicarNoMapa(pathElement, infoSelecionado, pDataRaw = null) {
 }
 
 /* ==========================================================================
-   BLOCO 6: DESENHO DO SVG
+   BLOCO 6: DESENHO DO SVG (HABILITA CLIQUE EM TUDO)
    ========================================================================== */
 function desenharMapa(dados, targetId, ehMinimizado) {
     const container = document.getElementById(targetId);
@@ -216,8 +232,18 @@ function desenharMapa(dados, targetId, ehMinimizado) {
         const corBase = ehMRV ? "#00713a" : "#cccccc";
         path.style.fill = corBase; path.style.stroke = "#ffffff"; path.style.strokeWidth = (ehMinimizado || !ehMRV) ? "0" : "1.2";
         path.setAttribute('data-cor-base', corBase);
+        
+        // Clique habilitado para TODOS os paths no mapa principal
         if (!ehMinimizado) {
-            path.onclick = (e) => { e.stopPropagation(); if (pData.id === "grandesaopaulo") { trocarMapas(); } else if (ehMRV) clicarNoMapa(path, null, pData); };
+            path.onclick = (e) => { 
+                e.stopPropagation(); 
+                if (pData.id === "grandesaopaulo") { 
+                    trocarMapas(); 
+                } else { 
+                    // Agora qualquer path (verde ou cinza) chama a função de clique
+                    clicarNoMapa(path, null, pData); 
+                } 
+            };
         }
         g.appendChild(path);
     });
@@ -337,15 +363,14 @@ function exibirDadosResidencial(info) {
 }
 
 /* ==========================================================================
-   BLOCO 8: MENU LATERAL (LARGURA -20% E PERSISTÊNCIA NO CLIQUE)
+   BLOCO 8: MENU LATERAL
    ========================================================================== */
 function gerarMenuResidenciais() {
     const menuEl = document.getElementById('menu-lateral');
     const lista = document.getElementById('lista-residenciais');
     if (!lista) return;
 
-    // REDUÇÃO DE LARGURA DO MENU EM 20%
-    if(menuEl) menuEl.style.width = "200px"; // Ajuste o valor fixo conforme seu layout base era 250px
+    if(menuEl) menuEl.style.width = "200px"; 
 
     lista.innerHTML = ""; 
     lista.style.overflowX = "hidden";
@@ -358,13 +383,11 @@ function gerarMenuResidenciais() {
         li.style.height = ALTURA_PADRAO;
         li.style.display = "flex";
         li.style.alignItems = "center";
-        
         li.style.marginLeft = "-10px";
         li.style.paddingLeft = "25px";
         li.style.width = "calc(100% + 10px)";
         li.style.boxSizing = "border-box";
-
-        li.style.fontSize = "0.7rem"; // Fonte um pouco menor para caber na largura reduzida
+        li.style.fontSize = "0.7rem"; 
         li.style.marginBottom = "4px";
         li.style.borderRadius = "4px";
 
@@ -381,7 +404,6 @@ function gerarMenuResidenciais() {
         
         li.onclick = (e) => { 
             e.stopPropagation(); 
-            // toggleMenu(); REMOVIDO PARA O MENU NÃO RECOLHER AO TOCAR NO BOTÃO
             let p = document.getElementById(info.id); 
             if (!p) { 
                 trocarMapas(); 
