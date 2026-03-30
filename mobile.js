@@ -1,5 +1,5 @@
 /* ==========================================================================
-   js v141.0.3 - VERSÃO ESTÁVEL: FIX ÍCONE FULLSCREEN + DESTAQUE RÁPIDO
+   js v141.1.0 - VERSÃO ESTÁVEL: FIX ÍCONE FULLSCREEN + DESTAQUE RÁPIDO
    ========================================================================== */
 
 const svgNS = "http://www.w3.org/2000/svg";
