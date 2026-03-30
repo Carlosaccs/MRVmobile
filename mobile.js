@@ -115,21 +115,24 @@ function exibirDadosResidencial(info) {
         const criarCard = (tit, lk, ico) => (!lk || lk.length < 5) ? "" : `<div style="display:flex; align-items:center; background:#fff; border-radius:4px; padding:0 10px; gap:8px; margin-top:6px; height:${ALTURA_PADRAO};"><span style="font-size:0.9rem;">${ico}</span><div style="flex-grow:1; font-size:0.75rem; font-weight:bold; color:#333;">${tit.toUpperCase()}</div><button onclick="window.open('${lk}','_blank')" style="background:#00713a; color:#fff; border:none; border-radius:4px; padding:0 8px; height:20px; font-size:0.6rem; font-weight:bold; cursor:pointer;">ABRIR</button></div>`;
         html += (info.descLonga ? `<div style="font-size:0.82rem; color:#eee; margin-bottom:10px;">${info.descLonga}</div>` : "") + criarCard("Book Cliente", info.bookCliente, "📄") + criarCard("Book Corretor", info.bookCorretor, "💼");
     } else {
-        // Bloco Residencial
+        // --- PARTE RESIDENCIAL ---
         const camp = (info.destaqueCampanha) ? `<div style="background:#fff; color:#e31c19; height:${ALTURA_PADRAO}; display:flex; align-items:center; justify-content:center; font-weight:900; font-size:0.75rem; border-radius:4px; margin-bottom:8px;">${info.destaqueCampanha.toUpperCase()}</div>` : "";
         const pTxt = (info.plantaMin && info.plantaMax) ? `${info.plantaMin} até ${info.plantaMax} m²` : (info.plantaMin || "---");
+        
         let eH = ""; const eN = parseInt(info.estoque);
         if (!info.estoque) eH = "---"; else if (info.estoque === "-") eH = "CONSULTAR"; else if (eN === 0) eH = `<span style="text-decoration:line-through; color:#bbb;">VENDIDO</span>`; else if (eN < 5) eH = `<span style="color:#e31c19;">APENAS ${eN} UN.</span>`; else eH = `RESTAM ${eN} UN.`;
 
         const cax = (l, v) => `<div style="background:#444; height:${ALTURA_PADRAO}; border-radius:4px; display:flex; align-items:center; justify-content:space-between; padding:0 8px;"><span style="color:#bbb; font-size:0.55rem; font-weight:bold;">${l}</span><span style="color:#fff; font-size:0.72rem; font-weight:bold;">${v}</span></div>`;
+        
         html += camp + `<div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-bottom:8px;">${cax("ENTREGA", info.entrega || "---")}${cax("OBRA", info.obra ? info.obra+'%' : '---')}${cax("PLANTAS", pTxt)}${cax("ESTOQUE", eH)}${cax("LIMITADOR", info.limitador || "---")}${cax("C. PAULISTA", info.cPaulista || "---")}</div>`;
 
+        // Tabela de Preços
         if (info.precosRaw && info.precosRaw.includes(";")) {
             let pL = ""; info.precosRaw.split(";").slice(1).forEach(l => { const d = l.split(","); if (d.length >= 4) pL += `<div style="display:grid; grid-template-columns:0.5fr 1.2fr 1fr 1fr; gap:4px; padding:6px 0; border-top:1px solid #555;"><span style="color:#fff; font-weight:800; font-size:0.7rem;">${d[0]}</span><span style="background:#ff8c00; color:#fff; font-weight:800; font-size:0.7rem; text-align:center; border-radius:2px;">${d[1]}</span><span style="color:#bbb; font-size:0.6rem; text-align:right;">${d[2]}</span><span style="color:#bbb; font-size:0.6rem; text-align:right;">${d[3]}</span></div>`; });
             html += `<div style="background:#444; border-radius:4px; padding:8px;"><div style="display:grid; grid-template-columns:0.5fr 1.2fr 1fr 1fr; gap:4px; margin-bottom:4px; font-size:0.5rem; color:#bbb; font-weight:bold;"><span>TIPO</span><span style="text-align:center;">MENOR PREÇO</span><span style="text-align:right;">AVAL.</span><span style="text-align:right;">B. PAG.</span></div>${pL}</div>`;
         }
 
-        // Novo Card: Estande de Vendas
+        // --- NOVO: CARD ESTANDE DE VENDAS COM BOTÃO COPIAR ---
         if (info.estandeVendas && info.estandeVendas.length > 5) {
             const linkE = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(info.estandeVendas)}`;
             html += `
@@ -137,14 +140,16 @@ function exibirDadosResidencial(info) {
                 <div style="background:#ddd; padding:4px 10px;"><span style="font-size:0.65rem; font-weight:900; color:#222;">📍 ESTANDE DE VENDAS</span></div>
                 <div style="padding:10px; display:flex; align-items:flex-start; justify-content:space-between; gap:10px;">
                     <div style="color:#fff; font-size:0.75rem; line-height:1.2; flex-grow:1;">${info.estandeVendas.toUpperCase()}</div>
-                    <button onclick="window.open('${linkE}','_blank')" style="padding:5px 10px; background:#4285F4; color:#fff; border:none; border-radius:3px; font-size:0.6rem; font-weight:bold; cursor:pointer;">MAPS</button>
+                    <div style="display:flex; flex-direction:column; gap:5px;">
+                        <button onclick="window.open('${linkE}','_blank')" style="padding:5px 8px; background:#4285F4; color:#fff; border:none; border-radius:3px; font-size:0.55rem; font-weight:bold; cursor:pointer;">MAPS</button>
+                        <button onclick="copyToClipboard('${info.estandeVendas}')" style="padding:5px 8px; background:#666; color:#fff; border:none; border-radius:3px; font-size:0.55rem; font-weight:bold; cursor:pointer;">LINK</button>
+                    </div>
                 </div>
             </div>`;
         }
     }
     elDetalhes.innerHTML = html;
 }
-
 /* --------------------------------------------------------------------------
    5. INTERAÇÃO COM MAPAS E TROCA DE ESTADOS
    -------------------------------------------------------------------------- */
