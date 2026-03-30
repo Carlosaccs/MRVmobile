@@ -83,14 +83,12 @@ async function carregarPlanilha() {
                         bookCliente: limpar(c[25] || ""),
                         bookCorretor: limpar(c[26] || ""),
                         estandeVendas: limpar(c[31] || ""), 
-                        // NOVOS CAMPOS ABAIXO:
-                        obsImportante: limpar(c[19] || ""), // Coluna T
-                        localizacao: limpar(c[20] || ""),   // Coluna U
-                        mobilidade: limpar(c[21] || ""),    // Coluna V
-                        culturaLazer: limpar(c[22] || ""),  // Coluna W
-                        comercio: limpar(c[23] || ""),      // Coluna X
-                        saudeEducacao: limpar(c[24] || ""), // Coluna Y
-                        
+                        obsImportante: limpar(c[19] || ""), 
+                        localizacao: limpar(c[20] || ""),   
+                        mobilidade: limpar(c[21] || ""),    
+                        culturaLazer: limpar(c[22] || ""),  
+                        comercio: limpar(c[23] || ""),      
+                        saudeEducacao: limpar(c[24] || ""), 
                         estoque: limpar(c[6]), entrega: limpar(c[9]),     
                         plantaMin: limpar(c[10]), plantaMax: limpar(c[11]),  
                         obra: limpar(c[12]), limitador: limpar(c[13]), cPaulista: limpar(c[15])   
@@ -137,25 +135,7 @@ function exibirDadosResidencial(info) {
             html += `<div style="background:#444; border-radius:4px; padding:8px;"><div style="display:grid; grid-template-columns:0.5fr 1.2fr 1fr 1fr; gap:4px; margin-bottom:4px; font-size:0.5rem; color:#bbb; font-weight:bold;"><span>TIPO</span><span style="text-align:center;">MENOR PREÇO</span><span style="text-align:right;">AVAL.</span><span style="text-align:right;">B. PAG.</span></div>${pL}</div>`;
         }
 
-        // Função auxiliar para criar cards de texto simples
-        const criarCardTexto = (titulo, texto, corBorda) => {
-            if (!texto || texto.length < 3) return "";
-            return `
-            <div style="margin-top:10px; border-radius:6px; overflow:hidden; border-left:4px solid ${corBorda}; background:#333;">
-                <div style="background:#ddd; padding:4px 10px;"><span style="font-size:0.65rem; font-weight:900; color:#222;">${titulo.toUpperCase()}</span></div>
-                <div style="padding:10px; color:#fff; font-size:0.75rem; line-height:1.3;">${texto.toUpperCase()}</div>
-            </div>`;
-        };
-
-        // Renderizando os novos campos
-        html += criarCardTexto("⚠️ Observação Importante", info.obsImportante, "#e31c19");
-        html += criarCardTexto("📍 Localização", info.localizacao, "#4285F4");
-        html += criarCardTexto("🚲 Mobilidade", info.mobilidade, "#ff8c00");
-        html += criarCardTexto("🎭 Cultura e Lazer", info.culturaLazer, "#d1147e");
-        html += criarCardTexto("🛒 Comércio", info.comercio, "#7b1fa2");
-        html += criarCardTexto("🏥 Saúde e Educação", info.saudeEducacao, "#0054a6");
-
-        // Estande de Vendas (Mantendo com botões)
+        // 1º LUGAR: ESTANDE DE VENDAS
         if (info.estandeVendas && info.estandeVendas.length > 5) {
             const linkE = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(info.estandeVendas)}`;
             html += `
@@ -170,6 +150,23 @@ function exibirDadosResidencial(info) {
                 </div>
             </div>`;
         }
+
+        const criarCardTexto = (titulo, texto, corBorda) => {
+            if (!texto || texto.length < 3) return "";
+            return `
+            <div style="margin-top:10px; border-radius:6px; overflow:hidden; border-left:4px solid ${corBorda}; background:#333;">
+                <div style="background:#ddd; padding:4px 10px;"><span style="font-size:0.65rem; font-weight:900; color:#222;">${titulo.toUpperCase()}</span></div>
+                <div style="padding:10px; color:#fff; font-size:0.75rem; line-height:1.3;">${texto.toUpperCase()}</div>
+            </div>`;
+        };
+
+        // DEMAIS CARDS NA SEQUÊNCIA
+        html += criarCardTexto("⚠️ Observação Importante", info.obsImportante, "#e31c19");
+        html += criarCardTexto("📍 Localização", info.localizacao, "#4285F4");
+        html += criarCardTexto("🚲 Mobilidade", info.mobilidade, "#ff8c00");
+        html += criarCardTexto("🎭 Cultura e Lazer", info.culturaLazer, "#d1147e");
+        html += criarCardTexto("🛒 Comércio", info.comercio, "#7b1fa2");
+        html += criarCardTexto("🏥 Saúde e Educação", info.saudeEducacao, "#0054a6");
     }
     elDetalhes.innerHTML = html;
 }
