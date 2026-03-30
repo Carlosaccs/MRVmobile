@@ -1,5 +1,5 @@
 /* ==========================================================================
-   js v140.9.1 - FIX: TEMPO DE EXIBIÇÃO PARA PATHS CINZA
+   js v140.9.2 - FIX: TEMPO 1s + RESTAURAÇÃO DO FORCED FULLSCREEN
    ========================================================================== */
 
 const svgNS = "http://www.w3.org/2000/svg";
@@ -16,7 +16,7 @@ const AJUSTES_MAPA = {
 
 const ALTURA_PADRAO = "28px";
 
-/* --- FULLSCREEN --- */
+/* --- FULLSCREEN (RESTAURADO) --- */
 function atualizarIconeFullscreen() {
     const btn = document.getElementById('btn-fullscreen');
     if (!btn) return;
@@ -31,6 +31,14 @@ function atualizarIconeFullscreen() {
 }
 document.addEventListener('fullscreenchange', atualizarIconeFullscreen);
 document.addEventListener('webkitfullscreenchange', atualizarIconeFullscreen);
+
+function solicitarFullscreen() {
+    const elem = document.documentElement;
+    if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+        if (elem.requestFullscreen) elem.requestFullscreen();
+        else if (elem.webkitRequestFullscreen) elem.webkitRequestFullscreen();
+    }
+}
 
 function alternarFullscreen() {
     const elem = document.documentElement;
@@ -101,20 +109,18 @@ function atualizarTextoTopo(nome) {
 
 /* --- CLIQUE MAPA --- */
 function clicarNoMapa(pathElement, infoSelecionado, pDataRaw = null) {
+    solicitarFullscreen(); // Força o fullscreen ao interagir com o mapa
     const ehVerde = pathElement.getAttribute('data-cor-base') === "#00713a";
     const nomeLocal = pDataRaw ? pDataRaw.name : pathElement.getAttribute('data-name');
 
-    // CASO CINZA (SEM LANÇAMENTO)
     if (!ehVerde && !infoSelecionado) {
         atualizarTextoTopo(nomeLocal);
         setTimeout(() => {
-            // Volta para o nome do residencial ativo se houver um, senão limpa
             atualizarTextoTopo(residencialAtivoGeral ? residencialAtivoGeral.nomeCurto : null);
-        }, 1500);
+        }, 1000); // Reduzido para 1 segundo
         return; 
     }
 
-    // CASO VERDE (COM LANÇAMENTO)
     document.querySelectorAll('#mapa-container path').forEach(p => { 
         p.setAttribute('data-selecionado', 'false'); 
         p.style.fill = p.getAttribute('data-cor-base'); 
@@ -127,7 +133,7 @@ function clicarNoMapa(pathElement, infoSelecionado, pDataRaw = null) {
     const todosDestaRegiao = window.dadosGerais.filter(d => d.id === idRegiao).sort((a, b) => a.ordem - b.ordem);
     const ativo = infoSelecionado || todosDestaRegiao[0];
     
-    residencialAtivoGeral = ativo; // Salva quem é o ativo para o "rollback" do texto
+    residencialAtivoGeral = ativo;
     atualizarTextoTopo(ativo ? ativo.nomeCurto : nomeLocal);
 
     const containerBotoes = document.getElementById('container-vitrine-botoes');
@@ -286,7 +292,13 @@ function desenharMapa(dados, targetId, ehMinimizado) {
     svg.appendChild(g); container.appendChild(svg);
 }
 
-function trocarMapas() { residencialAtivoGeral = null; limparSelecaoAnterior(); mapaAtivo = (mapaAtivo === "GSP") ? "INTERIOR" : "GSP"; atualizarVisualizacao(); }
+function trocarMapas() { 
+    solicitarFullscreen(); 
+    residencialAtivoGeral = null; 
+    limparSelecaoAnterior(); 
+    mapaAtivo = (mapaAtivo === "GSP") ? "INTERIOR" : "GSP"; 
+    atualizarVisualizacao(); 
+}
 
 function limparSelecaoAnterior() {
     document.querySelectorAll('#mapa-container path').forEach(p => {
@@ -333,6 +345,7 @@ function gerarMenuResidenciais() {
         }
         li.onclick = (e) => { 
             e.stopPropagation(); 
+            solicitarFullscreen();
             let p = document.getElementById(info.id); 
             if (!p) { trocarMapas(); setTimeout(() => { let np = document.getElementById(info.id); if (np) clicarNoMapa(np, info); }, 300); } 
             else { clicarNoMapa(p, info); } 
@@ -341,7 +354,15 @@ function gerarMenuResidenciais() {
     });
 }
 
-function toggleMenu() { const menu = document.getElementById('menu-lateral'); if(menu) { menu.classList.toggle('menu-aberto'); menu.classList.toggle('menu-oculto'); } }
+function toggleMenu() { 
+    solicitarFullscreen(); 
+    const menu = document.getElementById('menu-lateral'); 
+    if(menu) { 
+        menu.classList.toggle('menu-aberto'); 
+        menu.classList.toggle('menu-oculto'); 
+    } 
+}
+
 function copyToClipboard(text) { if(!text || text === "#") return alert("Link indisponível"); navigator.clipboard.writeText(text).then(() => alert("Copiado!")); }
 
 window.onload = carregarPlanilha;
