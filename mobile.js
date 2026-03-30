@@ -1,12 +1,12 @@
 /* ==========================================================================
-   js v140.9.4 - FIX: ROLLBACK PARA NOME DA REGIÃO (NÃO DO PRÉDIO)
+   js v140.9.3 - UPDATE: MENU COM NOME POR EXTENSO DA ZONA
    ========================================================================== */
 
 const svgNS = "http://www.w3.org/2000/svg";
 const URL_PLANILHA = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSRKdJctOPQjKAtOZSDHyArD_H8SgKIouelAS1vF1d_-13pu7u_ic6J8nP3r0Ijd56WA-mbUmHjb4Me/pub?output=csv';
 
 let mapaAtivo = "GSP";
-let regiaoAtivaGeral = null; // Nova variável para memorizar o texto do topo
+let regiaoAtivaGeral = null; 
 window.dadosGerais = [];
 
 const AJUSTES_MAPA = {
@@ -15,6 +15,19 @@ const AJUSTES_MAPA = {
 };
 
 const ALTURA_PADRAO = "28px";
+
+/* --- AUXILIAR: TRADUTOR DE ZONA --- */
+function obterNomeZona(sigla) {
+    const s = sigla ? sigla.trim().toUpperCase() : "";
+    switch(s) {
+        case "ZO": return "Z. OESTE";
+        case "ZL": return "Z. LESTE";
+        case "ZN": return "Z. NORTE";
+        case "ZS": return "Z. SUL";
+        case "C":  return "CENTRO";
+        default: return ""; 
+    }
+}
 
 /* --- FULLSCREEN --- */
 function atualizarIconeFullscreen() {
@@ -113,17 +126,12 @@ function clicarNoMapa(pathElement, infoSelecionado, pDataRaw = null) {
     const ehVerde = pathElement.getAttribute('data-cor-base') === "#00713a";
     const nomeDestaRegiao = pDataRaw ? pDataRaw.name : pathElement.getAttribute('data-name');
 
-    // CASO CINZA (SEM LANÇAMENTO)
     if (!ehVerde && !infoSelecionado) {
         atualizarTextoTopo(nomeDestaRegiao);
-        setTimeout(() => {
-            // Volta para a região que estava ativa anteriormente (ou limpa se não houver)
-            atualizarTextoTopo(regiaoAtivaGeral);
-        }, 1000); 
+        setTimeout(() => { atualizarTextoTopo(regiaoAtivaGeral); }, 1000); 
         return; 
     }
 
-    // CASO VERDE (COM LANÇAMENTO)
     document.querySelectorAll('#mapa-container path').forEach(p => { 
         p.setAttribute('data-selecionado', 'false'); 
         p.style.fill = p.getAttribute('data-cor-base'); 
@@ -136,12 +144,9 @@ function clicarNoMapa(pathElement, infoSelecionado, pDataRaw = null) {
     const todosDestaRegiao = window.dadosGerais.filter(d => d.id === idRegiao).sort((a, b) => a.ordem - b.ordem);
     const ativo = infoSelecionado || todosDestaRegiao[0];
 
-    // ATUALIZAÇÃO DA MEMÓRIA:
     if (infoSelecionado) {
-        // Se veio do menu ou botões, a "região ativa" passa a ser o nome do residencial
         regiaoAtivaGeral = ativo.nomeCurto;
     } else {
-        // Se tocou direto no mapa, a "região ativa" é o nome da cidade/região
         regiaoAtivaGeral = nomeDestaRegiao;
     }
     
@@ -154,7 +159,11 @@ function clicarNoMapa(pathElement, infoSelecionado, pDataRaw = null) {
             if (item.nomeCurto && item.nomeCurto !== (ativo ? ativo.nomeCurto : "")) {
                 const btn = document.createElement('div');
                 btn.className = 'menu-item-mrv';
-                btn.innerText = item.nomeCurto.toUpperCase();
+                
+                // NOME + ZONA NO TÍTULO (VITRINE)
+                const nomeZona = obterNomeZona(item.zona);
+                btn.innerText = item.nomeCurto.toUpperCase() + (nomeZona ? ` - ${nomeZona}` : "");
+                
                 btn.style.height = ALTURA_PADRAO;
                 btn.style.display = "flex";
                 btn.style.alignItems = "center";
@@ -303,7 +312,7 @@ function desenharMapa(dados, targetId, ehMinimizado) {
 
 function trocarMapas() { 
     solicitarFullscreen(); 
-    regiaoAtivaGeral = null; // Limpa memória ao trocar mapa
+    regiaoAtivaGeral = null; 
     limparSelecaoAnterior(); 
     mapaAtivo = (mapaAtivo === "GSP") ? "INTERIOR" : "GSP"; 
     atualizarVisualizacao(); 
@@ -336,7 +345,11 @@ function gerarMenuResidenciais() {
     [...window.dadosGerais].sort((a, b) => a.ordem - b.ordem).forEach(info => {
         const li = document.createElement('li');
         li.className = 'menu-item-mrv';
-        li.innerText = info.nomeCurto.toUpperCase();
+        
+        // NOME + ZONA NO TÍTULO (MENU LATERAL)
+        const nomeZona = obterNomeZona(info.zona);
+        li.innerText = info.nomeCurto.toUpperCase() + (nomeZona ? ` - ${nomeZona}` : "");
+
         li.style.height = ALTURA_PADRAO;
         li.style.display = "flex";
         li.style.alignItems = "center";
