@@ -1,12 +1,12 @@
 /* ==========================================================================
-   js v140.9.3 - FIX: PRIORIDADE DO NOME DA REGIÃO NO TOQUE DO MAPA
+   js v140.9.4 - FIX: ROLLBACK PARA NOME DA REGIÃO (NÃO DO PRÉDIO)
    ========================================================================== */
 
 const svgNS = "http://www.w3.org/2000/svg";
 const URL_PLANILHA = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSRKdJctOPQjKAtOZSDHyArD_H8SgKIouelAS1vF1d_-13pu7u_ic6J8nP3r0Ijd56WA-mbUmHjb4Me/pub?output=csv';
 
 let mapaAtivo = "GSP";
-let residencialAtivoGeral = null; 
+let regiaoAtivaGeral = null; // Nova variável para memorizar o texto do topo
 window.dadosGerais = [];
 
 const AJUSTES_MAPA = {
@@ -111,13 +111,14 @@ function atualizarTextoTopo(nome) {
 function clicarNoMapa(pathElement, infoSelecionado, pDataRaw = null) {
     solicitarFullscreen();
     const ehVerde = pathElement.getAttribute('data-cor-base') === "#00713a";
-    const nomeRegiao = pDataRaw ? pDataRaw.name : pathElement.getAttribute('data-name');
+    const nomeDestaRegiao = pDataRaw ? pDataRaw.name : pathElement.getAttribute('data-name');
 
     // CASO CINZA (SEM LANÇAMENTO)
     if (!ehVerde && !infoSelecionado) {
-        atualizarTextoTopo(nomeRegiao);
+        atualizarTextoTopo(nomeDestaRegiao);
         setTimeout(() => {
-            atualizarTextoTopo(residencialAtivoGeral ? residencialAtivoGeral.nomeCurto : null);
+            // Volta para a região que estava ativa anteriormente (ou limpa se não houver)
+            atualizarTextoTopo(regiaoAtivaGeral);
         }, 1000); 
         return; 
     }
@@ -133,25 +134,23 @@ function clicarNoMapa(pathElement, infoSelecionado, pDataRaw = null) {
     
     const idRegiao = pathElement.id.replace('mini-', '').toLowerCase();
     const todosDestaRegiao = window.dadosGerais.filter(d => d.id === idRegiao).sort((a, b) => a.ordem - b.ordem);
-    
-    // Define o ativo: se veio de um clique em botão (infoSelecionado) ou se é o primeiro da lista
     const ativo = infoSelecionado || todosDestaRegiao[0];
-    residencialAtivoGeral = ativo;
 
-    // LÓGICA DO TEXTO TOPO: 
-    // Se clicou direto no mapa (infoSelecionado é null), mostra nome da REGIÃO
-    // Se clicou num botão da vitrine ou menu (infoSelecionado existe), mostra nome do RESIDENCIAL
+    // ATUALIZAÇÃO DA MEMÓRIA:
     if (infoSelecionado) {
-        atualizarTextoTopo(ativo.nomeCurto);
+        // Se veio do menu ou botões, a "região ativa" passa a ser o nome do residencial
+        regiaoAtivaGeral = ativo.nomeCurto;
     } else {
-        atualizarTextoTopo(nomeRegiao);
+        // Se tocou direto no mapa, a "região ativa" é o nome da cidade/região
+        regiaoAtivaGeral = nomeDestaRegiao;
     }
+    
+    atualizarTextoTopo(regiaoAtivaGeral);
 
     const containerBotoes = document.getElementById('container-vitrine-botoes');
     if(containerBotoes) {
         containerBotoes.innerHTML = "";
         todosDestaRegiao.forEach(item => {
-            // Só mostra na vitrine os que NÃO são o ativo atual
             if (item.nomeCurto && item.nomeCurto !== (ativo ? ativo.nomeCurto : "")) {
                 const btn = document.createElement('div');
                 btn.className = 'menu-item-mrv';
@@ -169,11 +168,9 @@ function clicarNoMapa(pathElement, infoSelecionado, pDataRaw = null) {
                 const corZona = obterCorPorZona(item);
                 if (item.categoria === "COMPLEXO") {
                     btn.classList.add('estilo-complexo');
-                    btn.style.backgroundColor = corZona;
-                    btn.style.color = "#ffffff";
+                    btn.style.backgroundColor = corZona; btn.style.color = "#ffffff";
                 } else {
-                    btn.style.backgroundColor = "#ffffff";
-                    btn.style.color = "#333";
+                    btn.style.backgroundColor = "#ffffff"; btn.style.color = "#333";
                     btn.style.borderRight = `4px solid ${corZona}`; 
                 }
                 btn.onclick = (e) => { e.stopPropagation(); clicarNoMapa(pathElement, item, pDataRaw); };
@@ -306,7 +303,7 @@ function desenharMapa(dados, targetId, ehMinimizado) {
 
 function trocarMapas() { 
     solicitarFullscreen(); 
-    residencialAtivoGeral = null; 
+    regiaoAtivaGeral = null; // Limpa memória ao trocar mapa
     limparSelecaoAnterior(); 
     mapaAtivo = (mapaAtivo === "GSP") ? "INTERIOR" : "GSP"; 
     atualizarVisualizacao(); 
