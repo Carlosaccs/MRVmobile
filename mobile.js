@@ -1,12 +1,12 @@
 /* ==========================================================================
-   js v140.9.0 - FIX: FICHA RESIDENCIAL COMPLETA + TOQUE EM PATHS CINZA
+   js v140.9.1 - FIX: TEMPO DE EXIBIÇÃO PARA PATHS CINZA
    ========================================================================== */
 
 const svgNS = "http://www.w3.org/2000/svg";
 const URL_PLANILHA = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSRKdJctOPQjKAtOZSDHyArD_H8SgKIouelAS1vF1d_-13pu7u_ic6J8nP3r0Ijd56WA-mbUmHjb4Me/pub?output=csv';
 
 let mapaAtivo = "GSP";
-let cidadeClicadaAtiva = null; 
+let residencialAtivoGeral = null; 
 window.dadosGerais = [];
 
 const AJUSTES_MAPA = {
@@ -16,11 +16,11 @@ const AJUSTES_MAPA = {
 
 const ALTURA_PADRAO = "28px";
 
-/* --- BLOCO: FULLSCREEN --- */
+/* --- FULLSCREEN --- */
 function atualizarIconeFullscreen() {
     const btn = document.getElementById('btn-fullscreen');
     if (!btn) return;
-    const isFull = !!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement);
+    const isFull = !!(document.fullscreenElement || document.webkitFullscreenElement);
     btn.innerHTML = isFull ? `
         <svg viewBox="0 0 24 24" width="24" height="24" fill="white">
             <path d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z"/>
@@ -31,14 +31,6 @@ function atualizarIconeFullscreen() {
 }
 document.addEventListener('fullscreenchange', atualizarIconeFullscreen);
 document.addEventListener('webkitfullscreenchange', atualizarIconeFullscreen);
-
-function solicitarFullscreen() {
-    const elem = document.documentElement;
-    if (!document.fullscreenElement && !document.webkitFullscreenElement) {
-        if (elem.requestFullscreen) elem.requestFullscreen();
-        else if (elem.webkitRequestFullscreen) elem.webkitRequestFullscreen();
-    }
-}
 
 function alternarFullscreen() {
     const elem = document.documentElement;
@@ -51,7 +43,7 @@ function alternarFullscreen() {
     }
 }
 
-/* --- BLOCO: DADOS --- */
+/* --- DADOS --- */
 async function carregarPlanilha() {
     try {
         const res = await fetch(`${URL_PLANILHA}&cache_buster=${Date.now()}`);
@@ -88,7 +80,7 @@ async function carregarPlanilha() {
         });
         atualizarVisualizacao();
         gerarMenuResidenciais(); 
-    } catch (e) { console.error("Erro na planilha:", e); }
+    } catch (e) { console.error("Erro planilha:", e); }
 }
 
 function obterCorPorZona(info) {
@@ -102,39 +94,27 @@ function obterCorPorZona(info) {
     }
 }
 
-/* --- BLOCO: INTERFACE --- */
 function atualizarTextoTopo(nome) {
     const indicador = document.getElementById('identificador-cidade');
     if (indicador) indicador.innerText = nome ? nome.toUpperCase() : (mapaAtivo === "GSP" ? "GRANDE SP" : "ESTADO DE SP");
 }
 
-function limparSelecaoAnterior() {
-    cidadeClicadaAtiva = null;
-    document.querySelectorAll('#mapa-container path').forEach(p => {
-        p.setAttribute('data-selecionado', 'false');
-        p.style.fill = p.getAttribute('data-cor-base');
-    });
-    const vitrine = document.getElementById('container-vitrine-botoes');
-    if (vitrine) vitrine.innerHTML = "";
-    if (document.getElementById('nome-imovel')) document.getElementById('nome-imovel').innerText = "";
-    if (document.getElementById('detalhes-imovel')) document.getElementById('detalhes-imovel').innerHTML = "";
-    atualizarTextoTopo(null);
-}
-
-/* --- BLOCO: CLIQUE MAPA --- */
+/* --- CLIQUE MAPA --- */
 function clicarNoMapa(pathElement, infoSelecionado, pDataRaw = null) {
-    solicitarFullscreen();
-    const idRegiao = pathElement.id.replace('mini-', '').toLowerCase();
     const ehVerde = pathElement.getAttribute('data-cor-base') === "#00713a";
+    const nomeLocal = pDataRaw ? pDataRaw.name : pathElement.getAttribute('data-name');
 
-    // Se for cinza, apenas atualiza o nome no topo e encerra
+    // CASO CINZA (SEM LANÇAMENTO)
     if (!ehVerde && !infoSelecionado) {
-        const nomeCidade = pDataRaw ? pDataRaw.name : pathElement.getAttribute('data-name');
-        atualizarTextoTopo(nomeCidade);
+        atualizarTextoTopo(nomeLocal);
+        setTimeout(() => {
+            // Volta para o nome do residencial ativo se houver um, senão limpa
+            atualizarTextoTopo(residencialAtivoGeral ? residencialAtivoGeral.nomeCurto : null);
+        }, 1500);
         return; 
     }
 
-    // Se for verde, limpa seleções anteriores e destaca
+    // CASO VERDE (COM LANÇAMENTO)
     document.querySelectorAll('#mapa-container path').forEach(p => { 
         p.setAttribute('data-selecionado', 'false'); 
         p.style.fill = p.getAttribute('data-cor-base'); 
@@ -143,13 +123,13 @@ function clicarNoMapa(pathElement, infoSelecionado, pDataRaw = null) {
     pathElement.setAttribute('data-selecionado', 'true');
     pathElement.style.fill = "#FF4500"; 
     
-    const nomeDaCidade = pDataRaw ? pDataRaw.name : pathElement.getAttribute('data-name');
-    cidadeClicadaAtiva = { name: (nomeDaCidade || "").toUpperCase() }; 
-    atualizarTextoTopo(cidadeClicadaAtiva.name);
-    
+    const idRegiao = pathElement.id.replace('mini-', '').toLowerCase();
     const todosDestaRegiao = window.dadosGerais.filter(d => d.id === idRegiao).sort((a, b) => a.ordem - b.ordem);
     const ativo = infoSelecionado || todosDestaRegiao[0];
     
+    residencialAtivoGeral = ativo; // Salva quem é o ativo para o "rollback" do texto
+    atualizarTextoTopo(ativo ? ativo.nomeCurto : nomeLocal);
+
     const containerBotoes = document.getElementById('container-vitrine-botoes');
     if(containerBotoes) {
         containerBotoes.innerHTML = "";
@@ -186,7 +166,7 @@ function clicarNoMapa(pathElement, infoSelecionado, pDataRaw = null) {
     if (ativo) exibirDadosResidencial(ativo);
 }
 
-/* --- BLOCO: FICHA TÉCNICA (RESTURADA E COMPLETA) --- */
+/* --- FICHA TÉCNICA --- */
 function exibirDadosResidencial(info) {
     const elNome = document.getElementById('nome-imovel');
     const elDetalhes = document.getElementById('detalhes-imovel');
@@ -222,7 +202,6 @@ function exibirDadosResidencial(info) {
         htmlContent += (info.descLonga ? `<div style="font-size:0.82rem; color:#eee; margin-bottom:10px;">${info.descLonga}</div>` : "") + 
                        criarCard("Book Cliente", info.bookCliente, "📄") + criarCard("Book Corretor", info.bookCorretor, "💼");
     } else {
-        // MODO RESIDENCIAL COMPLETO (Com Tabela e Status)
         let htmlCaixaQ = (info.destaqueCampanha && info.destaqueCampanha.trim() !== "") ? `
             <div style="background: #fff; color: #e31c19; height: ${ALTURA_PADRAO}; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 0.75rem; border-radius: 4px; margin-bottom: 8px; text-transform: uppercase;">
                 ${info.destaqueCampanha}
@@ -246,7 +225,6 @@ function exibirDadosResidencial(info) {
         let htmlPrecos = "";
         if (info.precosRaw && info.precosRaw.includes(";")) {
             const blocos = info.precosRaw.split(";");
-            const cabecalho = blocos[0].split(",");
             let linhasHtml = "";
             blocos.slice(1).forEach(linha => {
                 const d = linha.split(",");
@@ -272,7 +250,7 @@ function exibirDadosResidencial(info) {
     elDetalhes.innerHTML = htmlContent;
 }
 
-/* --- BLOCO: MAPA --- */
+/* --- MAPA --- */
 function desenharMapa(dados, targetId, ehMinimizado) {
     const container = document.getElementById(targetId);
     if (!container || !dados) return;
@@ -300,7 +278,7 @@ function desenharMapa(dados, targetId, ehMinimizado) {
             path.onclick = (e) => { 
                 e.stopPropagation(); 
                 if (pData.id === "grandesaopaulo") { trocarMapas(); } 
-                else { clicarNoMapa(path, null, pData); } // Agora o cinza entra aqui também
+                else { clicarNoMapa(path, null, pData); } 
             };
         }
         g.appendChild(path);
@@ -308,7 +286,19 @@ function desenharMapa(dados, targetId, ehMinimizado) {
     svg.appendChild(g); container.appendChild(svg);
 }
 
-function trocarMapas() { solicitarFullscreen(); limparSelecaoAnterior(); mapaAtivo = (mapaAtivo === "GSP") ? "INTERIOR" : "GSP"; atualizarVisualizacao(); }
+function trocarMapas() { residencialAtivoGeral = null; limparSelecaoAnterior(); mapaAtivo = (mapaAtivo === "GSP") ? "INTERIOR" : "GSP"; atualizarVisualizacao(); }
+
+function limparSelecaoAnterior() {
+    document.querySelectorAll('#mapa-container path').forEach(p => {
+        p.setAttribute('data-selecionado', 'false');
+        p.style.fill = p.getAttribute('data-cor-base');
+    });
+    const vitrine = document.getElementById('container-vitrine-botoes');
+    if (vitrine) vitrine.innerHTML = "";
+    if (document.getElementById('nome-imovel')) document.getElementById('nome-imovel').innerText = "";
+    if (document.getElementById('detalhes-imovel')) document.getElementById('detalhes-imovel').innerHTML = "";
+    atualizarTextoTopo(null);
+}
 
 function atualizarVisualizacao() {
     if (typeof MAPA_GSP !== 'undefined' && typeof MAPA_INTERIOR !== 'undefined') {
@@ -317,7 +307,7 @@ function atualizarVisualizacao() {
     }
 }
 
-/* --- BLOCO: MENU --- */
+/* --- MENU --- */
 function gerarMenuResidenciais() {
     const lista = document.getElementById('lista-residenciais');
     if (!lista) return;
@@ -351,7 +341,7 @@ function gerarMenuResidenciais() {
     });
 }
 
-function toggleMenu() { solicitarFullscreen(); const menu = document.getElementById('menu-lateral'); if(menu) { menu.classList.toggle('menu-aberto'); menu.classList.toggle('menu-oculto'); } }
+function toggleMenu() { const menu = document.getElementById('menu-lateral'); if(menu) { menu.classList.toggle('menu-aberto'); menu.classList.toggle('menu-oculto'); } }
 function copyToClipboard(text) { if(!text || text === "#") return alert("Link indisponível"); navigator.clipboard.writeText(text).then(() => alert("Copiado!")); }
 
 window.onload = carregarPlanilha;
