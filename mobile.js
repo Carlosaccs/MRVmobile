@@ -109,16 +109,27 @@ function exibirDadosResidencial(info) {
     const elDetalhes = document.getElementById('detalhes-imovel');
     if (elNome) elNome.innerText = info.nomeCurto.toUpperCase();
     
+    // FUNÇÃO DE SEGURANÇA: Limpa links do Google Drive para visualização protegida
+    const tratarLinkDrive = (url) => {
+        if (!url) return "#";
+        if (url.includes("drive.google.com")) {
+            // Substitui /view, /edit ou /usp=sharing por /preview (abre limpo)
+            return url.replace(/\/view.*|\/edit.*|\?usp=sharing/g, "") + "/preview";
+        }
+        return url;
+    };
+
     // Função auxiliar para cards de links (Books, etc)
     const criarCardLink = (titulo, link, icone) => {
         if (!link || link.length < 5) return "";
+        const linkSeguro = tratarLinkDrive(link);
         return `
         <div style="display:flex; align-items:center; background:#fff; border-radius:4px; padding:0 10px; gap:8px; margin-top:6px; height:${ALTURA_PADRAO};">
             <span style="font-size:0.9rem;">${icone}</span>
             <div style="flex-grow:1; font-size:0.75rem; font-weight:bold; color:#333;">${titulo.toUpperCase()}</div>
             <div style="display:flex; gap:4px;">
-                <button onclick="window.open('${link}','_blank')" style="background:#00713a; color:#fff; border:none; border-radius:4px; padding:0 8px; height:20px; font-size:0.55rem; font-weight:bold; cursor:pointer;">ABRIR</button>
-                <button onclick="copyToClipboard('${link}')" style="background:#666; color:#fff; border:none; border-radius:4px; padding:0 8px; height:20px; font-size:0.55rem; font-weight:bold; cursor:pointer;">URL</button>
+                <button onclick="window.open('${linkSeguro}','_blank')" style="background:#00713a; color:#fff; border:none; border-radius:4px; padding:0 8px; height:20px; font-size:0.55rem; font-weight:bold; cursor:pointer;">ABRIR</button>
+                <button onclick="copyToClipboard('${linkSeguro}')" style="background:#666; color:#fff; border:none; border-radius:4px; padding:0 8px; height:20px; font-size:0.55rem; font-weight:bold; cursor:pointer;">COPIAR</button>
             </div>
         </div>`;
     };
@@ -128,7 +139,7 @@ function exibirDadosResidencial(info) {
         <div style="font-size:0.82rem; color:#fff; margin-bottom:12px; font-weight:bold;">📍 ${info.endereco}</div>
         <div style="display:flex; gap:8px; margin-bottom:15px;">
             <button onclick="window.open('${linkM}','_blank')" style="width:70px; height:${ALTURA_PADRAO}; background:#4285F4; color:#fff; border:none; border-radius:4px; font-weight:800; cursor:pointer; font-size:0.7rem;">MAPS</button>
-            <button onclick="copyToClipboard('${info.link}')" style="width:70px; height:${ALTURA_PADRAO}; background:#444; color:#fff; border:none; border-radius:4px; font-weight:800; cursor:pointer; font-size:0.7rem;">LINK</button>
+            <button onclick="copyToClipboard('${tratarLinkDrive(info.link)}')" style="width:70px; height:${ALTURA_PADRAO}; background:#444; color:#fff; border:none; border-radius:4px; font-weight:800; cursor:pointer; font-size:0.7rem;">COPIAR</button>
         </div>`;
 
     if (info.categoria === "COMPLEXO") {
@@ -160,7 +171,7 @@ function exibirDadosResidencial(info) {
                     <div style="color:#fff; font-size:0.75rem; line-height:1.2; flex-grow:1;">${info.estandeVendas.toUpperCase()}</div>
                     <div style="display:flex; flex-direction:column; gap:5px;">
                         <button onclick="window.open('${linkE}','_blank')" style="padding:5px 8px; background:#4285F4; color:#fff; border:none; border-radius:3px; font-size:0.55rem; font-weight:bold; cursor:pointer;">MAPS</button>
-                        <button onclick="copyToClipboard('${info.estandeVendas}')" style="padding:5px 8px; background:#666; color:#fff; border:none; border-radius:3px; font-size:0.55rem; font-weight:bold; cursor:pointer;">LINK</button>
+                        <button onclick="copyToClipboard('${info.estandeVendas}')" style="padding:5px 8px; background:#666; color:#fff; border:none; border-radius:3px; font-size:0.55rem; font-weight:bold; cursor:pointer;">COPIAR</button>
                     </div>
                 </div>
             </div>`;
@@ -183,7 +194,7 @@ function exibirDadosResidencial(info) {
         html += criarCardTexto("🛒 Comércio", info.comercio, "#7b1fa2");
         html += criarCardTexto("🏥 Saúde e Educação", info.saudeEducacao, "#0054a6");
 
-        // NOVOS LINKS PADRONIZADOS (Aparecem no final do residencial)
+        // LINKS DE BOOKS (Com COPIAR e proteção de Drive)
         html += criarCardLink("Book Cliente", info.bookCliente, "📄");
         html += criarCardLink("Book Corretor", info.bookCorretor, "💼");
     }
