@@ -1,5 +1,5 @@
 /* ==========================================================================
-   js v140.8.1 - COMPLETO: PREÇOS, COMPLEXOS E DESIGN REFINADO
+   js v140.8.2 - VERSÃO INTEGRAL: FIX FULLSCREEN E MERGULHO DO MENU
    ========================================================================== */
 
 /* ==========================================================================
@@ -20,7 +20,7 @@ const AJUSTES_MAPA = {
 const ALTURA_PADRAO = "28px";
 
 /* ==========================================================================
-   BLOCO 2: AUXILIARES E FULLSCREEN
+   BLOCO 2: AUXILIARES E FULLSCREEN (COM CORREÇÃO DE ÍCONE DEFINITIVA)
    ========================================================================== */
 function obterCorPorZona(info) {
     const z = info.zona ? info.zona.trim().toUpperCase() : "";
@@ -36,7 +36,9 @@ function obterCorPorZona(info) {
 function atualizarIconeFullscreen() {
     const btn = document.getElementById('btn-fullscreen');
     if (!btn) return;
-    const isFull = document.fullscreenElement || document.webkitFullscreenElement;
+    // Verifica todos os estados possíveis de tela cheia no navegador
+    const isFull = !!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement);
+    
     btn.innerHTML = isFull ? `
         <svg viewBox="0 0 24 24" width="24" height="24" fill="white">
             <path d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z"/>
@@ -46,27 +48,31 @@ function atualizarIconeFullscreen() {
         </svg>`;
 }
 
+// Escutadores globais: O ícone muda sozinho sempre que a tela mudar de tamanho
+document.addEventListener('fullscreenchange', atualizarIconeFullscreen);
+document.addEventListener('webkitfullscreenchange', atualizarIconeFullscreen);
+
 function solicitarFullscreen() {
     const elem = document.documentElement;
     if (!document.fullscreenElement && !document.webkitFullscreenElement) {
         if (elem.requestFullscreen) elem.requestFullscreen();
         else if (elem.webkitRequestFullscreen) elem.webkitRequestFullscreen();
     }
-    setTimeout(atualizarIconeFullscreen, 150);
 }
 
 function alternarFullscreen() {
     const elem = document.documentElement;
     if (!document.fullscreenElement && !document.webkitFullscreenElement) {
         if (elem.requestFullscreen) elem.requestFullscreen();
+        else if (elem.webkitRequestFullscreen) elem.webkitRequestFullscreen();
     } else {
         if (document.exitFullscreen) document.exitFullscreen();
+        else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
     }
-    setTimeout(atualizarIconeFullscreen, 150);
 }
 
 /* ==========================================================================
-   BLOCO 3: GESTÃO DE DADOS (MAPEAMENTO DE COLUNAS)
+   BLOCO 3: GESTÃO DE DADOS
    ========================================================================== */
 async function carregarPlanilha() {
     try {
@@ -86,7 +92,7 @@ async function carregarPlanilha() {
                     zona: limpar(c[3]).toUpperCase(),
                     nomeCurto: limpar(c[4]),
                     endereco: limpar(c[7]),
-                    precosRaw: limpar(c[8]),    // Coluna I
+                    precosRaw: limpar(c[8]),
                     destaqueCampanha: limpar(c[16]), 
                     link: limpar(c[16]), 
                     descLonga: limpar(c[18]),
@@ -130,7 +136,7 @@ function limparSelecaoAnterior() {
 }
 
 /* ==========================================================================
-   BLOCO 5: CLIQUE NO MAPA E VITRINE (28px E RECUO 25px)
+   BLOCO 5: CLIQUE NO MAPA E VITRINE (COM AJUSTE DE MERGULHO)
    ========================================================================== */
 function clicarNoMapa(pathElement, infoSelecionado, pDataRaw = null) {
     solicitarFullscreen();
@@ -160,12 +166,16 @@ function clicarNoMapa(pathElement, infoSelecionado, pDataRaw = null) {
                 btn.style.height = ALTURA_PADRAO;
                 btn.style.display = "flex";
                 btn.style.alignItems = "center";
-                btn.style.paddingLeft = "25px"; // RECUO MERGULHADO
+                
+                // AJUSTE DE MERGULHO
+                btn.style.marginLeft = "-10px"; 
+                btn.style.paddingLeft = "25px"; 
+                btn.style.width = "calc(100% + 10px)";
                 btn.style.paddingRight = "8px";
                 btn.style.fontSize = "0.7rem";
                 btn.style.marginBottom = "4px";
                 btn.style.borderRadius = "4px";
-                btn.style.width = "100%";
+                btn.style.boxSizing = "border-box";
                 
                 const corZona = obterCorPorZona(item);
                 if (item.categoria === "COMPLEXO") {
@@ -186,7 +196,7 @@ function clicarNoMapa(pathElement, infoSelecionado, pDataRaw = null) {
 }
 
 /* ==========================================================================
-   BLOCO 6: DESENHO DO SVG (MAPA)
+   BLOCO 6: DESENHO DO SVG
    ========================================================================== */
 function desenharMapa(dados, targetId, ehMinimizado) {
     const container = document.getElementById(targetId);
@@ -337,6 +347,8 @@ function gerarMenuResidenciais() {
     const lista = document.getElementById('lista-residenciais');
     if (!lista) return;
     lista.innerHTML = ""; 
+    lista.style.overflowX = "hidden";
+
     [...window.dadosGerais].sort((a, b) => a.ordem - b.ordem).forEach(info => {
         if (!info.nomeCurto) return;
         const li = document.createElement('li');
@@ -345,7 +357,13 @@ function gerarMenuResidenciais() {
         li.style.height = ALTURA_PADRAO;
         li.style.display = "flex";
         li.style.alignItems = "center";
-        li.style.paddingLeft = "25px"; // RECUO MERGULHADO
+        
+        // AJUSTE DE MERGULHO NO MENU
+        li.style.marginLeft = "-10px";
+        li.style.paddingLeft = "25px";
+        li.style.width = "calc(100% + 10px)";
+        li.style.boxSizing = "border-box";
+
         li.style.fontSize = "0.75rem";
         li.style.marginBottom = "4px";
         li.style.borderRadius = "4px";
