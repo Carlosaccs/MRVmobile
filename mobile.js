@@ -1,5 +1,5 @@
 /* ==========================================================================
-   js v140.8.4 - NOMES EM CINZA ATIVADOS + MENU ESTÁVEL + LARGURA -20%
+   js v140.8.5 - FIX CINZA + ALINHAMENTO VITRINE INDEPENDENTE
    ========================================================================== */
 
 /* ==========================================================================
@@ -120,50 +120,52 @@ function atualizarTextoTopo(nome) {
     if (indicador) indicador.innerText = nome ? nome.toUpperCase() : (mapaAtivo === "GSP" ? "GRANDE SP" : "ESTADO DE SP");
 }
 
+function limparFichaTecnica() {
+    const vitrine = document.getElementById('container-vitrine-botoes');
+    if (vitrine) vitrine.innerHTML = "";
+    if (document.getElementById('nome-imovel')) document.getElementById('nome-imovel').innerText = "";
+    if (document.getElementById('detalhes-imovel')) document.getElementById('detalhes-imovel').innerHTML = "";
+}
+
 function limparSelecaoAnterior() {
     cidadeClicadaAtiva = null;
     document.querySelectorAll('#mapa-container path').forEach(p => {
         p.setAttribute('data-selecionado', 'false');
         p.style.fill = p.getAttribute('data-cor-base');
     });
-    const vitrine = document.getElementById('container-vitrine-botoes');
-    if (vitrine) vitrine.innerHTML = "";
-    if (document.getElementById('nome-imovel')) document.getElementById('nome-imovel').innerText = "";
-    if (document.getElementById('detalhes-imovel')) document.getElementById('detalhes-imovel').innerHTML = "";
+    limparFichaTecnica();
     atualizarTextoTopo(null);
 }
 
 /* ==========================================================================
-   BLOCO 5: CLIQUE NO MAPA (CORREÇÃO PARA PATHS CINZA)
+   BLOCO 5: CLIQUE NO MAPA (FIX TOQUE CINZA + VITRINE ALINHADA)
    ========================================================================== */
 function clicarNoMapa(pathElement, infoSelecionado, pDataRaw = null) {
     solicitarFullscreen();
     const idRegiao = pathElement.id.replace('mini-', '').toLowerCase();
     
-    // Limpa destaque anterior
+    // 1. Limpa destaque e reseta cores
     document.querySelectorAll('#mapa-container path').forEach(p => { 
         p.setAttribute('data-selecionado', 'false'); 
         p.style.fill = p.getAttribute('data-cor-base'); 
     });
 
-    // Destaca a região clicada (mesmo se for cinza)
+    // 2. Destaca o path tocado (verde ou cinza)
     pathElement.setAttribute('data-selecionado', 'true');
     pathElement.style.fill = "#FF4500"; 
     
-    // Atualiza o nome da cidade no topo (Independente de ter MRV ou não)
+    // 3. Atualiza nome do topo sempre
     const nomeDaCidade = pDataRaw ? pDataRaw.name : pathElement.getAttribute('data-name');
     cidadeClicadaAtiva = { name: (nomeDaCidade || "").toUpperCase() }; 
     atualizarTextoTopo(cidadeClicadaAtiva.name);
     
-    // Filtra dados apenas se a região for da MRV
+    // 4. Busca dados
     const todosDestaRegiao = window.dadosGerais.filter(d => d.id === idRegiao).sort((a, b) => a.ordem - b.ordem);
     
-    // Se não houver dados (Cidade Cinza), limpa a vitrine e a ficha
+    // Se for cinza (sem dados), limpa e para aqui
     if (todosDestaRegiao.length === 0 && !infoSelecionado) {
-        const vitrine = document.getElementById('container-vitrine-botoes');
-        if (vitrine) vitrine.innerHTML = "";
+        limparFichaTecnica();
         if (document.getElementById('nome-imovel')) document.getElementById('nome-imovel').innerText = "SEM LANÇAMENTOS";
-        if (document.getElementById('detalhes-imovel')) document.getElementById('detalhes-imovel').innerHTML = "";
         return;
     }
 
@@ -180,9 +182,10 @@ function clicarNoMapa(pathElement, infoSelecionado, pDataRaw = null) {
                 btn.style.height = ALTURA_PADRAO;
                 btn.style.display = "flex";
                 btn.style.alignItems = "center";
-                btn.style.marginLeft = "-10px"; 
-                btn.style.paddingLeft = "25px"; 
-                btn.style.width = "calc(100% + 10px)";
+                
+                // ALINHAMENTO DA VITRINE: Sem margem negativa, alinhado à esquerda
+                btn.style.paddingLeft = "10px"; 
+                btn.style.width = "100%";
                 btn.style.paddingRight = "8px";
                 btn.style.fontSize = "0.7rem";
                 btn.style.marginBottom = "4px";
@@ -208,7 +211,7 @@ function clicarNoMapa(pathElement, infoSelecionado, pDataRaw = null) {
 }
 
 /* ==========================================================================
-   BLOCO 6: DESENHO DO SVG (HABILITA CLIQUE EM TUDO)
+   BLOCO 6: DESENHO DO SVG
    ========================================================================== */
 function desenharMapa(dados, targetId, ehMinimizado) {
     const container = document.getElementById(targetId);
@@ -233,16 +236,11 @@ function desenharMapa(dados, targetId, ehMinimizado) {
         path.style.fill = corBase; path.style.stroke = "#ffffff"; path.style.strokeWidth = (ehMinimizado || !ehMRV) ? "0" : "1.2";
         path.setAttribute('data-cor-base', corBase);
         
-        // Clique habilitado para TODOS os paths no mapa principal
         if (!ehMinimizado) {
             path.onclick = (e) => { 
                 e.stopPropagation(); 
-                if (pData.id === "grandesaopaulo") { 
-                    trocarMapas(); 
-                } else { 
-                    // Agora qualquer path (verde ou cinza) chama a função de clique
-                    clicarNoMapa(path, null, pData); 
-                } 
+                if (pData.id === "grandesaopaulo") trocarMapas(); 
+                else clicarNoMapa(path, null, pData); 
             };
         }
         g.appendChild(path);
@@ -363,7 +361,7 @@ function exibirDadosResidencial(info) {
 }
 
 /* ==========================================================================
-   BLOCO 8: MENU LATERAL
+   BLOCO 8: MENU LATERAL (FIX ALINHAMENTO INTERNO)
    ========================================================================== */
 function gerarMenuResidenciais() {
     const menuEl = document.getElementById('menu-lateral');
@@ -383,6 +381,8 @@ function gerarMenuResidenciais() {
         li.style.height = ALTURA_PADRAO;
         li.style.display = "flex";
         li.style.alignItems = "center";
+        
+        // ALINHAMENTO DO MENU LATERAL: Com mergulho à esquerda
         li.style.marginLeft = "-10px";
         li.style.paddingLeft = "25px";
         li.style.width = "calc(100% + 10px)";
