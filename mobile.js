@@ -1,5 +1,5 @@
 /* ==========================================================================
-   js v140.7.8 - CONEXÃO REAL COM PLANILHA (COLUNAS J, M, K, L, G, N, P)
+   js v140.8.1 - COMPLETO: PREÇOS, COMPLEXOS E DESIGN REFINADO
    ========================================================================== */
 
 /* ==========================================================================
@@ -33,12 +33,26 @@ function obterCorPorZona(info) {
     }
 }
 
+function atualizarIconeFullscreen() {
+    const btn = document.getElementById('btn-fullscreen');
+    if (!btn) return;
+    const isFull = document.fullscreenElement || document.webkitFullscreenElement;
+    btn.innerHTML = isFull ? `
+        <svg viewBox="0 0 24 24" width="24" height="24" fill="white">
+            <path d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z"/>
+        </svg>` : `
+        <svg viewBox="0 0 24 24" width="24" height="24" fill="white">
+            <path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/>
+        </svg>`;
+}
+
 function solicitarFullscreen() {
     const elem = document.documentElement;
     if (!document.fullscreenElement && !document.webkitFullscreenElement) {
         if (elem.requestFullscreen) elem.requestFullscreen();
         else if (elem.webkitRequestFullscreen) elem.webkitRequestFullscreen();
     }
+    setTimeout(atualizarIconeFullscreen, 150);
 }
 
 function alternarFullscreen() {
@@ -48,10 +62,11 @@ function alternarFullscreen() {
     } else {
         if (document.exitFullscreen) document.exitFullscreen();
     }
+    setTimeout(atualizarIconeFullscreen, 150);
 }
 
 /* ==========================================================================
-   BLOCO 3: GESTÃO DE DADOS (INCLUSÃO DA COLUNA I)
+   BLOCO 3: GESTÃO DE DADOS (MAPEAMENTO DE COLUNAS)
    ========================================================================== */
 async function carregarPlanilha() {
     try {
@@ -71,7 +86,7 @@ async function carregarPlanilha() {
                     zona: limpar(c[3]).toUpperCase(),
                     nomeCurto: limpar(c[4]),
                     endereco: limpar(c[7]),
-                    precosRaw: limpar(c[8]),    // Coluna I (índice 8) - A NOVA ESTRELA
+                    precosRaw: limpar(c[8]),    // Coluna I
                     destaqueCampanha: limpar(c[16]), 
                     link: limpar(c[16]), 
                     descLonga: limpar(c[18]),
@@ -115,12 +130,10 @@ function limparSelecaoAnterior() {
 }
 
 /* ==========================================================================
-   BLOCO 5: CLIQUE NO MAPA E VITRINE (AJUSTE DE RECUO E ÍCONE)
+   BLOCO 5: CLIQUE NO MAPA E VITRINE (28px E RECUO 25px)
    ========================================================================== */
 function clicarNoMapa(pathElement, infoSelecionado, pDataRaw = null) {
     solicitarFullscreen();
-    atualizarIconeFullscreen(); // Garante que o ícone mude ao ampliar via toque
-    
     const idRegiao = pathElement.id.replace('mini-', '').toLowerCase();
     document.querySelectorAll('#mapa-container path').forEach(p => { 
         p.setAttribute('data-selecionado', 'false'); 
@@ -147,7 +160,7 @@ function clicarNoMapa(pathElement, infoSelecionado, pDataRaw = null) {
                 btn.style.height = ALTURA_PADRAO;
                 btn.style.display = "flex";
                 btn.style.alignItems = "center";
-                btn.style.paddingLeft = "25px"; // RECUO PARA MERGULHAR SOB A FAIXA VERDE
+                btn.style.paddingLeft = "25px"; // RECUO MERGULHADO
                 btn.style.paddingRight = "8px";
                 btn.style.fontSize = "0.7rem";
                 btn.style.marginBottom = "4px";
@@ -215,7 +228,7 @@ function atualizarVisualizacao() {
 }
 
 /* ==========================================================================
-   BLOCO 7: FICHA TÉCNICA (RESTAURAÇÃO DE COMPLEXOS E TABELA)
+   BLOCO 7: FICHA TÉCNICA (COMPLEXO + RESIDENCIAL + PREÇOS)
    ========================================================================= */
 function exibirDadosResidencial(info) {
     const elNome = document.getElementById('nome-imovel');
@@ -254,13 +267,11 @@ function exibirDadosResidencial(info) {
         let cards = criarCard("Book Cliente", info.bookCliente, "📄") + criarCard("Book Corretor", info.bookCorretor, "💼") + criarCard("Vídeo Decorado", info.videoDecorado, "🎬");
         htmlContent += htmlDesc + (cards ? `<div style="margin-top: 5px;">${cards}</div>` : "");
     } else {
-        // --- LÓGICA RESIDENCIAL (CAIXA Q, GRID 6 E TABELA DE PREÇOS) ---
         let htmlCaixaQ = (info.destaqueCampanha && info.destaqueCampanha.trim() !== "") ? `
             <div style="background: #fff; color: #e31c19; height: ${ALTURA_PADRAO}; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 0.75rem; border-radius: 4px; margin-bottom: 8px; text-transform: uppercase;">
                 ${info.destaqueCampanha}
             </div>` : "";
 
-        // Reutilizando a lógica de estoque da v140.7.9
         let estoqueHtml = "";
         const estValue = info.estoque ? info.estoque.toString().trim() : "";
         const estNum = parseInt(estValue);
@@ -286,7 +297,6 @@ function exibirDadosResidencial(info) {
                 ${criarCaixaDado("C. PAULISTA", `<span style="color: #fff; font-size: 0.72rem; font-weight: bold;">${info.cPaulista || "---"}</span>`)}
             </div>`;
 
-        // TABELA DE PREÇOS (Coluna I)
         let htmlPrecos = "";
         if (info.precosRaw && info.precosRaw.includes(";")) {
             const blocos = info.precosRaw.split(";");
@@ -319,22 +329,10 @@ function exibirDadosResidencial(info) {
     }
     elDetalhes.innerHTML = htmlContent;
 }
-/* ==========================================================================
-   BLOCO 8: MENU E FULLSCREEN (SINCRONIA DE ÍCONES)
-   ========================================================================== */
-function atualizarIconeFullscreen() {
-    const btn = document.getElementById('btn-fullscreen');
-    if (!btn) return;
-    const isFull = document.fullscreenElement || document.webkitFullscreenElement;
-    btn.innerHTML = isFull ? `
-        <svg viewBox="0 0 24 24" width="24" height="24" fill="white">
-            <path d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z"/>
-        </svg>` : `
-        <svg viewBox="0 0 24 24" width="24" height="24" fill="white">
-            <path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/>
-        </svg>`;
-}
 
+/* ==========================================================================
+   BLOCO 8: MENU LATERAL E EVENTOS
+   ========================================================================== */
 function gerarMenuResidenciais() {
     const lista = document.getElementById('lista-residenciais');
     if (!lista) return;
@@ -347,7 +345,7 @@ function gerarMenuResidenciais() {
         li.style.height = ALTURA_PADRAO;
         li.style.display = "flex";
         li.style.alignItems = "center";
-        li.style.paddingLeft = "25px"; // RECUO PARA MERGULHAR SOB A FAIXA VERDE
+        li.style.paddingLeft = "25px"; // RECUO MERGULHADO
         li.style.fontSize = "0.75rem";
         li.style.marginBottom = "4px";
         li.style.borderRadius = "4px";
@@ -378,15 +376,6 @@ function gerarMenuResidenciais() {
     });
 }
 
-function alternarFullscreen() {
-    const elem = document.documentElement;
-    if (!document.fullscreenElement && !document.webkitFullscreenElement) {
-        if (elem.requestFullscreen) elem.requestFullscreen();
-    } else {
-        if (document.exitFullscreen) document.exitFullscreen();
-    }
-    setTimeout(atualizarIconeFullscreen, 150); // Pequeno atraso para o navegador processar
-}
 function toggleMenu() { solicitarFullscreen(); const menu = document.getElementById('menu-lateral'); if(menu) { menu.classList.toggle('menu-aberto'); menu.classList.toggle('menu-oculto'); } }
 function copyToClipboard(text) { if(!text || text === "#") return alert("Link indisponível"); navigator.clipboard.writeText(text).then(() => alert("Copiado!")); }
 
