@@ -1,5 +1,5 @@
 /* ==========================================================================
-   js v141.0.1 - RESTAURAÇÃO COMPLETA: FIX COMPLEXOS, PREÇOS E FULLSCREEN
+   js v141.0.2 - FIX: DESTAQUE RÁPIDO (800ms) + CINZA ESCURO EM ÁREAS OFF
    ========================================================================== */
 
 const svgNS = "http://www.w3.org/2000/svg";
@@ -92,17 +92,20 @@ function clicarNoMapa(pathElement, infoSelecionado, pDataRaw = null) {
     const ehVerde = pathElement.getAttribute('data-cor-base') === "#00713a";
     const nomePath = pDataRaw ? pDataRaw.name : pathElement.getAttribute('data-name');
 
-    // Se clicar em cinza sem item selecionado, só mostra nome e volta
+    // REGRA PARA PATHS CINZA (SEM EMPREENDIMENTO)
     if (!ehVerde && !infoSelecionado) {
         atualizarTextoTopo(nomePath);
-        pathElement.style.fill = "#FF4500";
+        const corOriginal = pathElement.getAttribute('data-cor-base');
+        pathElement.style.fill = "#666666"; // DESTAQUE CINZA ESCURO
+        
         setTimeout(() => { 
-            pathElement.style.fill = pathElement.getAttribute('data-cor-base');
-            atualizarTextoTopo(regiaoAtivaGeral); 
-        }, 1000);
+            pathElement.style.fill = corOriginal;
+            atualizarTextoTopo(regiaoAtivaGeral); // RETORNA PARA A REGIÃO VERDE ATIVA
+        }, 800); // 0.8 SEGUNDOS
         return;
     }
 
+    // REGRA PARA PATHS VERDE (COM EMPREENDIMENTO)
     regiaoAtivaGeral = nomePath;
     atualizarTextoTopo(regiaoAtivaGeral);
 
@@ -156,7 +159,7 @@ function exibirDadosResidencial(info) {
         html += (info.descLonga ? `<div style="font-size:0.82rem; color:#eee; margin-bottom:10px;">${info.descLonga}</div>` : "") + criarCard("Book Cliente", info.bookCliente, "📄") + criarCard("Book Corretor", info.bookCorretor, "💼");
     } else {
         const camp = (info.destaqueCampanha) ? `<div style="background:#fff; color:#e31c19; height:${ALTURA_PADRAO}; display:flex; align-items:center; justify-content:center; font-weight:900; font-size:0.75rem; border-radius:4px; margin-bottom:8px;">${info.destaqueCampanha.toUpperCase()}</div>` : "";
-        const pTxt = (info.plantaMin && info.plantaMax) ? `${info.plantaMin} até ${info.plantaMax}` : (info.plantaMin || "---");
+        const pTxt = (info.plantaMin && info.plantaMax) ? `${info.plantaMin} até ${info.plantaMax} m²` : (info.plantaMin || "---");
         let eH = ""; const eN = parseInt(info.estoque);
         if (!info.estoque) eH = "---"; else if (info.estoque === "-") eH = "CONSULTAR"; else if (eN === 0) eH = `<span style="text-decoration:line-through; color:#bbb;">VENDIDO</span>`; else if (eN < 5) eH = `<span style="color:#e31c19;">APENAS ${eN} UN.</span>`; else eH = `RESTAM ${eN} UN.`;
 
