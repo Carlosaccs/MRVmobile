@@ -1,7 +1,10 @@
 /* ==========================================================================
-   js v140.8.7 - FIX DEFINITIVO: TOQUE CINZA + FICHA COMPLETA + ALINHAMENTO
+   js v140.8.2 - VERSÃO INTEGRAL: FIX FULLSCREEN E MERGULHO DO MENU
    ========================================================================== */
 
+/* ==========================================================================
+   BLOCO 1: CONFIGURAÇÕES E VARIÁVEIS
+   ========================================================================== */
 const svgNS = "http://www.w3.org/2000/svg";
 const URL_PLANILHA = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSRKdJctOPQjKAtOZSDHyArD_H8SgKIouelAS1vF1d_-13pu7u_ic6J8nP3r0Ijd56WA-mbUmHjb4Me/pub?output=csv';
 
@@ -16,7 +19,9 @@ const AJUSTES_MAPA = {
 
 const ALTURA_PADRAO = "28px";
 
-/* --- AUXILIARES E FULLSCREEN --- */
+/* ==========================================================================
+   BLOCO 2: AUXILIARES E FULLSCREEN (COM CORREÇÃO DE ÍCONE DEFINITIVA)
+   ========================================================================== */
 function obterCorPorZona(info) {
     const z = info.zona ? info.zona.trim().toUpperCase() : "";
     switch(z) {
@@ -28,6 +33,25 @@ function obterCorPorZona(info) {
     }
 }
 
+function atualizarIconeFullscreen() {
+    const btn = document.getElementById('btn-fullscreen');
+    if (!btn) return;
+    // Verifica todos os estados possíveis de tela cheia no navegador
+    const isFull = !!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement);
+    
+    btn.innerHTML = isFull ? `
+        <svg viewBox="0 0 24 24" width="24" height="24" fill="white">
+            <path d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z"/>
+        </svg>` : `
+        <svg viewBox="0 0 24 24" width="24" height="24" fill="white">
+            <path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/>
+        </svg>`;
+}
+
+// Escutadores globais: O ícone muda sozinho sempre que a tela mudar de tamanho
+document.addEventListener('fullscreenchange', atualizarIconeFullscreen);
+document.addEventListener('webkitfullscreenchange', atualizarIconeFullscreen);
+
 function solicitarFullscreen() {
     const elem = document.documentElement;
     if (!document.fullscreenElement && !document.webkitFullscreenElement) {
@@ -37,14 +61,19 @@ function solicitarFullscreen() {
 }
 
 function alternarFullscreen() {
-    if (!document.fullscreenElement && !document.webkitFullscreenElement) solicitarFullscreen();
-    else {
+    const elem = document.documentElement;
+    if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+        if (elem.requestFullscreen) elem.requestFullscreen();
+        else if (elem.webkitRequestFullscreen) elem.webkitRequestFullscreen();
+    } else {
         if (document.exitFullscreen) document.exitFullscreen();
         else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
     }
 }
 
-/* --- GESTÃO DE DADOS --- */
+/* ==========================================================================
+   BLOCO 3: GESTÃO DE DADOS
+   ========================================================================== */
 async function carregarPlanilha() {
     try {
         const res = await fetch(`${URL_PLANILHA}&cache_buster=${Date.now()}`);
@@ -85,29 +114,37 @@ async function carregarPlanilha() {
     } catch (e) { console.error("Erro na planilha:", e); }
 }
 
-/* --- INTERFACE E TOPO --- */
+/* ==========================================================================
+   BLOCO 4: INTERFACE E TEXTOS
+   ========================================================================== */
 function atualizarTextoTopo(nome) {
     const indicador = document.getElementById('identificador-cidade');
     if (indicador) indicador.innerText = nome ? nome.toUpperCase() : (mapaAtivo === "GSP" ? "GRANDE SP" : "ESTADO DE SP");
 }
 
-function limparFichaTecnica() {
+function limparSelecaoAnterior() {
+    cidadeClicadaAtiva = null;
+    document.querySelectorAll('#mapa-container path').forEach(p => {
+        p.setAttribute('data-selecionado', 'false');
+        p.style.fill = p.getAttribute('data-cor-base');
+    });
     const vitrine = document.getElementById('container-vitrine-botoes');
     if (vitrine) vitrine.innerHTML = "";
-    if (document.getElementById('nome-imovel')) document.getElementById('nome-imovel').innerText = "SEM LANÇAMENTOS";
+    if (document.getElementById('nome-imovel')) document.getElementById('nome-imovel').innerText = "";
     if (document.getElementById('detalhes-imovel')) document.getElementById('detalhes-imovel').innerHTML = "";
+    atualizarTextoTopo(null);
 }
 
-/* --- CLIQUE E VITRINE (ALINHAMENTO FIXADO) --- */
+/* ==========================================================================
+   BLOCO 5: CLIQUE NO MAPA E VITRINE (COM AJUSTE DE MERGULHO)
+   ========================================================================== */
 function clicarNoMapa(pathElement, infoSelecionado, pDataRaw = null) {
     solicitarFullscreen();
     const idRegiao = pathElement.id.replace('mini-', '').toLowerCase();
-    
     document.querySelectorAll('#mapa-container path').forEach(p => { 
         p.setAttribute('data-selecionado', 'false'); 
         p.style.fill = p.getAttribute('data-cor-base'); 
     });
-
     pathElement.setAttribute('data-selecionado', 'true');
     pathElement.style.fill = "#FF4500"; 
     
@@ -116,15 +153,9 @@ function clicarNoMapa(pathElement, infoSelecionado, pDataRaw = null) {
     atualizarTextoTopo(cidadeClicadaAtiva.name);
     
     const todosDestaRegiao = window.dadosGerais.filter(d => d.id === idRegiao).sort((a, b) => a.ordem - b.ordem);
-    
-    if (todosDestaRegiao.length === 0 && !infoSelecionado) {
-        limparFichaTecnica();
-        return;
-    }
-
     const ativo = infoSelecionado || todosDestaRegiao[0];
-    const containerBotoes = document.getElementById('container-vitrine-botoes');
     
+    const containerBotoes = document.getElementById('container-vitrine-botoes');
     if(containerBotoes) {
         containerBotoes.innerHTML = "";
         todosDestaRegiao.forEach(item => {
@@ -136,10 +167,11 @@ function clicarNoMapa(pathElement, infoSelecionado, pDataRaw = null) {
                 btn.style.display = "flex";
                 btn.style.alignItems = "center";
                 
-                // ALINHAMENTO VITRINE: Sem margem negativa, alinhado à esquerda
-                btn.style.marginLeft = "0px";
-                btn.style.paddingLeft = "10px"; 
-                btn.style.width = "100%";
+                // AJUSTE DE MERGULHO
+                btn.style.marginLeft = "-10px"; 
+                btn.style.paddingLeft = "25px"; 
+                btn.style.width = "calc(100% + 10px)";
+                btn.style.paddingRight = "8px";
                 btn.style.fontSize = "0.7rem";
                 btn.style.marginBottom = "4px";
                 btn.style.borderRadius = "4px";
@@ -163,7 +195,9 @@ function clicarNoMapa(pathElement, infoSelecionado, pDataRaw = null) {
     if (ativo) exibirDadosResidencial(ativo);
 }
 
-/* --- DESENHO DO MAPA --- */
+/* ==========================================================================
+   BLOCO 6: DESENHO DO SVG
+   ========================================================================== */
 function desenharMapa(dados, targetId, ehMinimizado) {
     const container = document.getElementById(targetId);
     if (!container || !dados) return;
@@ -186,22 +220,15 @@ function desenharMapa(dados, targetId, ehMinimizado) {
         const corBase = ehMRV ? "#00713a" : "#cccccc";
         path.style.fill = corBase; path.style.stroke = "#ffffff"; path.style.strokeWidth = (ehMinimizado || !ehMRV) ? "0" : "1.2";
         path.setAttribute('data-cor-base', corBase);
-        
         if (!ehMinimizado) {
-            path.onpointerdown = (e) => { e.stopPropagation(); atualizarTextoTopo(pData.name); };
-            path.onpointerleave = () => { atualizarTextoTopo(cidadeClicadaAtiva ? cidadeClicadaAtiva.name : null); };
-            path.onclick = (e) => { 
-                e.stopPropagation(); 
-                if (pData.id === "grandesaopaulo") trocarMapas(); 
-                else clicarNoMapa(path, null, pData); // Removida a trava do v140.7 para aceitar cinza
-            };
+            path.onclick = (e) => { e.stopPropagation(); if (pData.id === "grandesaopaulo") { trocarMapas(); } else if (ehMRV) clicarNoMapa(path, null, pData); };
         }
         g.appendChild(path);
     });
     svg.appendChild(g); container.appendChild(svg);
 }
 
-function trocarMapas() { solicitarFullscreen(); mapaAtivo = (mapaAtivo === "GSP") ? "INTERIOR" : "GSP"; atualizarVisualizacao(); atualizarTextoTopo(null); }
+function trocarMapas() { solicitarFullscreen(); limparSelecaoAnterior(); mapaAtivo = (mapaAtivo === "GSP") ? "INTERIOR" : "GSP"; atualizarVisualizacao(); }
 
 function atualizarVisualizacao() {
     if (typeof MAPA_GSP !== 'undefined' && typeof MAPA_INTERIOR !== 'undefined') {
@@ -210,7 +237,9 @@ function atualizarVisualizacao() {
     }
 }
 
-/* --- FICHA TÉCNICA COMPLETA --- */
+/* ==========================================================================
+   BLOCO 7: FICHA TÉCNICA (COMPLEXO + RESIDENCIAL + PREÇOS)
+   ========================================================================= */
 function exibirDadosResidencial(info) {
     const elNome = document.getElementById('nome-imovel');
     const elDetalhes = document.getElementById('detalhes-imovel');
@@ -255,22 +284,24 @@ function exibirDadosResidencial(info) {
 
         let estoqueHtml = "";
         const estValue = info.estoque ? info.estoque.toString().trim() : "";
-        if (estValue === "" || estValue === "-") estoqueHtml = `<span style="color: #fff; font-size: 0.72rem; font-weight: bold;">CONSULTAR</span>`;
-        else if (parseInt(estValue) === 0) estoqueHtml = `<span style="color: #bbb; font-size: 0.72rem; font-weight: bold; text-decoration: line-through;">VENDIDO</span>`;
-        else if (parseInt(estValue) < 5) estoqueHtml = `<span style="color: #e31c19; font-size: 0.72rem; font-weight: bold;">APENAS ${estValue} UN.</span>`;
-        else estoqueHtml = `<span style="color: #fff; font-size: 0.72rem; font-weight: bold;">RESTAM ${estValue} UN.</span>`;
+        const estNum = parseInt(estValue);
+        if (estValue === "" || estValue === null) estoqueHtml = "";
+        else if (estValue === "-") estoqueHtml = `<span style="color: #fff; font-size: 0.72rem; font-weight: bold;">CONSULTAR</span>`;
+        else if (estNum === 0) estoqueHtml = `<span style="color: #bbb; font-size: 0.72rem; font-weight: bold; text-decoration: line-through;">VENDIDO</span>`;
+        else if (estNum < 5) estoqueHtml = `<span style="color: #e31c19; font-size: 0.72rem; font-weight: bold;">APENAS ${estNum} UN.</span>`;
+        else estoqueHtml = `<span style="color: #fff; font-size: 0.72rem; font-weight: bold;">RESTAM ${estNum} UN.</span>`;
 
         const criarCaixaDado = (label, valorHtml) => `
-            <div style="background: #444; height: ${ALTURA_PADRAO}; border-radius: 4px; display: flex; align-items: center; justify-content: space-between; padding: 0 8px;">
-                <span style="color: #bbb; font-size: 0.55rem; font-weight: bold;">${label}</span>
-                <div style="flex-grow: 1; text-align: right;">${valorHtml}</div>
+            <div style="background: #444; height: ${ALTURA_PADRAO}; border-radius: 4px; display: flex; align-items: center; justify-content: space-between; padding: 0 8px; box-sizing: border-box;">
+                <span style="color: #bbb; font-size: 0.55rem; font-weight: bold; text-transform: uppercase;">${label}</span>
+                <div style="flex-grow: 1; text-align: right; display: flex; justify-content: flex-end;">${valorHtml}</div>
             </div>`;
 
         let htmlGrid6 = `
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 8px;">
                 ${criarCaixaDado("ENTREGA", `<span style="color: #fff; font-size: 0.72rem; font-weight: bold;">${info.entrega || "---"}</span>`)}
                 ${criarCaixaDado("OBRA", `<span style="color: #fff; font-size: 0.72rem; font-weight: bold;">${info.obra ? info.obra+'%' : '---'}</span>`)}
-                ${criarCaixaDado("PLANTAS", `<span style="color: #fff; font-size: 0.72rem; font-weight: bold;">${info.plantaMin || "---"}</span>`)}
+                ${criarCaixaDado("PLANTAS", `<span style="color: #fff; font-size: 0.72rem; font-weight: bold;">${(info.plantaMin && info.plantaMax) ? info.plantaMin + ' ATÉ ' + info.plantaMax : (info.plantaMin || "---")}</span>`)}
                 ${criarCaixaDado("ESTOQUE", estoqueHtml)}
                 ${criarCaixaDado("LIMITADOR", `<span style="color: #fff; font-size: 0.72rem; font-weight: bold;">${info.limitador || "---"}</span>`)}
                 ${criarCaixaDado("C. PAULISTA", `<span style="color: #fff; font-size: 0.72rem; font-weight: bold;">${info.cPaulista || "---"}</span>`)}
@@ -309,12 +340,17 @@ function exibirDadosResidencial(info) {
     elDetalhes.innerHTML = htmlContent;
 }
 
-/* --- MENU LATERAL (MANTÉM O MERGULHO) --- */
+/* ==========================================================================
+   BLOCO 8: MENU LATERAL E EVENTOS
+   ========================================================================== */
 function gerarMenuResidenciais() {
     const lista = document.getElementById('lista-residenciais');
     if (!lista) return;
     lista.innerHTML = ""; 
+    lista.style.overflowX = "hidden";
+
     [...window.dadosGerais].sort((a, b) => a.ordem - b.ordem).forEach(info => {
+        if (!info.nomeCurto) return;
         const li = document.createElement('li');
         li.className = 'menu-item-mrv';
         li.innerText = info.nomeCurto.toUpperCase();
@@ -322,26 +358,37 @@ function gerarMenuResidenciais() {
         li.style.display = "flex";
         li.style.alignItems = "center";
         
-        // ESTILO MENU LATERAL: Com mergulho à esquerda para o fundo verde
+        // AJUSTE DE MERGULHO NO MENU
         li.style.marginLeft = "-10px";
         li.style.paddingLeft = "25px";
         li.style.width = "calc(100% + 10px)";
-        li.style.fontSize = "0.7rem";
+        li.style.boxSizing = "border-box";
+
+        li.style.fontSize = "0.75rem";
         li.style.marginBottom = "4px";
         li.style.borderRadius = "4px";
 
         const corZona = obterCorPorZona(info);
         if (info.categoria === "COMPLEXO") { 
-            li.classList.add('estilo-complexo'); li.style.backgroundColor = corZona; li.style.color = "#ffffff";
+            li.classList.add('estilo-complexo'); 
+            li.style.backgroundColor = corZona; 
+            li.style.color = "#ffffff";
         } else { 
-            li.style.backgroundColor = "#ffffff"; li.style.color = "#333"; li.style.borderRight = `5px solid ${corZona}`; 
+            li.style.backgroundColor = "#ffffff";
+            li.style.color = "#333";
+            li.style.borderRight = `5px solid ${corZona}`; 
         }
         
         li.onclick = (e) => { 
             e.stopPropagation(); 
+            toggleMenu(); 
             let p = document.getElementById(info.id); 
-            if (!p) { trocarMapas(); setTimeout(() => { let np = document.getElementById(info.id); if (np) clicarNoMapa(np, info); }, 300); } 
-            else { clicarNoMapa(p, info); } 
+            if (!p) { 
+                trocarMapas(); 
+                setTimeout(() => { let np = document.getElementById(info.id); if (np) clicarNoMapa(np, info); }, 300); 
+            } else { 
+                clicarNoMapa(p, info); 
+            } 
         };
         lista.appendChild(li);
     });
