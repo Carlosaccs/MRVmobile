@@ -1,5 +1,5 @@
 /* ==========================================================================
-   js v140.8.6 - FIX TOQUE CINZA + ALINHAMENTO VITRINE
+   js v140.8.7 - FIX DEFINITIVO: TOQUE CINZA + FICHA COMPLETA + ALINHAMENTO
    ========================================================================== */
 
 const svgNS = "http://www.w3.org/2000/svg";
@@ -16,7 +16,7 @@ const AJUSTES_MAPA = {
 
 const ALTURA_PADRAO = "28px";
 
-/* --- AUXILIARES --- */
+/* --- AUXILIARES E FULLSCREEN --- */
 function obterCorPorZona(info) {
     const z = info.zona ? info.zona.trim().toUpperCase() : "";
     switch(z) {
@@ -37,15 +37,14 @@ function solicitarFullscreen() {
 }
 
 function alternarFullscreen() {
-    if (!document.fullscreenElement && !document.webkitFullscreenElement) {
-        solicitarFullscreen();
-    } else {
+    if (!document.fullscreenElement && !document.webkitFullscreenElement) solicitarFullscreen();
+    else {
         if (document.exitFullscreen) document.exitFullscreen();
         else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
     }
 }
 
-/* --- DADOS --- */
+/* --- GESTÃO DE DADOS --- */
 async function carregarPlanilha() {
     try {
         const res = await fetch(`${URL_PLANILHA}&cache_buster=${Date.now()}`);
@@ -86,7 +85,7 @@ async function carregarPlanilha() {
     } catch (e) { console.error("Erro na planilha:", e); }
 }
 
-/* --- INTERFACE --- */
+/* --- INTERFACE E TOPO --- */
 function atualizarTextoTopo(nome) {
     const indicador = document.getElementById('identificador-cidade');
     if (indicador) indicador.innerText = nome ? nome.toUpperCase() : (mapaAtivo === "GSP" ? "GRANDE SP" : "ESTADO DE SP");
@@ -99,29 +98,25 @@ function limparFichaTecnica() {
     if (document.getElementById('detalhes-imovel')) document.getElementById('detalhes-imovel').innerHTML = "";
 }
 
-/* --- CLIQUE E VITRINE --- */
+/* --- CLIQUE E VITRINE (ALINHAMENTO FIXADO) --- */
 function clicarNoMapa(pathElement, infoSelecionado, pDataRaw = null) {
     solicitarFullscreen();
     const idRegiao = pathElement.id.replace('mini-', '').toLowerCase();
     
-    // Reset visual
     document.querySelectorAll('#mapa-container path').forEach(p => { 
         p.setAttribute('data-selecionado', 'false'); 
         p.style.fill = p.getAttribute('data-cor-base'); 
     });
 
-    // Destaque Laranja
     pathElement.setAttribute('data-selecionado', 'true');
     pathElement.style.fill = "#FF4500"; 
     
-    // Nome no Topo
     const nomeDaCidade = pDataRaw ? pDataRaw.name : pathElement.getAttribute('data-name');
     cidadeClicadaAtiva = { name: (nomeDaCidade || "").toUpperCase() }; 
     atualizarTextoTopo(cidadeClicadaAtiva.name);
     
     const todosDestaRegiao = window.dadosGerais.filter(d => d.id === idRegiao).sort((a, b) => a.ordem - b.ordem);
     
-    // Se não tem dados, limpa e para
     if (todosDestaRegiao.length === 0 && !infoSelecionado) {
         limparFichaTecnica();
         return;
@@ -141,8 +136,8 @@ function clicarNoMapa(pathElement, infoSelecionado, pDataRaw = null) {
                 btn.style.display = "flex";
                 btn.style.alignItems = "center";
                 
-                // CORREÇÃO ALINHAMENTO VITRINE: Sem margem negativa aqui
-                btn.style.marginLeft = "0";
+                // ALINHAMENTO VITRINE: Sem margem negativa, alinhado à esquerda
+                btn.style.marginLeft = "0px";
                 btn.style.paddingLeft = "10px"; 
                 btn.style.width = "100%";
                 btn.style.fontSize = "0.7rem";
@@ -168,7 +163,7 @@ function clicarNoMapa(pathElement, infoSelecionado, pDataRaw = null) {
     if (ativo) exibirDadosResidencial(ativo);
 }
 
-/* --- MAPA --- */
+/* --- DESENHO DO MAPA --- */
 function desenharMapa(dados, targetId, ehMinimizado) {
     const container = document.getElementById(targetId);
     if (!container || !dados) return;
@@ -193,11 +188,12 @@ function desenharMapa(dados, targetId, ehMinimizado) {
         path.setAttribute('data-cor-base', corBase);
         
         if (!ehMinimizado) {
-            // Volta a aceitar cliques em qualquer lugar (verde ou cinza)
+            path.onpointerdown = (e) => { e.stopPropagation(); atualizarTextoTopo(pData.name); };
+            path.onpointerleave = () => { atualizarTextoTopo(cidadeClicadaAtiva ? cidadeClicadaAtiva.name : null); };
             path.onclick = (e) => { 
                 e.stopPropagation(); 
                 if (pData.id === "grandesaopaulo") trocarMapas(); 
-                else clicarNoMapa(path, null, pData); 
+                else clicarNoMapa(path, null, pData); // Removida a trava do v140.7 para aceitar cinza
             };
         }
         g.appendChild(path);
@@ -214,7 +210,7 @@ function atualizarVisualizacao() {
     }
 }
 
-/* --- FICHA TÉCNICA --- */
+/* --- FICHA TÉCNICA COMPLETA --- */
 function exibirDadosResidencial(info) {
     const elNome = document.getElementById('nome-imovel');
     const elDetalhes = document.getElementById('detalhes-imovel');
@@ -252,23 +248,68 @@ function exibirDadosResidencial(info) {
         let cards = criarCard("Book Cliente", info.bookCliente, "📄") + criarCard("Book Corretor", info.bookCorretor, "💼") + criarCard("Vídeo Decorado", info.videoDecorado, "🎬");
         htmlContent += htmlDesc + (cards ? `<div style="margin-top: 5px;">${cards}</div>` : "");
     } else {
+        let htmlCaixaQ = (info.destaqueCampanha && info.destaqueCampanha.trim() !== "") ? `
+            <div style="background: #fff; color: #e31c19; height: ${ALTURA_PADRAO}; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 0.75rem; border-radius: 4px; margin-bottom: 8px; text-transform: uppercase;">
+                ${info.destaqueCampanha}
+            </div>` : "";
+
+        let estoqueHtml = "";
+        const estValue = info.estoque ? info.estoque.toString().trim() : "";
+        if (estValue === "" || estValue === "-") estoqueHtml = `<span style="color: #fff; font-size: 0.72rem; font-weight: bold;">CONSULTAR</span>`;
+        else if (parseInt(estValue) === 0) estoqueHtml = `<span style="color: #bbb; font-size: 0.72rem; font-weight: bold; text-decoration: line-through;">VENDIDO</span>`;
+        else if (parseInt(estValue) < 5) estoqueHtml = `<span style="color: #e31c19; font-size: 0.72rem; font-weight: bold;">APENAS ${estValue} UN.</span>`;
+        else estoqueHtml = `<span style="color: #fff; font-size: 0.72rem; font-weight: bold;">RESTAM ${estValue} UN.</span>`;
+
+        const criarCaixaDado = (label, valorHtml) => `
+            <div style="background: #444; height: ${ALTURA_PADRAO}; border-radius: 4px; display: flex; align-items: center; justify-content: space-between; padding: 0 8px;">
+                <span style="color: #bbb; font-size: 0.55rem; font-weight: bold;">${label}</span>
+                <div style="flex-grow: 1; text-align: right;">${valorHtml}</div>
+            </div>`;
+
         let htmlGrid6 = `
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 8px;">
-                <div style="background: #444; height: ${ALTURA_PADRAO}; border-radius: 4px; display: flex; align-items: center; justify-content: space-between; padding: 0 8px;">
-                    <span style="color: #bbb; font-size: 0.55rem; font-weight: bold;">ENTREGA</span>
-                    <span style="color: #fff; font-size: 0.72rem; font-weight: bold;">${info.entrega || "---"}</span>
-                </div>
-                <div style="background: #444; height: ${ALTURA_PADRAO}; border-radius: 4px; display: flex; align-items: center; justify-content: space-between; padding: 0 8px;">
-                    <span style="color: #bbb; font-size: 0.55rem; font-weight: bold;">OBRA</span>
-                    <span style="color: #fff; font-size: 0.72rem; font-weight: bold;">${info.obra ? info.obra+'%' : '---'}</span>
-                </div>
+                ${criarCaixaDado("ENTREGA", `<span style="color: #fff; font-size: 0.72rem; font-weight: bold;">${info.entrega || "---"}</span>`)}
+                ${criarCaixaDado("OBRA", `<span style="color: #fff; font-size: 0.72rem; font-weight: bold;">${info.obra ? info.obra+'%' : '---'}</span>`)}
+                ${criarCaixaDado("PLANTAS", `<span style="color: #fff; font-size: 0.72rem; font-weight: bold;">${info.plantaMin || "---"}</span>`)}
+                ${criarCaixaDado("ESTOQUE", estoqueHtml)}
+                ${criarCaixaDado("LIMITADOR", `<span style="color: #fff; font-size: 0.72rem; font-weight: bold;">${info.limitador || "---"}</span>`)}
+                ${criarCaixaDado("C. PAULISTA", `<span style="color: #fff; font-size: 0.72rem; font-weight: bold;">${info.cPaulista || "---"}</span>`)}
             </div>`;
-        htmlContent += htmlGrid6;
+
+        let htmlPrecos = "";
+        if (info.precosRaw && info.precosRaw.includes(";")) {
+            const blocos = info.precosRaw.split(";");
+            const cabecalho = blocos[0].split(",");
+            let linhasHtml = "";
+            blocos.slice(1).forEach(linha => {
+                const d = linha.split(",");
+                if (d.length >= 4) {
+                    linhasHtml += `
+                        <div style="display: grid; grid-template-columns: 0.5fr 1.2fr 1fr 1fr; gap: 4px; padding: 6px 0; border-top: 1px solid #555; align-items: center;">
+                            <span style="color: #fff; font-weight: 800; font-size: 0.7rem;">${d[0]}</span>
+                            <span style="color: #fff; font-weight: 800; font-size: 0.7rem;">${d[1]}</span>
+                            <span style="color: #bbb; font-size: 0.6rem; text-align: right;">${d[2]}</span>
+                            <span style="color: #bbb; font-size: 0.6rem; text-align: right;">${d[3]}</span>
+                        </div>`;
+                }
+            });
+            htmlPrecos = `
+                <div style="background: #444; border-radius: 4px; padding: 8px; margin-top: 4px;">
+                    <div style="display: grid; grid-template-columns: 0.5fr 1.2fr 1fr 1fr; gap: 4px; margin-bottom: 4px;">
+                        <span style="color: #bbb; font-size: 0.5rem; font-weight: bold;">${cabecalho[0]}</span>
+                        <span style="color: #bbb; font-size: 0.5rem; font-weight: bold;">${cabecalho[1]}</span>
+                        <span style="color: #bbb; font-size: 0.5rem; font-weight: bold; text-align: right;">AVAL.</span>
+                        <span style="color: #bbb; font-size: 0.5rem; font-weight: bold; text-align: right;">B. PAG.</span>
+                    </div>
+                    ${linhasHtml}
+                </div>`;
+        }
+        htmlContent += htmlCaixaQ + htmlGrid6 + htmlPrecos;
     }
     elDetalhes.innerHTML = htmlContent;
 }
 
-/* --- MENU LATERAL --- */
+/* --- MENU LATERAL (MANTÉM O MERGULHO) --- */
 function gerarMenuResidenciais() {
     const lista = document.getElementById('lista-residenciais');
     if (!lista) return;
@@ -281,7 +322,7 @@ function gerarMenuResidenciais() {
         li.style.display = "flex";
         li.style.alignItems = "center";
         
-        // ESTILO MENU LATERAL: Com mergulho à esquerda
+        // ESTILO MENU LATERAL: Com mergulho à esquerda para o fundo verde
         li.style.marginLeft = "-10px";
         li.style.paddingLeft = "25px";
         li.style.width = "calc(100% + 10px)";
