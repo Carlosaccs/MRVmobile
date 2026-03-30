@@ -1,5 +1,5 @@
 /* ==========================================================================
-   DASHBOARD MRV - VERSÃO FINAL CONSOLIDADA v141.2.1
+   DASHBOARD MRV - VERSÃO FINAL CONSOLIDADA v141.3.0
    Foco: Estande de Vendas (AF), Performance de Mapa e Fullscreen Estável
    ========================================================================== */
 
