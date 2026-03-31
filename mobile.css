@@ -183,3 +183,43 @@ html, body {
     padding-top: 0px;
     margin-bottom: 5px;
 }
+
+/* ==========================================================================
+   BLOCO 7: CONTROLES DE ZOOM (MOBILE)
+   ========================================================================== */
+.zoom-container {
+    position: absolute;
+    bottom: 20px;
+    left: 80px; /* Fica ao lado da faixa verde de 60px */
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    z-index: 2500;
+}
+
+.btn-zoom {
+    width: 55px !important;    /* Tamanho do botão */
+    height: 55px !important;
+    background: white;
+    border: 2px solid var(--mrv-verde);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    cursor: pointer;
+    padding: 0;
+}
+
+/* AQUI ESTÁ O SEGREDO: Forçar o tamanho do SVG interno */
+.btn-zoom svg {
+    width: 32px !important;  /* Ajuste aqui para aumentar o ícone */
+    height: 32px !important;
+    fill: var(--mrv-verde);
+    pointer-events: none;    /* Impede que o clique pegue no ícone em vez do botão */
+}
+
+.btn-zoom:active {
+    background: #f0f0f0;
+    transform: scale(0.9);
+}
