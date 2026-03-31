@@ -26,30 +26,35 @@ html, body {
 }
 
 /* ==========================================================================
-   BLOCO 2: FAIXA VERDE E BOTÕES LATERAIS
+   BLOCO 2.1: AJUSTE ESPECÍFICO DOS ÍCONES DA FAIXA VERDE
    ========================================================================== */
-.faixa-verde-vertical {
-    position: absolute; left: 0; top: 0;
-    width: 60px; height: 100%;
-    background-color: #00713a;
-    display: flex; flex-direction: column;
-    align-items: center; justify-content: space-between;
-    padding: 15px 0; z-index: 4000;
-    box-shadow: none;
-    border-right: none;
+
+/* Ajuste do botão de Menu (Topo) */
+#btn-menu svg {
+    width: 32px !important; 
+    height: 32px !important;
+    transition: transform 0.2s;
 }
 
-.titulo-vertical {
-    writing-mode: vertical-rl; transform: rotate(180deg);
-    font-weight: bold; font-size: 1.1rem;
-    letter-spacing: 2px; color: white !important;
-    white-space: nowrap; flex-grow: 1;
-    display: flex; align-items: center; justify-content: center;
+/* Ajuste do botão de Fullscreen / Zoom (Base) */
+#btn-fullscreen {
+    margin-bottom: 10px; /* Afasta um pouco da borda inferior */
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-#btn-menu:active, #btn-fullscreen:active {
-    opacity: 0.5;
-    transform: scale(0.9);
+#btn-fullscreen svg {
+    width: 45px !important;  /* Aumentei para 45px conforme seu desejo de ampliar */
+    height: 45px !important;
+    transition: all 0.2s ease;
+}
+
+/* Efeito de clique para feedback visual no mobile */
+#btn-menu:active svg, 
+#btn-fullscreen:active svg {
+    transform: scale(0.85);
+    opacity: 0.7;
 }
 
 /* ==========================================================================
