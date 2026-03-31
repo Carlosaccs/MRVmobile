@@ -73,8 +73,8 @@ html, body {
 
 /* --- FORÇANDO O TAMANHO DO ÍCONE (SVG) --- */
 #btn-menu svg, #btn-fullscreen svg {
-    width: 32px !important;  /* Aumentado de 20px para 32px */
-    height: 32px !important; /* Força o redimensionamento visual */
+    width: 40px !important;  /* Aumentado de 20px para 32px */
+    height: 40px !important; /* Força o redimensionamento visual */
     fill: white;
     display: block;
     transition: transform 0.2s, opacity 0.2s;
