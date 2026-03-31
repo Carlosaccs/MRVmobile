@@ -1,6 +1,6 @@
 /* ==========================================================================
-   DASHBOARD MRV - VERSÃO FINAL CONSOLIDADA v141.3.2 (REVISADA)
-   Foco: Diferenciação Visual COMPLEXO vs RESIDENCIAL e Acessibilidade
+   DASHBOARD MRV - VERSÃO FINAL CONSOLIDADA v141.3.3 (REVISADA)
+   Foco: Correção de ícones Fullscreen e Estabilidade
    ========================================================================== */
 
 /* --------------------------------------------------------------------------
@@ -21,7 +21,7 @@ const AJUSTES_MAPA = {
 const ALTURA_PADRAO = "28px";
 
 /* --------------------------------------------------------------------------
-   2. UTILITÁRIOS E FULLSCREEN
+   2. UTILITÁRIOS E FULLSCREEN (LIMPO)
    -------------------------------------------------------------------------- */
 function obterNomeZona(sigla) {
     const s = sigla ? sigla.trim().toUpperCase() : "";
@@ -35,14 +35,22 @@ function obterNomeZona(sigla) {
     }
 }
 
-function renderizarIconeFullscreen() {
-    const btn = document.getElementById('btn-fullscreen');
-    if (!btn) return;
+// REMOVIDO: A função que injetava SVGs via JS e travava o tamanho.
+// Agora o CSS controla os IDs #svg-expandir e #svg-recolher que já estão no HTML.
+function atualizarIconeFullscreen() {
+    const svgExpandir = document.getElementById('svg-expandir');
+    const svgRecolher = document.getElementById('svg-recolher');
+    if (!svgExpandir || !svgRecolher) return;
+
     const estaFull = document.fullscreenElement || document.webkitFullscreenElement;
     
-    btn.innerHTML = estaFull 
-        ? '<svg viewBox="0 0 24 24" width="32" height="32" fill="white"><path d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z"/></svg>'
-        : '<svg viewBox="0 0 24 24" width="32" height="32" fill="white"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>';
+    if (estaFull) {
+        svgExpandir.style.display = 'none';
+        svgRecolher.style.display = 'block';
+    } else {
+        svgExpandir.style.display = 'block';
+        svgRecolher.style.display = 'none';
+    }
 }
 
 function solicitarFullscreen() {
@@ -53,8 +61,8 @@ function solicitarFullscreen() {
     }
 }
 
-document.addEventListener('fullscreenchange', renderizarIconeFullscreen);
-document.addEventListener('webkitfullscreenchange', renderizarIconeFullscreen);
+document.addEventListener('fullscreenchange', atualizarIconeFullscreen);
+document.addEventListener('webkitfullscreenchange', atualizarIconeFullscreen);
 
 /* --------------------------------------------------------------------------
    3. PROCESSAMENTO DE DADOS (GOOGLE SHEETS)
@@ -301,7 +309,7 @@ function gerarMenuResidenciais() {
 function toggleMenu() { solicitarFullscreen(); const m = document.getElementById('menu-lateral'); if(m) { m.classList.toggle('menu-aberto'); m.classList.toggle('menu-oculto'); } }
 function copyToClipboard(t) { if(!t || t==="#") return alert("Link indisponível"); navigator.clipboard.writeText(t).then(()=>alert("Copiado!")); }
 
-window.onload = () => { carregarPlanilha(); renderizarIconeFullscreen(); };
+window.onload = () => { carregarPlanilha(); atualizarIconeFullscreen(); };
 
 document.addEventListener('click', (e) => {
     if (e.target.closest('#btn-menu')) toggleMenu();
