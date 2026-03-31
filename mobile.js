@@ -1,6 +1,6 @@
 /* ==========================================================================
-   DASHBOARD MRV - VERSÃO FINAL CONSOLIDADA v141.3.1 (REVISADA)
-   Foco: Estabilidade de Dados, Fullscreen e Bloqueio de Orientação
+   DASHBOARD MRV - VERSÃO FINAL CONSOLIDADA v141.3.2 (REVISADA)
+   Foco: Diferenciação Visual COMPLEXO vs RESIDENCIAL e Acessibilidade
    ========================================================================== */
 
 /* --------------------------------------------------------------------------
@@ -40,10 +40,9 @@ function renderizarIconeFullscreen() {
     if (!btn) return;
     const estaFull = document.fullscreenElement || document.webkitFullscreenElement;
     
-    // Aumentei de 20 para 26 para dar mais área de clique e visibilidade
     btn.innerHTML = estaFull 
-        ? '<svg viewBox="0 0 24 24" width="26" height="26" fill="white"><path d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z"/></svg>'
-        : '<svg viewBox="0 0 24 24" width="26" height="26" fill="white"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>';
+        ? '<svg viewBox="0 0 24 24" width="32" height="32" fill="white"><path d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z"/></svg>'
+        : '<svg viewBox="0 0 24 24" width="32" height="32" fill="white"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>';
 }
 
 function solicitarFullscreen() {
@@ -67,7 +66,6 @@ async function carregarPlanilha() {
         const linhas = csv.split(/\r?\n/).filter(l => l.trim() !== "");
         window.dadosGerais = []; 
         linhas.slice(1).forEach((linha) => {
-            // Regex corrigida (removida aspa extra)
             const c = linha.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
             if (c.length >= 32) { 
                 const limpar = (t) => t ? t.replace(/"/g, '').trim() : "";
@@ -146,7 +144,7 @@ function exibirDadosResidencial(info) {
         return cards;
     };
 
-    const linkM = `https://www.google.com/maps/search/?api=1&query=$${encodeURIComponent(info.endereco)}`;
+    const linkM = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(info.endereco)}`;
     let html = `<div style="font-size:0.82rem; color:#fff; margin-bottom:12px; font-weight:bold;">📍 ${info.endereco}</div>
         <div style="display:flex; gap:8px; margin-bottom:15px;">
             <button onclick="window.open('${linkM}','_blank')" style="width:70px; height:${ALTURA_PADRAO}; background:#4285F4; color:#fff; border:none; border-radius:4px; font-weight:800; cursor:pointer; font-size:0.7rem;">MAPS</button>
@@ -209,10 +207,18 @@ function clicarNoMapa(pathElement, infoSelecionado, pDataRaw = null) {
         todosDestaRegiao.forEach(item => {
             if (item.nomeCurto !== (ativo ? ativo.nomeCurto : "")) {
                 const btn = document.createElement('div');
-                btn.className = 'menu-item-mrv';
+                const ehComplexo = item.categoria === "COMPLEXO";
                 const corZ = (item.zona === "ZO") ? "#ff8c00" : (item.zona === "ZL") ? "#e31c19" : (item.zona === "ZN") ? "#0054a6" : (item.zona === "ZS") ? "#d1147e" : "#00713a";
-                btn.innerHTML = `<span>${item.nomeCurto.toUpperCase()}</span><span style="opacity:0.7; font-size:0.6rem;">${obterNomeZona(item.zona)}</span>`;
-                btn.style.cssText = `height:${ALTURA_PADRAO}; display:flex; align-items:center; justify-content:space-between; padding:0 10px; font-size:0.7rem; margin-bottom:4px; border-radius:4px; cursor:pointer; background:#fff; color:#333; border-right:4px solid ${corZ};`;
+                
+                btn.className = 'menu-item-mrv' + (ehComplexo ? ' estilo-complexo' : '');
+                btn.innerHTML = `<span>${item.nomeCurto.toUpperCase()}</span><span style="opacity:0.8; font-size:0.6rem;">${obterNomeZona(item.zona)}</span>`;
+                
+                const estiloBase = `height:${ALTURA_PADRAO}; display:flex; align-items:center; justify-content:space-between; padding:0 10px; font-size:0.7rem; margin-bottom:4px; border-radius:4px; cursor:pointer; border-right:4px solid ${corZ};`;
+                const cores = ehComplexo 
+                    ? `background:${corZ}; color:#fff; font-weight:800;` 
+                    : `background:#fff; color:#333;`;
+
+                btn.style.cssText = estiloBase + cores;
                 btn.onclick = (e) => { e.stopPropagation(); clicarNoMapa(pathElement, item, pDataRaw); };
                 containerBotoes.appendChild(btn);
             }
@@ -262,11 +268,32 @@ function gerarMenuResidenciais() {
     lista.innerHTML = "";
     [...window.dadosGerais].sort((a,b)=>a.ordem-b.ordem).forEach(info => {
         const li = document.createElement('li');
-        li.className = 'menu-item-mrv';
+        const ehComplexo = info.categoria === "COMPLEXO";
         const corZ = (info.zona === "ZO") ? "#ff8c00" : (info.zona === "ZL") ? "#e31c19" : (info.zona === "ZN") ? "#0054a6" : (info.zona === "ZS") ? "#d1147e" : "#00713a";
-        li.innerHTML = `<span>${info.nomeCurto.toUpperCase()}</span><span style="opacity:0.7; font-size:0.6rem;">${obterNomeZona(info.zona)}</span>`;
-        li.style.cssText = `height:${ALTURA_PADRAO}; display:flex; align-items:center; justify-content:space-between; padding-left:25px; width:calc(100% + 10px); font-size:0.75rem; margin-bottom:4px; border-radius:4px; cursor:pointer; margin-left:-10px; background:#fff; color:#333; border-right:5px solid ${corZ};`;
-        li.onclick = (e) => { e.stopPropagation(); solicitarFullscreen(); let p = document.getElementById(info.id); if (!p) { trocarMapas(); setTimeout(() => { let np = document.getElementById(info.id); if(np) clicarNoMapa(np, info); }, 400); } else clicarNoMapa(p, info); };
+        
+        li.className = 'menu-item-mrv' + (ehComplexo ? ' estilo-complexo' : '');
+        li.innerHTML = `<span>${info.nomeCurto.toUpperCase()}</span><span style="opacity:0.8; font-size:0.6rem;">${obterNomeZona(info.zona)}</span>`;
+        
+        const estiloBase = `height:${ALTURA_PADRAO}; display:flex; align-items:center; justify-content:space-between; padding-left:25px; width:calc(100% + 10px); font-size:0.75rem; margin-bottom:4px; border-radius:4px; cursor:pointer; margin-left:-10px; border-right:5px solid ${corZ};`;
+        const cores = ehComplexo 
+            ? `background:${corZ}; color:#fff; font-weight:800;` 
+            : `background:#fff; color:#333;`;
+            
+        li.style.cssText = estiloBase + cores;
+        
+        li.onclick = (e) => { 
+            e.stopPropagation(); 
+            solicitarFullscreen(); 
+            let p = document.getElementById(info.id); 
+            if (!p) { 
+                trocarMapas(); 
+                setTimeout(() => { 
+                    let np = document.getElementById(info.id); 
+                    if(np) clicarNoMapa(np, info); 
+                }, 400); 
+            } else clicarNoMapa(p, info); 
+            toggleMenu(); 
+        };
         lista.appendChild(li);
     });
 }
@@ -296,7 +323,3 @@ function fecharAvisoEAmpliar() {
     const aviso = document.getElementById('aviso-orientacao');
     if (aviso) aviso.style.display = 'none';
 }
-
-window.addEventListener("orientationchange", () => {
-    console.log("Mudança de orientação: " + (screen.orientation ? screen.orientation.angle : "N/A"));
-});
